@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from databroker.databroker import DataBroker as db
 
 class xpdAn:
@@ -9,21 +9,28 @@ class xpdAn:
     _default_dict = {'group':'XPD'}
 
     def __init__(self, saf_num, is_prun=True, is_setup=False):
-        print("====Analysis calss has been instantiated====")
-        self.saf_num = self.update_saf(saf_num)
+        print("====  Analysis calss has been instantiated  ====")
+        self._saf_num = saf_num
         self._current_search = None
         self._current_table = None
+        self.all_headers = self._all_headers()
         #FIXME - add hook to is_prun, is_setup filter
 
-    def update_saf(self, saf_num):
-        """ update saf and pull out all headers belong to this saf """
-        self.saf_num = saf_num
-        self.all_headers = self._all_headers()
+    @property
+    def saf_num(self):
+        return self._saf_num
 
+    def update_saf(self, saf_num):
+        """ update saf and pull out all headers belong to this saf 
+            
+        similar to property setter but want user to specifically use this method
+        """
+        self._saf_num = saf_num
+        self.all_headers = self._all_headers()
 
     def _all_headers(self):
         """ methods that pull out all headers """
-        self._default_dict.update(dict(bt_safN=self.saf_num))
+        self._default_dict.update(dict(bt_safN=self._saf_num))
         headers = db(**self._default_dict)
         self._default_dict.popitem()
         if len(headers) == 0:
@@ -39,40 +46,42 @@ class xpdAn:
 
     @property
     def current_search(self):
+        """ property that holds a list of header(s) from most recent search """
         return self._current_search
 
-    @current_search.setter
-    def current_search(self, header):
+    def _set_current_search(self, header):
         print("INFO: `current_search` attribute has been updated")
         self._current_search = header
 
     @property
     def current_table(self):
+        """ property that holds a pd.DataFrames from most recent search """
         return self._current_table
 
-    @current_table.setter
-    def current_table(self, table):
+    def _set_current_table(self, table):
         print("INFO: `current_table` attribute has been updated")
         self._current_table = table
 
-    def list(self, *, group_index=None, **kwargs):
+    def list(self, **kwargs):
         """ method that lists/filter headers """
         _default_key = 'sa_name' # default grouping
         if not kwargs:
             group_list = self._filter(_default_key)
-            self._current_search = group_list
+            self._set_current_search(group_list)
+            print("INFO: to subsample this list, please gives the key value"
+                  " and do `an.list(key=value)` again")
         else:
             if len(kwargs) != 1:
                 print("WARNING: we only allows one search key now")
+                return
             elif len(kwargs) == 1:
                 key = list(kwargs.keys()).pop()
                 val = list(kwargs.values()).pop()
                 group_list = self._filter(key, val)
-                self._current_search = group_list
+                self._set_current_search(group_list)
             else:
                 print('WARNING: oppps')
         #FIXME add group_index method
-
 
     def _filter(self, key, value=None):
         """ assume a flat md_dict so everything is in 'start' """
@@ -90,12 +99,10 @@ class xpdAn:
             for el in unique_list:
                 h_list = [h for h in self.all_headers if h.start[key] == el]
                 group_list.append(h_list)
-            print("Required field: {} resulting in following grouping:"
+            print("INFO: Required field: `{}` resulting in following grouping:"
                   .format(key))
             self._table_gen([unique_list,list(map(len, group_list))],
                             col_name=[key, '# of headers'])
-            print("INFO: to subsample this list, please gives the key value"
-                  " and do `an.list(key=value)` again")
         else:
             # give specific header list
             group_list = [h for h in self.all_headers if h.start.get(key) == value]
@@ -105,20 +112,23 @@ class xpdAn:
                             col_name=[key, '# of headers'])
         return group_list
 
-    def _header_and_len(self, header):
-        """ samll function to return [header, len(header)] """
-        return [header,list(map(len, header))]
-
-    def _table_gen(self, data, row_name=None, col_name=None):
+    def _table_gen(self, data, ind_name=None, col_name=None):
         """ thin layer of pd.dataFrame to include print """
-        # normalize dim
+        # complete_shape
+        data = _complete_shape(data)
         data_dim = np.shape(data)
         col_dim = np.shape(col_name)
-        row_dim = np.shape(row_name)
-        if data_dim[0] == col_dim[0]:
-            print('Transpose called')
+        # check if need transpose
+        if data_dim[0] == col_dim[0] and data_dim != col_dim:
             data = np.transpose(data)
-        pd_table = pd.DataFrame(data, row_name, col_name)
+        pd_table = pd.DataFrame(data, ind_name, col_name)
         print(pd_table)
-        self._current_table = pd_table
+        self._set_current_table(pd_table)
         return pd_table
+
+def _complete_shape(array):
+    if len(np.shape(array)) == 1:
+        output_array = np.expand_dims(array, 0)
+    else:
+        output_array = array
+    return output_array

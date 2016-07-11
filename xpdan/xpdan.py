@@ -92,19 +92,17 @@ class xpdAn:
                 group_list.append(h_list)
             print("Required field: {} resulting in following grouping:"
                   .format(key))
-            self._table_gen([group_list,list(map(len, group_list))],
-                            row_name=unique_list,
-                            col_name=['header', '# of headers'])
+            self._table_gen([unique_list,list(map(len, group_list))],
+                            col_name=[key, '# of headers'])
             print("INFO: to subsample this list, please gives the key value"
                   " and do `an.list(key=value)` again")
         else:
             # give specific header list
             group_list = [h for h in self.all_headers if h.start.get(key) == value]
-            print("INFO: search with '{} = {}' has pulled out {}"
-                  "headers".format(key, value, len(group_list)))
-            self._table_gen([group_list,list(map(len, group_list))],
-                            row_name=value,
-                            col_name=['header', '# of headers'])
+            print("INFO: search with '{} = {}' has pulled out {} headers"
+                  .format(key, value, len(group_list)))
+            self._table_gen([value, len(group_list)],
+                            col_name=[key, '# of headers'])
         return group_list
 
     def _header_and_len(self, header):
@@ -117,7 +115,8 @@ class xpdAn:
         data_dim = np.shape(data)
         col_dim = np.shape(col_name)
         row_dim = np.shape(row_name)
-        if data_dim[0] == col_dim[0] and data_dim[1] == row_dim[0]:
+        if data_dim[0] == col_dim[0]:
+            print('Transpose called')
             data = np.transpose(data)
         pd_table = pd.DataFrame(data, row_name, col_name)
         print(pd_table)

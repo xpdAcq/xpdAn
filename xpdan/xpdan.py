@@ -41,15 +41,19 @@ class xpdAn:
         return self._current_search
 
 
-    def _set_current_search(self, headers):
+    def _set_current_search(self, headers, *, index=None):
         print("INFO: attribute of `current search` has been updated.")
-        self._current_search = headers
+        if index is None:
+            self._current_search = headers
+        else:
+            self._current_search = self._current_search[index]
 
 
-    def list(self, *, group_index=None, **kwargs):
+    def list(self, **kwargs):
         """ method that lists/filter headers """
         _default_key = 'sa_name' # default grouping
         if not kwargs:
+            # default setting
             group_list = self._filter(_default_key)
             self._set_current_search(group_list)
         else:
@@ -62,7 +66,14 @@ class xpdAn:
                 self._set_current_search(group_list)
             else:
                 print('WARNING: oppps')
-        #FIXME add group_index method
+
+
+    def get_index(self, group_ind=None):
+        """ method to slicing current_search """
+        if index is None:
+            print("INFO: dude, you don't give me index. Nothing happen")
+        self._set_current_search(index=group_ind)
+
 
 
     def _filter(self, key, value=None):

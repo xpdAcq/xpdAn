@@ -46,7 +46,8 @@ class XpdAn:
     _default_dict = {'group':'XPD'}
 
     def __init__(self, *, saf_num=None, **kwargs):
-        self.md_fields = ['sa_name', 'timestamp']
+        self.header_md_fields = ['sa_name', 'timestamp']
+        self.event_md_fiedls = None
         self._search_dict = None
         self._current_table = None
         self._current_search = None
@@ -68,6 +69,7 @@ class XpdAn:
 
     @property
     def md_fields(self):
+        """ fileds of metadata that will be summarized """
         return self._md_fields
 
 
@@ -107,15 +109,27 @@ class XpdAn:
             search_dict = self._search_dict
         search_dict.update(kwargs)
         self._set_current_search(db(**search_dict))
+        self._tabel_gen(self._current_search,
+                        col_name=self.header_md_fields)
 
+    def _table_gen(self, header, ind_name=None, col_name=None):
+        """ self-maintained thin layer of pd.dataFrame, and print
 
-    def _table_gen(self, data, ind_name=None, col_name=None):
-        """ thin layer of pd.dataFrame, including print
-
-        maybe better to use get_table
+        mature function in databroker.core.get_table
         """
+        col_len = len(col_name)
+
+        # prepare md array
+        header_md = []
+        for h in headers:
+            _md_info = []
+            for field in header_md_fields:
+                _md_info.append(h['start'][field])
+            header_md.append(_md_info)
+        md_array = np.asarray(header_md)
+        md_array.resize((len(header_md)/col_len, col_len))
         # complete_shape
-        data = _complete_shape(data)
+        pd_data = _complete_shape(md_array)
         data_dim = np.shape(data)
         col_dim = np.shape(col_name)
         # check if need transpose
@@ -124,16 +138,5 @@ class XpdAn:
         pd_table = pd.DataFrame(data, ind_name, col_name)
         print(pd_table)
         self._set_current_table(pd_table)
-        return pd_table
-
-
-    def integrate(self):
-        print('use SrX to integrate all images in side this header')
-        pass
-
-
-    def plot(self):
-        print('plot all images from headers under current_search')
-        pass
 
 

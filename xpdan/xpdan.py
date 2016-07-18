@@ -1,54 +1,86 @@
+import os
+import yaml
 import numpy as np
 import pandas as pd
-from databroker.databroker import DataBroker as db
 
-class xpdAn:
-    """ class that pull out headers belongs to given beamtime
+#from databroker.databroker import get_table
+#from databroker.databroker import DataBroker as db
+
+from xpdacq.new_xpdacq.glbl import glbl
+
+########### helper function #########
+
+def _get_current_saf():
+    bt_list= [f for f in os.listdir(glbl.yaml_dir) if f.startswith('bt_')]
+    if len(bt_list) != 1:
+        raise RuntimeError("There are more than one beamtime objects in"
+                           "{}. Please either gives specific saf or"
+                           .format(glbl.yaml_dir))
+    with open(os.path.join(glbl.yaml_dir, bt_list[0]), 'r') as f:
+        bt = yaml.load(f)
+        saf = bt['bt_safN']
+        return saf
+
+
+def _complete_shape(array):
+    if len(np.shape(array)) == 1:
+        output_array = np.expand_dims(array, 0)
+    else:
+        output_array = array
+    return output_array
+
+
+def _update_default_dict(default_dict, **kwargs):
+    output_dict = dict(default_dict)
+    output_dict.update(kwargs)
+    return output_dict
+
+
+######################################
+
+class XpdAn:
+    """ calss that holds databroker headers/events and summarize the
+    metadata
     """
 
     _default_dict = {'group':'XPD'}
 
-    def __init__(self, saf_num, is_prun=True, is_setup=False):
-        print("====  Analysis calss has been instantiated  ====")
-        self._saf_num = saf_num
-        self._current_search = None
+    def __init__(self, *, saf_num=None, **kwargs):
+        self.md_fields = ['sa_name', 'timestamp']
+        self._search_dict = None
         self._current_table = None
-        self.all_headers = self._all_headers()
-        #FIXME - add hook to is_prun, is_setup filter
+        self._current_search = None
+        if saf_num is None:
+            # current saf
+            saf_num = _get_current_saf()
+            self._search_dict = _update_default_dict(self._default_dict,
+                                                     bt_safN=saf_num)
+
+    def __getitem__(self, ind):
+        return self._current_search[ind]
+
 
     @property
-    def saf_num(self):
-        return self._saf_num
+    def search_dict(self):
+        """ propery that returns current search key-value pair """
+        return self._search_dict
 
-    def update_saf(self, saf_num):
-        """ update saf and pull out all headers belong to this saf 
-        similar to property setter but want user to be specific
-        """
 
-        self._saf_num = saf_num
-        self.all_headers = self._all_headers()
+    @property
+    def md_fields(self):
+        return self._md_fields
 
-    def _all_headers(self):
-        """ methods that pull out all headers """
-        self._default_dict.update(dict(bt_safN=self._saf_num))
-        headers = db(**self._default_dict)
-        self._default_dict.popitem()
-        if len(headers) == 0:
-            print("WARNING: there's no headers under this SAF"
-                  "number={}, please make sure you have a valid SAF"
-                  "number".format(self.saf_num))
-            print("INFO: to update saf_number, please do"
-                  "'an.update_saf(<saf_num>)' to update SAF"
-                  "number associated with this analysis class" )
-        print("INFO: there are {} headers associated with this"
-              "SAF".format(len(headers)))
-        return headers
+
+    @md_fields.setter
+    def md_fields(self, new_fields):
+        self._md_fields = new_fields
 
 
     @property
     def current_search(self):
-        """ property that holds a list of header(s) from most recent search """
+        """ property holds a list of header(s) from most recent search """
         return self._current_search
+
 
     def _set_current_search(self, headers, *, index=None):
         print("INFO: attribute of `current search` has been updated.")
@@ -56,6 +88,7 @@ class xpdAn:
             self._current_search = headers
         else:
             self._current_search = self._current_search[index]
+
 
     @property
     def current_table(self):
@@ -68,67 +101,19 @@ class xpdAn:
         self._current_table = table
 
 
-    def list(self, **kwargs):
-        """ method that lists/filter headers """
-        _default_key = 'sa_name' # default grouping
-        if not kwargs:
-            # default setting
-            group_list = self._filter(_default_key)
-            self._set_current_search(group_list)
-            print("INFO: to subsample this list, please gives the key value"
-                  " and do `an.list(key=value)` again")
-        else:
-            if len(kwargs) != 1:
-                print("WARNING: we only allows one search key now")
-                return
-            elif len(kwargs) == 1:
-                key = list(kwargs.keys()).pop()
-                val = list(kwargs.values()).pop()
-                group_list = self._filter(key, val)
-                self._set_current_search(group_list)
-            else:
-                print('WARNING: oppps')
+    def list(self, *, search_dict=None, **kwargs):
+        """ method that lists headers """
+        if search_dict is None:
+            search_dict = self._search_dict
+        search_dict.update(kwargs)
+        self._set_current_search(db(**search_dict))
 
-
-    def get_index(self, group_ind=None):
-        """ method to slicing current_search """
-        if index is None:
-            print("INFO: dude, you don't give me index. Nothing happen")
-        self._set_current_search(index=group_ind)
-
-
-
-    def _filter(self, key, value=None):
-        """ assume a flat md_dict so everything is in 'start' """
-        if value is None:
-            # give a summary
-            #full_list = [h.start[key] for h in self.headers]
-            full_list = []
-            for h in self.all_headers:
-                if key in h.start:
-                    full_list.append(h.start[key])
-                else:
-                    full_list.append('missing sample name')
-                unique_list = list(set(full_list))
-            group_list = []
-            for el in unique_list:
-                h_list = [h for h in self.all_headers if h.start[key] == el]
-                group_list.append(h_list)
-            print("INFO: Required field: `{}` resulting in following grouping:"
-                  .format(key))
-            self._table_gen([unique_list,list(map(len, group_list))],
-                            col_name=[key, '# of headers'])
-        else:
-            # give specific key-val pair
-            group_list = [h for h in self.all_headers if h.start.get(key) == value]
-            print("INFO: search with '{} = {}' has pulled out {} headers"
-                  .format(key, value, len(group_list)))
-            self._table_gen([value, len(group_list)],
-                            col_name=[key, '# of headers'])
-        return group_list
 
     def _table_gen(self, data, ind_name=None, col_name=None):
-        """ thin layer of pd.dataFrame to include print """
+        """ thin layer of pd.dataFrame, including print
+
+        maybe better to use get_table
+        """
         # complete_shape
         data = _complete_shape(data)
         data_dim = np.shape(data)
@@ -151,9 +136,4 @@ class xpdAn:
         print('plot all images from headers under current_search')
         pass
 
-def _complete_shape(array):
-    if len(np.shape(array)) == 1:
-        output_array = np.expand_dims(array, 0)
-    else:
-        output_array = array
-    return output_array
+

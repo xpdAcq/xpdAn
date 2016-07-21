@@ -50,6 +50,11 @@ class XpdanSerch(QtGui.QWidget):
         self.f4_cbox.addItem("or")
         self.field_option_list.append((self.f4_Edit, self.f4_cbox))
 
+        self.output = QtGui.QLabel('Search Query')
+        self.output_box = QtGui.QTextEdit()
+        self.output_box.setReadOnly(True)
+        self.output_box.moveCursor(QtGui.QTextCursor.End)
+        self.output_box.setLineWrapMode(self.output_box.NoWrap)
         # this is default supported
         #self.datakey = QtGui.QLabel('data key')
         #self.datakey_Edit = QtGui.QLineEdit()
@@ -82,6 +87,13 @@ class XpdanSerch(QtGui.QWidget):
         #grid.addWidget(self.datakey_Edit, 5, 1)
         #grid.addWidget(self.datakey_cbox, 5, 2)
 
+
+        out_grid = QtGui.QGridLayout()
+        out_grid.setSpacing(5)
+
+        out_grid.addWidget(self.output, 1, 0)
+        out_grid.addWidget(self.output_box, 2, 0)
+
         # layout
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch(1)
@@ -91,12 +103,12 @@ class XpdanSerch(QtGui.QWidget):
         vbox.addStretch(1)
         vbox.addLayout(grid)
         vbox.addLayout(hbox)
-
+        vbox.addLayout(out_grid)
 
         self.setLayout(vbox)
 
         self.setWindowTitle("xpdAn search")
-        self.setGeometry(2048, 0, 400, 300)
+        self.setGeometry(2048, 0, 400, 600)
 
         self.show()
 
@@ -136,11 +148,19 @@ class XpdanSerch(QtGui.QWidget):
             #    search_dict.update({in_def :{'$exist':True}})
         if or_list:
             search_dict.update({'$or':or_list})
-        if len(search_dict) < 2:
-            print('search dict = {}'.format(search_dict))
-            print('Warning: at least need two fields')
-            return
         print('search dict = {}'.format(search_dict))
+        if len(search_dict) < 2:
+            print('Warning: at least need two fields')
+            self.output_box.insertPlainText("Warning: at least need two"
+                                            " keys\n")
+            return
+        self.output_box.insertPlainText('{}\n'.format(search_dict))
+        sb = self.output_box.verticalScrollBar()
+        sb.setValue(sb.maximum())
+        cb = QtGui.QApplication.clipboard()
+        cb.clear(mode=cb.Clipboard )
+        cb.setText('{}'.format(search_dict), mode=cb.Clipboard)
+
 
 def main():
     app = QtGui.QApplication(sys.argv)

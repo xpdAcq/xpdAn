@@ -19,13 +19,13 @@ class XpdanSerch(QtGui.QWidget):
         generate_btn.resize(generate_btn.sizeHint())
 
         # set up fileds
+
         self.f1 = QtGui.QLabel('PI last name')
         self.f1_Edit = QtGui.QLineEdit()
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
         self.field_option_list.append((self.f1_Edit, self.f1_cbox))
-
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
         self.f2 = QtGui.QLabel('sample name')
@@ -49,6 +49,14 @@ class XpdanSerch(QtGui.QWidget):
         self.f4_cbox.addItem("or")
         self.field_option_list.append((self.f4_Edit, self.f4_cbox))
 
+        # this is default supported
+        self.datakey = QtGui.QLabel('data key')
+        self.datakey_Edit = QtGui.QLineEdit()
+        self.datakey_cbox = QtGui.QComboBox(self)
+        self.datakey_cbox.addItem("and")
+        self.datakey_cbox.addItem("or")
+        self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
+
         grid = QtGui.QGridLayout()
         grid.setSpacing(5)
 
@@ -67,6 +75,10 @@ class XpdanSerch(QtGui.QWidget):
         grid.addWidget(self.f4, 4, 0)
         grid.addWidget(self.f4_Edit, 4, 1)
         grid.addWidget(self.f4_cbox, 4, 2)
+
+        grid.addWidget(self.datakey, 5, 0)
+        grid.addWidget(self.datakey_Edit, 5, 1)
+        grid.addWidget(self.datakey_cbox, 5, 2)
 
         # layout
         hbox = QtGui.QHBoxLayout()

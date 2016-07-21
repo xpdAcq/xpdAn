@@ -10,8 +10,8 @@ class XpdanSerch(QtGui.QWidget):
 
     def initUI(self):
         # option_list
-        self.field_list = ['bt_piLast', 'sa_name', 'bt_experimenters',
-                           'plan_type','data_key']
+        self.field_list = ['bt_piLast', 'sa_name','bt_experimenters',
+                           'plan_name']
         self.field_option_list = []
 
         #generate btn
@@ -26,7 +26,6 @@ class XpdanSerch(QtGui.QWidget):
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
-        self.f1_cbox.addItem("in")
         self.field_option_list.append((self.f1_Edit, self.f1_cbox))
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
@@ -35,7 +34,6 @@ class XpdanSerch(QtGui.QWidget):
         self.f2_cbox = QtGui.QComboBox(self)
         self.f2_cbox.addItem("and")
         self.f2_cbox.addItem("or")
-        self.f2_cbox.addItem("in")
         self.field_option_list.append((self.f2_Edit, self.f2_cbox))
 
         self.f3 = QtGui.QLabel('experimenter name')
@@ -43,7 +41,6 @@ class XpdanSerch(QtGui.QWidget):
         self.f3_cbox = QtGui.QComboBox(self)
         self.f3_cbox.addItem("and")
         self.f3_cbox.addItem("or")
-        self.f3_cbox.addItem("in")
         self.field_option_list.append((self.f3_Edit, self.f3_cbox))
 
         self.f4 = QtGui.QLabel('scan type')
@@ -51,17 +48,16 @@ class XpdanSerch(QtGui.QWidget):
         self.f4_cbox = QtGui.QComboBox(self)
         self.f4_cbox.addItem("and")
         self.f4_cbox.addItem("or")
-        self.f4_cbox.addItem("in")
         self.field_option_list.append((self.f4_Edit, self.f4_cbox))
 
         # this is default supported
-        self.datakey = QtGui.QLabel('data key')
-        self.datakey_Edit = QtGui.QLineEdit()
-        self.datakey_cbox = QtGui.QComboBox(self)
-        self.datakey_cbox.addItem("and")
-        self.datakey_cbox.addItem("or")
-        self.datakey_cbox.addItem("in")
-        self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
+        #self.datakey = QtGui.QLabel('data key')
+        #self.datakey_Edit = QtGui.QLineEdit()
+        #self.datakey_cbox = QtGui.QComboBox(self)
+        #self.datakey_cbox.addItem("and")
+        #self.datakey_cbox.addItem("or")
+        #self.datakey_cbox.addItem("in")
+        #self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
 
         grid = QtGui.QGridLayout()
         grid.setSpacing(5)
@@ -82,9 +78,9 @@ class XpdanSerch(QtGui.QWidget):
         grid.addWidget(self.f4_Edit, 4, 1)
         grid.addWidget(self.f4_cbox, 4, 2)
 
-        grid.addWidget(self.datakey, 5, 0)
-        grid.addWidget(self.datakey_Edit, 5, 1)
-        grid.addWidget(self.datakey_cbox, 5, 2)
+        #grid.addWidget(self.datakey, 5, 0)
+        #grid.addWidget(self.datakey_Edit, 5, 1)
+        #grid.addWidget(self.datakey_cbox, 5, 2)
 
         # layout
         hbox = QtGui.QHBoxLayout()
@@ -117,14 +113,27 @@ class XpdanSerch(QtGui.QWidget):
             option = self.field_option_list[i][1].currentText()
             if val != ['']:
                 if len(val) ==1:
-                    search_dict.update({key:val[0].strip()})
-                else: # more than one -> or
+                    _val = val[0].strip()
+                    if option == 'or':
+                        or_list.append({key:_val})
+                    #elif option == 'in':
+                    #    in_def = '{}.{}'.format(key, _val)
+                    #    search_dict.update({in_def :{'$exists':True}})
+                    else: # and-logic
+                        search_dict.update({key:val[0].strip()})
+                else:
                     for el in val:
-                        or_list.append({key:el.strip()})
-            if option == 'or':
-                or_list.append({key:val})
-            if val == 'in':
-                raise NotImplementedError
+                        _val = el.strip()
+                        #if option == 'in':
+                        #    in_def = '{}.{}'.format(key, _val)
+                        #    search_dict.update({in_def :{'$exist':True}})
+                        #else: # or-logic here. and-logic is excluded
+                        or_list.append({key:_val})
+            #if option == 'or':
+            #    or_list.append({key:val})
+            #if option == 'in':
+            #    in_def = '{0}.{1}'.format(key, val)
+            #    search_dict.update({in_def :{'$exist':True}})
         if or_list:
             search_dict.update({'$or':or_list})
         if len(search_dict) < 2:

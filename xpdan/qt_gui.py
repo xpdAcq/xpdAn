@@ -108,7 +108,7 @@ class XpdanSerch(QtGui.QWidget):
     def generate(self):
         """ generate search query """
         print('Generate search query')
-        search_dict = {}
+        search_dict = {'group':'XPD'}
         or_list = [] # query purpose
         in_list = [] # ref
         for i in range(len(self.field_list)):

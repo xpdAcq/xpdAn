@@ -10,7 +10,8 @@ class XpdanSerch(QtGui.QWidget):
 
     def initUI(self):
         # option_list
-        self.field_list = ['bt_piLast', 'sa_name', 'ex_name', 'sp_type']
+        self.field_list = ['bt_piLast', 'bt_experimenters','sa_name',
+                           'ex_name','sp_type','data_key']
         self.field_option_list = []
 
         #generate btn
@@ -25,6 +26,7 @@ class XpdanSerch(QtGui.QWidget):
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
+        self.f1_cbox.addItem("in")
         self.field_option_list.append((self.f1_Edit, self.f1_cbox))
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
@@ -33,13 +35,15 @@ class XpdanSerch(QtGui.QWidget):
         self.f2_cbox = QtGui.QComboBox(self)
         self.f2_cbox.addItem("and")
         self.f2_cbox.addItem("or")
+        self.f2_cbox.addItem("in")
         self.field_option_list.append((self.f2_Edit, self.f2_cbox))
 
-        self.f3 = QtGui.QLabel('experiment name')
+        self.f3 = QtGui.QLabel('experimenter name')
         self.f3_Edit = QtGui.QLineEdit()
         self.f3_cbox = QtGui.QComboBox(self)
         self.f3_cbox.addItem("and")
         self.f3_cbox.addItem("or")
+        self.f3_cbox.addItem("in")
         self.field_option_list.append((self.f3_Edit, self.f3_cbox))
 
         self.f4 = QtGui.QLabel('scan type')
@@ -47,6 +51,7 @@ class XpdanSerch(QtGui.QWidget):
         self.f4_cbox = QtGui.QComboBox(self)
         self.f4_cbox.addItem("and")
         self.f4_cbox.addItem("or")
+        self.f4_cbox.addItem("in")
         self.field_option_list.append((self.f4_Edit, self.f4_cbox))
 
         # this is default supported
@@ -55,6 +60,7 @@ class XpdanSerch(QtGui.QWidget):
         self.datakey_cbox = QtGui.QComboBox(self)
         self.datakey_cbox.addItem("and")
         self.datakey_cbox.addItem("or")
+        self.datakey_cbox.addItem("in")
         self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
 
         grid = QtGui.QGridLayout()
@@ -103,12 +109,23 @@ class XpdanSerch(QtGui.QWidget):
         """ generate search query """
         print('Generate search query')
         search_dict = {}
+        or_list = [] # query purpose
+        in_list = [] # ref
         for i in range(len(self.field_list)):
             key = self.field_list[i]
             val = self.field_option_list[i][0].text()
             option = self.field_option_list[i][1].currentText()
             if val is not '':
                 search_dict.update({key:val})
+            if val == 'or':
+                or_list.append({key:val})
+            if val == 'in':
+                pass # not implemented error
+        if len(search_dict) < 2:
+            print('Warning: at least need two fields')
+            return
+        if or_list:
+            search_dict.append({'$or':or_list})
         print('search dict = {}'.format(search_dict))
 
 def main():

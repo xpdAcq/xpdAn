@@ -1,11 +1,14 @@
 import sys
 from PyQt4 import QtGui, QtCore
 
+from .xpdan import XpdAn
+an = XpdAn(saf_num=123) # dummy init
+
 class XpdanSerch(QtGui.QWidget):
 
     def __init__(self):
         super().__init__()
-
+        self._an = an # handing object
         self.initUI()
 
     def initUI(self):
@@ -115,7 +118,7 @@ class XpdanSerch(QtGui.QWidget):
 
     def generate(self):
         """ generate search query """
-        print('Generate search query')
+        #print('Generate search query')
         search_dict = {'group':'XPD'}
         or_list = [] # query purpose
         in_list = [] # ref
@@ -148,9 +151,9 @@ class XpdanSerch(QtGui.QWidget):
             #    search_dict.update({in_def :{'$exist':True}})
         if or_list:
             search_dict.update({'$or':or_list})
-        print('search dict = {}'.format(search_dict))
+        #print('search dict = {}'.format(search_dict))
         if len(search_dict) < 2:
-            print('Warning: at least need two fields')
+            #print('Warning: at least need two fields')
             self.output_box.insertPlainText("Warning: at least need two"
                                             " keys\n")
             return
@@ -161,7 +164,8 @@ class XpdanSerch(QtGui.QWidget):
         cb.clear(mode=cb.Clipboard )
         cb.setText('{}'.format(search_dict), mode=cb.Clipboard)
 
-
+        self._an.search_dict = search_dict
+"""
 def main():
     app = QtGui.QApplication(sys.argv)
     gui = XpdanSerch()
@@ -170,3 +174,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""

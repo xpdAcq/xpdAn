@@ -10,8 +10,8 @@ class XpdanSerch(QtGui.QWidget):
 
     def initUI(self):
         # option_list
-        self.field_list = ['bt_piLast', 'bt_experimenters','sa_name',
-                           'ex_name','sp_type','data_key']
+        self.field_list = ['bt_piLast', 'sa_name', 'bt_experimenters',
+                           'plan_type','data_key']
         self.field_option_list = []
 
         #generate btn
@@ -113,19 +113,24 @@ class XpdanSerch(QtGui.QWidget):
         in_list = [] # ref
         for i in range(len(self.field_list)):
             key = self.field_list[i]
-            val = self.field_option_list[i][0].text()
+            val = self.field_option_list[i][0].text().split(',')
             option = self.field_option_list[i][1].currentText()
-            if val is not '':
-                search_dict.update({key:val})
-            if val == 'or':
+            if val != ['']:
+                if len(val) ==1:
+                    search_dict.update({key:val[0].strip()})
+                else: # more than one -> or
+                    for el in val:
+                        or_list.append({key:el.strip()})
+            if option == 'or':
                 or_list.append({key:val})
             if val == 'in':
-                pass # not implemented error
+                raise NotImplementedError
+        if or_list:
+            search_dict.update({'$or':or_list})
         if len(search_dict) < 2:
+            print('search dict = {}'.format(search_dict))
             print('Warning: at least need two fields')
             return
-        if or_list:
-            search_dict.append({'$or':or_list})
         print('search dict = {}'.format(search_dict))
 
 def main():

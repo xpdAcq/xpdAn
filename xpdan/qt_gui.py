@@ -165,6 +165,7 @@ class XpdanSerch(QtGui.QWidget):
         cb.setText('{}'.format(search_dict), mode=cb.Clipboard)
 
         self._an.search_dict = search_dict
+        self._an.list()
 """
 def main():
     app = QtGui.QApplication(sys.argv)

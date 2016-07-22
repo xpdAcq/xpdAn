@@ -6,10 +6,15 @@ from itertools import chain
 import numpy as np
 import pandas as pd
 
-#from databroker.databroker import get_table
-#from databroker.databroker import DataBroker as db
-
 from .glbl import glbl
+
+if glbl._is_simulation:
+    pass
+else:
+    from databroker.databroker import get_table
+    from databroker.databroker import DataBroker as db
+
+
 
 ########### helper function #########
 

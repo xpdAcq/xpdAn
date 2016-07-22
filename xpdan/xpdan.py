@@ -9,7 +9,7 @@ import pandas as pd
 #from databroker.databroker import get_table
 #from databroker.databroker import DataBroker as db
 
-from xpdacq.new_xpdacq.glbl import glbl
+from .glbl import glbl
 
 ########### helper function #########
 

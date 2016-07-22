@@ -67,6 +67,11 @@ class XpdanSerch(QtGui.QWidget):
         #self.datakey_cbox.addItem("in")
         #self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
 
+        cal = QtGui.QCalendarWidget()
+        cal.setGridVisible(True)
+        cal.clicked[QtCore.QDate].connect(self.showDate)
+
+
         grid = QtGui.QGridLayout()
         grid.setSpacing(5)
 
@@ -104,6 +109,7 @@ class XpdanSerch(QtGui.QWidget):
 
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
+        vbox.addWidget(cal)
         vbox.addLayout(grid)
         vbox.addLayout(hbox)
         vbox.addLayout(out_grid)
@@ -114,6 +120,9 @@ class XpdanSerch(QtGui.QWidget):
         self.setGeometry(2048, 0, 400, 600)
 
         self.show()
+
+    def showDate(self, date):
+        print(date.toString())
 
 
     def generate(self):
@@ -154,16 +163,19 @@ class XpdanSerch(QtGui.QWidget):
         #print('search dict = {}'.format(search_dict))
         if len(search_dict) < 2:
             #print('Warning: at least need two fields')
-            self.output_box.insertPlainText("Warning: at least need two"
-                                            " keys\n")
+            self.output_box.insertPlainText("Warning: at least need one"
+                                            " key\n")
             return
         self.output_box.insertPlainText('{}\n'.format(search_dict))
         sb = self.output_box.verticalScrollBar()
         sb.setValue(sb.maximum())
-        cb = QtGui.QApplication.clipboard()
-        cb.clear(mode=cb.Clipboard )
-        cb.setText('{}'.format(search_dict), mode=cb.Clipboard)
 
+        # auto load to clippboard
+        #cb = QtGui.QApplication.clipboard()
+        #cb.clear(mode=cb.Clipboard )
+        #cb.setText('{}'.format(search_dict), mode=cb.Clipboard)
+
+        # operate on XpdAn
         self._an.search_dict = search_dict
         self._an.list()
 """

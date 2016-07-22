@@ -1,15 +1,16 @@
 import os
-import yaml
 import datetime
 from itertools import chain
+from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
 
 from .glbl import glbl
 
+
 if glbl._is_simulation:
-    pass
+    db = MagicMock()
 else:
     from databroker.databroker import get_table
     from databroker.databroker import DataBroker as db

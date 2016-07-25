@@ -75,39 +75,67 @@ class XpdanSearch(QtGui.QWidget):
         #self.datakey_cbox.addItem("in")
         #self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
 
-        self.start_time_label = QtGui.QLabel('start date')
-        self.start_time = QtGui.QCalendarWidget()
-        self.start_time.setGridVisible(True)
-        self.start_time.clicked[QtCore.QDate].connect(self.getDate)
+        self.date_range_option_list = []
+        self.start_date_chkbox = QtGui.QCheckBox('+', self)
+        self.start_date_label = QtGui.QLabel('start date')
+        self.start_date = QtGui.QCalendarWidget()
+        self.start_date.setGridVisible(True)
+        self.start_date_cbox = QtGui.QComboBox(self)
+        self.start_date_cbox.addItem("and")
+        self.start_date_cbox.addItem("or")
+        self.date_range_option_list.append((self.start_date_chkbox,
+                                            self.start_date,
+                                            self.start_date_cbox))
+        #self.start_date.clicked[QtCore.QDate].connect(self.getDate)
 
-        self.end_time_label = QtGui.QLabel('stop date')
-        self.end_time = QtGui.QCalendarWidget()
-        self.end_time.setGridVisible(True)
-        self.end_time.clicked[QtCore.QDate].connect(self.getDate)
+        self.end_date_chkbox = QtGui.QCheckBox('+', self)
+        self.end_date_label = QtGui.QLabel('stop date')
+        self.end_date = QtGui.QCalendarWidget()
+        self.end_date.setGridVisible(True)
+        self.end_date_cbox = QtGui.QComboBox(self)
+        self.end_date_cbox.addItem("and")
+        self.end_date_cbox.addItem("or")
+        self.date_range_option_list.append((self.end_date_chkbox,
+                                            self.end_date,
+                                            self.end_date_cbox))
+        #self.end_date.clicked[QtCore.QDate].connect(self.getDate)
 
         grid = QtGui.QGridLayout()
         grid.setSpacing(5)
 
-        grid.addWidget(self.f1, 1, 0)
-        grid.addWidget(self.f1_Edit, 1, 1)
-        grid.addWidget(self.f1_cbox, 1, 2)
+        grid.addWidget(self.f1_chkbox, 1, 0)
+        grid.addWidget(self.f1, 1, 1)
+        grid.addWidget(self.f1_Edit, 1, 2)
+        grid.addWidget(self.f1_cbox, 1, 3)
 
-        grid.addWidget(self.f2, 2, 0)
-        grid.addWidget(self.f2_Edit, 2, 1)
-        grid.addWidget(self.f2_cbox, 2, 2)
+        grid.addWidget(self.f2_chkbox, 2, 0)
+        grid.addWidget(self.f2, 2, 1)
+        grid.addWidget(self.f2_Edit, 2, 2)
+        grid.addWidget(self.f2_cbox, 2, 3)
 
-        grid.addWidget(self.f3, 3, 0)
-        grid.addWidget(self.f3_Edit, 3, 1)
-        grid.addWidget(self.f3_cbox, 3, 2)
+        grid.addWidget(self.f3_chkbox, 3, 0)
+        grid.addWidget(self.f3, 3, 1)
+        grid.addWidget(self.f3_Edit, 3, 2)
+        grid.addWidget(self.f3_cbox, 3, 3)
 
-        grid.addWidget(self.f4, 4, 0)
-        grid.addWidget(self.f4_Edit, 4, 1)
-        grid.addWidget(self.f4_cbox, 4, 2)
+        grid.addWidget(self.f4_chkbox, 4, 0)
+        grid.addWidget(self.f4, 4, 1)
+        grid.addWidget(self.f4_Edit, 4, 2)
+        grid.addWidget(self.f4_cbox, 4, 3)
+
+        grid.addWidget(self.start_date_chkbox, 5, 0)
+        grid.addWidget(self.start_date_label, 5, 1)
+        grid.addWidget(self.start_date, 5, 2)
+        grid.addWidget(self.start_date_cbox, 5, 3)
+
+        grid.addWidget(self.end_date_chkbox, 6, 0)
+        grid.addWidget(self.end_date_label, 6, 1)
+        grid.addWidget(self.end_date, 6, 2)
+        grid.addWidget(self.end_date_cbox, 6, 3)
 
         #grid.addWidget(self.datakey, 5, 0)
         #grid.addWidget(self.datakey_Edit, 5, 1)
         #grid.addWidget(self.datakey_cbox, 5, 2)
-
 
         out_grid = QtGui.QGridLayout()
         out_grid.setSpacing(5)
@@ -122,8 +150,8 @@ class XpdanSearch(QtGui.QWidget):
 
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addWidget(cal)
         vbox.addLayout(grid)
+        #vbox.addLayout(date_grid)
         vbox.addLayout(hbox)
         vbox.addLayout(out_grid)
 
@@ -134,9 +162,11 @@ class XpdanSearch(QtGui.QWidget):
 
         self.show()
 
-    def showDate(self, date):
+    def getDate(self, date):
         print(date.toString())
 
+    def printDate(self, obj):
+        print(obj.selectedDate())
 
     def generate(self):
         """ generate search query """
@@ -144,10 +174,14 @@ class XpdanSearch(QtGui.QWidget):
         search_dict = {'group':'XPD'}
         or_list = [] # query purpose
         in_list = [] # ref
+
+        for i in range(len(self.date_range_option_list)):
+            self.printDate(self.date_range_option_list[i][1])
+
         for i in range(len(self.field_list)):
             key = self.field_list[i]
             val = self.field_option_list[i][0].text().split(',')
-            option = self.field_option_list[i][1].currentText()
+            option = self.field_option_list[i][2].currentText()
             if val != ['']:
                 if len(val) ==1:
                     _val = val[0].strip()

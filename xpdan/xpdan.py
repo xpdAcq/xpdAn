@@ -91,22 +91,34 @@ class XpdAn:
         """ property holds a list of header(s) from most recent search """
         return self._current_search
 
-
     def _set_current_search(self, headers, *, index=None):
         if index is None:
             self._current_search = headers
         else:
             self._current_search = self._current_search[index]
 
-
     @property
     def current_table(self):
         """ property that holds a pd.DataFrames from most recent search """
         return self._current_table
 
-
     def _set_current_table(self, table):
         self._current_table = table
+
+    @property
+    def get_metadata(self):
+        """ property that returns md as a pd.DataFrames """
+        headers = self._current_search
+        if headers:
+            if type(list(headers)[1]) == str:
+                header_list = list()
+                header_list.append(headers)
+            else:
+                header_list = headers
+            md_df_list = []
+            for h in header_list:
+                md_df_list.append(pd.DataFrame.from_dict(h.start))
+            return md_df_list
 
     def reset(self):
         """ method to reset search """

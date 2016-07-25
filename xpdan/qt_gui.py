@@ -4,7 +4,7 @@ from PyQt4 import QtGui, QtCore
 from .xpdan import XpdAn
 an = XpdAn(saf_num=123) # dummy init
 
-class XpdanSerch(QtGui.QWidget):
+class XpdanSearch(QtGui.QWidget):
 
     def __init__(self):
         super().__init__()
@@ -18,42 +18,50 @@ class XpdanSerch(QtGui.QWidget):
         self.field_option_list = []
 
         #generate btn
-        generate_btn = QtGui.QPushButton("generate query", self)
+        generate_btn = QtGui.QPushButton("generate query and search", self)
         generate_btn.clicked.connect(self.generate)
         generate_btn.resize(generate_btn.sizeHint())
 
         # set up fileds
 
         self.f1 = QtGui.QLabel('PI last name')
+        self.f1_chkbox = QtGui.QCheckBox('+', self)
         self.f1_Edit = QtGui.QLineEdit()
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
-        self.field_option_list.append((self.f1_Edit, self.f1_cbox))
+        self.field_option_list.append((self.f1_chkbox, self.f1_Edit,
+                                       self.f1_cbox))
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
         self.f2 = QtGui.QLabel('sample name')
+        self.f2_chkbox = QtGui.QCheckBox('+', self)
         self.f2_Edit = QtGui.QLineEdit()
         self.f2_cbox = QtGui.QComboBox(self)
         self.f2_cbox.addItem("and")
         self.f2_cbox.addItem("or")
-        self.field_option_list.append((self.f2_Edit, self.f2_cbox))
+        self.field_option_list.append((self.f2_chkbox, self.f2_Edit,
+                                       self.f2_cbox))
 
         self.f3 = QtGui.QLabel('experimenter name')
+        self.f3_chkbox = QtGui.QCheckBox('+', self)
         self.f3_Edit = QtGui.QLineEdit()
         self.f3_cbox = QtGui.QComboBox(self)
         self.f3_cbox.addItem("and")
         self.f3_cbox.addItem("or")
-        self.field_option_list.append((self.f3_Edit, self.f3_cbox))
+        self.field_option_list.append((self.f3_chkbox, self.f3_Edit,
+                                       self.f3_cbox))
 
         self.f4 = QtGui.QLabel('scan type')
+        self.f4_chkbox = QtGui.QCheckBox('+', self)
         self.f4_Edit = QtGui.QLineEdit()
         self.f4_cbox = QtGui.QComboBox(self)
         self.f4_cbox.addItem("and")
         self.f4_cbox.addItem("or")
-        self.field_option_list.append((self.f4_Edit, self.f4_cbox))
+        self.field_option_list.append((self.f4_chkbox, self.f4_Edit,
+                                       self.f4_cbox))
 
-        self.output = QtGui.QLabel('Search Query')
+        self.output = QtGui.QLabel('Search Query History')
         self.output_box = QtGui.QTextEdit()
         self.output_box.setReadOnly(True)
         self.output_box.moveCursor(QtGui.QTextCursor.End)
@@ -67,10 +75,15 @@ class XpdanSerch(QtGui.QWidget):
         #self.datakey_cbox.addItem("in")
         #self.field_option_list.append((self.datakey_Edit, self.datakey_cbox))
 
-        cal = QtGui.QCalendarWidget()
-        cal.setGridVisible(True)
-        cal.clicked[QtCore.QDate].connect(self.showDate)
+        self.start_time_label = QtGui.QLabel('start date')
+        self.start_time = QtGui.QCalendarWidget()
+        self.start_time.setGridVisible(True)
+        self.start_time.clicked[QtCore.QDate].connect(self.getDate)
 
+        self.end_time_label = QtGui.QLabel('stop date')
+        self.end_time = QtGui.QCalendarWidget()
+        self.end_time.setGridVisible(True)
+        self.end_time.clicked[QtCore.QDate].connect(self.getDate)
 
         grid = QtGui.QGridLayout()
         grid.setSpacing(5)

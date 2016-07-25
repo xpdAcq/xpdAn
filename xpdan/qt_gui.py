@@ -28,7 +28,6 @@ class XpdanSearch(QtGui.QWidget):
 
     def initUI(self):
 
-
         #generate btn
         generate_btn = QtGui.QPushButton("generate query and search", self)
         generate_btn.clicked.connect(self.generate)
@@ -118,16 +117,16 @@ class XpdanSearch(QtGui.QWidget):
 
         # field to display md
         #MD_FIELD_LIST = ['bt_piLast', 'sa_name', 'sp_computed_exposure',
-        #                 'plan_name', 'time']
-        self.md_chkbox_1 = QtGui.QCheckBox('PI last')
+        #                 'time', 'plan_name']
+        self.md_chkbox_1 = QtGui.QCheckBox('PI last name')
         self.md_field_list.append(self.md_chkbox_1)
         self.md_chkbox_2 = QtGui.QCheckBox('sample name' )
         self.md_field_list.append(self.md_chkbox_2)
         self.md_chkbox_3 = QtGui.QCheckBox('total exposure time')
         self.md_field_list.append(self.md_chkbox_3)
-        self.md_chkbox_4 = QtGui.QCheckBox('plan name' )
+        self.md_chkbox_4 = QtGui.QCheckBox('time' )
         self.md_field_list.append(self.md_chkbox_4)
-        self.md_chkbox_5 = QtGui.QCheckBox('time' )
+        self.md_chkbox_5 = QtGui.QCheckBox('plan name' )
         self.md_field_list.append(self.md_chkbox_5)
 
         # group widgets
@@ -274,12 +273,14 @@ class XpdanSearch(QtGui.QWidget):
         # operate on XpdAn
         self._an.search_dict = search_dict
         md_field = []
+        print('length of md_field_list = {}'.format(len(self.md_field_list)))
+        print('length of MD_FIELD_LIST = {}'.format(len(self.MD_FIELD_LIST)))
         for i in range(len(self.md_field_list)):
             el = self.md_field_list[i]
             if el.isChecked():
                 md_field.append(self.MD_FIELD_LIST[i])
-        print(md_field)
-        self._an.header_md_fields
+        if md_field: # other than default
+            self._an.header_md_fields = md_field
         self._an.list()
 """
 def main():

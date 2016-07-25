@@ -105,20 +105,17 @@ class XpdAn:
     def _set_current_table(self, table):
         self._current_table = table
 
-    @property
-    def get_metadata(self):
+    def get_metadata(self, headers):
         """ property that returns md as a pd.DataFrames """
-        headers = self._current_search
-        if headers:
-            if type(list(headers)[1]) == str:
-                header_list = list()
-                header_list.append(headers)
-            else:
-                header_list = headers
-            md_df_list = []
-            for h in header_list:
-                md_df_list.append(pd.DataFrame.from_dict(h.start))
-            return md_df_list
+        if type(list(headers)[1]) == str:
+            header_list = list()
+            header_list.append(headers)
+        else:
+            header_list = headers
+        md_df_list = []
+        for h in header_list:
+            md_df_list.append(pd.DataFrame.from_dict(h.start,'index'))
+        return md_df_list
 
     def reset(self):
         """ method to reset search """

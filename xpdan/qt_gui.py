@@ -44,8 +44,9 @@ class XpdanSearch(QtGui.QWidget):
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
+        self.f1_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f1_chkbox, self.f1_Edit,
-                                       self.f1_cbox))
+                                       self.f1_cbox, self.f1_fuzzy))
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
         self.f2 = QtGui.QLabel('sample name')
@@ -54,8 +55,9 @@ class XpdanSearch(QtGui.QWidget):
         self.f2_cbox = QtGui.QComboBox(self)
         self.f2_cbox.addItem("and")
         self.f2_cbox.addItem("or")
+        self.f2_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f2_chkbox, self.f2_Edit,
-                                       self.f2_cbox))
+                                       self.f2_cbox, self.f2_fuzzy))
 
         self.f3 = QtGui.QLabel('experimenter name')
         self.f3_chkbox = QtGui.QCheckBox(self)
@@ -63,8 +65,9 @@ class XpdanSearch(QtGui.QWidget):
         self.f3_cbox = QtGui.QComboBox(self)
         self.f3_cbox.addItem("and")
         self.f3_cbox.addItem("or")
+        self.f3_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f3_chkbox, self.f3_Edit,
-                                       self.f3_cbox))
+                                       self.f3_cbox, self.f3_fuzzy))
 
         self.f4 = QtGui.QLabel('scan type')
         self.f4_chkbox = QtGui.QCheckBox(self)
@@ -72,8 +75,9 @@ class XpdanSearch(QtGui.QWidget):
         self.f4_cbox = QtGui.QComboBox(self)
         self.f4_cbox.addItem("and")
         self.f4_cbox.addItem("or")
+        self.f4_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f4_chkbox, self.f4_Edit,
-                                       self.f4_cbox))
+                                       self.f4_cbox, self.f4_fuzzy))
 
         self.output = QtGui.QLabel('Search Query History')
         self.output_box = QtGui.QTextEdit()
@@ -137,21 +141,25 @@ class XpdanSearch(QtGui.QWidget):
         grid.addWidget(self.f1, 1, 1)
         grid.addWidget(self.f1_Edit, 1, 2)
         grid.addWidget(self.f1_cbox, 1, 3)
+        grid.addWidget(self.f1_fuzzy, 1, 4)
 
         grid.addWidget(self.f2_chkbox, 2, 0)
         grid.addWidget(self.f2, 2, 1)
         grid.addWidget(self.f2_Edit, 2, 2)
         grid.addWidget(self.f2_cbox, 2, 3)
+        grid.addWidget(self.f2_fuzzy, 2, 4)
 
         grid.addWidget(self.f3_chkbox, 3, 0)
         grid.addWidget(self.f3, 3, 1)
         grid.addWidget(self.f3_Edit, 3, 2)
         grid.addWidget(self.f3_cbox, 3, 3)
+        grid.addWidget(self.f3_fuzzy, 3, 4)
 
         grid.addWidget(self.f4_chkbox, 4, 0)
         grid.addWidget(self.f4, 4, 1)
         grid.addWidget(self.f4_Edit, 4, 2)
         grid.addWidget(self.f4_cbox, 4, 3)
+        grid.addWidget(self.f4_fuzzy, 4, 4)
 
         grid.addWidget(self.start_date_chkbox, 5, 0)
         grid.addWidget(self.start_date_label, 5, 1)
@@ -169,7 +177,7 @@ class XpdanSearch(QtGui.QWidget):
 
         md_grid = QtGui.QGridLayout()
         md_grid.setSpacing(5)
-        md_grid.addWidget(QtGui.QLabel('Metadata to display'),1,0)
+        md_grid.addWidget(QtGui.QLabel('Metadata fields to display'), 1, 0)
         for i in range(len(self.md_field_list)):
             md_grid.addWidget(self.md_field_list[i], 2, i)
 
@@ -235,9 +243,14 @@ class XpdanSearch(QtGui.QWidget):
             y_n = self.field_option_list[i][0]
             val = self.field_option_list[i][1].text().split(',')
             option = self.field_option_list[i][2].currentText()
+            fuzzy = self.field_option_list[i][3]
             if y_n.isChecked():
                 if len(val) ==1 and val != ['']:
                     _val = val[0].strip()
+                    # update fuzzy search
+                    if fuzzy.isChecked():
+                        _val = '/^{}/'.format(_val)
+                    # update logic
                     if option == 'or':
                         or_list.append({key:_val})
                     else: # and-logic
@@ -245,6 +258,8 @@ class XpdanSearch(QtGui.QWidget):
                 elif len(val) >1:
                     for el in val:
                         _val = el.strip()
+                        if fuzzy.isChecked():
+                            _val = '/^{}/'.format(_val)
                         or_list.append({key:_val})
                 else:
                     # + is selected but no field entered, skipped
@@ -273,8 +288,8 @@ class XpdanSearch(QtGui.QWidget):
         # operate on XpdAn
         self._an.search_dict = search_dict
         md_field = []
-        print('length of md_field_list = {}'.format(len(self.md_field_list)))
-        print('length of MD_FIELD_LIST = {}'.format(len(self.MD_FIELD_LIST)))
+        #print('length of md_field_list = {}'.format(len(self.md_field_list)))
+        #print('length of MD_FIELD_LIST = {}'.format(len(self.MD_FIELD_LIST)))
         for i in range(len(self.md_field_list)):
             el = self.md_field_list[i]
             if el.isChecked():

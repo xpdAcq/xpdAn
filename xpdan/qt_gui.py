@@ -44,9 +44,8 @@ class XpdanSearch(QtGui.QWidget):
         self.f1_cbox = QtGui.QComboBox(self)
         self.f1_cbox.addItem("and")
         self.f1_cbox.addItem("or")
-        self.f1_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f1_chkbox, self.f1_Edit,
-                                       self.f1_cbox, self.f1_fuzzy))
+                                       self.f1_cbox))
         #self.f1_cbox.activated[str].connect(self.f1_and_or_option)
 
         self.f2 = QtGui.QLabel('sample name')
@@ -55,9 +54,8 @@ class XpdanSearch(QtGui.QWidget):
         self.f2_cbox = QtGui.QComboBox(self)
         self.f2_cbox.addItem("and")
         self.f2_cbox.addItem("or")
-        self.f2_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f2_chkbox, self.f2_Edit,
-                                       self.f2_cbox, self.f2_fuzzy))
+                                       self.f2_cbox))
 
         self.f3 = QtGui.QLabel('experimenter name')
         self.f3_chkbox = QtGui.QCheckBox(self)
@@ -65,9 +63,8 @@ class XpdanSearch(QtGui.QWidget):
         self.f3_cbox = QtGui.QComboBox(self)
         self.f3_cbox.addItem("and")
         self.f3_cbox.addItem("or")
-        self.f3_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f3_chkbox, self.f3_Edit,
-                                       self.f3_cbox, self.f3_fuzzy))
+                                       self.f3_cbox))
 
         self.f4 = QtGui.QLabel('scan type')
         self.f4_chkbox = QtGui.QCheckBox(self)
@@ -75,9 +72,12 @@ class XpdanSearch(QtGui.QWidget):
         self.f4_cbox = QtGui.QComboBox(self)
         self.f4_cbox.addItem("and")
         self.f4_cbox.addItem("or")
-        self.f4_fuzzy = QtGui.QCheckBox('starts with')
         self.field_option_list.append((self.f4_chkbox, self.f4_Edit,
-                                       self.f4_cbox, self.f4_fuzzy))
+                                       self.f4_cbox))
+
+        self.fuzzy = QtGui.QLabel('fuzzy search text')
+        self.fuzzy_chkbox = QtGui.QCheckBox(self)
+        self.fuzzy_Edit = QtGui.QLineEdit()
 
         self.output = QtGui.QLabel('Search Query History')
         self.output_box = QtGui.QTextEdit()
@@ -141,35 +141,35 @@ class XpdanSearch(QtGui.QWidget):
         grid.addWidget(self.f1, 1, 1)
         grid.addWidget(self.f1_Edit, 1, 2)
         grid.addWidget(self.f1_cbox, 1, 3)
-        grid.addWidget(self.f1_fuzzy, 1, 4)
 
         grid.addWidget(self.f2_chkbox, 2, 0)
         grid.addWidget(self.f2, 2, 1)
         grid.addWidget(self.f2_Edit, 2, 2)
         grid.addWidget(self.f2_cbox, 2, 3)
-        grid.addWidget(self.f2_fuzzy, 2, 4)
 
         grid.addWidget(self.f3_chkbox, 3, 0)
         grid.addWidget(self.f3, 3, 1)
         grid.addWidget(self.f3_Edit, 3, 2)
         grid.addWidget(self.f3_cbox, 3, 3)
-        grid.addWidget(self.f3_fuzzy, 3, 4)
 
         grid.addWidget(self.f4_chkbox, 4, 0)
         grid.addWidget(self.f4, 4, 1)
         grid.addWidget(self.f4_Edit, 4, 2)
         grid.addWidget(self.f4_cbox, 4, 3)
-        grid.addWidget(self.f4_fuzzy, 4, 4)
 
-        grid.addWidget(self.start_date_chkbox, 5, 0)
-        grid.addWidget(self.start_date_label, 5, 1)
-        grid.addWidget(self.start_date, 5, 2)
-        grid.addWidget(self.start_date_cbox, 5, 3)
+        grid.addWidget(self.fuzzy_chkbox, 5, 0)
+        grid.addWidget(self.fuzzy, 5, 1)
+        grid.addWidget(self.fuzzy_Edit, 5, 2)
 
-        grid.addWidget(self.end_date_chkbox, 6, 0)
-        grid.addWidget(self.end_date_label, 6, 1)
-        grid.addWidget(self.end_date, 6, 2)
-        grid.addWidget(self.end_date_cbox, 6, 3)
+        grid.addWidget(self.start_date_chkbox, 6, 0)
+        grid.addWidget(self.start_date_label, 6, 1)
+        grid.addWidget(self.start_date, 6, 2)
+        grid.addWidget(self.start_date_cbox, 6, 3)
+
+        grid.addWidget(self.end_date_chkbox, 7, 0)
+        grid.addWidget(self.end_date_label, 7, 1)
+        grid.addWidget(self.end_date, 7, 2)
+        grid.addWidget(self.end_date_cbox, 7, 3)
 
         #grid.addWidget(self.datakey, 5, 0)
         #grid.addWidget(self.datakey_Edit, 5, 1)
@@ -188,16 +188,22 @@ class XpdanSearch(QtGui.QWidget):
         out_grid.addWidget(self.output_box, 2, 0)
 
         # configure layout
+
         hbox = QtGui.QHBoxLayout()
         hbox.addStretch(1)
         hbox.addWidget(generate_btn)
 
+        #hbox2 = QtGui.QGridLayout()
+        #hbox2.addWidget(self.fuzzy_chkbox, 1, 0)
+        #hbox2.addWidget(self.fuzzy_Edit, 1, 1)
+
         vbox = QtGui.QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addLayout(grid)
-        vbox.addLayout(md_grid)
-        vbox.addLayout(hbox)
-        vbox.addLayout(out_grid)
+        vbox.addLayout(grid) # search field
+        #vbox.addLayout(hbox2) # fuzzy search
+        vbox.addLayout(md_grid) # md fields
+        vbox.addLayout(hbox) # generate btn
+        vbox.addLayout(out_grid) # history
 
         self.setLayout(vbox)
 
@@ -221,20 +227,20 @@ class XpdanSearch(QtGui.QWidget):
         in_list = [] # ref
 
         # date range
-        time_dict = {}
-        gtlt_dict = {}
+        time_dict = {'$and':''}
+        gtlt_list = []
         if self.start_date_chkbox.isChecked():
             start_time = self.date2timestamp(self.start_date)
-            gtlt_dict.update({'$gte':start_time})
+            gtlt_list.append({'time':{'$gte':start_time}})
         else:
             pass
         if self.end_date_chkbox.isChecked():
             end_time = self.date2timestamp(self.end_date)
-            gtlt_dict.update({'$lte':end_time})
+            gtlt_list.append({'time':{'$lte':end_time}})
         else:
             pass
-        if gtlt_dict:
-            time_dict.update({'time':gtlt_dict})
+        if gtlt_list:
+            time_dict.update({'$and':gtlt_list})
             search_dict.update(time_dict)
 
         # key-val search
@@ -243,23 +249,17 @@ class XpdanSearch(QtGui.QWidget):
             y_n = self.field_option_list[i][0]
             val = self.field_option_list[i][1].text().split(',')
             option = self.field_option_list[i][2].currentText()
-            fuzzy = self.field_option_list[i][3]
             if y_n.isChecked():
                 if len(val) ==1 and val != ['']:
                     _val = val[0].strip()
-                    # update fuzzy search
-                    if fuzzy.isChecked():
-                        _val = '/^{}/'.format(_val)
                     # update logic
                     if option == 'or':
                         or_list.append({key:_val})
                     else: # and-logic
-                        search_dict.update({key:val[0].strip()})
+                        search_dict.update({key:_val})
                 elif len(val) >1:
                     for el in val:
                         _val = el.strip()
-                        if fuzzy.isChecked():
-                            _val = '/^{}/'.format(_val)
                         or_list.append({key:_val})
                 else:
                     # + is selected but no field entered, skipped
@@ -267,7 +267,12 @@ class XpdanSearch(QtGui.QWidget):
 
         # update logic
         if or_list:
-            search_dict.update({'$or':or_list})
+            search_dict.update({'$or': or_list})
+
+        if self.fuzzy_chkbox.isChecked():
+            search_dict.update({'$text':
+                                    {'$search':self.fuzzy_Edit.text().strip()}
+                               })
 
         # validate search key
         if len(search_dict) < 2:

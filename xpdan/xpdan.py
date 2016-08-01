@@ -50,6 +50,20 @@ def _timestampstr(timestamp):
     timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%Y%m%d-%H%M')
     return timestring
 
+
+def get_metadata(headers):
+    """ samll function that returns md as a list of pd.DataFrames """
+    if type(list(headers)[1]) == str:
+        header_list = list()
+        header_list.append(headers)
+    else:
+        header_list = headers
+    md_df_list = []
+    for h in header_list:
+        md_df_list.append(pd.DataFrame.from_dict(h.start,'index'))
+    return md_df_list
+
+
 ######################################
 
 class XpdAn:
@@ -104,18 +118,6 @@ class XpdAn:
 
     def _set_current_table(self, table):
         self._current_table = table
-
-    def get_metadata(self, headers):
-        """ property that returns md as a pd.DataFrames """
-        if type(list(headers)[1]) == str:
-            header_list = list()
-            header_list.append(headers)
-        else:
-            header_list = headers
-        md_df_list = []
-        for h in header_list:
-            md_df_list.append(pd.DataFrame.from_dict(h.start,'index'))
-        return md_df_list
 
     def reset(self):
         """ method to reset search """

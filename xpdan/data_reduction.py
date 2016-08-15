@@ -25,20 +25,20 @@ import tifffile as tif
 import matplotlib as plt
 from time import strftime
 
-from .glbl import glbl
+from .glbl import an_glbl
 from .utils import _clean_info, _timestampstr
 
 # top definition for minimal impacts on the code 
-db = Glbl.db
-get_events = Glbl.get_events
-get_images = Glbl.get_images
+db = an_glbl.db
+get_events = an_glbl.get_events
+get_images = an_glbl.get_images
 
-w_dir = os.path.join(Glbl.home, 'tiff_base')
+w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir # in case of crashes in old codes
 
 
 
-class ImageProcess:
+class DataReduction:
     """ class that handle operations on images from databroker header
 
         Note: not a callback
@@ -49,7 +49,7 @@ class ImageProcess:
         self.labels = ['dark_frame']
         self.root_dir_name = ['sa_name']
         if image_field is None:
-            self.image_field = glbl.det_image_field
+            self.image_field = an_glbl.det_image_field
 
     def _feature_gen(self, event):
         ''' generate a human readable file name.
@@ -84,7 +84,7 @@ class ImageProcess:
         return "_".join(feature_list)
 
     def pull_dark(self, header):
-        dark_uid = header.start.get(glbl.dark_field_key, None)
+        dark_uid = header.start.get(an_glbl.dark_field_key, None)
         if dark_uid is None:
             print("INFO: no dark frame is associated in this header, "
                   "subrraction will not be processed")
@@ -97,7 +97,7 @@ class ImageProcess:
         return dark_img
 
     def _dark_sub(self, event, dark_img):
-        """ operate on event level """
+        """ priviate method operates on event level """
         dark_sub = False
         if dark_img is not None and isinstance(dark_img, np.ndarray):
             dark_sub = True
@@ -110,7 +110,7 @@ class ImageProcess:
         return img, event_timestamp, ind, dark_sub
 
     def dark_sub(self, hedear):
-        """ public function on header level """
+        """ public method operates on header level """
         img_list = []
         timestamp_list = []
         dark_img = self.pull_dark(header)
@@ -118,10 +118,10 @@ class ImageProcess:
             sub_img, event_timestamp = self._dark_sub(ev, dark_img)
             img_list.append(sub_img)
             timestamp_list.append(timestamp)
-        return img_list, timestamp_list
+        return img_list, timestamp_list, dark_img, header.start
 
     def _file_name(self, event, event_timestamp, ind):
-        """ operate on event level """
+        """ priviate method operates on event level """
         f_name = self._feature_gen(event)
         f_name = '_'.join([f_name,
                            _timestampstr(event_timestamp)])
@@ -140,8 +140,11 @@ class ImageProcess:
         for header in header_list:
             # create root_dir
             root = header.start.get(self.root_dir_name[0], None)
-            root_dir = os.path.join(W_DIR, self.root_dir_name)
-            os.makedirs(roor_dir, exist_ok=True)
+            if root is not None:
+                root_dir = os.path.join(W_DIR, self.root_dir_name)
+                os.makedirs(roor_dir, exist_ok=True)
+            else:
+                root_dir = W_DIR
             # dark logic
             dark_img = self.pull_dark(header)
             if not dark_sub:
@@ -159,7 +162,7 @@ class ImageProcess:
                     tif.imsave(w_name, img)
                 if os.path.isfile(w_name):
                     print('image "%s" has been saved at "%s"' %
-                          (combind_f_name, W_DIR))
+                          (combind_f_name, root_dir))
                 else:
                     print('Sorry, something went wrong with your tif saving')
                     return
@@ -169,7 +172,7 @@ class ImageProcess:
         print('||********Saving process FINISHED********||')
 
 # init
-xpd_img_process = ImageProcess()
+xpd_data_proc = DataReduction()
 
 # back-support alias
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
@@ -195,7 +198,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
     """
-    xpd_img_process.save_tiff(header, dark_sub, max_count, dryrun)
+    xpd_data_proc.save_tiff(header, dark_sub, max_count, dryrun)
 
 def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """ save images from the most recent scan as tiff format files.
@@ -216,5 +219,5 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
     """
-    xpd_img_process.save_tiff(db[-1], dark_sub, max_count, dryrun)
+    xpd_data_proc.save_tiff(db[-1], dark_sub, max_count, dryrun)
 

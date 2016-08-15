@@ -88,4 +88,4 @@ class Glbl:
     det_image_field = DET_IMAGE_FIELD
     dark_field_key = DARK_FIELD_KEY
 
-glbl = Glbl()
+an_glbl = Glbl()

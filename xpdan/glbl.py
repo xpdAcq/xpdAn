@@ -12,6 +12,8 @@ USER_BACKUP_DIR_NAME = strftime('%Y')
 OWNER = 'xf28id1'
 BEAMLINE_ID = 'xpd'
 GROUP = 'XPD'
+DET_IMAGE_FIELD = 'pe1_image'
+DARK_FIELD_KEY = 'sc_dk_field_uid'
 
 # change this to be handled by an environment variable later
 hostname = socket.gethostname()
@@ -83,5 +85,7 @@ class Glbl:
     owner = OWNER
     beamline_id = BEAMLINE_ID
     group = GROUP
+    det_image_field = DET_IMAGE_FIELD
+    dark_field_key = DARK_FIELD_KEY
 
 glbl = Glbl()

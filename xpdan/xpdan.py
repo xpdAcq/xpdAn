@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 import numpy as np
 import pandas as pd
 
-from .glbl import glbl
+from .glbl import an_glbl
 
 
-if glbl._is_simulation:
+if an_glbl._is_simulation:
     db = MagicMock()
 else:
     from databroker.databroker import get_table
@@ -20,12 +20,12 @@ else:
 ########### helper function #########
 
 def _get_current_saf():
-    bt_list= [f for f in os.listdir(glbl.yaml_dir) if f.startswith('bt_')]
+    bt_list= [f for f in os.listdir(an_glbl.yaml_dir) if f.startswith('bt_')]
     if len(bt_list) != 1:
         raise RuntimeError("There are more than one beamtime objects in"
                            "{}. Please either gives specific saf or"
-                           .format(glbl.yaml_dir))
-    with open(os.path.join(glbl.yaml_dir, bt_list[0]), 'r') as f:
+                           .format(an_glbl.yaml_dir))
+    with open(os.path.join(an_glbl.yaml_dir, bt_list[0]), 'r') as f:
         bt = yaml.load(f)
         saf = bt['bt_safN']
         return saf

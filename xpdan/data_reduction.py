@@ -24,14 +24,21 @@ import numpy as np
 import tifffile as tif
 import matplotlib as plt
 from time import strftime
+from unittest.mock import MagicMock
 
 from .glbl import an_glbl
 from .utils import _clean_info, _timestampstr
 
 # top definition for minimal impacts on the code 
-db = an_glbl.db
-get_events = an_glbl.get_events
-get_images = an_glbl.get_images
+if an_glbl._is_simulation:
+    db = MagicMock()
+    get_events = MagicMock()
+    get_images = MagicMock()
+else:
+    from databroker.databroker import get_table
+    from databroker.databroker import DataBroker as db
+    from databroker import get_images
+    from databroker import get_events
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir # in case of crashes in old codes
@@ -47,7 +54,7 @@ class DataReduction:
         # for file name
         self.fields = ['sa_name','sp_name', 'temperature']
         self.labels = ['dark_frame']
-        self.root_dir_name = ['sa_name']
+        self.root_dir_name = 'sa_name'
         if image_field is None:
             self.image_field = an_glbl.det_image_field
 
@@ -58,7 +65,7 @@ class DataReduction:
         run_start
         '''
         feature_list = []
-        run_start = event['run_start']
+        run_start = event.descriptor['run_start']
         uid = run_start['uid'][:6]
         # get special label
         for el in self.labels:
@@ -93,7 +100,7 @@ class DataReduction:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = db(**dark_search)
             dark_img = np.asarray(get_images(dark_header,
-                                             self.img_field)).squeeze()
+                                             self.image_field)).squeeze()
         return dark_img
 
     def _dark_sub(self, event, dark_img):
@@ -101,9 +108,9 @@ class DataReduction:
         dark_sub = False
         if dark_img is not None and isinstance(dark_img, np.ndarray):
             dark_sub = True
-        img = event['data'][self.img_field]
+        img = event['data'][self.image_field]
         ind = event['seq_num']
-        event_timestamp = event['timestamps'][self.img_field]
+        event_timestamp = event['timestamps'][self.image_field]
         # dark subtration logic
         if dark_img is not None:
             img -= dark_img
@@ -139,10 +146,10 @@ class DataReduction:
 
         for header in header_list:
             # create root_dir
-            root = header.start.get(self.root_dir_name[0], None)
+            root = header.start.get(self.root_dir_name, None)
             if root is not None:
-                root_dir = os.path.join(W_DIR, self.root_dir_name)
-                os.makedirs(roor_dir, exist_ok=True)
+                root_dir = os.path.join(W_DIR, root)
+                os.makedirs(root_dir, exist_ok=True)
             else:
                 root_dir = W_DIR
             # dark logic
@@ -157,15 +164,18 @@ class DataReduction:
                 if dark_sub:
                     f_name = 'sub_' + f_name
                 # save
-                w_name = os.path.join(root_dir, combind_f_name)
+                w_name = os.path.join(root_dir, f_name)
                 if not dryrun:
                     tif.imsave(w_name, img)
-                if os.path.isfile(w_name):
-                    print('image "%s" has been saved at "%s"' %
-                          (combind_f_name, root_dir))
+                    if os.path.isfile(w_name):
+                        print('image "%s" has been saved at "%s"' %
+                            (f_name, root_dir))
+                    else:
+                        print('Sorry, something went wrong with your tif saving')
+                        return
                 else:
-                    print('Sorry, something went wrong with your tif saving')
-                    return
+                    print("dryrun: image {} has been saved at {}"
+                          .format(f_name, root_dir))
                 if max_count is not None and ind >= max_count:
                     # break the loop if max_count reached, move to next header
                     break
@@ -198,7 +208,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
     """
-    xpd_data_proc.save_tiff(header, dark_sub, max_count, dryrun)
+    xpd_data_proc.save_tiff(headers, dark_sub, max_count, dryrun)
 
 def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """ save images from the most recent scan as tiff format files.

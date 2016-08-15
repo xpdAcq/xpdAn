@@ -128,7 +128,8 @@ class ImageProcess:
         f_name = '{}_{:04d}.tif'.format(f_name, ind)
         return f_name
 
-    def save_tiff(self, headers, dark_sub=True, max_count=None):
+    def save_tiff(self, headers, dark_sub=True, max_count=None,
+                  dryrun=False):
         """ operate on header level """
         if type(list(headers)[1]) == str:
             header_list = list()
@@ -154,7 +155,8 @@ class ImageProcess:
                     f_name = 'sub_' + f_name
                 # save
                 w_name = os.path.join(root_dir, combind_f_name)
-                tif.imsave(w_name, img)
+                if not dryrun:
+                    tif.imsave(w_name, img)
                 if os.path.isfile(w_name):
                     print('image "%s" has been saved at "%s"' %
                           (combind_f_name, W_DIR))
@@ -169,8 +171,8 @@ class ImageProcess:
 # init
 xpd_img_process = ImageProcess()
 
-# alias
-def save_tiff(headers, dark_sub=True, max_count=None):
+# back-support alias
+def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
     """ save images obtained from dataBroker as tiff format files.
 
     Parameters
@@ -187,11 +189,15 @@ def save_tiff(headers, dark_sub=True, max_count=None):
     max_count : int, optional
         The maximum number of events to process per-run.  This can be
         useful to 'preview' an export or if there are corrupted files
-        in the data stream (ex from the IOC crashing during data acquisition).
-    """
-    xpd_img_process.save_tiff(header, dark_sub, max_count)
+        in the data stream (ex from the IOC crashing during data
+        acquisition).
 
-def save_last_tiff(dark_sub=True, max_count=None):
+    dryrun : bool, optional
+        if set to True, file won't be saved. default is False
+    """
+    xpd_img_process.save_tiff(header, dark_sub, max_count, dryrun)
+
+def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """ save images from the most recent scan as tiff format files.
 
     Parameters
@@ -206,6 +212,9 @@ def save_last_tiff(dark_sub=True, max_count=None):
         The maximum number of events to process per-run.  This can be
         useful to 'preview' an export or if there are corrupted files
         in the data stream (ex from the IOC crashing during data acquisition).
+
+    dryrun : bool, optional
+        if set to True, file won't be saved. default is False
     """
-    xpd_img_process.save_tiff(db[-1], dark_sub, max_count)
+    xpd_img_process.save_tiff(db[-1], dark_sub, max_count, dryrun)
 

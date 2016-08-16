@@ -76,7 +76,7 @@ class Glbl:
     config_base = CONFIG_BASE
     tiff_base =TIFF_BASE
     usrScript_dir = USERSCRIPT_DIR
-    analysis_dir = ANALYSIS_DIR
+    usrAnalysis_dir = ANALYSIS_DIR
     yaml_dir = YAML_DIR
     bt_dir = BT_DIR
     sample_dir = SAMPLE_DIR

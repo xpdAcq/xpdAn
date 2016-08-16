@@ -198,7 +198,7 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None, handler=xpd_data_p
     total_rv_list = []
     for header in header_list:
         header_rv_list = []
-        root_dir = an_glbl.analysis_dir
+        root_dir = an_glbl.usrAnalysis_dir
         # dark logic
         dark_img = handler.pull_dark(header)
         if not dark_sub:

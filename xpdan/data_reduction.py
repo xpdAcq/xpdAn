@@ -29,6 +29,9 @@ from unittest.mock import MagicMock
 from .glbl import an_glbl
 from .utils import _clean_info, _timestampstr
 
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+
+
 # top definition for minimal impacts on the code 
 if an_glbl._is_simulation:
     db = MagicMock()
@@ -135,57 +138,93 @@ class DataReduction:
         f_name = '{}_{:04d}.tif'.format(f_name, ind)
         return f_name
 
-    def save_tiff(self, headers, dark_sub=True, max_count=None,
-                  dryrun=False):
-        """ operate on header level """
-        if type(list(headers)[1]) == str:
-            header_list = list()
-            header_list.append(headers)
-        else:
-            header_list = headers
-
-        for header in header_list:
-            # create root_dir
-            root = header.start.get(self.root_dir_name, None)
-            if root is not None:
-                root_dir = os.path.join(W_DIR, root)
-                os.makedirs(root_dir, exist_ok=True)
-            else:
-                root_dir = W_DIR
-            # dark logic
-            dark_img = self.pull_dark(header)
-            if not dark_sub:
-                dark_img = None # no sub
-            # event
-            for event in get_events(header, fill=True):
-                img, event_timestamp, ind, dark_sub = self._dark_sub(event,
-                                                                     dark_img)
-                f_name = self._file_name(event, event_timestamp, ind)
-                if dark_sub:
-                    f_name = 'sub_' + f_name
-                # save
-                w_name = os.path.join(root_dir, f_name)
-                if not dryrun:
-                    tif.imsave(w_name, img)
-                    if os.path.isfile(w_name):
-                        print('image "%s" has been saved at "%s"' %
-                            (f_name, root_dir))
-                    else:
-                        print('Sorry, something went wrong with your tif saving')
-                        return
-                else:
-                    print("dryrun: image {} has been saved at {}"
-                          .format(f_name, root_dir))
-                if max_count is not None and ind >= max_count:
-                    # break the loop if max_count reached, move to next header
-                    break
-        print('||********Saving process FINISHED********||')
 
 # init
 xpd_data_proc = DataReduction()
+ai = AzimuthalIntegrator()
 
-# back-support alias
-def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
+
+### analysis function operates at header level ###
+def _prepare_header_list(headers):
+    if type(list(headers)[1]) == str:
+        header_list = list()
+        header_list.append(headers)
+    else:
+        header_list = headers
+    return header_list
+
+def _load_config():
+    with open(glbl.calib_config_name) as f:
+        config_dict = yaml.load(f)
+    return config_dict
+
+def _npt_cal(config_dict):
+    """ config_dict should be a PyFAI calibration dict """
+    x_0, y_0 = (config_dict['centerX'], config_dict['centerY'])
+    dist = np.sqrt((2048-x_0)**2 + (2048-y_0)**2)
+    return dist
+
+def pyFAI_integrate(headers, root_dir=None, config_dict=None, handler=xpd_data_proc):
+    """ integrate dark subtracted image for given list of headers
+
+        Parameters
+        ----------
+        headers : list
+            a list of header objects obtained from a query to dataBroker
+
+        root_dir : str, optional
+            path of chi files that are going to be saved. default is
+            xpdUser/userAnalysis/
+
+        config_dict : dict, optional
+            dictionary stores integration parameters of pyFAI azimuthal
+            integrator. default is the most recent parameters saved in
+            xpdUser/conifg_base
+
+        handler : instance of class, optional
+            instance of class that handles data process, don't change it
+            unless needed.
+    """
+    # normalize list
+    header_list = _prepare_header_list(headers)
+
+    # config_dict
+    if config_dict is None:
+        config_dict = _load_config() # default one
+    ai.setPyFAI(**config_dict)
+    npt = _npt_cal(config_dict)
+
+    # iterate over header
+    total_rv_list = []
+    for header in header_list:
+        header_rv_list = []
+        root_dir = an_glbl.analysis_dir
+        # dark logic
+        dark_img = handler.pull_dark(header)
+        if not dark_sub:
+            dark_img = None
+        # event
+        for event in get_events(header, fill=True):
+            img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
+                                                                    dark_img)
+            f_name = handler._file_name(event, event_timestamp, ind)
+            if dark_sub:
+                f_name = 'sub_' + f_name
+            w_name = os.path.join(root_dir, f_name)
+            integration_dict = {'filename':w_name, 'npt':npt,
+                                'polarization_factor': 0.99}
+            print("INFO: integrating image: {filename}"
+                  .format(**integration_dict))
+            rv = ai.integrate1d(img, npt, **integration_dict)
+            header_rv_list.append(rv)
+        total_rv_list.append(header_rv_list)
+        # each header generate  a list of rv
+
+    print("{:*^30}".format('Integration process finished'))
+    return total_rv_list
+
+def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
+              handler=xpd_data_proc):
     """ save images obtained from dataBroker as tiff format files.
 
     Parameters
@@ -207,8 +246,50 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False):
 
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
+
+    handler : instance of class
+        instance of class that handles data process, don't change it
+        unless needed.
     """
-    xpd_data_proc.save_tiff(headers, dark_sub, max_count, dryrun)
+    # normalize list
+    header_list = _prepare_header_list(headers)
+
+    for header in header_list:
+        # create root_dir
+        root = header.start.get(handler.root_dir_name, None)
+        if root is not None:
+            root_dir = os.path.join(W_DIR, root)
+            os.makedirs(root_dir, exist_ok=True)
+        else:
+            root_dir = W_DIR
+        # dark logic
+        dark_img = handler.pull_dark(header)
+        if not dark_sub:
+            dark_img = None # no sub
+        # event
+        for event in get_events(header, fill=True):
+            img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
+                                                                    dark_img)
+            f_name = handler._file_name(event, event_timestamp, ind)
+            if dark_sub:
+                f_name = 'sub_' + f_name
+            # save
+            w_name = os.path.join(root_dir, f_name)
+            if not dryrun:
+                tif.imsave(w_name, img)
+                if os.path.isfile(w_name):
+                    print('image "%s" has been saved at "%s"' %
+                        (f_name, root_dir))
+                else:
+                    print('Sorry, something went wrong with your tif saving')
+                    return
+            else:
+                print("dryrun: image {} has been saved at {}"
+                      .format(f_name, root_dir))
+            if max_count is not None and ind >= max_count:
+                # break the loop if max_count reached, move to next header
+                break
+    print("{:*^30}".format('Saving process finished'))
 
 def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """ save images from the most recent scan as tiff format files.
@@ -229,5 +310,6 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
     """
-    xpd_data_proc.save_tiff(db[-1], dark_sub, max_count, dryrun)
+
+    save_tiff(db[-1], dark_sub, max_count, dryrun)
 

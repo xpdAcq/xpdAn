@@ -14,6 +14,7 @@ BEAMLINE_ID = 'xpd'
 GROUP = 'XPD'
 DET_IMAGE_FIELD = 'pe1_image'
 DARK_FIELD_KEY = 'sc_dk_field_uid'
+CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
 # change this to be handled by an environment variable later
 hostname = socket.gethostname()
@@ -75,6 +76,7 @@ class Glbl:
     config_base = CONFIG_BASE
     tiff_base =TIFF_BASE
     usrScript_dir = USERSCRIPT_DIR
+    analysis_dir = ANALYSIS_DIR
     yaml_dir = YAML_DIR
     bt_dir = BT_DIR
     sample_dir = SAMPLE_DIR
@@ -87,5 +89,6 @@ class Glbl:
     group = GROUP
     det_image_field = DET_IMAGE_FIELD
     dark_field_key = DARK_FIELD_KEY
+    calib_config_name = CALIB_CONFIG_NAME
 
 an_glbl = Glbl()

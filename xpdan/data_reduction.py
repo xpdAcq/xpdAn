@@ -124,7 +124,7 @@ class DataReduction:
         img_list = []
         timestamp_list = []
         dark_img = self.pull_dark(header)
-        for ev in get_events(header):
+        for ev in get_events(header, fill=True):
             sub_img, event_timestamp = self._dark_sub(ev, dark_img)
             img_list.append(sub_img)
             timestamp_list.append(timestamp)
@@ -164,7 +164,8 @@ def _npt_cal(config_dict):
     dist = np.sqrt((2048-x_0)**2 + (2048-y_0)**2)
     return dist
 
-def pyFAI_integrate(headers, root_dir=None, config_dict=None, handler=xpd_data_proc):
+def pyFAI_integrate(headers, root_dir=None, config_dict=None,
+                    handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
         Parameters

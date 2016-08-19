@@ -211,7 +211,7 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
             if dark_sub:
                 f_name = 'sub_' + f_name
             w_name = os.path.join(root_dir, f_name)
-            integration_dict = {'filename':w_name, 'npt':npt,
+            integration_dict = {'filename':w_name,
                                 'polarization_factor': 0.99}
             print("INFO: integrating image: {}".format(f_name))
             rv = ai.integrate1d(img, npt, **integration_dict)
@@ -298,7 +298,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
-            # save
+            # save tif
             w_name = os.path.join(root_dir, f_name)
             if not dryrun:
                 tif.imsave(w_name, img)
@@ -308,12 +308,20 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
                 else:
                     print('Sorry, something went wrong with your tif saving')
                     return
+            # dryrun : print
             else:
                 print("dryrun: image {} has been saved at {}"
                       .format(f_name, root_dir))
             if max_count is not None and ind >= max_count:
                 # break the loop if max_count reached, move to next header
                 break
+
+        # save config
+        stem, ext = os.path.splitext(w_name)
+        config_name = w_name.replace(ext, '.yaml')
+        with open(config_name, 'w') as f:
+            yaml.dump(header.start['sc_calibration_md'], f)
+
     print("{:*^30}".format('Saving process finished'))
 
 def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):

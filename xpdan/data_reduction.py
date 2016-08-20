@@ -316,11 +316,12 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
                 # break the loop if max_count reached, move to next header
                 break
 
-        # save config
+        # save run_start
         stem, ext = os.path.splitext(w_name)
         config_name = w_name.replace(ext, '.yaml')
         with open(config_name, 'w') as f:
-            yaml.dump(header.start['sc_calibration_md'], f)
+            #yaml.dump(header.start['sc_calibration_md'], f)
+            yaml.dump(header.start, f) # save all md in start
 
     print("{:*^30}".format('Saving process finished'))
 

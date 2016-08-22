@@ -20,6 +20,7 @@
 import os
 import warnings
 import datetime
+import yaml
 import numpy as np
 import tifffile as tif
 import matplotlib as plt
@@ -53,10 +54,11 @@ class DataReduction:
         Note: not a callback
     """
     def __init__(self, image_field=None):
-        # for file name
-        self.fields = ['sa_name','sp_name', 'temperature']
+        # for file name 
+        self.fields = ['sample_name','sp_type', 'sp_requested_exposure']
         self.labels = ['dark_frame']
-        self.root_dir_name = 'sa_name'
+        self.data_fields = ['temperature']
+        self.root_dir_name = 'sample_name'
         if image_field is None:
             self.image_field = an_glbl.det_image_field
 
@@ -78,13 +80,21 @@ class DataReduction:
                     pass
         # get fields
         for key in self.fields:
-            el = run_start.get(key, None)
+            el = str(run_start.get(key, None))
             if el is not None:
                 # truncate string length
-                if len(el)>12:
+                if len(el) >12:
                     value = el[:12]
                 # clear space
                 feature = _clean_info(el)
+                feature_list.append(feature)
+            else:
+                pass
+        # get data fields
+        for key in self.data_fields:
+            val = event['data'].get(key, None)
+            if el is not None:
+                feature = "{}={}".format(key, val)
                 feature_list.append(feature)
             else:
                 pass
@@ -103,28 +113,26 @@ class DataReduction:
             dark_header = db(**dark_search)
             dark_img = np.asarray(get_images(dark_header,
                                              self.image_field)).squeeze()
-        return dark_img
+        return dark_img, dark_header[0].start.time
 
     def _dark_sub(self, event, dark_img):
         """ priviate method operates on event level """
         dark_sub = False
+        img = event['data'][self.image_field]
         if dark_img is not None and isinstance(dark_img, np.ndarray):
             dark_sub = True
-        img = event['data'][self.image_field]
+            img -= dark_img
         ind = event['seq_num']
         event_timestamp = event['timestamps'][self.image_field]
-        # dark subtration logic
-        if dark_img is not None:
-            img -= dark_img
         return img, event_timestamp, ind, dark_sub
 
-    def dark_sub(self, hedear):
+    def dark_sub(self, header):
         """ public method operates on header level """
         img_list = []
         timestamp_list = []
-        dark_img = self.pull_dark(header)
+        dark_img, dark_time_stamp = self.pull_dark(header)
         for ev in get_events(header, fill=True):
-            sub_img, event_timestamp = self._dark_sub(ev, dark_img)
+            sub_img, timestamp, ind, dark_sub = self._dark_sub(ev, dark_img)
             img_list.append(sub_img)
             timestamp_list.append(timestamp)
         return img_list, timestamp_list, dark_img, header.start
@@ -153,7 +161,7 @@ def _prepare_header_list(headers):
     return header_list
 
 def _load_config():
-    with open(glbl.calib_config_name) as f:
+    with open(os.path.join(an_glbl.config_base, an_glbl.calib_config_name)) as f:
         config_dict = yaml.load(f)
     return config_dict
 
@@ -201,8 +209,8 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
         header_rv_list = []
         # dark logic
         dark_img = handler.pull_dark(header)
-        if not dark_sub:
-            dark_img = None
+        #if not dark_sub:
+        #    dark_img = None
         # event
         for event in get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
@@ -216,15 +224,20 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
             print("INFO: integrating image: {}".format(f_name))
             rv = ai.integrate1d(img, npt, **integration_dict)
             header_rv_list.append(rv)
+            stem, ext = os.path.splitext(f_name)
+            chi_name = stem + '.chi'
+            print("INFO: save chi file: {}".format(chi_name))
+            np.savetxt(w_name.replace('.tif', '.chi'), np.asarray(rv).T)
         total_rv_list.append(header_rv_list)
         # each header generate  a list of rv
 
-    print("{:*^30}".format('Integration process finished'))
+    print(" *** {} *** ".format('Integration process finished'))
+
     print("INFO: chi files are saved at {}".format(root_dir))
     return total_rv_list
 
 
-def pyFAI_integrate_last_image(root_dir=None, config_dict=None,
+def pyFAI_integrate_last(root_dir=None, config_dict=None,
                                handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
@@ -243,9 +256,9 @@ def pyFAI_integrate_last_image(root_dir=None, config_dict=None,
             instance of class that handles data process, don't change it
             unless needed.
     """
-    pyFAI_integrate_last_image(db[-1], root_dir=None,
-                               config_dict=None,
-                               handler=xpd_data_proc)
+    pyFAI_integrate(db[-1], root_dir=root_dir,
+                    config_dict=config_dict,
+                    handler=handler)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
@@ -288,7 +301,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         else:
             root_dir = W_DIR
         # dark logic
-        dark_img = handler.pull_dark(header)
+        dark_img, dark_time = handler.pull_dark(header)
         if not dark_sub:
             dark_img = None # no sub
         # event
@@ -323,7 +336,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
             #yaml.dump(header.start['sc_calibration_md'], f)
             yaml.dump(header.start, f) # save all md in start
 
-    print("{:*^30}".format('Saving process finished'))
+    print(" *** {} *** ".format('Saving process finished'))
 
 def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """ save images from the most recent scan as tiff format files.
@@ -338,7 +351,7 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
 
     max_count : int, optional
         The maximum number of events to process per-run.  This can be
-        useful to 'preview' an export or if there are corrupted files
+        useful to 'preview' an export or if ithere are corrupted files
         in the data stream (ex from the IOC crashing during data acquisition).
 
     dryrun : bool, optional

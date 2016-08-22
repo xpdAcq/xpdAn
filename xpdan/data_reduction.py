@@ -204,35 +204,30 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
 
     # iterate over header
     total_rv_list = []
-    root_dir = an_glbl.usrAnalysis_dir
+    if root_dir is None:
+        root_dir = an_glbl.usrAnalysis_dir
     for header in header_list:
         header_rv_list = []
         # dark logic
         dark_img = handler.pull_dark(header)
-        #if not dark_sub:
-        #    dark_img = None
-        # event
         for event in get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
-            w_name = os.path.join(root_dir, f_name)
-            integration_dict = {'filename':w_name,
+            stem, ext = os.path.splitext(f_name)
+            chi_name = stem + '.chi'
+            integration_dict = {'filename':os.path.join(root_dir, chi_name),
                                 'polarization_factor': 0.99}
             print("INFO: integrating image: {}".format(f_name))
             rv = ai.integrate1d(img, npt, **integration_dict)
             header_rv_list.append(rv)
-            stem, ext = os.path.splitext(f_name)
-            chi_name = stem + '.chi'
             print("INFO: save chi file: {}".format(chi_name))
-            np.savetxt(w_name.replace('.tif', '.chi'), np.asarray(rv).T)
         total_rv_list.append(header_rv_list)
         # each header generate  a list of rv
 
     print(" *** {} *** ".format('Integration process finished'))
-
     print("INFO: chi files are saved at {}".format(root_dir))
     return total_rv_list
 

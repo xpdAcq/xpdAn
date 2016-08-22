@@ -171,7 +171,7 @@ def _npt_cal(config_dict):
     dist = np.sqrt((2048-x_0)**2 + (2048-y_0)**2)
     return dist
 
-def pyFAI_integrate(headers, root_dir=None, config_dict=None,
+def integrate(headers, root_dir=None, config_dict=None,
                     handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
@@ -204,9 +204,13 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
 
     # iterate over header
     total_rv_list = []
-    if root_dir is None:
-        root_dir = an_glbl.usrAnalysis_dir
     for header in header_list:
+        root = header.start.get(handler.root_dir_name, None)
+        if root is not None:
+            root_dir = os.path.join(W_DIR, root)
+            os.makedirs(root_dir, exist_ok=True)
+        else:
+            root_dir = W_DIR
         header_rv_list = []
         # dark logic
         dark_img = handler.pull_dark(header)
@@ -232,15 +236,14 @@ def pyFAI_integrate(headers, root_dir=None, config_dict=None,
     return total_rv_list
 
 
-def pyFAI_integrate_last(root_dir=None, config_dict=None,
-                               handler=xpd_data_proc):
+def integrate_last(root_dir=None, config_dict=None, handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
         Parameters
         ----------
         root_dir : str, optional
             path of chi files that are going to be saved. default is
-            xpdUser/userAnalysis/
+            xpdUser/tiff_base/<sample_name>/
 
         config_dict : dict, optional
             dictionary stores integration parameters of pyFAI azimuthal

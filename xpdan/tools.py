@@ -167,3 +167,42 @@ def mask_img(img, geo,
     if alpha:
         working_mask *= binned_outlier(img, r, alpha, rbins, mask=tmsk)
     return working_mask
+
+
+def sum_images(imgs, sum_list=None):
+    """
+    Sum a bunch of images together from a list
+
+    Parameters
+    ----------
+    imgs: list of ndarrays
+        The list of images
+    sum_list: list of list of ints, optional
+        The list of lists of images to sum, if None sum all the images
+
+    Returns
+    -------
+    list of ndarray:
+        The list of summed images
+    """
+    if sum_list is None:
+        img = np.sum(imgs)
+        return [img]
+    else:
+        summed_imgs = []
+        for idxs in sum_list:
+            img = None
+            for idx in idxs:
+                if img is None:
+                    img = imgs[idx]['data']['img']
+                else:
+                    img += imgs[idx]['data']['img']
+            summed_imgs.append(img)
+        return summed_imgs
+
+
+def sum_and_integrate(imgs, geo, sum_list=None, npt=1450, **kwargs):
+    summed_imgs = sum_images(imgs, sum_list)
+    for img in summed_imgs:
+        q, iq = geo.integrate1d(img, npt=npt)
+        # save chi somewhere

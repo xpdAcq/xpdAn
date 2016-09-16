@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.path import Path
 import scipy.stats as sts
+from operator import itemgetter
 
 
 def margin(img_shape, edge_size):
@@ -191,12 +192,6 @@ def sum_images(imgs, sum_list=None):
     else:
         summed_imgs = []
         for idxs in sum_list:
-            img = None
-            for idx in idxs:
-                if img is None:
-                    img = imgs[idx]['data']['img']
-                else:
-                    img += imgs[idx]['data']['img']
             summed_imgs.append(img)
         return summed_imgs
 

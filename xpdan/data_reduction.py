@@ -153,7 +153,8 @@ ai = AzimuthalIntegrator()
 
 ### analysis function operates at header level ###
 def _prepare_header_list(headers):
-    if type(list(headers)[1]) == str:
+    if not isinstance(headers, list):
+        # still do it in two steps, easier to read
         header_list = list()
         header_list.append(headers)
     else:
@@ -165,20 +166,32 @@ def _load_config():
         config_dict = yaml.load(f)
     return config_dict
 
-def _npt_cal(config_dict):
+def _npt_cal(config_dict, total_shape=(2048, 2048)):
     """ config_dict should be a PyFAI calibration dict """
     x_0, y_0 = (config_dict['centerX'], config_dict['centerY'])
-    dist = np.sqrt((2048-x_0)**2 + (2048-y_0)**2)
+    center_len = np.hypot(x_0, y_0)
+    # FIXME : use hardwired shape now, use direct info later
+    x_total, y_total = total_shape
+    total_len = np.hypot(x_total, y_total)
+    # FIXME : use the longest diagonal distance. Optimal value might have
+    # to do with grid of Fourier transform. Need to revist it later
+    dist = max(total_len, total_len - center_len)
     return dist
 
-def integrate(headers, root_dir=None, config_dict=None,
-                    handler=xpd_data_proc):
+def integrate(headers, polarization_factor=0.99,
+              root_dir=None, config_dict=None, handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
         Parameters
         ----------
         headers : list
-            a list of header objects obtained from a query to dataBroker
+            a list of header objects obtained from a query to
+            dataBroker.
+
+        polarization_factor : float, int
+            polarization correction factor, ranged from -1(vertical) to
+            +1 (horizontal). default is 0.99. set to None for no
+            correction.
 
         root_dir : str, optional
             path of chi files that are going to be saved. default is
@@ -223,7 +236,8 @@ def integrate(headers, root_dir=None, config_dict=None,
             stem, ext = os.path.splitext(f_name)
             chi_name = stem + '.chi'
             integration_dict = {'filename':os.path.join(root_dir, chi_name),
-                                'polarization_factor': 0.99}
+                                'polarization_factor':
+                                polarization_factor}
             print("INFO: integrating image: {}".format(f_name))
             rv = ai.integrate1d(img, npt, **integration_dict)
             header_rv_list.append(rv)
@@ -236,11 +250,17 @@ def integrate(headers, root_dir=None, config_dict=None,
     return total_rv_list
 
 
-def integrate_last(root_dir=None, config_dict=None, handler=xpd_data_proc):
+def integrate_last(polarization_factor=0.99, root_dir=None,
+                   config_dict=None, handler=xpd_data_proc):
     """ integrate dark subtracted image for given list of headers
 
         Parameters
         ----------
+        polarization_factor : float, int
+            polarization correction factor, ranged from -1(vertical) to
+            +1 (horizontal). default is 0.99. set to None for no
+            correction.
+
         root_dir : str, optional
             path of chi files that are going to be saved. default is
             xpdUser/tiff_base/<sample_name>/
@@ -254,7 +274,9 @@ def integrate_last(root_dir=None, config_dict=None, handler=xpd_data_proc):
             instance of class that handles data process, don't change it
             unless needed.
     """
-    pyFAI_integrate(db[-1], root_dir=root_dir,
+    pyFAI_integrate(db[-1],
+                    polarization_factor=polarization_factor,
+                    root_dir=root_dir,
                     config_dict=config_dict,
                     handler=handler)
 
@@ -266,7 +288,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
     Parameters
     ----------
     headers : list
-        a list of header objects obtained from a query to dataBroker
+        a list of header objects obtained from a query to dataBroker.
 
     dark_subtraction : bool, optional
         Default is True, which allows dark/background subtraction to 

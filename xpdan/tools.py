@@ -5,13 +5,13 @@ from operator import itemgetter
 
 
 def margin(img_shape, edge_size):
-    """
-    Mask the edge of an image
+    """ Mask the edge of an image
 
     Parameters
     -----------
     img_shape: tuple
-        The shape of the image
+        The shape of the image.
+        This is usually given by image.shape
     edge_size: int
         Number of pixels to mask from the edge
 
@@ -26,21 +26,22 @@ def margin(img_shape, edge_size):
 
 
 def binned_outlier(img, r, alpha, bins, mask=None):
-    """
-    Generates a mask by identifying outlier pixels in bins and masks any
-    pixels which have a value greater or less than alpha * std away from the
-    mean
+    """ Generates a mask by identifying outlier pixels.
+
+    The image is binned and any pixels which have a value greater or less than
+    alpha * std away from the mean are masked.
 
     Parameters
     ----------
     img: 2darray
         The  image
     r: 2darray
-        The  array which maps pixels to bins
+        The array which maps pixels to bins.
+        This is usually given by pyFAI.geometry.Geometry.rArray
     alpha: float or tuple or, 1darray
-        Then number of acceptable standard deviations, if tuple then we use
-        a linear distribution of alphas from alpha[0] to alpha[1], if array
-        then we just use that as the distribution of alphas
+        The number of acceptable standard deviations.
+        If tuple then we use a linear distribution of alphas from alpha[0] to
+        alpha[1], if array then we use that as the distribution of alphas
     bins: list
         The bin edges
     mask: 1darray

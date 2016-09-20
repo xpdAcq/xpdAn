@@ -67,7 +67,7 @@ def get_metadata(headers):
 ######################################
 
 class XpdAn:
-    """ calss that holds databroker headers/events and summarize the
+    """ class that holds databroker headers/events and summarize the
     metadata
     """
 
@@ -135,9 +135,9 @@ class XpdAn:
                         col_name=self.header_md_fields)
 
     def _table_gen(self, headers, ind_name=None, col_name=None):
-        """ self-maintained thin layer of pd.dataFrame, and print
+        """ self-maintained thin layer of pd.dataFrame, and print it.
 
-        mature function in databroker.core.get_table
+        a more mature function is in databroker.core.get_table.
         """
         col_len = len(col_name)
 

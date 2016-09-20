@@ -6,5 +6,5 @@ setup(
     packages = find_packages(),
     description = 'analysis module',
     zip_safe = False,
-    url = 'http:/github.com/chiahaoliu/xpdAn'
+    url = 'http:/github.com/xpdAcq/xpdAn'
     )

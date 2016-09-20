@@ -172,32 +172,31 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate(headers, polarization_factor=0.99,
-              root_dir=None, config_dict=None, handler=xpd_data_proc):
-    """ integrate dark subtracted image for given list of headers
+def integrate_and_save(headers, polarization_factor=0.99,
+                       save_image=True, root_dir=None,
+                       config_dict=None, handler=xpd_data_proc):
+    """ integrate and save dark subtracted images for given list of headers
 
         Parameters
         ----------
         headers : list
-            a list of header objects obtained from a query to
-            dataBroker.
-
-        polarization_factor : float, int
-            polarization correction factor, ranged from -1(vertical) to
+            a list of databroker.header objects obtained
+        polarization_factor : float, optional
+            polarization correction factor, ranged from -1(vertical) to 
             +1 (horizontal). default is 0.99. set to None for no
             correction.
-
+        save_image : bool, optional
+            option to save dark subtracted images. images will be 
+            saved to the same directory of chi files. default is True.
         root_dir : str, optional
-            path of chi files that are going to be saved. default is
+            path of chi files that are going to be saved. default is 
             xpdUser/userAnalysis/
-
         config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal
-            integrator. default is the most recent parameters saved in
+            dictionary stores integration parameters of pyFAI azimuthal 
+            integrator. default is the most recent parameters saved in 
             xpdUser/conifg_base
-
         handler : instance of class, optional
-            instance of class that handles data process, don't change it
+            instance of class that handles data process, don't change it 
             unless needed.
     """
     # normalize list
@@ -229,6 +228,8 @@ def integrate(headers, polarization_factor=0.99,
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
+
+            # integration logic
             stem, ext = os.path.splitext(f_name)
             chi_name_Q = stem + '_Q_' + '.chi' # q_nm^-1
             chi_name_2theta = stem + '_2theta_' + '.chi' # 2theta_rad
@@ -243,12 +244,23 @@ def integrate(headers, polarization_factor=0.99,
             # 2theta-integration
             integration_dict.update({'filename': chi_name_2theta})
             rv_2theta = ai.integrate1d(img, npt, **integration_dict,
-                                unit="2th_deg")
-            # return value
+                                       unit="2th_deg")
+            # return integration results
             header_rv_list_Q.append(rv_Q)
             header_rv_list_2theta.append(rv_2theta)
             print("INFO: save chi file: {}".format(chi_name_Q))
             print("INFO: save chi file: {}".format(chi_name_2theta))
+
+            # save image logic
+            w_name = os.path.join(root_dir, f_name)
+            if save_image:
+                tif.imsave(w_name, img)
+                if os.path.isfile(w_name):
+                    print('image "%s" has been saved at "%s"' %
+                        (f_name, root_dir))
+                else:
+                    print('Sorry, something went wrong with your tif saving')
+                    return
 
         # each header generate  a list of rv
         total_rv_list_Q.append(header_rv_list_Q)
@@ -259,35 +271,38 @@ def integrate(headers, polarization_factor=0.99,
     return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_last(polarization_factor=0.99, root_dir=None,
-                   config_dict=None, handler=xpd_data_proc):
-    """ integrate dark subtracted image for given list of headers
+def integrate_and_save_last(polarization_factor=0.99, save_image=True,
+                            root_dir=None, config_dict=None,
+                            handler=xpd_data_proc):
+    """ integrate and save dark subtracted image for given list of headers
 
         Parameters
         ----------
-        polarization_factor : float, int
+        polarization_factor : float, optional
             polarization correction factor, ranged from -1(vertical) to
             +1 (horizontal). default is 0.99. set to None for no
             correction.
-
+        save_image : bool, optional
+            option to save dark subtracted images. images will be 
+            saved to the same directory with chi files. default is True.
         root_dir : str, optional
-            path of chi files that are going to be saved. default is
+            path of chi files that are going to be saved. default is 
             xpdUser/tiff_base/<sample_name>/
-
         config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal
-            integrator. default is the most recent parameters saved in
+            dictionary stores integration parameters of pyFAI azimuthal 
+            integrator. default is the most recent parameters saved in 
             xpdUser/conifg_base
-
         handler : instance of class, optional
-            instance of class that handles data process, don't change it
+            instance of class that handles data process, don't change it 
             unless needed.
     """
-    integrate(handler.exp_db[-1],
-              polarization_factor=polarization_factor,
-              root_dir=root_dir,
-              config_dict=config_dict,
-              handler=handler)
+
+    integrate_and_save(db[-1],
+                       polarization_factor=polarization_factor,
+                       save_image=save_image,
+                       root_dir=root_dir,
+                       config_dict=config_dict,
+                       handler=handler)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
@@ -362,8 +377,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         stem, ext = os.path.splitext(w_name)
         config_name = w_name.replace(ext, '.yaml')
         with open(config_name, 'w') as f:
-            # yaml.dump(header.start['sc_calibration_md'], f)
-            yaml.dump(header.start, f)  # save all md in start
+            yaml.dump(header.start, f) # save all md in start
 
     print(" *** {} *** ".format('Saving process finished'))
 

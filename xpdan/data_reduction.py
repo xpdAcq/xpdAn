@@ -210,7 +210,8 @@ def integrate(headers, polarization_factor=0.99,
     npt = _npt_cal(config_dict)
 
     # iterate over header
-    total_rv_list = []
+    total_rv_list_Q = []
+    total_rv_list_2theta = []
     for header in header_list:
         root = header.start.get(handler.root_dir_name, None)
         if root is not None:
@@ -218,7 +219,8 @@ def integrate(headers, polarization_factor=0.99,
             os.makedirs(root_dir, exist_ok=True)
         else:
             root_dir = W_DIR
-        header_rv_list = []
+        header_rv_list_Q = []
+        header_rv_list_2theta = []
         # dark logic
         dark_img = handler.pull_dark(header)
         for event in handler.exp_db.get_events(header, fill=True):
@@ -228,20 +230,33 @@ def integrate(headers, polarization_factor=0.99,
             if dark_sub:
                 f_name = 'sub_' + f_name
             stem, ext = os.path.splitext(f_name)
-            chi_name = stem + '.chi'
-            integration_dict = {'filename': os.path.join(root_dir, chi_name),
+            chi_name_Q = stem + '_Q_' + '.chi' # q_nm^-1
+            chi_name_2theta = stem + '_2theta_' + '.chi' # 2theta_rad
+            integration_dict = {'filename':
+                                os.path.join(root_dir, chi_name_Q),
                                 'polarization_factor':
                                     polarization_factor}
             print("INFO: integrating image: {}".format(f_name))
-            rv = ai.integrate1d(img, npt, **integration_dict)
-            header_rv_list.append(rv)
-            print("INFO: save chi file: {}".format(chi_name))
-        total_rv_list.append(header_rv_list)
+            # Q-integration
+            rv_Q = ai.integrate1d(img, npt, **integration_dict,
+                                  unit="q_nm^-1")
+            # 2theta-integration
+            integration_dict.update({'filename': chi_name_2theta})
+            rv_2theta = ai.integrate1d(img, npt, **integration_dict,
+                                unit="2th_deg")
+            # return value
+            header_rv_list_Q.append(rv_Q)
+            header_rv_list_2theta.append(rv_2theta)
+            print("INFO: save chi file: {}".format(chi_name_Q))
+            print("INFO: save chi file: {}".format(chi_name_2theta))
+
         # each header generate  a list of rv
+        total_rv_list_Q.append(header_rv_list_Q)
+        total_rv_list_2theta.append(header_rv_list_2theta)
 
     print(" *** {} *** ".format('Integration process finished'))
     print("INFO: chi files are saved at {}".format(root_dir))
-    return total_rv_list
+    return total_rv_list_Q, total_rv_list_2theta
 
 
 def integrate_last(polarization_factor=0.99, root_dir=None,

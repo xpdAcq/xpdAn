@@ -1,6 +1,6 @@
 [run]
 source = 
-    xpdacq
+    xpdan
 [report]
 omit =
     */python?.?/*

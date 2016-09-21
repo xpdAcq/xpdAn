@@ -57,8 +57,6 @@ def binned_outlier(img, r, alpha, bins, mask=None):
         working_mask = np.ones(img.shape).astype(bool)
     else:
         working_mask = mask.copy()
-    if working_mask.shape != img.shape:
-        working_mask = working_mask.reshape(img.shape)
     msk_img = img[working_mask]
     msk_r = r[working_mask]
 

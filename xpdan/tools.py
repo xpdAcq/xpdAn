@@ -1,7 +1,6 @@
 import numpy as np
-from matplotlib.path import Path
 import scipy.stats as sts
-from operator import itemgetter
+from matplotlib.path import Path
 
 
 def margin(img_shape, edge_size):
@@ -107,7 +106,7 @@ def mask_img(img, geo,
     bs_width: int, optional
         The width of the beamstop in pixels. Defaults to 13.
         If None, no beamstop polygon mask is applied.
-    tri_offset, int, optional
+    tri_offset: int, optional
         The triangular pixel offset to create a pointed beamstop polygon mask.
         Defaults to 13. If None, no beamstop polygon mask is applied.
     v_asym: int, optional
@@ -167,4 +166,3 @@ def mask_img(img, geo,
     if alpha:
         working_mask *= binned_outlier(img, r, alpha, rbins, mask=tmsk)
     return working_mask
-

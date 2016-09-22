@@ -3,6 +3,8 @@ import socket
 import yaml
 import time
 from time import strftime
+import tempfile
+
 
 HOME_DIR_NAME = 'xpdUser'
 BLCONFIG_DIR_NAME = 'xpdConfig'
@@ -25,6 +27,8 @@ else:
 
 if simulation:
     BASE_DIR = os.getcwd()
+elif os.environ["IS_TEST"] == 'TRUE':
+    BASE_DIR = tempfile.mkdtemp()
 else:
     BASE_DIR = os.path.expanduser('~/')
 

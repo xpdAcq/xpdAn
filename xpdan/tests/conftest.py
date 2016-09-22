@@ -114,8 +114,6 @@ def build_pymongo_backed_broker_with_imgs(request):
 
     request.addfinalizer(delete_fs)
 
-    Glbl.base = tempfile.mkdtemp()
-
     insert_imgs(exp_mds, exp_fs, 5, (200, 200), Glbl.base)
 
     def delete_imgs():

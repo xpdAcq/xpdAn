@@ -51,7 +51,7 @@ def _timestampstr(timestamp):
 
 
 def get_metadata(headers):
-    """ samll function that returns md as a list of pd.DataFrames """
+    """ small function that returns md as a list of pd.DataFrames """
     if type(list(headers)[1]) == str:
         header_list = list()
         header_list.append(headers)

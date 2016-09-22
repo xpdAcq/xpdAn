@@ -97,7 +97,8 @@ def mask_img(img, geo,
     img: ndarray
         The image to be masked
     geo: pyFAI.geometry.Geometry
-        The pyFAI description of the detector orientation
+        The pyFAI description of the detector orientation or sub-class
+        of pyFAI.geometry.Geomery class.
     edge: int, optional
         The number of edge pixels to mask. Defaults to 30. If None, no edge
         mask is applied
@@ -147,6 +148,7 @@ def mask_img(img, geo,
         working_mask *= (img > lower_thresh).astype(bool)
     if upper_thresh:
         working_mask *= (img < upper_thresh).astype(bool)
+    # beamstop masking
     if all([a is not None for a in [bs_width, tri_offset, v_asym]]):
         center_x, center_y = [geo.getFit2D()[k] for k in
                               ['centerX', 'centerY']]

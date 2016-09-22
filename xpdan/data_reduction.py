@@ -130,8 +130,8 @@ class DataReduction:
     def _file_name(self, event, event_timestamp, ind):
         """ priviate method operates on event level """
         f_name = self._feature_gen(event)
-        f_name = '_'.join([f_name,
-                           _timestampstr(event_timestamp)])
+        f_name = '_'.join([_timestampstr(event_timestamp),
+                           f_name])
         f_name = '{}_{:04d}.tif'.format(f_name, ind)
         return f_name
 
@@ -172,7 +172,8 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate_and_save(headers, polarization_factor=0.99,
+def integrate_and_save(headers, auto_dark=True,
+                       polarization_factor=0.99,
                        auto_mask=True, mask_dict=None,
                        save_image=True, root_dir=None,
                        config_dict=None, handler=xpd_data_proc, **kwargs):
@@ -182,6 +183,8 @@ def integrate_and_save(headers, polarization_factor=0.99,
         ----------
         headers : list
             a list of databroker.header objects
+        auto_dark : bool, optional
+            option to turn on/off dark subtraction functionality
         polarization_factor : float, optional
             polarization correction factor, ranged from -1(vertical) to 
             +1 (horizontal). default is 0.99. set to None for no
@@ -245,13 +248,15 @@ def integrate_and_save(headers, polarization_factor=0.99,
         header_rv_list_Q = []
         header_rv_list_2theta = []
         # dark logic
-        dark_img = handler.pull_dark(header)
+        dark_img = None
+        if auto_dark:
+            dark_img, dark_time = handler.pull_dark(header)
         for event in handler.exp_db.get_events(header, fill=True):
-            # basic file name
-            f_name = handler._file_name(event, event_timestamp, ind)
             # dark subtraction
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
+            # basic file name
+            f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
 
@@ -270,16 +275,16 @@ def integrate_and_save(headers, polarization_factor=0.99,
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
             chi_fn = os.path.join(root_dir, chi_name_Q)
-            rv_Q = ai.integrate1d(img, npt, filename=chi_fn, mask=mask
+            rv_Q = ai.integrate1d(img, npt, filename=chi_fn, mask=mask,
                                   polarization_factor=polarization_factor,
                                   unit="q_nm^-1", **kwargs)
             print("INFO: save chi file: {}".format(chi_name_Q))
             # 2theta-integration
             chi_fn = os.path.join(root_dir, chi_name_2th)
-            rv_2th  = ai.integrate1d(img, npt, filename=chi_fn, mask=mask
-                                     polarization_factor=polarization_factor,
-                                     unit="2th_deg", **kwargs)
-            print("INFO: save chi file: {}".format(chi_name_2theta))
+            rv_2th = ai.integrate1d(img, npt, filename=chi_fn, mask=mask,
+                                    polarization_factor=polarization_factor,
+                                    unit="2th_deg", **kwargs)
+            print("INFO: save chi file: {}".format(chi_name_2th))
             # return integration results
             header_rv_list_Q.append(rv_Q)
             header_rv_list_2theta.append(rv_2th)
@@ -303,7 +308,7 @@ def integrate_and_save(headers, polarization_factor=0.99,
     return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_and_save_last(polarization_factor=0.99,
+def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
                             auto_mask=True, mask_dict=None,
                             save_image=True, root_dir=None,
                             config_dict=None, handler=xpd_data_proc, **kwargs):
@@ -311,6 +316,8 @@ def integrate_and_save_last(polarization_factor=0.99,
 
         Parameters
         ----------
+        dark_sub : bool, optional
+            option to turn on/off dark subtraction functionality
         polarization_factor : float, optional
             polarization correction factor, ranged from -1(vertical) to 
             +1 (horizontal). default is 0.99. set to None for no
@@ -349,10 +356,9 @@ def integrate_and_save_last(polarization_factor=0.99,
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-
-    integrate_and_save(db[-1],
+    integrate_and_save(db[-1], auto_dark=auto_dark,
                        polarization_factor=polarization_factor,
-                       auto_maks=auto_mask, mask_dict=mask_dict,
+                       auto_mask=auto_mask, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,
@@ -399,9 +405,9 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         else:
             root_dir = W_DIR
         # dark logic
-        dark_img, dark_time = handler.pull_dark(header)
-        if not dark_sub:
-            dark_img = None  # no sub
+        dark_img = None
+        if dark_sub:
+            dark_img, dark_time = handler.pull_dark(header)
         # event
         for event in handler.exp_db.get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,

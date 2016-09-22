@@ -155,11 +155,10 @@ def make_glbl(env_code=0):
         calib_config_name = CALIB_CONFIG_NAME
         exp_db = db
         # default masking dict
-        auto_mask_dict = {'edge': 30, 'lower_thresh': 0.0,
-                          'upper_thresh': None, 'bs_width': 13,
-                          'tri_offset': 13, 'v_asym': 0,
-                          'alpha': 2.5, 'tmsk': None}
-
+        mask_dict = {'edge': 30, 'lower_thresh': 0.0,
+                     'upper_thresh': None, 'bs_width': 13,
+                     'tri_offset': 13, 'v_asym': 0,
+                     'alpha': 2.5, 'tmsk': None}
     return Glbl
 
 env_code = os.environ['XPDAN_SETUP']

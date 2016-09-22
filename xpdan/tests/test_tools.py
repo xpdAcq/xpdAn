@@ -3,6 +3,7 @@ from pyFAI.geometry import Geometry
 from xpdan.tools import margin, binned_outlier
 from numpy.testing import assert_array_equal
 
+
 def test_margin():
     size = (10, 10)
     edge = 1
@@ -43,7 +44,7 @@ def test_ring_blur_mask():
         pixels.append((a, b))
     pixel_size = [getattr(g, k) for k in ['pixel1', 'pixel2']]
     rres = np.hypot(*pixel_size)
-    bins = np.arange(np.min(r) - rres/2., np.max(r) + rres / 2., rres)
+    bins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres)
     msk = binned_outlier(Z, r, (3., 3), bins, mask=None)
     a = set(zip(*np.nonzero(~msk)))
     b = set(pixels)

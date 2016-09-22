@@ -8,7 +8,6 @@ import pandas as pd
 
 from .glbl import an_glbl
 
-
 if an_glbl._is_simulation:
     db = MagicMock()
 else:
@@ -16,11 +15,10 @@ else:
     from databroker.databroker import DataBroker as db
 
 
-
 ########### helper function #########
 
 def _get_current_saf():
-    bt_list= [f for f in os.listdir(an_glbl.yaml_dir) if f.startswith('bt_')]
+    bt_list = [f for f in os.listdir(an_glbl.yaml_dir) if f.startswith('bt_')]
     if len(bt_list) != 1:
         raise RuntimeError("There are more than one beamtime objects in"
                            "{}. Please either gives specific saf or"
@@ -46,8 +44,9 @@ def _update_default_dict(default_dict, **kwargs):
 
 
 def _timestampstr(timestamp):
-    ''' convert timestamp to strftime formate '''
-    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%Y%m%d-%H%M')
+    """ convert timestamp to strftime formate """
+    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
+        '%Y%m%d-%H%M')
     return timestring
 
 
@@ -60,7 +59,7 @@ def get_metadata(headers):
         header_list = headers
     md_df_list = []
     for h in header_list:
-        md_df_list.append(pd.DataFrame.from_dict(h.start,'index'))
+        md_df_list.append(pd.DataFrame.from_dict(h.start, 'index'))
     return md_df_list
 
 
@@ -71,7 +70,7 @@ class XpdAn:
     metadata
     """
 
-    _default_dict = {'group':'XPD'}
+    _default_dict = {'group': 'XPD'}
 
     def __init__(self, *, saf_num=None, **kwargs):
         self.header_md_fields = ['sa_name', 'time']
@@ -83,21 +82,21 @@ class XpdAn:
             # current saf
             saf_num = _get_current_saf()
             self.search_dict = _update_default_dict(self._default_dict,
-                                                     bt_safN=saf_num)
+                                                    bt_safN=saf_num)
             # dict for resetting
             self._reset_dict = _update_default_dict(self._default_dict,
-                                                     bt_safN=saf_num)
+                                                    bt_safN=saf_num)
+
     def __getitem__(self, ind):
         return self._current_search[ind]
 
-
-    #@property
-    #def search_dict(self):
+    # @property
+    # def search_dict(self):
     #    """ propery that returns current search key-value pair """
     #    return self._search_dict
 
-    #@search_dict.setter
-    #def search_dict(self, **kwargs):
+    # @search_dict.setter
+    # def search_dict(self, **kwargs):
     #    self._search_dict.update(kwargs)
 
     @property
@@ -148,7 +147,7 @@ class XpdAn:
             for field in self.header_md_fields:
                 try:
                     if field == 'time':
-                        timestamp =  h['start'][field]
+                        timestamp = h['start'][field]
                         _md_info.append(_timestampstr(timestamp))
                     else:
                         _md_info.append(h['start'][field])
@@ -157,7 +156,7 @@ class XpdAn:
             header_md.append(_md_info)
         header_md = list(chain.from_iterable(header_md))
         md_array = np.asarray(header_md)
-        md_array.resize((len(header_md)/col_len, col_len))
+        md_array.resize((len(header_md) / col_len, col_len))
         # complete_shape
         data = _complete_shape(md_array)
         data_dim = np.shape(data)
@@ -168,5 +167,3 @@ class XpdAn:
         pd_table = pd.DataFrame(data, ind_name, col_name)
         print(pd_table)
         self._set_current_table(pd_table)
-
-

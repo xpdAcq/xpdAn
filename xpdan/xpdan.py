@@ -8,11 +8,8 @@ import pandas as pd
 
 from .glbl import an_glbl
 
-if an_glbl._is_simulation:
-    db = MagicMock()
-else:
-    from databroker.databroker import get_table
-    from databroker.databroker import DataBroker as db
+from databroker.databroker import get_table
+from databroker.databroker import DataBroker as db
 
 
 ########### helper function #########

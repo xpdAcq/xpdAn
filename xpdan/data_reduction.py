@@ -33,15 +33,10 @@ from .utils import _clean_info, _timestampstr
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 # top definition for minimal impacts on the code 
-if an_glbl._is_simulation:
-    db = MagicMock()
-    get_events = MagicMock()
-    get_images = MagicMock()
-else:
-    from databroker.databroker import get_table
-    from databroker.databroker import DataBroker as db
-    from databroker import get_images
-    from databroker import get_events
+from databroker.databroker import get_table
+from databroker.databroker import DataBroker as db
+from databroker import get_images
+from databroker import get_events
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes

@@ -19,17 +19,11 @@ DARK_FIELD_KEY = 'sc_dk_field_uid'
 CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
 # change this to be handled by an environment variable later
-hostname = socket.gethostname()
-if hostname == BEAMLINE_HOST_NAME:
-    simulation = False
-else:
-    simulation = True
-
-if simulation:
-    BASE_DIR = os.getcwd()
-elif os.environ["IS_TEST"] == 'TRUE':
+print(os.environ["IS_TEST"])
+if int(os.environ["IS_TEST"]) == 1:
     BASE_DIR = tempfile.mkdtemp()
 else:
+    # We should load this from a user made config file
     BASE_DIR = os.path.expanduser('~/')
 
 # top directories
@@ -71,7 +65,6 @@ _EXPORT_TAR_DIR = [CONFIG_BASE, USERSCRIPT_DIR]
 
 
 class Glbl:
-    _is_simulation = simulation
     beamline_host_name = BEAMLINE_HOST_NAME
     base = BASE_DIR
     home = HOME_DIR

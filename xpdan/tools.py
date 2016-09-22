@@ -165,8 +165,8 @@ def mask_img(img, geo,
         path = Path(mask_verts)
         grid = path.contains_points(points)
         # Plug msk_grid into into next (edge-mask) step in automask
-        working_mask *= grid.reshape((ny, nx))
+        working_mask *= ~grid.reshape((ny, nx))
 
     if alpha:
-        working_mask *= binned_outlier(img, r, alpha, rbins, mask=tmsk)
+        working_mask *= binned_outlier(img, r, alpha, rbins, mask=working_mask)
     return working_mask

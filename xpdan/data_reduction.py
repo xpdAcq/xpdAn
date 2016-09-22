@@ -191,7 +191,7 @@ def integrate_and_save(headers, polarization_factor=0.99,
         mask_dict : dict, optional
             dictionary stores options for automasking functionality. 
             default is defined by an_glbl.auto_mask_dict. 
-            Please refer to documentation for more details.
+            Please refer to documentation for more details
         save_image : bool, optional
             option to save dark subtracted images. images will be 
             saved to the same directory of chi files. default is True.
@@ -209,6 +209,16 @@ def integrate_and_save(headers, polarization_factor=0.99,
             addtional keywords to overwrite integration behavior. Please
             refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
             more information
+
+    Note
+    ----
+    complete docstring of masking functionality could be find in
+    ``mask_img``
+
+    See also
+    --------
+    xpdan.tools.mask_img
+    pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
     # normalize list
     header_list = _prepare_header_list(headers)
@@ -246,6 +256,7 @@ def integrate_and_save(headers, polarization_factor=0.99,
                 f_name = 'sub_' + f_name
 
             # masking logic
+            mask = None
             if auto_mask:
                 print("INFO: mask your image: {}".format(f_name))
                 f_name = 'masked_' + f_name
@@ -259,13 +270,13 @@ def integrate_and_save(headers, polarization_factor=0.99,
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
             chi_fn = os.path.join(root_dir, chi_name_Q)
-            rv_Q = ai.integrate1d(img, npt, filename=chi_fn,
+            rv_Q = ai.integrate1d(img, npt, filename=chi_fn, mask=mask
                                   polarization_factor=polarization_factor,
                                   unit="q_nm^-1", **kwargs)
             print("INFO: save chi file: {}".format(chi_name_Q))
             # 2theta-integration
             chi_fn = os.path.join(root_dir, chi_name_2th)
-            rv_2th  = ai.integrate1d(img, npt, filename=chi_fn,
+            rv_2th  = ai.integrate1d(img, npt, filename=chi_fn, mask=mask
                                      polarization_factor=polarization_factor,
                                      unit="2th_deg", **kwargs)
             print("INFO: save chi file: {}".format(chi_name_2theta))
@@ -290,7 +301,6 @@ def integrate_and_save(headers, polarization_factor=0.99,
 
     print("INFO: chi/image files are saved at {}".format(root_dir))
     return total_rv_list_Q, total_rv_list_2theta
-
 
 
 def integrate_and_save_last(polarization_factor=0.99,
@@ -328,6 +338,16 @@ def integrate_and_save_last(polarization_factor=0.99,
             addtional keywords to overwrite integration behavior. Please
             refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
             more information
+
+    Note
+    ----
+    complete docstring of masking functionality could be find in
+    ``mask_img``
+
+    See also
+    --------
+    xpdan.tools.mask_img
+    pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
 
     integrate_and_save(db[-1],

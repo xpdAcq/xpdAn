@@ -139,7 +139,6 @@ class DataReduction:
 # init
 xpd_data_proc = DataReduction()
 ai = AzimuthalIntegrator()
-geo = Geometry()
 
 ### analysis function operates at header level ###
 def _prepare_header_list(headers):
@@ -200,7 +199,7 @@ def integrate_and_save(headers, auto_dark=True,
             saved to the same directory of chi files. default is True.
         root_dir : str, optional
             path of chi files that are going to be saved. default is 
-            xpdUser/userAnalysis/
+            the same as your image file
         config_dict : dict, optional
             dictionary stores integration parameters of pyFAI azimuthal 
             integrator. default is the most recent parameters saved in 
@@ -267,27 +266,27 @@ def integrate_and_save(headers, auto_dark=True,
                 f_name = 'masked_' + f_name
                 if mask_dict is None:
                     mask_dict = an_glbl.mask_dict
-                mask = mask_img(img, geo, **mask_dict)
+                mask = mask_img(img, ai, **mask_dict)
+                print("INFO: mask file '{}' is saved at {}"
+                      .format(f_name, root_dir))
+                np.save(os.path.join(root_dir, f_name),
+                        mask)
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
             chi_name_Q = stem + '_Q_' + '.chi' # q_nm^-1
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
-            chi_fn = os.path.join(root_dir, chi_name_Q)
-            rv_Q = ai.integrate1d(img, npt, filename=chi_fn, mask=mask,
-                                  polarization_factor=polarization_factor,
-                                  unit="q_nm^-1", **kwargs)
-            print("INFO: save chi file: {}".format(chi_name_Q))
-            # 2theta-integration
-            chi_fn = os.path.join(root_dir, chi_name_2th)
-            rv_2th = ai.integrate1d(img, npt, filename=chi_fn, mask=mask,
+            chi_fn_Q = os.path.join(root_dir, chi_name_Q)
+            chi_fn_2th = os.path.join(root_dir, chi_name_2th)
+            for unit, fn, l in zip(["q_nm^-1", "2th_deg"],
+                                   [chi_fn_Q, chi_fn_2th],
+                                   [header_rv_list_Q, header_rv_list_2theta]):
+                print("INFO: save chi file: {}".format(fn))
+                rv = ai.integrate1d(img, npt, filename=fn, mask=~mask,
                                     polarization_factor=polarization_factor,
-                                    unit="2th_deg", **kwargs)
-            print("INFO: save chi file: {}".format(chi_name_2th))
-            # return integration results
-            header_rv_list_Q.append(rv_Q)
-            header_rv_list_2theta.append(rv_2th)
+                                    unit=unit, **kwargs)
+                l.append(rv)
 
             # save image logic
             w_name = os.path.join(root_dir, f_name)

@@ -2,80 +2,84 @@ import numpy as np
 import scipy.stats as sts
 from matplotlib.path import Path
 
+# Ideally we would pull these functions from scikit-beam
+try:
+    from skbeam.core.mask import margin, binned_outlier
+# Otherwise we make them ourselves
+except ImportError:
+    def margin(img_shape, edge_size):
+        """ Mask the edge of an image
 
-def margin(img_shape, edge_size):
-    """ Mask the edge of an image
+        Parameters
+        -----------
+        img_shape: tuple
+            The shape of the image.
+            This is usually given by image.shape
+        edge_size: int
+            Number of pixels to mask from the edge
 
-    Parameters
-    -----------
-    img_shape: tuple
-        The shape of the image.
-        This is usually given by image.shape
-    edge_size: int
-        Number of pixels to mask from the edge
-
-    Returns
-    --------
-    2darray:
-        The mask array, bad pixels are 0
-    """
-    mask = np.ones(img_shape, dtype=bool)
-    mask[edge_size:-edge_size, edge_size:-edge_size] = 0.
-    return ~mask
+        Returns
+        --------
+        2darray:
+            The mask array, bad pixels are 0
+        """
+        mask = np.ones(img_shape, dtype=bool)
+        mask[edge_size:-edge_size, edge_size:-edge_size] = 0.
+        return ~mask
 
 
-def binned_outlier(img, r, alpha, bins, mask=None):
-    """ Generates a mask by identifying outlier pixels.
+    def binned_outlier(img, r, alpha, bins, mask=None):
+        """ Generates a mask by identifying outlier pixels.
 
-    The image is binned and any pixels which have a value greater or less than
-    alpha * std away from the mean are masked.
+        The image is binned and any pixels which have a value greater or less than
+        alpha * std away from the mean are masked.
 
-    Parameters
-    ----------
-    img: 2darray
-        The  image
-    r: 2darray
-        The array which maps pixels to bins.
-        This is usually given by pyFAI.geometry.Geometry.rArray
-    alpha: float or tuple or, 1darray
-        The number of acceptable standard deviations.
-        If tuple then we use a linear distribution of alphas from alpha[0] to
-        alpha[1], if array then we use that as the distribution of alphas
-    bins: list
-        The bin edges
-    mask: 1darray
-        A starting flattened mask
+        Parameters
+        ----------
+        img: 2darray
+            The  image
+        r: 2darray
+            The array which maps pixels to bins.
+            This is usually given by pyFAI.geometry.Geometry.rArray
+        alpha: float or tuple or, 1darray
+            The number of acceptable standard deviations.
+            If tuple then we use a linear distribution of alphas from alpha[0] to
+            alpha[1], if array then we use that as the distribution of alphas
+        bins: list
+            The bin edges
+        mask: 1darray
+            A starting flattened mask
 
-    Returns
-    --------
-    2darray:
-        The mask
-    """
+        Returns
+        --------
+        2darray:
+            The mask
+        """
 
-    if mask is None:
-        working_mask = np.ones(img.shape).astype(bool)
-    else:
-        working_mask = mask.copy()
-    msk_img = img[working_mask]
-    msk_r = r[working_mask]
+        if mask is None:
+            working_mask = np.ones(img.shape).astype(bool)
+        else:
+            working_mask = mask.copy()
+        msk_img = img[working_mask]
+        msk_r = r[working_mask]
 
-    int_r = np.digitize(r, bins[:-1], True) - 1
-    # integration
-    mean = sts.binned_statistic(msk_r, msk_img, bins=bins,
-                                statistic='mean')[0]
-    std = sts.binned_statistic(msk_r, msk_img, bins=bins,
-                               statistic=np.std)[0]
-    if type(alpha) is tuple:
-        alpha = np.linspace(alpha[0], alpha[1], len(std))
-    threshold = alpha * std
-    lower = mean - threshold
-    upper = mean + threshold
+        int_r = np.digitize(r, bins[:-1], True) - 1
+        # integration
+        mean = sts.binned_statistic(msk_r, msk_img, bins=bins,
+                                    statistic='mean')[0]
+        std = sts.binned_statistic(msk_r, msk_img, bins=bins,
+                                   statistic=np.std)[0]
+        if type(alpha) is tuple:
+            alpha = np.linspace(alpha[0], alpha[1], len(std))
+        threshold = alpha * std
+        lower = mean - threshold
+        upper = mean + threshold
 
-    # single out the too low and too high pixels
-    working_mask *= img > lower[int_r]
-    working_mask *= img < upper[int_r]
+        # single out the too low and too high pixels
+        working_mask *= img > lower[int_r]
+        working_mask *= img < upper[int_r]
 
-    return working_mask.astype(bool)
+        return working_mask.astype(bool)
 
 
 def mask_img(img, geo,

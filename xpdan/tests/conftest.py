@@ -7,7 +7,7 @@ from databroker import Broker
 from filestore.handlers import NpyHandler
 import tempfile
 
-from .utils import insert_imgs
+from xpdan.tests.utils import insert_imgs
 from filestore.utils import install_sentinels
 
 if sys.version_info >= (3, 0):

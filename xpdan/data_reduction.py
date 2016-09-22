@@ -24,8 +24,8 @@ from time import strftime
 from unittest.mock import MagicMock
 
 from .glbl import an_glbl
+from .tools import mask_img
 
-from .utils import _clean_info, _timestampstr
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from itertools import islice
 
@@ -139,7 +139,7 @@ class DataReduction:
 # init
 xpd_data_proc = DataReduction()
 ai = AzimuthalIntegrator()
-
+geo = Geometry()
 
 ### analysis function operates at header level ###
 def _prepare_header_list(headers):
@@ -173,18 +173,25 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
 
 
 def integrate_and_save(headers, polarization_factor=0.99,
+                       auto_mask=True, mask_dict=None,
                        save_image=True, root_dir=None,
-                       config_dict=None, handler=xpd_data_proc):
+                       config_dict=None, handler=xpd_data_proc, **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
         Parameters
         ----------
         headers : list
-            a list of databroker.header objects obtained
+            a list of databroker.header objects
         polarization_factor : float, optional
             polarization correction factor, ranged from -1(vertical) to 
             +1 (horizontal). default is 0.99. set to None for no
             correction.
+        auto_mask : bool, optional
+            turn on/off of automask functionality. default is True
+        mask_dict : dict, optional
+            dictionary stores options for automasking functionality. 
+            default is defined by an_glbl.auto_mask_dict. 
+            Please refer to documentation for more details.
         save_image : bool, optional
             option to save dark subtracted images. images will be 
             saved to the same directory of chi files. default is True.
@@ -198,19 +205,26 @@ def integrate_and_save(headers, polarization_factor=0.99,
         handler : instance of class, optional
             instance of class that handles data process, don't change it 
             unless needed.
+        kwargs :
+            addtional keywords to overwrite integration behavior. Please
+            refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+            more information
     """
     # normalize list
     header_list = _prepare_header_list(headers)
 
     # config_dict
     if config_dict is None:
-        config_dict = _load_config()  # default one
+        config_dict = _load_config() # default dict 
+
+    # setting up geometry
     ai.setPyFAI(**config_dict)
     npt = _npt_cal(config_dict)
 
-    # iterate over header
     total_rv_list_Q = []
     total_rv_list_2theta = []
+
+    # iterate over header
     for header in header_list:
         root = header.start.get(handler.root_dir_name, None)
         if root is not None:
@@ -223,33 +237,41 @@ def integrate_and_save(headers, polarization_factor=0.99,
         # dark logic
         dark_img = handler.pull_dark(header)
         for event in handler.exp_db.get_events(header, fill=True):
+            # basic file name
+            f_name = handler._file_name(event, event_timestamp, ind)
+            # dark subtraction
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
-            f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
+
+            # masking logic
+            if auto_mask:
+                print("INFO: mask your image: {}".format(f_name))
+                f_name = 'masked_' + f_name
+                if mask_dict is None:
+                    mask_dict = an_glbl.mask_dict
+                mask = mask_img(img, geo, **mask_dict)
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
             chi_name_Q = stem + '_Q_' + '.chi' # q_nm^-1
-            chi_name_2theta = stem + '_2theta_' + '.chi' # 2theta_rad
-            integration_dict = {'filename':
-                                os.path.join(root_dir, chi_name_Q),
-                                'polarization_factor':
-                                    polarization_factor}
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
-            rv_Q = ai.integrate1d(img, npt, **integration_dict,
-                                  unit="q_nm^-1")
+            chi_fn = os.path.join(root_dir, chi_name_Q)
+            rv_Q = ai.integrate1d(img, npt, filename=chi_fn,
+                                  polarization_factor=polarization_factor,
+                                  unit="q_nm^-1", **kwargs)
+            print("INFO: save chi file: {}".format(chi_name_Q))
             # 2theta-integration
-            integration_dict.update({'filename': chi_name_2theta})
-            rv_2theta = ai.integrate1d(img, npt, **integration_dict,
-                                       unit="2th_deg")
+            chi_fn = os.path.join(root_dir, chi_name_2th)
+            rv_2th  = ai.integrate1d(img, npt, filename=chi_fn,
+                                     polarization_factor=polarization_factor,
+                                     unit="2th_deg", **kwargs)
+            print("INFO: save chi file: {}".format(chi_name_2theta))
             # return integration results
             header_rv_list_Q.append(rv_Q)
-            header_rv_list_2theta.append(rv_2theta)
-            print("INFO: save chi file: {}".format(chi_name_Q))
-            print("INFO: save chi file: {}".format(chi_name_2theta))
+            header_rv_list_2theta.append(rv_2th)
 
             # save image logic
             w_name = os.path.join(root_dir, f_name)
@@ -266,28 +288,35 @@ def integrate_and_save(headers, polarization_factor=0.99,
         total_rv_list_Q.append(header_rv_list_Q)
         total_rv_list_2theta.append(header_rv_list_2theta)
 
-    print(" *** {} *** ".format('Integration process finished'))
-    print("INFO: chi files are saved at {}".format(root_dir))
+    print("INFO: chi/image files are saved at {}".format(root_dir))
     return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_and_save_last(polarization_factor=0.99, save_image=True,
-                            root_dir=None, config_dict=None,
-                            handler=xpd_data_proc):
-    """ integrate and save dark subtracted image for given list of headers
+
+def integrate_and_save_last(polarization_factor=0.99,
+                            auto_mask=True, mask_dict=None,
+                            save_image=True, root_dir=None,
+                            config_dict=None, handler=xpd_data_proc, **kwargs):
+    """ integrate and save dark subtracted images for given list of headers
 
         Parameters
         ----------
         polarization_factor : float, optional
-            polarization correction factor, ranged from -1(vertical) to
+            polarization correction factor, ranged from -1(vertical) to 
             +1 (horizontal). default is 0.99. set to None for no
             correction.
+        auto_mask : bool, optional
+            turn on/off of automask functionality. default is True
+        mask_dict : dict, optional
+            dictionary stores options for automasking functionality. 
+            default is defined by an_glbl.auto_mask_dict. 
+            Please refer to documentation for more details.
         save_image : bool, optional
             option to save dark subtracted images. images will be 
-            saved to the same directory with chi files. default is True.
+            saved to the same directory of chi files. default is True.
         root_dir : str, optional
             path of chi files that are going to be saved. default is 
-            xpdUser/tiff_base/<sample_name>/
+            xpdUser/userAnalysis/
         config_dict : dict, optional
             dictionary stores integration parameters of pyFAI azimuthal 
             integrator. default is the most recent parameters saved in 
@@ -295,10 +324,15 @@ def integrate_and_save_last(polarization_factor=0.99, save_image=True,
         handler : instance of class, optional
             instance of class that handles data process, don't change it 
             unless needed.
+        kwargs :
+            addtional keywords to overwrite integration behavior. Please
+            refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+            more information
     """
 
     integrate_and_save(db[-1],
                        polarization_factor=polarization_factor,
+                       auto_maks=auto_mask, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,

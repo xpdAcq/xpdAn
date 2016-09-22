@@ -178,44 +178,47 @@ def integrate_and_save(headers, auto_dark=True,
                        config_dict=None, handler=xpd_data_proc, **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
-        Parameters
-        ----------
-        headers : list
-            a list of databroker.header objects
-        auto_dark : bool, optional
-            option to turn on/off dark subtraction functionality
-        polarization_factor : float, optional
-            polarization correction factor, ranged from -1(vertical) to 
-            +1 (horizontal). default is 0.99. set to None for no
-            correction.
-        auto_mask : bool, optional
-            turn on/off of automask functionality. default is True
-        mask_dict : dict, optional
-            dictionary stores options for automasking functionality. 
-            default is defined by an_glbl.auto_mask_dict. 
-            Please refer to documentation for more details
-        save_image : bool, optional
-            option to save dark subtracted images. images will be 
-            saved to the same directory of chi files. default is True.
-        root_dir : str, optional
-            path of chi files that are going to be saved. default is 
-            the same as your image file
-        config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal 
-            integrator. default is the most recent parameters saved in 
-            xpdUser/conifg_base
-        handler : instance of class, optional
-            instance of class that handles data process, don't change it 
-            unless needed.
-        kwargs :
-            addtional keywords to overwrite integration behavior. Please
-            refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
-            more information
+    Parameters
+    ----------
+    headers : list
+        a list of databroker.header objects
+    auto_dark : bool, optional
+        option to turn on/off dark subtraction functionality
+    polarization_factor : float, optional
+        polarization correction factor, ranged from -1(vertical) to 
+        +1 (horizontal). default is 0.99. set to None for no
+        correction.
+    auto_mask : bool, optional
+        turn on/off of automask functionality. default is True
+    mask_dict : dict, optional
+        dictionary stores options for automasking functionality. 
+        default is defined by an_glbl.auto_mask_dict. 
+        Please refer to documentation for more details
+    save_image : bool, optional
+        option to save dark subtracted images. images will be 
+        saved to the same directory of chi files. default is True.
+    root_dir : str, optional
+        path of chi files that are going to be saved. default is 
+        the same as your image file
+    config_dict : dict, optional
+        dictionary stores integration parameters of pyFAI azimuthal 
+        integrator. default is the most recent parameters saved in 
+        xpdUser/conifg_base
+    handler : instance of class, optional
+        instance of class that handles data process, don't change it 
+        unless needed.
+    kwargs :
+        addtional keywords to overwrite integration behavior. Please
+        refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+        more information
 
     Note
     ----
     complete docstring of masking functionality could be find in
     ``mask_img``
+
+    customized mask can be assign to by kwargs (It must be a ndarray)
+    >>> integrate_and_save(mask=my_mask)
 
     See also
     --------
@@ -313,42 +316,45 @@ def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
                             config_dict=None, handler=xpd_data_proc, **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
-        Parameters
-        ----------
-        dark_sub : bool, optional
-            option to turn on/off dark subtraction functionality
-        polarization_factor : float, optional
-            polarization correction factor, ranged from -1(vertical) to 
-            +1 (horizontal). default is 0.99. set to None for no
-            correction.
-        auto_mask : bool, optional
-            turn on/off of automask functionality. default is True
-        mask_dict : dict, optional
-            dictionary stores options for automasking functionality. 
-            default is defined by an_glbl.auto_mask_dict. 
-            Please refer to documentation for more details.
-        save_image : bool, optional
-            option to save dark subtracted images. images will be 
-            saved to the same directory of chi files. default is True.
-        root_dir : str, optional
-            path of chi files that are going to be saved. default is 
-            xpdUser/userAnalysis/
-        config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal 
-            integrator. default is the most recent parameters saved in 
-            xpdUser/conifg_base
-        handler : instance of class, optional
-            instance of class that handles data process, don't change it 
-            unless needed.
-        kwargs :
-            addtional keywords to overwrite integration behavior. Please
-            refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
-            more information
+    Parameters
+    ----------
+    dark_sub : bool, optional
+        option to turn on/off dark subtraction functionality
+    polarization_factor : float, optional
+        polarization correction factor, ranged from -1(vertical) to 
+        +1 (horizontal). default is 0.99. set to None for no
+        correction.
+    auto_mask : bool, optional
+        turn on/off of automask functionality. default is True
+    mask_dict : dict, optional
+        dictionary stores options for automasking functionality. 
+        default is defined by an_glbl.auto_mask_dict. 
+        Please refer to documentation for more details.
+    save_image : bool, optional
+        option to save dark subtracted images. images will be 
+        saved to the same directory of chi files. default is True.
+    root_dir : str, optional
+        path of chi files that are going to be saved. default is 
+        xpdUser/userAnalysis/
+    config_dict : dict, optional
+        dictionary stores integration parameters of pyFAI azimuthal 
+        integrator. default is the most recent parameters saved in 
+        xpdUser/conifg_base
+    handler : instance of class, optional
+        instance of class that handles data process, don't change it 
+        unless needed.
+    kwargs :
+        addtional keywords to overwrite integration behavior. Please
+        refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+        more information
 
     Note
     ----
     complete docstring of masking functionality could be find in
     ``mask_img``
+
+    customized mask can be assign to by kwargs (It must be a ndarray)
+    >>> integrate_and_save_last(mask=my_mask)
 
     See also
     --------

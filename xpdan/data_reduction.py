@@ -13,10 +13,6 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-# from dataportal import DataBroker as db
-# from dataportal import get_events, get_table, get_images
-# from metadatastore.commands import find_run_starts
-
 import os
 import warnings
 import datetime
@@ -35,8 +31,6 @@ from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
 from databroker.databroker import DataBroker as db
-from databroker import get_images
-from databroker import get_events
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes
@@ -48,12 +42,13 @@ class DataReduction:
         Note: not a callback
     """
 
-    def __init__(self, image_field=None):
+    def __init__(self, exp_db=db, image_field=None):
         # for file name 
         self.fields = ['sample_name', 'sp_type', 'sp_requested_exposure']
         self.labels = ['dark_frame']
         self.data_fields = ['temperature']
         self.root_dir_name = 'sample_name'
+        self.exp_db = exp_db
         if image_field is None:
             self.image_field = an_glbl.det_image_field
 
@@ -106,7 +101,7 @@ class DataReduction:
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = db(**dark_search)
-            dark_img = np.asarray(get_images(dark_header,
+            dark_img = np.asarray(self.exp_db.get_images(dark_header,
                                              self.image_field)).squeeze()
         return dark_img, dark_header[0].start.time
 
@@ -126,7 +121,7 @@ class DataReduction:
         img_list = []
         timestamp_list = []
         dark_img, dark_time_stamp = self.pull_dark(header)
-        for ev in get_events(header, fill=True):
+        for ev in self.exp_db.get_events(header, fill=True):
             sub_img, timestamp, ind, dark_sub = self._dark_sub(ev, dark_img)
             img_list.append(sub_img)
             timestamp_list.append(timestamp)
@@ -226,7 +221,7 @@ def integrate(headers, polarization_factor=0.99,
         header_rv_list = []
         # dark logic
         dark_img = handler.pull_dark(header)
-        for event in get_events(header, fill=True):
+        for event in handler.exp_db.get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)
@@ -324,7 +319,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         if not dark_sub:
             dark_img = None  # no sub
         # event
-        for event in get_events(header, fill=True):
+        for event in handler.exp_db.get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)

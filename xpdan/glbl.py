@@ -36,6 +36,7 @@ CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
 if int(os.environ["IS_TEST"]) == 1:
     a = os.path.dirname(os.path.abspath(__file__))
     b = a.split('glbl.py')[0]
+    os.makedirs(CONFIG_BASE)
     shutil.copyfile(os.path.join(b, 'tests/pyFAI_calib.yml'),
                     os.path.join(CONFIG_BASE, 'pyFAI_calib.yml'))
 YAML_DIR = os.path.join(HOME_DIR, 'config_base', 'yml')

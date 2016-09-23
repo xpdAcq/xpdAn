@@ -128,7 +128,7 @@ def build_pymongo_backed_broker_with_imgs(request):
     def delete_imgs():
         shutil.rmtree(Glbl.base)
 
-    # request.addfinalizer(delete_imgs)
+    request.addfinalizer(delete_imgs)
 
     return Broker(exp_mds, exp_fs)
 

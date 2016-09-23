@@ -31,6 +31,7 @@ from .glbl import an_glbl
 from .utils import _clean_info, _timestampstr
 
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+from itertools import islice
 
 # top definition for minimal impacts on the code 
 if an_glbl._is_simulation:
@@ -380,3 +381,34 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
 
     save_tiff(db[-1], dark_sub, max_count, dryrun)
 
+
+def sum_images(header, idxs_list=None, img_key='pe1_img'):
+    if idxs_list is None:
+        total_img = None
+        for event in db.get_events(header):
+            if total_img is None:
+                total_img = event['data'][img_key]
+            else:
+                total_img += event['data'][img_key]
+        return [total_img]
+    else:
+        total_img_list = []
+        for idxs in idxs_list:
+            total_img = None
+            if isinstance(idxs, tuple):
+                events = db.get_events(header)
+                for idx in range(idxs[0], idxs[1]):
+                    if total_img is None:
+                        total_img = next(islice(events, idx))
+                    else:
+                        total_img += next(islice(events, idx))
+            else:
+                events = db.get_events(header)
+                total_img = None
+                for idx in idxs:
+                    if total_img is None:
+                        total_img = next(islice(events, idx))
+                    else:
+                        total_img += next(islice(events, idx))
+            total_img_list.append(total_img)
+        return total_img_list

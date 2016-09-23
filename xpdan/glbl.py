@@ -65,6 +65,10 @@ ALL_FOLDERS = [
     ANALYSIS_DIR
 ]
 
+if int(os.environ["IS_TEST"]) == 1:
+    for folder in ALL_FOLDERS:
+        os.makedirs(folder, exist_ok=True)
+
 # directories that won't be tar in the end of beamtime
 _EXCLUDE_DIR = [HOME_DIR, BLCONFIG_DIR, YAML_DIR]
 _EXPORT_TAR_DIR = [CONFIG_BASE, USERSCRIPT_DIR]

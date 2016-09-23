@@ -8,6 +8,7 @@ from filestore.handlers import NpyHandler
 import tempfile
 
 from xpdan.tests.utils import insert_imgs
+from xpdan.data_reduction import DataReduction
 from filestore.utils import install_sentinels
 
 if sys.version_info >= (3, 0):
@@ -23,6 +24,13 @@ def db(request):
         'mongo': build_pymongo_backed_broker}
 
     return param_map[request.param](request)
+
+
+@pytest.fixture(scope='function')
+def handler(exp_db):
+    handler = DataReduction(exp_db=exp_db)
+
+    return handler
 
 
 @pytest.fixture(params=[

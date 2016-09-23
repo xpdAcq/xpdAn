@@ -56,8 +56,8 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp()):
     run_start = mds.insert_run_start(uid=str(uuid4()), time=time.time(),
                                      name='test', dark_uid=dark_uid)
     data_keys = {
-        'img': dict(source='testing', external='FILESTORE:',
-                    dtype='array')}
+        'pe1_image': dict(source='testing', external='FILESTORE:',
+                          dtype='array')}
     data_hdr = dict(run_start=run_start,
                     data_keys=data_keys,
                     time=time.time(), uid=str(uuid4()))
@@ -73,8 +73,8 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp()):
             descriptor=descriptor,
             uid=str(uuid4()),
             time=time.time(),
-            data={'img': fs_uid},
-            timestamps={},
+            data={'pe1_image': fs_uid},
+            timestamps={'pe1_image': time.time()},
             seq_num=i)
     mds.insert_run_stop(run_start=run_start,
                         uid=str(uuid4()),

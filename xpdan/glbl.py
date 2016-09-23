@@ -4,7 +4,7 @@ import yaml
 import time
 from time import strftime
 import tempfile
-
+import shutil
 
 HOME_DIR_NAME = 'xpdUser'
 BLCONFIG_DIR_NAME = 'xpdConfig'
@@ -33,6 +33,11 @@ ARCHIVE_BASE_DIR = os.path.join(BASE_DIR, ARCHIVE_BASE_DIR_NAME)
 
 # aquire object directories
 CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
+if int(os.environ["IS_TEST"]) == 1:
+    a = os.path.dirname(os.path.abspath(__file__))
+    b = a.split('glbl.py')[0]
+    shutil.copyfile(os.path.join(b, 'tests/pyFAI_calib.yml'),
+                    os.path.join(CONFIG_BASE, 'pyFAI_calib.yml'))
 YAML_DIR = os.path.join(HOME_DIR, 'config_base', 'yml')
 BT_DIR = YAML_DIR
 SAMPLE_DIR = os.path.join(YAML_DIR, 'samples')

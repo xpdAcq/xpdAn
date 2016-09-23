@@ -383,6 +383,33 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
 
 
 def sum_images(header, idxs_list=None, img_key='pe1_img'):
+    """Sum images in a header
+
+    Sum the images in a header according to the idxs_list
+
+    Parameters
+    ----------
+    header: mds.header
+        The run header to be summed
+    idxs_list: list of lists and tuple, optional
+        The list of lists and tuples which specify the images to be summed.
+        If None, sum all the images in the run. Defaults to None.
+    img_key: str
+        The key for the image in the event
+
+    Returns
+    -------
+    list:
+        The list of summed images
+
+    >>> hdr = db[-1]
+    >>> total_imgs = sum_images(hdr) # Sum all the images
+    >>> assert len(total_imgs) == 1
+    >>> total_imgs = sum_images(hdr, [1, 2, 3])
+    >>> assert len(total_imgs) == 1
+    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)])
+    >>> assert len(total_imgs) == 2
+    """
     if idxs_list is None:
         total_img = None
         for event in db.get_events(header):
@@ -393,6 +420,10 @@ def sum_images(header, idxs_list=None, img_key='pe1_img'):
         return [total_img]
     else:
         total_img_list = []
+        # If we only have one list make it into a list of lists
+        if not all(isinstance(list, e1) or isinstance(tuple, e1) for e1 in
+                   idxs_list):
+            idxs_list = [idxs_list]
         for idxs in idxs_list:
             total_img = None
             if isinstance(idxs, tuple):

@@ -2,7 +2,10 @@ from xpdan.data_reduction import integrate, sum_images
 
 
 def test_integrate_smoke(exp_db, handler):
-    integrate(exp_db[-1], handler=handler)
+    # no auto_dark
+    integrate_and_save(exp_db[-1], dark_sub=False, handler=handler)
+    # include auto_dark
+    integrate_and_save(exp_db[-1], dark_sub=True, handler=handler)
 
 
 def test_sum_logic_smoke(exp_db, handler):
@@ -15,3 +18,4 @@ def test_sum_logic_smoke(exp_db, handler):
     assert len(a) == 1
     a = sum_images(hdr, [(1, 3)], handler=handler)
     assert len(a) == 1
+

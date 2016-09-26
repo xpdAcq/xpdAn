@@ -377,7 +377,7 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     save_tiff(db[-1], dark_sub, max_count, dryrun)
 
 
-def sum_images(header, idxs_list=None, img_key='pe1_img'):
+def sum_images(header, idxs_list=None, handler=xpd_data_proc):
     """Sum images in a header
 
     Sum the images in a header according to the idxs_list
@@ -407,34 +407,38 @@ def sum_images(header, idxs_list=None, img_key='pe1_img'):
     """
     if idxs_list is None:
         total_img = None
-        for event in db.get_events(header):
+        for event in handler.exp_db.get_events(header):
             if total_img is None:
-                total_img = event['data'][img_key]
+                total_img = event['data'][handler.image_field]
             else:
-                total_img += event['data'][img_key]
+                total_img += event['data'][handler.image_field]
         return [total_img]
     else:
         total_img_list = []
         # If we only have one list make it into a list of lists
-        if not all(isinstance(list, e1) or isinstance(tuple, e1) for e1 in
+        if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
                    idxs_list):
             idxs_list = [idxs_list]
         for idxs in idxs_list:
             total_img = None
             if isinstance(idxs, tuple):
-                events = db.get_events(header)
+                events = handler.exp_db.get_events(header)
                 for idx in range(idxs[0], idxs[1]):
                     if total_img is None:
-                        total_img = next(islice(events, idx))
+                        total_img = next(islice(events, idx))['data'][
+                            handler.image_field]
                     else:
-                        total_img += next(islice(events, idx))
+                        total_img += next(islice(events, idx))['data'][
+                            handler.image_field]
             else:
-                events = db.get_events(header)
+                events = handler.exp_db.get_events(header)
                 total_img = None
                 for idx in idxs:
                     if total_img is None:
-                        total_img = next(islice(events, idx))
+                        total_img = next(islice(events, idx))['data'][
+                            handler.image_field]
                     else:
-                        total_img += next(islice(events, idx))
+                        total_img += next(islice(events, idx))['data'][
+                            handler.image_field]
             total_img_list.append(total_img)
         return total_img_list

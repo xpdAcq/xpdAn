@@ -97,7 +97,7 @@ class DataReduction:
         if dark_uid is None:
             print("INFO: no dark frame is associated in this header, "
                   "subrraction will not be processed")
-            return None
+            return None, header.start.time
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = self.exp_db(**dark_search)
@@ -171,7 +171,7 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate_and_save(headers, auto_dark=True,
+def integrate_and_save(headers, dark_sub=True,
                        polarization_factor=0.99,
                        auto_mask=True, mask_dict=None,
                        save_image=True, root_dir=None,
@@ -182,7 +182,7 @@ def integrate_and_save(headers, auto_dark=True,
     ----------
     headers : list
         a list of databroker.header objects
-    auto_dark : bool, optional
+    dark_sub : bool, optional
         option to turn on/off dark subtraction functionality
     polarization_factor : float, optional
         polarization correction factor, ranged from -1(vertical) to 
@@ -251,7 +251,7 @@ def integrate_and_save(headers, auto_dark=True,
         header_rv_list_2theta = []
         # dark logic
         dark_img = None
-        if auto_dark:
+        if dark_sub:
             dark_img, dark_time = handler.pull_dark(header)
         for event in handler.exp_db.get_events(header, fill=True):
             # dark subtraction
@@ -453,7 +453,7 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False,
 
     Parameters
     ----------
-    dark_subtraction : bool, optional
+    dark_sub : bool, optional
         Default is True, which allows dark/background subtraction to 
         be done before saving each image. If header doesn't contain
         necessary information to perform dark subtraction, uncorrected

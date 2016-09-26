@@ -126,6 +126,7 @@ def build_pymongo_backed_broker_with_imgs(request):
     print(Glbl.base)
 
     def delete_imgs():
+        print('removing {}'.format(Glbl.base))
         shutil.rmtree(Glbl.base)
 
     request.addfinalizer(delete_imgs)

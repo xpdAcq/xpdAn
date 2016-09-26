@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import pytest
+import os
 
 if __name__ == '__main__':
     # show output results from every test function
@@ -13,4 +14,7 @@ if __name__ == '__main__':
     # args.extend(['--cov', 'xpdAcq'])
     # call pytest and exit with the return code from pytest so that
     # travis will fail correctly if tests fail
-    sys.exit(pytest.main(args))
+    os.environ['IS_TEST'] = str(1)
+    exit_res = pytest.main(args)
+    os.environ['IS_TEST'] = str(0)
+    sys.exit(exit_res)

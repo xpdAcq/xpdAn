@@ -106,7 +106,7 @@ class DataReduction:
             return None
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
-            dark_header = exp_db(**dark_search)
+            dark_header = self.exp_db(**dark_search)
             dark_img = np.asarray(self.exp_db.get_images(dark_header,
                                              self.image_field)).squeeze()
         return dark_img, dark_header[0].start.time
@@ -274,11 +274,11 @@ def integrate_last(polarization_factor=0.99, root_dir=None,
             instance of class that handles data process, don't change it
             unless needed.
     """
-    integrate(an_glbl.db[-1],
-                      polarization_factor=polarization_factor,
-                      root_dir=root_dir,
-                      config_dict=config_dict,
-                      handler=handler)
+    integrate(handler.exp_db[-1],
+              polarization_factor=polarization_factor,
+              root_dir=root_dir,
+              config_dict=config_dict,
+              handler=handler)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
@@ -359,7 +359,8 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
     print(" *** {} *** ".format('Saving process finished'))
 
 
-def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
+def save_last_tiff(dark_sub=True, max_count=None, dryrun=False,
+                   handler=xpd_data_proc):
     """ save images from the most recent scan as tiff format files.
 
     Parameters
@@ -377,9 +378,14 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
 
     dryrun : bool, optional
         if set to True, file won't be saved. default is False
+
+    handler : instance of class
+        instance of class that handles data process, don't change it
+        unless needed.
     """
 
-    save_tiff(db[-1], dark_sub, max_count, dryrun)
+    save_tiff(handler.exp_db[-1], dark_sub, max_count, dryrun,
+              handler=handler)
 
 
 def sum_images(header, idxs_list=None, handler=xpd_data_proc):
@@ -394,9 +400,9 @@ def sum_images(header, idxs_list=None, handler=xpd_data_proc):
     idxs_list: list of lists and tuple, optional
         The list of lists and tuples which specify the images to be summed.
         If None, sum all the images in the run. Defaults to None.
-    img_key: str
-        The key for the image in the event
-
+    handler : instance of class
+        instance of class that handles data process, don't change it
+        unless needed.
     Returns
     -------
     list:

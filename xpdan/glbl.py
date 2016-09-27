@@ -19,11 +19,17 @@ DARK_FIELD_KEY = 'sc_dk_field_uid'
 CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
 # change this to be handled by an environment variable later
-print(os.environ["IS_TEST"])
-if int(os.environ["IS_TEST"]) == 1:
-    BASE_DIR = tempfile.mkdtemp()
+env_code = os.environ.get('ENV_VAR', None)
+if env_code:
+    # test
+    if int(env_code) == 1:
+        BASE_DIR = tempfile.mkdtemp()
+    # simulation
+    elif int(env_code) == 2:
+        BASE_DIR = os.getcwd()
+# FIXME: make ENV_VAR exist universally
 else:
-    # We should load this from a user made config file
+    # beamline
     BASE_DIR = os.path.expanduser('~/')
 
 # top directories
@@ -33,10 +39,12 @@ ARCHIVE_BASE_DIR = os.path.join(BASE_DIR, ARCHIVE_BASE_DIR_NAME)
 
 # aquire object directories
 CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
-if int(os.environ["IS_TEST"]) == 1:
+
+# copying pyFAI calib dict yml for test
+if int(env_code) == 1:
     a = os.path.dirname(os.path.abspath(__file__))
     b = a.split('glbl.py')[0]
-    os.makedirs(CONFIG_BASE)
+    os.makedirs(CONFIG_BASE, exist_ok=True)
     shutil.copyfile(os.path.join(b, 'tests/pyFAI_calib.yml'),
                     os.path.join(CONFIG_BASE, 'pyFAI_calib.yml'))
 YAML_DIR = os.path.join(HOME_DIR, 'config_base', 'yml')
@@ -44,6 +52,7 @@ BT_DIR = YAML_DIR
 SAMPLE_DIR = os.path.join(YAML_DIR, 'samples')
 EXPERIMENT_DIR = os.path.join(YAML_DIR, 'experiments')
 SCANPLAN_DIR = os.path.join(YAML_DIR, 'scanplans')
+
 # other dirs
 IMPORT_DIR = os.path.join(HOME_DIR, 'Import')
 ANALYSIS_DIR = os.path.join(HOME_DIR, 'userAnalysis')
@@ -65,9 +74,8 @@ ALL_FOLDERS = [
     ANALYSIS_DIR
 ]
 
-if int(os.environ["IS_TEST"]) == 1:
-    for folder in ALL_FOLDERS:
-        os.makedirs(folder, exist_ok=True)
+for folder in ALL_FOLDERS:
+    os.makedirs(folder, exist_ok=True)
 
 # directories that won't be tar in the end of beamtime
 _EXCLUDE_DIR = [HOME_DIR, BLCONFIG_DIR, YAML_DIR]

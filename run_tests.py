@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # args.extend(['--cov', 'xpdAcq'])
     # call pytest and exit with the return code from pytest so that
     # travis will fail correctly if tests fail
-    os.environ['IS_TEST'] = str(1)
+    os.environ['ENV_VAR'] = str(1)
     exit_res = pytest.main(args)
-    os.environ['IS_TEST'] = str(0)
+    os.environ['ENV_VAR'] = str(0)
     sys.exit(exit_res)

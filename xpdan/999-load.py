@@ -29,7 +29,7 @@ def make_broker():
     from databroker import Broker
 
     # make visible temp_dir, a layer up than xpdUser
-    mds_dir = os.path.join(an_glbl.base, tempfile.mkdtemp())
+    mds_dir = tempfile.mkdtemp()
     mds = MDS({'directory': mds_dir,
                'timezone': tzlocal.get_localzone().zone})
     fs = FileStore({'dbpath': os.path.join(mds_dir, 'filestore.db')})

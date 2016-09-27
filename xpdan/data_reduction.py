@@ -31,7 +31,12 @@ from itertools import islice
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
-#from databroker.databroker import DataBroker as db
+
+# FIXME: hotfix
+if os.environ['ENV_VAR'] == str(1):
+    # in test environ, import created db
+    from databroker.databroker import DataBroker as db
+    an_glbl.db = db
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes

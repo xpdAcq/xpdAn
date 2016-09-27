@@ -27,6 +27,7 @@ from .glbl import an_glbl
 from .utils import _clean_info, _timestampstr
 
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+from itertools import islice
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
@@ -374,3 +375,70 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False):
     """
 
     save_tiff(db[-1], dark_sub, max_count, dryrun)
+
+
+def sum_images(header, idxs_list=None, handler=xpd_data_proc):
+    """Sum images in a header
+
+    Sum the images in a header according to the idxs_list
+
+    Parameters
+    ----------
+    header: mds.header
+        The run header to be summed
+    idxs_list: list of lists and tuple, optional
+        The list of lists and tuples which specify the images to be summed.
+        If None, sum all the images in the run. Defaults to None.
+    img_key: str
+        The key for the image in the event
+
+    Returns
+    -------
+    list:
+        The list of summed images
+
+    >>> hdr = db[-1]
+    >>> total_imgs = sum_images(hdr) # Sum all the images
+    >>> assert len(total_imgs) == 1
+    >>> total_imgs = sum_images(hdr, [1, 2, 3])
+    >>> assert len(total_imgs) == 1
+    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)])
+    >>> assert len(total_imgs) == 2
+    """
+    if idxs_list is None:
+        total_img = None
+        for event in handler.exp_db.get_events(header, fill=True):
+            if total_img is None:
+                total_img = event['data'][handler.image_field]
+            else:
+                total_img += event['data'][handler.image_field]
+        return [total_img]
+    else:
+        total_img_list = []
+        # If we only have one list make it into a list of lists
+        if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
+                   idxs_list):
+            idxs_list = [idxs_list]
+        for idxs in idxs_list:
+            total_img = None
+            if isinstance(idxs, tuple):
+                events = handler.exp_db.get_events(header, fill=True)
+                for idx in range(idxs[0], idxs[1]):
+                    if total_img is None:
+                        total_img = next(islice(events, idx))['data'][
+                            handler.image_field]
+                    else:
+                        total_img += next(islice(events, idx))['data'][
+                            handler.image_field]
+            else:
+                events = handler.exp_db.get_events(header, fill=True)
+                total_img = None
+                for idx in idxs:
+                    if total_img is None:
+                        total_img = next(islice(events, idx))['data'][
+                            handler.image_field]
+                    else:
+                        total_img += next(islice(events, idx))['data'][
+                            handler.image_field]
+            total_img_list.append(total_img)
+        return total_img_list

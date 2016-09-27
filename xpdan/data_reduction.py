@@ -31,7 +31,7 @@ from itertools import islice
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
-from databroker.databroker import DataBroker as db
+#from databroker.databroker import DataBroker as db
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes
@@ -43,7 +43,7 @@ class DataReduction:
         Note: not a callback
     """
 
-    def __init__(self, exp_db=db, image_field=None):
+    def __init__(self, exp_db=an_glbl.db, image_field=None):
         # for file name 
         self.fields = ['sample_name', 'sp_type', 'sp_requested_exposure']
         self.labels = ['dark_frame']
@@ -101,7 +101,7 @@ class DataReduction:
             return None
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
-            dark_header = db(**dark_search)
+            dark_header = exp_db(**dark_search)
             dark_img = np.asarray(self.exp_db.get_images(dark_header,
                                              self.image_field)).squeeze()
         return dark_img, dark_header[0].start.time
@@ -269,11 +269,11 @@ def integrate_last(polarization_factor=0.99, root_dir=None,
             instance of class that handles data process, don't change it
             unless needed.
     """
-    integrate(db[-1],
-                    polarization_factor=polarization_factor,
-                    root_dir=root_dir,
-                    config_dict=config_dict,
-                    handler=handler)
+    integrate(an_glbl.db[-1],
+                      polarization_factor=polarization_factor,
+                      root_dir=root_dir,
+                      config_dict=config_dict,
+                      handler=handler)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,

@@ -407,7 +407,7 @@ def sum_images(header, idxs_list=None, handler=xpd_data_proc):
     """
     if idxs_list is None:
         total_img = None
-        for event in handler.exp_db.get_events(header):
+        for event in handler.exp_db.get_events(header, fill=True):
             if total_img is None:
                 total_img = event['data'][handler.image_field]
             else:
@@ -422,7 +422,7 @@ def sum_images(header, idxs_list=None, handler=xpd_data_proc):
         for idxs in idxs_list:
             total_img = None
             if isinstance(idxs, tuple):
-                events = handler.exp_db.get_events(header)
+                events = handler.exp_db.get_events(header, fill=True)
                 for idx in range(idxs[0], idxs[1]):
                     if total_img is None:
                         total_img = next(islice(events, idx))['data'][
@@ -431,7 +431,7 @@ def sum_images(header, idxs_list=None, handler=xpd_data_proc):
                         total_img += next(islice(events, idx))['data'][
                             handler.image_field]
             else:
-                events = handler.exp_db.get_events(header)
+                events = handler.exp_db.get_events(header, fill=True)
                 total_img = None
                 for idx in idxs:
                     if total_img is None:

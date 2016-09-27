@@ -56,6 +56,7 @@ def build_pymongo_backed_broker(request):
     mds_test_conf = dict(database=db_name, host='localhost',
                          port=27017, timezone='US/Eastern')
     try:
+       # nasty details: to save MacOS user
         mds = MDS(mds_test_conf, 1, auth=False)
     except:
         mds = MDS(mds_test_conf, 1)

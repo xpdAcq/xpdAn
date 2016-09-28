@@ -33,7 +33,7 @@ def handler(exp_db):
 
 @pytest.fixture(scope='function')
 def exp_db(db):
-    glbl = make_glbl()
+    glbl = make_glbl(1)
     db2 = next(db)
     mds = db2.mds
     fs = db2.fs

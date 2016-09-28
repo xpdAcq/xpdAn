@@ -8,10 +8,6 @@ import pandas as pd
 
 from .glbl import an_glbl
 
-from databroker.databroker import get_table
-from databroker.databroker import DataBroker as db
-
-
 ########### helper function #########
 
 def _get_current_saf():
@@ -69,7 +65,7 @@ class XpdAn:
 
     _default_dict = {'group': 'XPD'}
 
-    def __init__(self, *, saf_num=None, **kwargs):
+    def __init__(self, exp_db = an_glbl.exp_db, *, saf_num=None, **kwargs):
         self.header_md_fields = ['sa_name', 'time']
         self.event_md_fiedls = None
         self.search_dict = None
@@ -126,7 +122,7 @@ class XpdAn:
             search_dict = self.search_dict
         # allow update
         search_dict.update(kwargs)
-        self._set_current_search(db(**search_dict))
+        self._set_current_search(exp_db(**search_dict))
         self._table_gen(self._current_search,
                         col_name=self.header_md_fields)
 

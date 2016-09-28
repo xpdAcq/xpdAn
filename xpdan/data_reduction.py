@@ -24,19 +24,13 @@ from time import strftime
 from unittest.mock import MagicMock
 
 from .glbl import an_glbl
-from .utils import _clean_info, _timestampstr
 
+from .utils import _clean_info, _timestampstr
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from itertools import islice
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
-
-# FIXME: hotfix
-if os.environ['ENV_VAR'] == str(1):
-    # in test environ, import created db
-    from databroker.databroker import DataBroker as db
-    an_glbl.db = db
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes
@@ -48,7 +42,7 @@ class DataReduction:
         Note: not a callback
     """
 
-    def __init__(self, exp_db=an_glbl.db, image_field=None):
+    def __init__(self, exp_db=an_glbl.exp_db, image_field=None):
         # for file name 
         self.fields = ['sample_name', 'sp_type', 'sp_requested_exposure']
         self.labels = ['dark_frame']

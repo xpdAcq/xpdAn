@@ -58,7 +58,7 @@ def build_pymongo_backed_broker(request):
     try:
        # nasty details: to save MacOS user
         mds = MDS(mds_test_conf, 1, auth=False)
-    except:
+    except KeyError:
         mds = MDS(mds_test_conf, 1)
 
     db_name = "fs_testing_base_disposable_{}".format(str(uuid.uuid4()))

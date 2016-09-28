@@ -156,6 +156,6 @@ def make_glbl(env_code=0):
         exp_db = db
     return Glbl
 
-env_code = os.environ['ENV_VAR']
+env_code = os.environ['XPDAN_SETUP']
 print('ENV_CODE = {}'.format(env_code))
 an_glbl = make_glbl(env_code)

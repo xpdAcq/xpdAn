@@ -8,7 +8,7 @@ app = QtGui.QApplication(sys.argv)
 # 0 -> beamline
 # 1 -> test
 # 2 -> simulation
-os.environ['ENV_VAR'] = str(2)
+os.environ['XPDAN_SETUP'] = str(2)
 
 # setup glbl
 from xpdan.glbl import an_glbl

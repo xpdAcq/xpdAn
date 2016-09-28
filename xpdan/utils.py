@@ -51,7 +51,7 @@ class SimulatedPE1C(Reader):
 def _generate_simulation_data():
     """ priviate function to insert data to exp_db
     """
-    if os.environ['ENV_VAR'] != str(2):
+    if os.environ['XPDAN_SETUP'] != str(2):
         raise RuntimeError("ONLY insert data if you are running"
                            "simulation")
     # simulated det

@@ -33,7 +33,7 @@ def handler(exp_db):
 
 @pytest.fixture(scope='function')
 def exp_db(db):
-    glbl = make_glbl()
+    glbl = make_glbl(1)
     db2 = next(db)
     mds = db2.mds
     fs = db2.fs
@@ -55,9 +55,11 @@ def build_pymongo_backed_broker(request):
     db_name = "mds_testing_disposable_{}".format(str(uuid.uuid4()))
     mds_test_conf = dict(database=db_name, host='localhost',
                          port=27017, timezone='US/Eastern')
-    mds = MDS(mds_test_conf, 1,
-              # auth=False
-              )
+    try:
+       # nasty details: to save MacOS user
+        mds = MDS(mds_test_conf, 1, auth=False)
+    except TypeError:
+        mds = MDS(mds_test_conf, 1)
 
     db_name = "fs_testing_base_disposable_{}".format(str(uuid.uuid4()))
     fs_test_conf = create_test_database(host='localhost',

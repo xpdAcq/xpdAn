@@ -28,7 +28,7 @@ from .tools import mask_img
 from .utils import _clean_info, _timestampstr
 
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
-from itertools import islice
+from itertools import islice, tee
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
@@ -103,30 +103,27 @@ class DataReduction:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = self.exp_db(**dark_search)
             dark_img = np.asarray(self.exp_db.get_images(dark_header,
-                                             self.image_field)).squeeze()
+                                                         self.image_field)).squeeze()
         return dark_img, dark_header[0].start.time
 
     def _dark_sub(self, event, dark_img):
         """ priviate method operates on event level """
-        dark_sub = False
+        dark_sub_bool = False
         img = event['data'][self.image_field]
         if dark_img is not None and isinstance(dark_img, np.ndarray):
-            dark_sub = True
+            dark_sub_bool = True
             img -= dark_img
         ind = event['seq_num']
         event_timestamp = event['timestamps'][self.image_field]
-        return img, event_timestamp, ind, dark_sub
+        return img, event_timestamp, ind, dark_sub_bool
 
     def dark_sub(self, header):
         """ public method operates on header level """
-        img_list = []
-        timestamp_list = []
         dark_img, dark_time_stamp = self.pull_dark(header)
         for ev in self.exp_db.get_events(header, fill=True):
-            sub_img, timestamp, ind, dark_sub = self._dark_sub(ev, dark_img)
-            img_list.append(sub_img)
-            timestamp_list.append(timestamp)
-        return img_list, timestamp_list, dark_img, header.start
+            sub_img, timestamp, ind, dark_sub_bool = self._dark_sub(ev,
+                                                                    dark_img)
+            yield sub_img, timestamp, ind, dark_img, header.start, ev
 
     def _file_name(self, event, event_timestamp, ind):
         """ priviate method operates on event level """
@@ -136,10 +133,17 @@ class DataReduction:
         f_name = '{}_{:04d}.tif'.format(f_name, ind)
         return f_name
 
+    def construct_event_stream(self, header):
+        for event in self.exp_db.get_events(header, fill=True):
+            yield event['data'][self.image_field], \
+                  event['timestamps'][self.image_field], \
+                  event['seq_num'], event
+
 
 # init
 xpd_data_proc = DataReduction()
 ai = AzimuthalIntegrator()
+
 
 ### analysis function operates at header level ###
 def _prepare_header_list(headers):
@@ -172,18 +176,20 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate_and_save(headers, dark_sub=True,
+def integrate_and_save(headers, dark_sub_bool=True,
                        polarization_factor=0.99,
                        auto_mask=True, mask_dict=None,
                        save_image=True, root_dir=None,
-                       config_dict=None, handler=xpd_data_proc, **kwargs):
+                       config_dict=None, handler=xpd_data_proc,
+                       sum_idx_list=None,
+                       **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
     Parameters
     ----------
     headers : list
         a list of databroker.header objects
-    dark_sub : bool, optional
+    dark_sub_bool : bool, optional
         option to turn on/off dark subtraction functionality
     polarization_factor : float, optional
         polarization correction factor, ranged from -1(vertical) to 
@@ -231,7 +237,7 @@ def integrate_and_save(headers, dark_sub=True,
 
     # config_dict
     if config_dict is None:
-        config_dict = _load_config() # default dict 
+        config_dict = _load_config()  # default dict
 
     # setting up geometry
     ai.setPyFAI(**config_dict)
@@ -250,17 +256,17 @@ def integrate_and_save(headers, dark_sub=True,
             root_dir = W_DIR
         header_rv_list_Q = []
         header_rv_list_2theta = []
+
         # dark logic
-        dark_img = None
-        if dark_sub:
-            dark_img, dark_time = handler.pull_dark(header)
-        for event in handler.exp_db.get_events(header, fill=True):
-            # dark subtraction
-            img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
-                                                                    dark_img)
-            # basic file name
+        if dark_sub_bool:
+            event_stream = handler.dark_sub(header)
+        else:
+            event_stream = handler.construct_event_stream(header)
+        # python3 voodoo
+        for img, event_timestamp, ind, *rest, event in event_stream:
+
             f_name = handler._file_name(event, event_timestamp, ind)
-            if dark_sub:
+            if dark_sub_bool:
                 f_name = 'sub_' + f_name
 
             # masking logic
@@ -270,7 +276,7 @@ def integrate_and_save(headers, dark_sub=True,
                 f_name = 'masked_' + f_name
                 if mask_dict is None:
                     mask_dict = an_glbl.mask_dict
-                dummy_img = np.copy(img) # prepare for masking
+                dummy_img = np.copy(img)  # prepare for masking
                 dummy_img /= ai.polarization(dummy_img.shape,
                                              polarization_factor)
                 mask = mask_img(dummy_img, ai, **mask_dict)
@@ -281,8 +287,8 @@ def integrate_and_save(headers, dark_sub=True,
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
-            chi_name_Q = 'Q_' + stem + '.chi' # q_nm^-1
-            chi_name_2th = '2th_' + stem + '.chi' # deg^-1
+            chi_name_Q = 'Q_' + stem + '.chi'  # q_nm^-1
+            chi_name_2th = '2th_' + stem + '.chi'  # deg^-1
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
             chi_fn_Q = os.path.join(root_dir, chi_name_Q)
@@ -302,7 +308,7 @@ def integrate_and_save(headers, dark_sub=True,
                 tif.imsave(w_name, img)
                 if os.path.isfile(w_name):
                     print('image "%s" has been saved at "%s"' %
-                        (f_name, root_dir))
+                          (f_name, root_dir))
                 else:
                     print('Sorry, something went wrong with your tif saving')
                     return
@@ -315,15 +321,17 @@ def integrate_and_save(headers, dark_sub=True,
     return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
+def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
                             auto_mask=True, mask_dict=None,
                             save_image=True, root_dir=None,
-                            config_dict=None, handler=xpd_data_proc, **kwargs):
+                            config_dict=None, handler=xpd_data_proc,
+                            sum_imgs=None,
+                            **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
     Parameters
     ----------
-    dark_sub : bool, optional
+    dark_sub_bool : bool, optional
         option to turn on/off dark subtraction functionality
     polarization_factor : float, optional
         polarization correction factor, ranged from -1(vertical) to 
@@ -375,7 +383,7 @@ def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
                        handler=handler, **kwargs)
 
 
-def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
+def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,
               handler=xpd_data_proc):
     """ save images obtained from dataBroker as tiff format files.
 
@@ -384,7 +392,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
     headers : list
         a list of header objects obtained from a query to dataBroker.
 
-    dark_subtraction : bool, optional
+    dark_sub_bool : bool, optional
         Default is True, which allows dark/background subtraction to 
         be done before saving each image. If header doesn't contain
         necessary information to perform dark subtraction, uncorrected
@@ -416,14 +424,14 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
             root_dir = W_DIR
         # dark logic
         dark_img = None
-        if dark_sub:
+        if dark_sub_bool:
             dark_img, dark_time = handler.pull_dark(header)
         # event
         for event in handler.exp_db.get_events(header, fill=True):
-            img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
-                                                                    dark_img)
+            img, event_timestamp, ind, dark_sub_bool = handler._dark_sub(event,
+                                                                         dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)
-            if dark_sub:
+            if dark_sub_bool:
                 f_name = 'sub_' + f_name
             # save tif
             w_name = os.path.join(root_dir, f_name)
@@ -447,18 +455,18 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         stem, ext = os.path.splitext(w_name)
         config_name = w_name.replace(ext, '.yaml')
         with open(config_name, 'w') as f:
-            yaml.dump(header.start, f) # save all md in start
+            yaml.dump(header.start, f)  # save all md in start
 
     print(" *** {} *** ".format('Saving process finished'))
 
 
-def save_last_tiff(dark_sub=True, max_count=None, dryrun=False,
+def save_last_tiff(dark_sub_bool=True, max_count=None, dryrun=False,
                    handler=xpd_data_proc):
     """ save images from the most recent scan as tiff format files.
 
     Parameters
     ----------
-    dark_sub : bool, optional
+    dark_sub_bool : bool, optional
         Default is True, which allows dark/background subtraction to 
         be done before saving each image. If header doesn't contain
         necessary information to perform dark subtraction, uncorrected
@@ -477,11 +485,11 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False,
         unless needed.
     """
 
-    save_tiff(handler.exp_db[-1], dark_sub, max_count, dryrun,
+    save_tiff(handler.exp_db[-1], dark_sub_bool, max_count, dryrun,
               handler=handler)
 
 
-def sum_images(header, idxs_list=None, handler=xpd_data_proc):
+def sum_images(event_stream, idxs_list=None):
     """Sum images in a header
 
     Sum the images in a header according to the idxs_list
@@ -510,39 +518,40 @@ def sum_images(header, idxs_list=None, handler=xpd_data_proc):
     >>> assert len(total_imgs) == 2
     """
     if idxs_list is None:
+        for event in event_stream:
+            yield event
+    if idxs_list is 'all':
         total_img = None
-        for event in handler.exp_db.get_events(header, fill=True):
+        for img, *rest in event_stream:
             if total_img is None:
-                total_img = event['data'][handler.image_field]
+                total_img = img
             else:
-                total_img += event['data'][handler.image_field]
-        return [total_img]
-    else:
-        total_img_list = []
+                total_img += img
+        yield total_img
+    elif idxs_list:
         # If we only have one list make it into a list of lists
         if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
                    idxs_list):
             idxs_list = [idxs_list]
-        for idxs in idxs_list:
+        # Each idx list gets its own copy of the event stream
+        # This is to prevent one idx list from eating the generator
+        event_stream_copies = tee(event_stream, len(idxs_list))
+        for idxs, sub_event_stream in zip(idxs_list, event_stream_copies):
             total_img = None
             if isinstance(idxs, tuple):
-                events = handler.exp_db.get_events(header, fill=True)
                 for idx in range(idxs[0], idxs[1]):
+                    img, *rest = next(islice(sub_event_stream, idx))
                     if total_img is None:
-                        total_img = next(islice(events, idx))['data'][
-                            handler.image_field]
+                        total_img = img
                     else:
-                        total_img += next(islice(events, idx))['data'][
-                            handler.image_field]
+                        total_img += img
+                yield total_img
             else:
-                events = handler.exp_db.get_events(header, fill=True)
                 total_img = None
                 for idx in idxs:
+                    img, *rest = next(islice(sub_event_stream, idx))
                     if total_img is None:
-                        total_img = next(islice(events, idx))['data'][
-                            handler.image_field]
+                        total_img = img
                     else:
-                        total_img += next(islice(events, idx))['data'][
-                            handler.image_field]
-            total_img_list.append(total_img)
-        return total_img_list
+                        total_img += img
+                yield total_img

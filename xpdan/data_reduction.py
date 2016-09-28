@@ -262,12 +262,14 @@ def integrate_and_save(headers, dark_sub_bool=True,
             event_stream = handler.dark_sub(header)
         else:
             event_stream = handler.construct_event_stream(header)
-        # python3 voodoo
-        for img, event_timestamp, ind, *rest, event in event_stream:
+        for img, event_timestamp, ind, *rest, event in sum_images(
+                event_stream, sum_idx_list):
 
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub_bool:
                 f_name = 'sub_' + f_name
+            if sum_idx_list:
+                f_name = 'sum_' + rest[-1] + f_name
 
             # masking logic
             mask = None
@@ -518,16 +520,15 @@ def sum_images(event_stream, idxs_list=None):
     >>> assert len(total_imgs) == 2
     """
     if idxs_list is None:
-        for event in event_stream:
-            yield event
+        yield from event_stream
     if idxs_list is 'all':
         total_img = None
-        for img, *rest in event_stream:
+        for img, *rest, event in event_stream:
             if total_img is None:
                 total_img = img
             else:
                 total_img += img
-        yield total_img
+        yield total_img, rest, 'all', event
     elif idxs_list:
         # If we only have one list make it into a list of lists
         if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
@@ -540,18 +541,19 @@ def sum_images(event_stream, idxs_list=None):
             total_img = None
             if isinstance(idxs, tuple):
                 for idx in range(idxs[0], idxs[1]):
-                    img, *rest = next(islice(sub_event_stream, idx))
+                    img, *rest, event = next(islice(sub_event_stream, idx))
                     if total_img is None:
                         total_img = img
                     else:
                         total_img += img
-                yield total_img
+                yield total_img, rest, '({}-{})'.format(*idxs), event
             else:
                 total_img = None
                 for idx in idxs:
-                    img, *rest = next(islice(sub_event_stream, idx))
+                    img, *rest, event = next(islice(sub_event_stream, idx))
                     if total_img is None:
                         total_img = img
                     else:
                         total_img += img
-                yield total_img
+                yield total_img, rest, '[{}]'.format(
+                    ','.join(map(str, idxs))), event

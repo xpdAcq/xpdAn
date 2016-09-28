@@ -270,7 +270,10 @@ def integrate_and_save(headers, dark_sub=True,
                 f_name = 'masked_' + f_name
                 if mask_dict is None:
                     mask_dict = an_glbl.mask_dict
-                mask = mask_img(img, ai, **mask_dict)
+                dummy_img = np.copy(img) # prepare for masking
+                dummy_img /= ai.polarization(dummy_img.shape,
+                                             polarization_factor)
+                mask = mask_img(dummy_img, ai, **mask_dict)
                 print("INFO: mask file '{}' is saved at {}"
                       .format(f_name, root_dir))
                 np.save(os.path.join(root_dir, f_name),
@@ -363,13 +366,13 @@ def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-    integrate_and_save(db[-1], auto_dark=auto_dark,
+    integrate_and_save(handler.exp_db[-1], auto_dark=auto_dark,
                        polarization_factor=polarization_factor,
                        auto_mask=auto_mask, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,
-                       handler=handler)
+                       handler=handler, **kwargs)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,

@@ -97,7 +97,8 @@ def mask_img(img, geo,
     img: ndarray
         The image to be masked
     geo: pyFAI.geometry.Geometry
-        The pyFAI description of the detector orientation
+        The pyFAI description of the detector orientation or any
+        subclass of pyFAI.geometry.Geometry class
     edge: int, optional
         The number of edge pixels to mask. Defaults to 30. If None, no edge
         mask is applied

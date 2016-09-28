@@ -24,8 +24,9 @@ from time import strftime
 from unittest.mock import MagicMock
 
 from .glbl import an_glbl
-
+from .tools import mask_img
 from .utils import _clean_info, _timestampstr
+
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from itertools import islice
 
@@ -97,7 +98,7 @@ class DataReduction:
         if dark_uid is None:
             print("INFO: no dark frame is associated in this header, "
                   "subrraction will not be processed")
-            return None
+            return None, header.start.time
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = self.exp_db(**dark_search)
@@ -130,8 +131,8 @@ class DataReduction:
     def _file_name(self, event, event_timestamp, ind):
         """ priviate method operates on event level """
         f_name = self._feature_gen(event)
-        f_name = '_'.join([f_name,
-                           _timestampstr(event_timestamp)])
+        f_name = '_'.join([_timestampstr(event_timestamp),
+                           f_name])
         f_name = '{}_{:04d}.tif'.format(f_name, ind)
         return f_name
 
@@ -139,7 +140,6 @@ class DataReduction:
 # init
 xpd_data_proc = DataReduction()
 ai = AzimuthalIntegrator()
-
 
 ### analysis function operates at header level ###
 def _prepare_header_list(headers):
@@ -172,45 +172,75 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate(headers, polarization_factor=0.99,
-              root_dir=None, config_dict=None, handler=xpd_data_proc):
-    """ integrate dark subtracted image for given list of headers
+def integrate_and_save(headers, dark_sub=True,
+                       polarization_factor=0.99,
+                       auto_mask=True, mask_dict=None,
+                       save_image=True, root_dir=None,
+                       config_dict=None, handler=xpd_data_proc, **kwargs):
+    """ integrate and save dark subtracted images for given list of headers
 
-        Parameters
-        ----------
-        headers : list
-            a list of header objects obtained from a query to
-            dataBroker.
+    Parameters
+    ----------
+    headers : list
+        a list of databroker.header objects
+    dark_sub : bool, optional
+        option to turn on/off dark subtraction functionality
+    polarization_factor : float, optional
+        polarization correction factor, ranged from -1(vertical) to 
+        +1 (horizontal). default is 0.99. set to None for no
+        correction.
+    auto_mask : bool, optional
+        turn on/off of automask functionality. default is True
+    mask_dict : dict, optional
+        dictionary stores options for automasking functionality. 
+        default is defined by an_glbl.auto_mask_dict. 
+        Please refer to documentation for more details
+    save_image : bool, optional
+        option to save dark subtracted images. images will be 
+        saved to the same directory of chi files. default is True.
+    root_dir : str, optional
+        path of chi files that are going to be saved. default is 
+        the same as your image file
+    config_dict : dict, optional
+        dictionary stores integration parameters of pyFAI azimuthal 
+        integrator. default is the most recent parameters saved in 
+        xpdUser/conifg_base
+    handler : instance of class, optional
+        instance of class that handles data process, don't change it 
+        unless needed.
+    kwargs :
+        addtional keywords to overwrite integration behavior. Please
+        refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+        more information
 
-        polarization_factor : float, int
-            polarization correction factor, ranged from -1(vertical) to
-            +1 (horizontal). default is 0.99. set to None for no
-            correction.
+    Note
+    ----
+    complete docstring of masking functionality could be find in
+    ``mask_img``
 
-        root_dir : str, optional
-            path of chi files that are going to be saved. default is
-            xpdUser/userAnalysis/
+    customized mask can be assign to by kwargs (It must be a ndarray)
+    >>> integrate_and_save(mask=my_mask)
 
-        config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal
-            integrator. default is the most recent parameters saved in
-            xpdUser/conifg_base
-
-        handler : instance of class, optional
-            instance of class that handles data process, don't change it
-            unless needed.
+    See also
+    --------
+    xpdan.tools.mask_img
+    pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
     # normalize list
     header_list = _prepare_header_list(headers)
 
     # config_dict
     if config_dict is None:
-        config_dict = _load_config()  # default one
+        config_dict = _load_config() # default dict 
+
+    # setting up geometry
     ai.setPyFAI(**config_dict)
     npt = _npt_cal(config_dict)
 
+    total_rv_list_Q = []
+    total_rv_list_2theta = []
+
     # iterate over header
-    total_rv_list = []
     for header in header_list:
         root = header.start.get(handler.root_dir_name, None)
         if root is not None:
@@ -218,61 +248,131 @@ def integrate(headers, polarization_factor=0.99,
             os.makedirs(root_dir, exist_ok=True)
         else:
             root_dir = W_DIR
-        header_rv_list = []
+        header_rv_list_Q = []
+        header_rv_list_2theta = []
         # dark logic
-        dark_img = handler.pull_dark(header)
+        dark_img = None
+        if dark_sub:
+            dark_img, dark_time = handler.pull_dark(header)
         for event in handler.exp_db.get_events(header, fill=True):
+            # dark subtraction
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
                                                                     dark_img)
+            # basic file name
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub:
                 f_name = 'sub_' + f_name
+
+            # masking logic
+            mask = None
+            if auto_mask:
+                print("INFO: mask your image: {}".format(f_name))
+                f_name = 'masked_' + f_name
+                if mask_dict is None:
+                    mask_dict = an_glbl.mask_dict
+                dummy_img = np.copy(img) # prepare for masking
+                dummy_img /= ai.polarization(dummy_img.shape,
+                                             polarization_factor)
+                mask = mask_img(dummy_img, ai, **mask_dict)
+                print("INFO: mask file '{}' is saved at {}"
+                      .format(f_name, root_dir))
+                np.save(os.path.join(root_dir, f_name),
+                        mask)
+
+            # integration logic
             stem, ext = os.path.splitext(f_name)
-            chi_name = stem + '.chi'
-            integration_dict = {'filename': os.path.join(root_dir, chi_name),
-                                'polarization_factor':
-                                    polarization_factor}
+            chi_name_Q = 'Q_' + stem + '.chi' # q_nm^-1
+            chi_name_2th = '2th_' + stem + '.chi' # deg^-1
             print("INFO: integrating image: {}".format(f_name))
-            rv = ai.integrate1d(img, npt, **integration_dict)
-            header_rv_list.append(rv)
-            print("INFO: save chi file: {}".format(chi_name))
-        total_rv_list.append(header_rv_list)
+            # Q-integration
+            chi_fn_Q = os.path.join(root_dir, chi_name_Q)
+            chi_fn_2th = os.path.join(root_dir, chi_name_2th)
+            for unit, fn, l in zip(["q_nm^-1", "2th_deg"],
+                                   [chi_fn_Q, chi_fn_2th],
+                                   [header_rv_list_Q, header_rv_list_2theta]):
+                print("INFO: save chi file: {}".format(fn))
+                rv = ai.integrate1d(img, npt, filename=fn, mask=~mask,
+                                    polarization_factor=polarization_factor,
+                                    unit=unit, **kwargs)
+                l.append(rv)
+
+            # save image logic
+            w_name = os.path.join(root_dir, f_name)
+            if save_image:
+                tif.imsave(w_name, img)
+                if os.path.isfile(w_name):
+                    print('image "%s" has been saved at "%s"' %
+                        (f_name, root_dir))
+                else:
+                    print('Sorry, something went wrong with your tif saving')
+                    return
+
         # each header generate  a list of rv
+        total_rv_list_Q.append(header_rv_list_Q)
+        total_rv_list_2theta.append(header_rv_list_2theta)
 
-    print(" *** {} *** ".format('Integration process finished'))
-    print("INFO: chi files are saved at {}".format(root_dir))
-    return total_rv_list
+    print("INFO: chi/image files are saved at {}".format(root_dir))
+    return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_last(polarization_factor=0.99, root_dir=None,
-                   config_dict=None, handler=xpd_data_proc):
-    """ integrate dark subtracted image for given list of headers
+def integrate_and_save_last(dark_sub=True, polarization_factor=0.99,
+                            auto_mask=True, mask_dict=None,
+                            save_image=True, root_dir=None,
+                            config_dict=None, handler=xpd_data_proc, **kwargs):
+    """ integrate and save dark subtracted images for given list of headers
 
-        Parameters
-        ----------
-        polarization_factor : float, int
-            polarization correction factor, ranged from -1(vertical) to
-            +1 (horizontal). default is 0.99. set to None for no
-            correction.
+    Parameters
+    ----------
+    dark_sub : bool, optional
+        option to turn on/off dark subtraction functionality
+    polarization_factor : float, optional
+        polarization correction factor, ranged from -1(vertical) to 
+        +1 (horizontal). default is 0.99. set to None for no
+        correction.
+    auto_mask : bool, optional
+        turn on/off of automask functionality. default is True
+    mask_dict : dict, optional
+        dictionary stores options for automasking functionality. 
+        default is defined by an_glbl.auto_mask_dict. 
+        Please refer to documentation for more details.
+    save_image : bool, optional
+        option to save dark subtracted images. images will be 
+        saved to the same directory of chi files. default is True.
+    root_dir : str, optional
+        path of chi files that are going to be saved. default is 
+        xpdUser/userAnalysis/
+    config_dict : dict, optional
+        dictionary stores integration parameters of pyFAI azimuthal 
+        integrator. default is the most recent parameters saved in 
+        xpdUser/conifg_base
+    handler : instance of class, optional
+        instance of class that handles data process, don't change it 
+        unless needed.
+    kwargs :
+        addtional keywords to overwrite integration behavior. Please
+        refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
+        more information
 
-        root_dir : str, optional
-            path of chi files that are going to be saved. default is
-            xpdUser/tiff_base/<sample_name>/
+    Note
+    ----
+    complete docstring of masking functionality could be find in
+    ``mask_img``
 
-        config_dict : dict, optional
-            dictionary stores integration parameters of pyFAI azimuthal
-            integrator. default is the most recent parameters saved in
-            xpdUser/conifg_base
+    customized mask can be assign to by kwargs (It must be a ndarray)
+    >>> integrate_and_save_last(mask=my_mask)
 
-        handler : instance of class, optional
-            instance of class that handles data process, don't change it
-            unless needed.
+    See also
+    --------
+    xpdan.tools.mask_img
+    pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-    integrate(handler.exp_db[-1],
-              polarization_factor=polarization_factor,
-              root_dir=root_dir,
-              config_dict=config_dict,
-              handler=handler)
+    integrate_and_save(handler.exp_db[-1], auto_dark=auto_dark,
+                       polarization_factor=polarization_factor,
+                       auto_mask=auto_mask, mask_dict=mask_dict,
+                       save_image=save_image,
+                       root_dir=root_dir,
+                       config_dict=config_dict,
+                       handler=handler, **kwargs)
 
 
 def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
@@ -315,9 +415,9 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         else:
             root_dir = W_DIR
         # dark logic
-        dark_img, dark_time = handler.pull_dark(header)
-        if not dark_sub:
-            dark_img = None  # no sub
+        dark_img = None
+        if dark_sub:
+            dark_img, dark_time = handler.pull_dark(header)
         # event
         for event in handler.exp_db.get_events(header, fill=True):
             img, event_timestamp, ind, dark_sub = handler._dark_sub(event,
@@ -347,8 +447,7 @@ def save_tiff(headers, dark_sub=True, max_count=None, dryrun=False,
         stem, ext = os.path.splitext(w_name)
         config_name = w_name.replace(ext, '.yaml')
         with open(config_name, 'w') as f:
-            # yaml.dump(header.start['sc_calibration_md'], f)
-            yaml.dump(header.start, f)  # save all md in start
+            yaml.dump(header.start, f) # save all md in start
 
     print(" *** {} *** ".format('Saving process finished'))
 
@@ -359,7 +458,7 @@ def save_last_tiff(dark_sub=True, max_count=None, dryrun=False,
 
     Parameters
     ----------
-    dark_subtraction : bool, optional
+    dark_sub : bool, optional
         Default is True, which allows dark/background subtraction to 
         be done before saving each image. If header doesn't contain
         necessary information to perform dark subtraction, uncorrected

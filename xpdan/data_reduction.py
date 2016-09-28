@@ -25,6 +25,7 @@ from unittest.mock import MagicMock
 
 from .glbl import an_glbl
 from .tools import mask_img
+from .utils import _clean_info, _timestampstr
 
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from itertools import islice
@@ -277,7 +278,8 @@ def integrate_and_save(headers, dark_sub=True,
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
-            chi_name_Q = stem + '_Q_' + '.chi' # q_nm^-1
+            chi_name_Q = 'Q_' + stem + '.chi' # q_nm^-1
+            chi_name_2th = '2th_' + stem + '.chi' # deg^-1
             print("INFO: integrating image: {}".format(f_name))
             # Q-integration
             chi_fn_Q = os.path.join(root_dir, chi_name_Q)

@@ -1,4 +1,4 @@
-from xpdan.data_reduction import integrate, sum_images
+from xpdan.data_reduction import integrate_and_save, sum_images
 
 
 def test_integrate_smoke(exp_db, handler):

@@ -35,13 +35,17 @@ def test_integrate_smoke(exp_db, handler, kwargs):
     integrate_and_save(exp_db[-1], handler=handler, **kwargs)
 
 
-def test_sum_logic_smoke(exp_db, handler):
+@pytest.mark.parametrize("idx_values", sum_idx_values)
+def test_sum_logic_smoke(exp_db, handler, idx_values):
     hdr = exp_db[-1]
-    event_stream = handler.exp_db.get_events(hdr, fill=True)
-    sub_event_streams = tee(event_stream, 4)
-    a = sum_images(sub_event_streams[0])
-    assert len(list(a)) == len(list(sub_event_streams[1]))
-    a = sum_images(sub_event_streams[2], [1, 2, 3])
-    assert len(list(a)) == 1
-    a = sum_images(sub_event_streams[3], [(1, 3)])
-    assert len(list(a)) == 1
+    for idxs in idx_values:
+        event_stream = handler.exp_db.get_events(hdr, fill=True)
+
+        sub_event_streams = tee(event_stream, 2)
+        a = sum_images(sub_event_streams[0])
+        if idxs is None:
+            assert len(list(a)) == len(list(sub_event_streams[1]))
+        elif idxs is 'all':
+            assert len(list(a)) == 1
+        else:
+            assert len(list(a)) == len(idxs)

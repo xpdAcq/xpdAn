@@ -73,6 +73,7 @@ def make_glbl(env_code=0):
     if int(env_code) == 1:
         from databroker import db # import db created for test
         BASE_DIR = tempfile.mkdtemp()
+        print('creating {}'.format(BASE_DIR))
     # simulation
     elif int(env_code) == 2:
         BASE_DIR = os.getcwd()

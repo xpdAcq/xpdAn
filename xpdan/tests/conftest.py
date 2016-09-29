@@ -41,7 +41,6 @@ def exp_db(db):
     yield db2
     print('removing {}'.format(glbl.base))
     shutil.rmtree(glbl.base)
-
     print("DROPPING DB")
     mds._connection.drop_database(mds.config['database'])
     print("DROPPING DB")

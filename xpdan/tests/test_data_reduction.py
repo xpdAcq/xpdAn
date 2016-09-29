@@ -1,6 +1,7 @@
 from xpdan.data_reduction import integrate_and_save, sum_images
 from itertools import tee, product
 import pytest
+from pprint import pprint
 
 sum_idx_values = (
     None, 'all', [1, 2, 3], [(1, 3)], [[1, 2, 3], [2, 3]], [[1, 3], (1, 3)])
@@ -30,7 +31,7 @@ for vs in integrate_kwarg_values:
 
 @pytest.mark.parametrize("kwargs", integrate_kwargs)
 def test_integrate_smoke(exp_db, handler, kwargs):
-    print(kwargs)
+    pprint(kwargs)
     integrate_and_save(exp_db[-1], handler=handler, **kwargs)
 
 

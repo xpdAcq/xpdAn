@@ -276,7 +276,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 f_name = 'sum_' + rest[-1] + f_name
 
             # masking logic
-            mask = None
+            mask = np.ones(img.shape).astype(bool)
             if auto_mask:
                 print("INFO: mask your image: {}".format(f_name))
                 f_name = 'masked_' + f_name

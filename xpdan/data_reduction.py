@@ -537,7 +537,7 @@ def sum_images(event_stream, idxs_list=None):
                 total_img = img
             else:
                 total_img += img
-        yield chain([total_img, *rest, 'all', event])
+        yield chain([total_img], rest, ['all', event])
     elif idxs_list:
         # If we only have one list make it into a list of lists
         if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
@@ -555,7 +555,7 @@ def sum_images(event_stream, idxs_list=None):
                         total_img = img
                     else:
                         total_img += img
-                yield chain([total_img, *rest, '({}-{})'.format(*idxs), event])
+                yield chain([total_img], rest, ['({}-{})'.format(*idxs), event])
             else:
                 total_img = None
                 for idx in idxs:
@@ -564,5 +564,5 @@ def sum_images(event_stream, idxs_list=None):
                         total_img = img
                     else:
                         total_img += img
-                yield chain([total_img, *rest, '[{}]'.format(
+                yield chain([total_img], rest, ['[{}]'.format(
                     ','.join(map(str, idxs))), event])

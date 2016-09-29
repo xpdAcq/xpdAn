@@ -28,7 +28,7 @@ from .tools import mask_img
 from .utils import _clean_info, _timestampstr
 
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
-from itertools import islice, tee
+from itertools import islice, tee, chain
 
 # top definition for minimal impacts on the code 
 from databroker.databroker import get_table
@@ -214,6 +214,10 @@ def integrate_and_save(headers, dark_sub_bool=True,
     handler : instance of class, optional
         instance of class that handles data process, don't change it 
         unless needed.
+    sum_idx_list: list of lists and tuple or list or 'all', optional
+        The list of lists and tuples which specify the images to be summed.
+        If 'all', sum all the images in the run. If None, do nothing.
+        Defaults to None.
     kwargs :
         addtional keywords to overwrite integration behavior. Please
         refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
@@ -327,7 +331,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
                             auto_mask=True, mask_dict=None,
                             save_image=True, root_dir=None,
                             config_dict=None, handler=xpd_data_proc,
-                            sum_imgs=None,
+                            sum_idx_list=None,
                             **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
@@ -358,6 +362,10 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     handler : instance of class, optional
         instance of class that handles data process, don't change it 
         unless needed.
+    sum_idx_list: list of lists and tuple or list or 'all', optional
+        The list of lists and tuples which specify the images to be summed.
+        If 'all', sum all the images in the run. If None, do nothing.
+        Defaults to None.
     kwargs :
         addtional keywords to overwrite integration behavior. Please
         refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
@@ -376,7 +384,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-    integrate_and_save(handler.exp_db[-1], auto_dark=auto_dark,
+    integrate_and_save(handler.exp_db[-1], dark_sub_bool=dark_sub_bool,
                        polarization_factor=polarization_factor,
                        auto_mask=auto_mask, mask_dict=mask_dict,
                        save_image=save_image,
@@ -500,9 +508,10 @@ def sum_images(event_stream, idxs_list=None):
     ----------
     header: mds.header
         The run header to be summed
-    idxs_list: list of lists and tuple, optional
+    idxs_list: list of lists and tuple or list or 'all', optional
         The list of lists and tuples which specify the images to be summed.
-        If None, sum all the images in the run. Defaults to None.
+        If 'all', sum all the images in the run. If None, do nothing.
+        Defaults to None.
     handler : instance of class
         instance of class that handles data process, don't change it
         unless needed.
@@ -528,7 +537,7 @@ def sum_images(event_stream, idxs_list=None):
                 total_img = img
             else:
                 total_img += img
-        yield total_img, rest, 'all', event
+        yield chain([total_img, *rest, 'all', event])
     elif idxs_list:
         # If we only have one list make it into a list of lists
         if not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
@@ -546,7 +555,7 @@ def sum_images(event_stream, idxs_list=None):
                         total_img = img
                     else:
                         total_img += img
-                yield total_img, rest, '({}-{})'.format(*idxs), event
+                yield chain([total_img, *rest, '({}-{})'.format(*idxs), event])
             else:
                 total_img = None
                 for idx in idxs:
@@ -555,5 +564,5 @@ def sum_images(event_stream, idxs_list=None):
                         total_img = img
                     else:
                         total_img += img
-                yield total_img, rest, '[{}]'.format(
-                    ','.join(map(str, idxs))), event
+                yield chain([total_img, *rest, '[{}]'.format(
+                    ','.join(map(str, idxs))), event])

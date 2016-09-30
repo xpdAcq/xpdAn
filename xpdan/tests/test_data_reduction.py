@@ -15,8 +15,10 @@ integrate_params = ['dark_sub_bool',
                     'root_dir',
                     'config_dict',
                     'sum_idx_list']
-good_kwargs = [(True, False), (.99, .95, .5), (True, False),
-               [None, {'alpha': 3}],
+good_kwargs = [(True, False), (.99,
+                               # .95, .5
+                               ), (True, False),
+                               [None, {'alpha': 3}],
                (True, False), [None], [None], sum_idx_values]
 
 bad_integrate_params = ['dark_sub_bool',

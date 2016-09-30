@@ -1,4 +1,5 @@
-from xpdan.data_reduction import integrate_and_save, sum_images
+from xpdan.data_reduction import integrate_and_save, sum_images, \
+    integrate_and_save_last, save_tiff, save_last_tiff
 from itertools import tee, product
 import pytest
 from pprint import pprint
@@ -43,6 +44,23 @@ for vs in bad_kwargs:
 def test_integrate_smoke(exp_db, handler, kwargs, known_fail_bool):
     pprint(kwargs)
     a = integrate_and_save(exp_db[-1], handler=handler, **kwargs)
+    if known_fail_bool and not a:
+        pytest.xfail('Bad params')
+
+
+@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
+def test_integrate_and_save_last_smoke(handler, kwargs,
+                                       known_fail_bool):
+    pprint(kwargs)
+    a = integrate_and_save_last(handler=handler, **kwargs)
+    if known_fail_bool and not a:
+        pytest.xfail('Bad params')
+
+
+@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
+def test_save_tiff_smoke(exp_db, handler, kwargs, known_fail_bool):
+    pprint(kwargs)
+    a = save_tiff(exp_db[-1], handler=handler, **kwargs)
     if known_fail_bool and not a:
         pytest.xfail('Bad params')
 

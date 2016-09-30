@@ -58,7 +58,7 @@ def test_ring_blur_mask():
 
 
 def test_compression_decompression():
-    mask = np.ones((10, 10))
+    mask = np.ones((10, 10)).astype(bool)
     a, b, c = compress_mask(mask)
     mask2 = decompress_mask(a, b, c, mask.shape)
     assert_array_equal(mask, mask2)

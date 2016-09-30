@@ -180,4 +180,4 @@ def compress_mask(mask):
 
 def decompress_mask(data, indicies, indptr, shape):
     cmask = csr_matrix((data, indicies, indptr), shape=shape)
-    return cmask.toarray()
+    return cmask.toarray().astype(bool)

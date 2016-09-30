@@ -386,7 +386,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,
-                       handler=handler,sum_idx_list=sum_idx_list, **kwargs)
+                       handler=handler, sum_idx_list=sum_idx_list, **kwargs)
 
 
 def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,

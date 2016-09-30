@@ -28,7 +28,7 @@ def test_ring_blur_mask():
     )
     r = g.rArray((2048, 2048))
     # make some sample data
-    Z = 100 * np.cos(50 * r) ** 2 + 150
+    iq = 100 * np.cos(50 * r) ** 2 + 150
 
     np.random.seed(10)
     pixels = []
@@ -37,15 +37,15 @@ def test_ring_blur_mask():
                np.random.randint(low=0, high=2048)
         if np.random.random() > .5:
             # Add some hot pixels
-            Z[a, b] = np.random.randint(low=200, high=255)
+            iq[a, b] = np.random.randint(low=200, high=255)
         else:
             # and dead pixels
-            Z[a, b] = np.random.randint(low=0, high=10)
+            iq[a, b] = np.random.randint(low=0, high=10)
         pixels.append((a, b))
     pixel_size = [getattr(g, k) for k in ['pixel1', 'pixel2']]
     rres = np.hypot(*pixel_size)
     bins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres)
-    msk = binned_outlier(Z, r, (3., 3), bins, mask=None)
+    msk = binned_outlier(iq, r, (3., 3), bins, mask=None)
     a = set(zip(*np.nonzero(~msk)))
     b = set(pixels)
     a_not_in_b = a - b

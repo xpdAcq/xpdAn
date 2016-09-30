@@ -31,8 +31,8 @@ except ImportError:
     def binned_outlier(img, r, alpha, bins, mask=None):
         """ Generates a mask by identifying outlier pixels.
 
-        The image is binned and any pixels which have a value greater or less than
-        alpha * std away from the mean are masked.
+        The image is binned and any pixels which have a value greater or less
+        than alpha * std away from the mean are masked.
 
         Parameters
         ----------

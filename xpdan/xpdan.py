@@ -7,8 +7,10 @@ import numpy as np
 import pandas as pd
 
 from .glbl import an_glbl
+import yaml
 
-########### helper function #########
+""" helper function """
+
 
 def _get_current_saf():
     bt_list = [f for f in os.listdir(an_glbl.yaml_dir) if f.startswith('bt_')]
@@ -65,7 +67,7 @@ class XpdAn:
 
     _default_dict = {'group': 'XPD'}
 
-    def __init__(self, exp_db = an_glbl.exp_db, *, saf_num=None, **kwargs):
+    def __init__(self, exp_db=an_glbl.exp_db, *, saf_num=None, **kwargs):
         self.header_md_fields = ['sa_name', 'time']
         self.event_md_fiedls = None
         self.search_dict = None

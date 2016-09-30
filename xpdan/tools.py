@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats as sts
 from matplotlib.path import Path
-
+from scipy.sparse import csr_matrix
 # Ideally we would pull these functions from scikit-beam
 try:
     from skbeam.core.mask import margin, binned_outlier
@@ -171,3 +171,13 @@ def mask_img(img, geo,
     if alpha:
         working_mask *= binned_outlier(img, r, alpha, rbins, mask=working_mask)
     return working_mask
+
+
+def compress_mask(mask):
+    cmask = csr_matrix(~mask)
+    return cmask.data, cmask.indices, cmask.indptr
+
+
+def decompress_mask(data, indicies, indptr, shape):
+    cmask = csr_matrix((data, indicies, indptr), shape=shape)
+    return cmask.toarray()

@@ -39,6 +39,14 @@ for vs in bad_kwargs:
     d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
     integrate_kwargs.append((d, True))
 
+save_tiff_kwargs = []
+save_tiff_params = ['dark_sub_bool', 'max_count', 'dryrun']
+save_tiff_kwarg_values = [(True, False), (None, 1), (True, False)]
+
+for vs in save_tiff_kwarg_values:
+    d = {k: v for (k, v) in zip(save_tiff_params, vs)}
+    save_tiff_kwargs.append((d, False))
+
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
 def test_integrate_smoke(exp_db, handler, kwargs, known_fail_bool):
@@ -57,10 +65,18 @@ def test_integrate_and_save_last_smoke(handler, kwargs,
         pytest.xfail('Bad params')
 
 
-@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
+@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
 def test_save_tiff_smoke(exp_db, handler, kwargs, known_fail_bool):
     pprint(kwargs)
     a = save_tiff(exp_db[-1], handler=handler, **kwargs)
+    if known_fail_bool and not a:
+        pytest.xfail('Bad params')
+
+
+@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
+def test_save_last_tiff_smoke(handler, kwargs, known_fail_bool):
+    pprint(kwargs)
+    a = save_last_tiff(handler=handler, **kwargs)
     if known_fail_bool and not a:
         pytest.xfail('Bad params')
 

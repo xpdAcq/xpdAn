@@ -1,6 +1,6 @@
 import numpy as np
 from pyFAI.geometry import Geometry
-from xpdan.tools import margin, binned_outlier
+from xpdan.tools import margin, binned_outlier, compress_mask, decompress_mask
 from numpy.testing import assert_array_equal
 
 
@@ -55,3 +55,10 @@ def test_ring_blur_mask():
     assert len(a_not_in_b) / len(b) < .1
     # Make certain that we have masked over 90% of the bad pixels
     assert len(b_not_in_a) / len(b) < .1
+
+
+def test_compression_decompression():
+    mask = np.ones((10, 10))
+    a, b, c = compress_mask(mask)
+    mask2 = decompress_mask(a, b, c, mask.shape)
+    assert_array_equal(mask, mask2)

@@ -4,24 +4,9 @@ import tempfile
 from time import strftime
 
 import matplotlib
-import tzlocal
+from databroker import db
 
 matplotlib.use('qt4agg')
-
-
-# make db for simulation
-def make_broker():
-    # FIXME: need to deal with protable vs mongo, we need both
-    from portable_mds.sqlite.mds import MDS
-    from portable_fs.sqlite.fs import FileStore
-    from databroker import Broker
-
-    # make visible temp_dir, a layer up than xpdUser
-    mds_dir = tempfile.mkdtemp()
-    mds = MDS({'directory': mds_dir,
-               'timezone': tzlocal.get_localzone().zone})
-    fs = FileStore({'dbpath': os.path.join(mds_dir, 'filestore.db')})
-    return Broker(mds, fs)
 
 
 def make_glbl(env_code=0):
@@ -55,14 +40,11 @@ def make_glbl(env_code=0):
     # change this to be handled by an environment variable later
     # test
     if int(env_code) == 1:
-        from databroker import db  # import db created for test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
     # simulation
     elif int(env_code) == 2:
         BASE_DIR = os.getcwd()
-        # simulated db
-        db = make_broker()
     else:
         # beamline
         BASE_DIR = os.path.expanduser('~/')

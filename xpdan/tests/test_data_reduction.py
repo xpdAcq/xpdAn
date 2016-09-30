@@ -14,25 +14,37 @@ integrate_params = ['dark_sub_bool',
                     'root_dir',
                     'config_dict',
                     'sum_idx_list']
-dsb = (True, False)
-pf = (.99, .95, .5)
-am = (True, False)
-md = [None]
-si = (True, False)
-rd = [None]
-cd = [None]
+good_kwargs = [(True, False), (.99, .95, .5), (True, False),
+               [None, {'alpha': 3}],
+               (True, False), [None], [None], sum_idx_values]
 
-integrate_kwarg_values = product(dsb, pf, am, md, si, rd, cd, sum_idx_values)
+bad_integrate_params = ['dark_sub_bool',
+                        'polarization_factor',
+                        'auto_mask',
+                        'mask_dict',
+                        'save_image',
+                        'config_dict',
+                        'sum_idx_list']
+
+bad_kwargs = [['str'] for i in range(len(bad_integrate_params))]
+
+integrate_kwarg_values = product(*good_kwargs)
 integrate_kwargs = []
 for vs in integrate_kwarg_values:
     d = {k: v for (k, v) in zip(integrate_params, vs)}
-    integrate_kwargs.append(d)
+    integrate_kwargs.append((d, False))
+
+for vs in bad_kwargs:
+    d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
+    integrate_kwargs.append((d, True))
 
 
-@pytest.mark.parametrize("kwargs", integrate_kwargs)
-def test_integrate_smoke(exp_db, handler, kwargs):
+@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
+def test_integrate_smoke(exp_db, handler, kwargs, known_fail_bool):
     pprint(kwargs)
-    integrate_and_save(exp_db[-1], handler=handler, **kwargs)
+    a = integrate_and_save(exp_db[-1], handler=handler, **kwargs)
+    if known_fail_bool and not a:
+        pytest.xfail('Bad params')
 
 
 @pytest.mark.parametrize("idxs", sum_idx_values)
@@ -47,7 +59,7 @@ def test_sum_logic_smoke(exp_db, handler, idxs):
     elif idxs is 'all':
         assert len(list(a)) == 1
     elif not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
-                   idxs):
+                 idxs):
         assert len(list(a)) == 1
     else:
         assert len(list(a)) == len(idxs)

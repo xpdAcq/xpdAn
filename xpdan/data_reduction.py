@@ -506,19 +506,17 @@ def sum_images(event_stream, idxs_list=None):
 
     Parameters
     ----------
-    header: mds.header
-        The run header to be summed
+    event_stream: generator
+        The event stream to be summed. The image must be first, with the
+        event itself last
     idxs_list: list of lists and tuple or list or 'all', optional
         The list of lists and tuples which specify the images to be summed.
         If 'all', sum all the images in the run. If None, do nothing.
         Defaults to None.
-    handler : instance of class
-        instance of class that handles data process, don't change it
-        unless needed.
-    Returns
+    Yields
     -------
-    list:
-        The list of summed images
+    event_stream:
+        The event stream, with the images (in the first position) summed
 
     >>> hdr = db[-1]
     >>> total_imgs = sum_images(hdr) # Sum all the images

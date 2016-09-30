@@ -48,7 +48,7 @@ def make_glbl(env_code=0):
 
     Parameters
     ----------
-    en_var : int
+    env_code : int
         environment variable to specify current situation
 
     Note

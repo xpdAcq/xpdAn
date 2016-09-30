@@ -41,6 +41,10 @@ def exp_db(db):
     yield db2
     print('removing {}'.format(glbl.base))
     shutil.rmtree(glbl.base)
+    print("DROPPING DB")
+    mds._connection.drop_database(mds.config['database'])
+    print("DROPPING DB")
+    fs._connection.drop_database(fs.config['database'])
 
 
 def build_pymongo_backed_broker(request):
@@ -70,8 +74,3 @@ def build_pymongo_backed_broker(request):
     fs.register_handler('npy', NpyHandler)
 
     yield Broker(mds, fs)
-
-    print("DROPPING DB")
-    mds._connection.drop_database(mds_test_conf['database'])
-    print("DROPPING DB")
-    fs._connection.drop_database(fs_test_conf['database'])

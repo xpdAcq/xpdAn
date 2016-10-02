@@ -2,6 +2,7 @@ import numpy as np
 import scipy.stats as sts
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
+
 # Ideally we would pull these functions from scikit-beam
 try:
     from skbeam.core.mask import margin, binned_outlier
@@ -174,10 +175,53 @@ def mask_img(img, geo,
 
 
 def compress_mask(mask):
+    """Compress a mask via a csr sparse matrix
+
+    Parameters
+    ----------
+    mask: 2d boolean array
+        The mask, True/1 are good pixels, False/0 are bad
+
+    Returns
+    -------
+    list:
+        The csr_matrix data
+    list:
+        The csr_matrix indices
+    list:
+        The csr_matrix indptr
+
+    See Also:
+    ---------
+    scipy.sparse.csr_matrix
+    """
     cmask = csr_matrix(~mask)
-    return cmask.data, cmask.indices, cmask.indptr
+    return cmask.data.tolist(), cmask.indices.tolist(), cmask.indptr.tolist()
 
 
-def decompress_mask(data, indicies, indptr, shape):
-    cmask = csr_matrix((data, indicies, indptr), shape=shape)
+def decompress_mask(data, indices, indptr, shape):
+    """Decompress a csr sparse matrix into a mask
+
+    Parameters
+    ----------
+    data: list
+        The csr_matrix data
+    indices: list
+        The csr_matrix indices
+    indptr: list
+        The csr_matrix indptr
+    shape: tuple
+        The shape of the array to be recreated
+
+    Returns
+    -------
+    mask: 2d boolean array
+        The mask, True/1 are good pixels, False/0 are bad
+
+    See Also:
+    ---------
+    scipy.sparse.csr_matrix
+    """
+    cmask = csr_matrix(
+        tuple([np.asarray(a) for a in [data, indices, indptr]]), shape=shape)
     return ~cmask.toarray().astype(bool)

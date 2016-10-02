@@ -1,43 +1,12 @@
 import os
-import socket
-import yaml
-import time
-from time import strftime
-import tempfile
 import shutil
-from mock import MagicMock
+import tempfile
+from time import strftime
 
 import matplotlib
+from databroker import db
+
 matplotlib.use('qt4agg')
-import tempfile
-import os
-import tzlocal
-
-HOME_DIR_NAME = 'xpdUser'
-BLCONFIG_DIR_NAME = 'xpdConfig'
-BEAMLINE_HOST_NAME = 'xf28id1-ws2'
-ARCHIVE_BASE_DIR_NAME = 'pe2_data/.userBeamtimeArchive'
-USER_BACKUP_DIR_NAME = strftime('%Y')
-OWNER = 'xf28id1'
-BEAMLINE_ID = 'xpd'
-GROUP = 'XPD'
-DET_IMAGE_FIELD = 'pe1_image'
-DARK_FIELD_KEY = 'sc_dk_field_uid'
-CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
-
-
-# make db for simulation
-def make_broker():
-    from portable_mds.sqlite.mds import MDS
-    from portable_fs.sqlite.fs import FileStore
-    from databroker import Broker
-
-    # make visible temp_dir, a layer up than xpdUser
-    mds_dir = tempfile.mkdtemp()
-    mds = MDS({'directory': mds_dir,
-               'timezone': tzlocal.get_localzone().zone})
-    fs = FileStore({'dbpath': os.path.join(mds_dir, 'filestore.db')})
-    return Broker(mds, fs)
 
 
 def make_glbl(env_code=0):
@@ -48,7 +17,7 @@ def make_glbl(env_code=0):
 
     Parameters
     ----------
-    en_var : int
+    env_code : int
         environment variable to specify current situation
 
     Note
@@ -71,14 +40,11 @@ def make_glbl(env_code=0):
     # change this to be handled by an environment variable later
     # test
     if int(env_code) == 1:
-        from databroker import db # import db created for test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
     # simulation
     elif int(env_code) == 2:
         BASE_DIR = os.getcwd()
-        # simulated db
-        db = make_broker()
     else:
         # beamline
         BASE_DIR = os.path.expanduser('~/')
@@ -160,7 +126,9 @@ def make_glbl(env_code=0):
                      'upper_thresh': None, 'bs_width': 13,
                      'tri_offset': 13, 'v_asym': 0,
                      'alpha': 2.5, 'tmsk': None}
+
     return Glbl
+
 
 env_code = os.environ['XPDAN_SETUP']
 print('ENV_CODE = {}'.format(env_code))

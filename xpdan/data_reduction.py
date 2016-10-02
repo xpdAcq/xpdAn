@@ -14,24 +14,18 @@
 #
 ##############################################################################
 import os
-import warnings
-import datetime
-import yaml
+from itertools import islice, tee, chain
+
 import numpy as np
 import tifffile as tif
-import matplotlib as plt
-from time import strftime
-from unittest.mock import MagicMock
+import yaml
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 from .glbl import an_glbl
 from .tools import mask_img
 from .utils import _clean_info, _timestampstr
 
-from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
-from itertools import islice, tee, chain
-
-# top definition for minimal impacts on the code 
-from databroker.databroker import get_table
+# top definition for minimal impacts on the code
 
 w_dir = os.path.join(an_glbl.home, 'tiff_base')
 W_DIR = w_dir  # in case of crashes in old codes
@@ -103,7 +97,8 @@ class DataReduction:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
             dark_header = self.exp_db(**dark_search)
             dark_img = np.asarray(self.exp_db.get_images(dark_header,
-                                                         self.image_field)).squeeze()
+                                                         self.image_field)
+                                  ).squeeze()
         return dark_img, dark_header[0].start.time
 
     def _dark_sub(self, event, dark_img):
@@ -144,8 +139,9 @@ class DataReduction:
 xpd_data_proc = DataReduction()
 ai = AzimuthalIntegrator()
 
+""" analysis function operates at header level """
 
-### analysis function operates at header level ###
+
 def _prepare_header_list(headers):
     if not isinstance(headers, list):
         # still do it in two steps, easier to read
@@ -390,7 +386,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,
-                       handler=handler, **kwargs)
+                       handler=handler,sum_idx_list=sum_idx_list, **kwargs)
 
 
 def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,
@@ -438,8 +434,8 @@ def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,
             dark_img, dark_time = handler.pull_dark(header)
         # event
         for event in handler.exp_db.get_events(header, fill=True):
-            img, event_timestamp, ind, dark_sub_bool = handler._dark_sub(event,
-                                                                         dark_img)
+            img, event_timestamp, ind, dark_sub_bool = handler._dark_sub(
+                event, dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)
             if dark_sub_bool:
                 f_name = 'sub_' + f_name
@@ -506,20 +502,19 @@ def sum_images(event_stream, idxs_list=None):
 
     Parameters
     ----------
-    header: mds.header
-        The run header to be summed
+    event_stream: generator
+        The event stream to be summed. The image must be first, with the
+        event itself last
     idxs_list: list of lists and tuple or list or 'all', optional
         The list of lists and tuples which specify the images to be summed.
         If 'all', sum all the images in the run. If None, do nothing.
         Defaults to None.
-    handler : instance of class
-        instance of class that handles data process, don't change it
-        unless needed.
-    Returns
+    Yields
     -------
-    list:
-        The list of summed images
+    event_stream:
+        The event stream, with the images (in the first position) summed
 
+    >>> from databroker import db
     >>> hdr = db[-1]
     >>> total_imgs = sum_images(hdr) # Sum all the images
     >>> assert len(total_imgs) == 1
@@ -555,7 +550,8 @@ def sum_images(event_stream, idxs_list=None):
                         total_img = img
                     else:
                         total_img += img
-                yield chain([total_img], rest, ['({}-{})'.format(*idxs), event])
+                yield chain([total_img], rest,
+                            ['({}-{})'.format(*idxs), event])
             else:
                 total_img = None
                 for idx in idxs:

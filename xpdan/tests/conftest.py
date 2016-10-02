@@ -27,8 +27,8 @@ def db(request):
 
 @pytest.fixture(scope='function')
 def handler(exp_db):
-    handler = DataReduction(exp_db=exp_db)
-    return handler
+    h = DataReduction(exp_db=exp_db)
+    return h
 
 
 @pytest.fixture(scope='function')

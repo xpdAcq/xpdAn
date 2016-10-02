@@ -9,18 +9,22 @@ from bluesky.plans import scan, count, relative_scan
 
 from .glbl import an_glbl
 
+
 def _clean_info(input_str):
     return input_str.strip().replace(' ', '_')
 
+
 def _timestampstr(timestamp):
-    ''' convert timestamp to strftime formate '''
-    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%Y%m%d-%H%M')
+    """ convert timestamp to strftime formate """
+    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
+        '%Y%m%d-%H%M')
     return timestring
 
 
 # area det for simulation
 class SimulatedPE1C(Reader):
-    """Subclass the bluesky plain detector examples ('Reader'); add attributes."""
+    """Subclass the bluesky plain detector examples ('Reader')
+     add attributes."""
 
     def __init__(self, name, read_fields):
         self.images_per_set = MagicMock()
@@ -56,7 +60,7 @@ def _generate_simulation_data():
                            "simulation")
     # simulated det
     pe1c = SimulatedPE1C('pe1c',
-                         {'pe1_image': lambda: np.random.randn(25,25)})
+                         {'pe1_image': lambda: np.random.randn(25, 25)})
     # TODO : add md schema later
     RE = RunEngine({})
     RE.subscribe('all', an_glbl.exp_db.mds.insert)

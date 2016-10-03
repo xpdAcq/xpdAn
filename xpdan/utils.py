@@ -7,6 +7,8 @@ from bluesky import RunEngine
 from bluesky.examples import Reader, motor
 from bluesky.plans import scan, count, relative_scan
 
+from databroker import Broker 
+
 from .glbl import an_glbl
 
 

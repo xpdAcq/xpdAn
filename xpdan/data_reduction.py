@@ -272,21 +272,23 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 f_name = 'sum_' + rest[-1] + f_name
 
             # masking logic
+            # workflow for xpdAcq v0.5.1 release, will change later
             mask = np.ones(img.shape).astype(bool)
-            if auto_mask:
-                print("INFO: mask your image: {}".format(f_name))
-                f_name = 'masked_' + f_name
-                if mask_dict is None:
-                    mask_dict = an_glbl.mask_dict
-                dummy_img = np.copy(img)  # prepare for masking
-                dummy_img /= ai.polarization(dummy_img.shape,
-                                             polarization_factor)
-                mask = mask_img(dummy_img, ai, **mask_dict)
+            mask_md = header.start.get('mask', None)
+            if auto_mask and mask_md is not None:
+                # unpack here 
+                data, ind, indptr = mask_md
+                print("INFO: pull off mask associate with your image: {}"
+                      .format(f_name))
+                mask = decompress_mask(data, ind, indtpr, img.shape)
+                mask_fn = os.path.splitext(f_name)[0]  # remove ext
                 print("INFO: mask file '{}' is saved at {}"
-                      .format(f_name, root_dir))
-                np.save(os.path.join(root_dir, f_name),
-                        mask)
-
+                      .format(mask_fn, root_dir))
+                np.save(os.path.join(root_dir, mask_fn),
+                        mask)  # default is .npy from np.save
+            else:
+                print("INFO: no mask associated or mask information was"
+                      " not set up correctly, no mask will be applied")
             # integration logic
             stem, ext = os.path.splitext(f_name)
             chi_name_Q = 'Q_' + stem + '.chi'  # q_nm^-1

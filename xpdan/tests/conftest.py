@@ -9,6 +9,7 @@ from filestore.handlers import NpyHandler
 from xpdan.tests.utils import insert_imgs
 from xpdan.data_reduction import DataReduction
 from xpdan.glbl import make_glbl
+from xpdan.simulation import build_pymongo_backed_broker
 
 if sys.version_info >= (3, 0):
     pass
@@ -16,7 +17,7 @@ if sys.version_info >= (3, 0):
 
 @pytest.fixture(params=[
     # 'sqlite',
-    'mongo'], scope='function')
+    'mongo'], scope='module')
 def db(request):
     param_map = {
         # 'sqlite': build_sqlite_backed_broker,
@@ -25,16 +26,16 @@ def db(request):
     return param_map[request.param](request)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def handler(exp_db):
     h = DataReduction(exp_db=exp_db)
     return h
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def exp_db(db):
     glbl = make_glbl(1)
-    db2 = next(db)
+    db2 = db
     mds = db2.mds
     fs = db2.fs
     insert_imgs(mds, fs, 5, (200, 200), glbl.base)
@@ -46,31 +47,3 @@ def exp_db(db):
     print("DROPPING DB")
     fs._connection.drop_database(fs.config['database'])
 
-
-def build_pymongo_backed_broker(request):
-    """Provide a function level scoped MDS instance talking to
-    temporary database on localhost:27017 with v1 schema.
-
-    """
-    from metadatastore.mds import MDS
-    from filestore.utils import create_test_database
-    from filestore.fs import FileStore
-
-    db_name = "mds_testing_disposable_{}".format(str(uuid.uuid4()))
-    mds_test_conf = dict(database=db_name, host='localhost',
-                         port=27017, timezone='US/Eastern')
-    try:
-       # nasty details: to save MacOS user
-        mds = MDS(mds_test_conf, 1, auth=False)
-    except TypeError:
-        mds = MDS(mds_test_conf, 1)
-
-    db_name = "fs_testing_base_disposable_{}".format(str(uuid.uuid4()))
-    fs_test_conf = create_test_database(host='localhost',
-                                        port=27017,
-                                        version=1,
-                                        db_template=db_name)
-    fs = FileStore(fs_test_conf, version=1)
-    fs.register_handler('npy', NpyHandler)
-
-    yield Broker(mds, fs)

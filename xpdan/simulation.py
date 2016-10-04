@@ -1,7 +1,7 @@
 import uuid
 from databroker import Broker
 
-def build_pymongo_backed_broker():
+def build_pymongo_backed_broker(request=None):
     """Provide a function level scoped MDS instance talking to
     temporary database on localhost:27017 with v1 schema.
 

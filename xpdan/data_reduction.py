@@ -152,10 +152,17 @@ def _prepare_header_list(headers):
     return header_list
 
 
-def _load_config():
-    with open(
-            os.path.join(an_glbl.config_base, an_glbl.calib_config_name)) as f:
-        config_dict = yaml.load(f)
+def _load_config(header):
+    try:
+        with open(
+                os.path.join(an_glbl.config_base, an_glbl.calib_config_name)) as f:
+            config_dict = yaml.load(f)
+    except FileNotFoundError:
+        config_dict = header.start.get('calibration_md', None)
+        if config_dict is None:
+            # back support
+            config_dict = header.start.get('sc_calibration_md', None)
+
     return config_dict
 
 
@@ -238,6 +245,11 @@ def integrate_and_save(headers, dark_sub_bool=True,
     # config_dict
     if config_dict is None:
         config_dict = _load_config()  # default dict
+        if config_dict is None: # still None
+            print("INFO: can't find calibration parameter under "
+                  "xpdUser/config_base/ or header metadata\n"
+                  "data reduction can not be perfomed.")
+            return
 
     # setting up geometry
     ai.setPyFAI(**config_dict)

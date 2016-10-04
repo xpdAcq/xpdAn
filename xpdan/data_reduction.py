@@ -181,7 +181,7 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
 
 def integrate_and_save(headers, dark_sub_bool=True,
                        polarization_factor=0.99,
-                       auto_mask=True, mask_dict=None,
+                       mask='default', mask_dict=None,
                        save_image=True, root_dir=None,
                        config_dict=None, handler=xpd_data_proc,
                        sum_idx_list=None,
@@ -195,14 +195,18 @@ def integrate_and_save(headers, dark_sub_bool=True,
     dark_sub_bool : bool, optional
         option to turn on/off dark subtraction functionality
     polarization_factor : float, optional
-        polarization correction factor, ranged from -1(vertical) to 
-        +1 (horizontal). default is 0.99. set to None for no
+        polarization correction factor, ranged from -1(vertical) to +1
+        (horizontal). default is 0.99. set to None for no
         correction.
-    auto_mask : bool, optional
-        turn on/off of automask functionality. default is True
+    mask : str, optional
+        string for mask option. Valid options are 'default', 'auto' and
+        'None'. If 'default', mask included in metadata will be
+        used. If 'auto', a new mask would be generated from current
+        image. If 'None', no mask would be applied. predefined option is
+        'default'.
     mask_dict : dict, optional
-        dictionary stores options for automasking functionality. 
-        default is defined by an_glbl.auto_mask_dict. 
+        dictionary stores options for automasking functionality.
+        default is defined by an_glbl.auto_mask_dict.
         Please refer to documentation for more details
     save_image : bool, optional
         option to save dark subtracted images. images will be 
@@ -242,19 +246,6 @@ def integrate_and_save(headers, dark_sub_bool=True,
     # normalize list
     header_list = _prepare_header_list(headers)
 
-    # config_dict
-    if config_dict is None:
-        config_dict = _load_config()  # default dict
-        if config_dict is None: # still None
-            print("INFO: can't find calibration parameter under "
-                  "xpdUser/config_base/ or header metadata\n"
-                  "data reduction can not be perfomed.")
-            return
-
-    # setting up geometry
-    ai.setPyFAI(**config_dict)
-    npt = _npt_cal(config_dict)
-
     total_rv_list_Q = []
     total_rv_list_2theta = []
 
@@ -266,6 +257,20 @@ def integrate_and_save(headers, dark_sub_bool=True,
             os.makedirs(root_dir, exist_ok=True)
         else:
             root_dir = W_DIR
+
+        # config_dict
+        if config_dict is None:
+            config_dict = _load_config(header)  # default dict
+            if config_dict is None: # still None
+                print("INFO: can't find calibration parameter under "
+                      "xpdUser/config_base/ or header metadata\n"
+                      "data reduction can not be perfomed.")
+                return
+
+        # setting up geometry
+        ai.setPyFAI(**config_dict)
+        npt = _npt_cal(config_dict)
+
         header_rv_list_Q = []
         header_rv_list_2theta = []
 

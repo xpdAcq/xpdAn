@@ -9,7 +9,7 @@ sum_idx_values = (
 
 integrate_params = ['dark_sub_bool',
                     'polarization_factor',
-                    'auto_mask',
+                    'mask',
                     'mask_dict',
                     'save_image',
                     'root_dir',
@@ -17,7 +17,7 @@ integrate_params = ['dark_sub_bool',
                     'sum_idx_list']
 good_kwargs = [(True, False), (.99,
                                # .95, .5
-                               ), (True, False),
+                               ), ('default', 'auto','None'),
                                [None, {'alpha': 3}],
                (True, False), [None], [None], sum_idx_values]
 

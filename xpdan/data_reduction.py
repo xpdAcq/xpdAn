@@ -291,21 +291,26 @@ def integrate_and_save(headers, dark_sub_bool=True,
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
             mask = np.ones(img.shape).astype(bool)
-            mask_md = header.start.get('mask', None)
-            if auto_mask and mask_md is not None:
+            if mask=='default':
+                mask_md = header.start.get('mask', None)
+                if mask_md is None:
+                    print("INFO: no mask associated or mask information was"
+                          " not set up correctly, no mask will be applied")
                 # unpack here 
                 data, ind, indptr = mask_md
                 print("INFO: pull off mask associate with your image: {}"
                       .format(f_name))
                 mask = decompress_mask(data, ind, indtpr, img.shape)
-                mask_fn = os.path.splitext(f_name)[0]  # remove ext
-                print("INFO: mask file '{}' is saved at {}"
-                      .format(mask_fn, root_dir))
-                np.save(os.path.join(root_dir, mask_fn),
-                        mask)  # default is .npy from np.save
-            else:
-                print("INFO: no mask associated or mask information was"
-                      " not set up correctly, no mask will be applied")
+            elif mask=='auto':
+                mask = mask_img(img, ai, **glbl.mask_dict)
+            elif mask=='None':
+                mask = None
+            mask_fn = os.path.splitext(f_name)[0]  # remove ext
+            print("INFO: mask file '{}' is saved at {}"
+                  .format(mask_fn, root_dir))
+            np.save(os.path.join(root_dir, mask_fn),
+                    mask)  # default is .npy from np.save
+
             # integration logic
             stem, ext = os.path.splitext(f_name)
             chi_name_Q = 'Q_' + stem + '.chi'  # q_nm^-1
@@ -318,7 +323,10 @@ def integrate_and_save(headers, dark_sub_bool=True,
                                    [chi_fn_Q, chi_fn_2th],
                                    [header_rv_list_Q, header_rv_list_2theta]):
                 print("INFO: save chi file: {}".format(fn))
-                rv = ai.integrate1d(img, npt, filename=fn, mask=~mask,
+                if mask is not None:
+                    # flip before handing in mask
+                    mask = ~mask
+                rv = ai.integrate1d(img, npt, filename=fn, mask=mask,
                                     polarization_factor=polarization_factor,
                                     unit=unit, **kwargs)
                 l.append(rv)
@@ -343,7 +351,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
 
 
 def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
-                            auto_mask=True, mask_dict=None,
+                            mask='default', mask_dict=None,
                             save_image=True, root_dir=None,
                             config_dict=None, handler=xpd_data_proc,
                             sum_idx_list=None,
@@ -358,8 +366,12 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
         polarization correction factor, ranged from -1(vertical) to 
         +1 (horizontal). default is 0.99. set to None for no
         correction.
-    auto_mask : bool, optional
-        turn on/off of automask functionality. default is True
+    mask : str, optional
+        string for mask option. Valid options are 'default', 'auto' and
+        'None'. If 'default', mask included in metadata will be
+        used. If 'auto', a new mask would be generated from current
+        image. If 'None', no mask would be applied. predefined option is
+        'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality. 
         default is defined by an_glbl.auto_mask_dict. 
@@ -401,7 +413,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     """
     integrate_and_save(handler.exp_db[-1], dark_sub_bool=dark_sub_bool,
                        polarization_factor=polarization_factor,
-                       auto_mask=auto_mask, mask_dict=mask_dict,
+                       mask=mask, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,

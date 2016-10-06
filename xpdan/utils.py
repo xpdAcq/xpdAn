@@ -1,6 +1,7 @@
 import os
 import datetime
 import numpy as np
+import yaml
 from mock import MagicMock
 
 from bluesky import RunEngine
@@ -22,6 +23,24 @@ def _timestampstr(timestamp):
         '%Y%m%d-%H%M')
     return timestring
 
+
+def start_xpdan():
+    """ function to read in beamtime info and initialize analysis
+    environment
+
+    Note
+    ----
+    Temperary version
+    """
+
+    bt_fn =os.path.join(an_glbl.config_base, 'bt_bt.yml')
+    if os.path.isfile(bt_fn):
+        with open(bt_fn, 'r') as f:
+            an = yaml.load(f)
+    else:
+        print("INFO: have you started a beamtime yet?")
+        print("Please contact beamline scientist for help")
+        return
 
 # area det for simulation
 class SimulatedPE1C(Reader):

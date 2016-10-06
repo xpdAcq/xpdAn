@@ -306,10 +306,11 @@ def integrate_and_save(headers, dark_sub_bool=True,
             elif mask=='None':
                 mask = None
             mask_fn = os.path.splitext(f_name)[0]  # remove ext
-            print("INFO: mask file '{}' is saved at {}"
-                  .format(mask_fn, root_dir))
-            np.save(os.path.join(root_dir, mask_fn),
-                    mask)  # default is .npy from np.save
+            if mask is not None:
+                print("INFO: mask file '{}' is saved at {}"
+                      .format(mask_fn, root_dir))
+                np.save(os.path.join(root_dir, mask_fn),
+                        ~mask)  # default is .npy from np.save
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
@@ -341,6 +342,12 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 else:
                     print('Sorry, something went wrong with your tif saving')
                     return
+
+        # save run_start
+        stem, ext = os.path.splitext(w_name)
+        config_name = w_name.replace(ext, '.yml')
+        with open(config_name, 'w') as f:
+            yaml.dump(header.start, f)  # save all md in start
 
         # each header generate  a list of rv
         total_rv_list_Q.append(header_rv_list_Q)
@@ -490,7 +497,7 @@ def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,
 
         # save run_start
         stem, ext = os.path.splitext(w_name)
-        config_name = w_name.replace(ext, '.yaml')
+        config_name = w_name.replace(ext, '.yml')
         with open(config_name, 'w') as f:
             yaml.dump(header.start, f)  # save all md in start
 

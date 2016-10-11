@@ -288,6 +288,9 @@ def integrate_and_save(headers, dark_sub_bool=True,
             if sum_idx_list:
                 f_name = 'sum_' + rest[-1] + f_name
 
+            # copy tiff_name here
+            tiff_fn = f_name
+
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
             mask = np.ones(img.shape).astype(bool)
@@ -310,7 +313,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 print("INFO: mask file '{}' is saved at {}"
                       .format(mask_fn, root_dir))
                 np.save(os.path.join(root_dir, mask_fn),
-                        ~mask)  # default is .npy from np.save
+                        mask)  # default is .npy from np.save
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
@@ -325,20 +328,21 @@ def integrate_and_save(headers, dark_sub_bool=True,
                                    [header_rv_list_Q, header_rv_list_2theta]):
                 print("INFO: save chi file: {}".format(fn))
                 if mask is not None:
-                    # flip before handing in mask
-                    mask = ~mask
-                rv = ai.integrate1d(img, npt, filename=fn, mask=mask,
+                    # make a copy, don't overwrite it
+                    _mask = ~mask
+
+                rv = ai.integrate1d(img, npt, filename=fn, mask=_mask,
                                     polarization_factor=polarization_factor,
                                     unit=unit, **kwargs)
                 l.append(rv)
 
             # save image logic
-            w_name = os.path.join(root_dir, f_name)
+            w_name = os.path.join(root_dir, tiff_fn)
             if save_image:
                 tif.imsave(w_name, img)
                 if os.path.isfile(w_name):
                     print('image "%s" has been saved at "%s"' %
-                          (f_name, root_dir))
+                          (tiff_fn, root_dir))
                 else:
                     print('Sorry, something went wrong with your tif saving')
                     return

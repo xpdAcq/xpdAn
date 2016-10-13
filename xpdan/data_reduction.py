@@ -103,21 +103,21 @@ class DataReduction:
 
     def _dark_sub(self, event, dark_img):
         """ priviate method operates on event level """
-        dark_sub_bool = False
+        dark_sub = False
         img = event['data'][self.image_field]
         if dark_img is not None and isinstance(dark_img, np.ndarray):
-            dark_sub_bool = True
+            dark_sub = True
             img -= dark_img
         ind = event['seq_num']
         event_timestamp = event['timestamps'][self.image_field]
-        return img, event_timestamp, ind, dark_sub_bool
+        return img, event_timestamp, ind, dark_sub
 
     def dark_sub(self, header):
         """ public method operates on header level """
         dark_img, dark_time_stamp = self.pull_dark(header)
         for ev in self.exp_db.get_events(header, fill=True):
-            sub_img, timestamp, ind, dark_sub_bool = self._dark_sub(ev,
-                                                                    dark_img)
+            sub_img, timestamp, ind, dark_sub = self._dark_sub(ev,
+                                                               dark_img)
             yield sub_img, timestamp, ind, dark_img, header.start, ev
 
     def _file_name(self, event, event_timestamp, ind):
@@ -476,10 +476,10 @@ def save_tiff(headers, dark_sub_bool=True, max_count=None, dryrun=False,
             dark_img, dark_time = handler.pull_dark(header)
         # event
         for event in handler.exp_db.get_events(header, fill=True):
-            img, event_timestamp, ind, dark_sub_bool = handler._dark_sub(
+            img, event_timestamp, ind, dark_sub = handler._dark_sub(
                 event, dark_img)
             f_name = handler._file_name(event, event_timestamp, ind)
-            if dark_sub_bool:
+            if dark_sub:
                 f_name = 'sub_' + f_name
             # save tif
             w_name = os.path.join(root_dir, f_name)

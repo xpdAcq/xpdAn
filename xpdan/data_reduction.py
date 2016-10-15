@@ -199,12 +199,12 @@ def integrate_and_save(headers, dark_sub_bool=True,
         polarization correction factor, ranged from -1(vertical) to +1
         (horizontal). default is 0.99. set to None for no
         correction.
-    mask_setting : str, optional
+    mask_setting : str, ndarray optional
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
-        image. If 'None', no mask would be applied. predefined option is
-        'default'.
+        image. If 'None', no mask would be applied. If a ndarray of bools use
+        as mask. Predefined option is 'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality.
         default is defined by an_glbl.auto_mask_dict.
@@ -295,7 +295,10 @@ def integrate_and_save(headers, dark_sub_bool=True,
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
             mask = None
-            if mask_setting == 'default':
+            if type(mask_setting) == np.ndarray and \
+                            mask_setting.dtype == np.dtype('bool'):
+                mask = mask_setting
+            elif mask_setting == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:
                     print("INFO: no mask associated or mask information was"

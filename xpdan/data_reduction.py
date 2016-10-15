@@ -155,7 +155,8 @@ def _prepare_header_list(headers):
 def _load_config(header):
     try:
         with open(
-                os.path.join(an_glbl.config_base, an_glbl.calib_config_name)) as f:
+                os.path.join(an_glbl.config_base,
+                             an_glbl.calib_config_name)) as f:
             config_dict = yaml.load(f)
     except FileNotFoundError:
         config_dict = header.start.get('calibration_md', None)
@@ -261,7 +262,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
         # config_dict
         if config_dict is None:
             config_dict = _load_config(header)  # default dict
-            if config_dict is None: # still None
+            if config_dict is None:  # still None
                 print("INFO: can't find calibration parameter under "
                       "xpdUser/config_base/ or header metadata\n"
                       "data reduction can not be perfomed.")
@@ -294,7 +295,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
             mask = np.ones(img.shape).astype(bool)
-            if mask=='default':
+            if mask == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:
                     print("INFO: no mask associated or mask information was"
@@ -304,9 +305,9 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 print("INFO: pull off mask associate with your image: {}"
                       .format(f_name))
                 mask = decompress_mask(data, ind, indtpr, img.shape)
-            elif mask=='auto':
+            elif mask == 'auto':
                 mask = mask_img(img, ai, **glbl.mask_dict)
-            elif mask=='None':
+            elif mask == 'None':
                 mask = None
             mask_fn = os.path.splitext(f_name)[0]  # remove ext
             if mask is not None:

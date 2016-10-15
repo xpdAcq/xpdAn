@@ -22,7 +22,7 @@ import yaml
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 from .glbl import an_glbl
-from .tools import mask_img
+from .tools import mask_img, decompress_mask
 from .utils import _clean_info, _timestampstr
 
 # top definition for minimal impacts on the code
@@ -182,7 +182,7 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
 
 def integrate_and_save(headers, dark_sub_bool=True,
                        polarization_factor=0.99,
-                       mask='default', mask_dict=None,
+                       mask_setting='default', mask_dict=None,
                        save_image=True, root_dir=None,
                        config_dict=None, handler=xpd_data_proc,
                        sum_idx_list=None,
@@ -237,7 +237,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
     ``mask_img``
 
     customized mask can be assign to by kwargs (It must be a ndarray)
-    >>> integrate_and_save(mask=my_mask)
+    >>> integrate_and_save(mask_setting=my_mask)
 
     See also
     --------
@@ -294,27 +294,30 @@ def integrate_and_save(headers, dark_sub_bool=True,
 
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
-            mask = np.ones(img.shape).astype(bool)
-            if mask == 'default':
+            mask = None
+            if mask_setting == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:
                     print("INFO: no mask associated or mask information was"
                           " not set up correctly, no mask will be applied")
-                # unpack here 
-                data, ind, indptr = mask_md
-                print("INFO: pull off mask associate with your image: {}"
-                      .format(f_name))
-                mask = decompress_mask(data, ind, indtpr, img.shape)
-            elif mask == 'auto':
-                mask = mask_img(img, ai, **glbl.mask_dict)
-            elif mask == 'None':
+                    mask = None
+                else:
+                    # unpack here
+                    data, ind, indptr = mask_md
+                    print("INFO: pull off mask associate with your image: {}"
+                          .format(f_name))
+                    mask = decompress_mask(data, ind, indptr, img.shape)
+            elif mask_setting == 'auto':
+                mask = mask_img(img, ai, **an_glbl.mask_dict)
+            elif mask_setting == 'None':
                 mask = None
+
             mask_fn = os.path.splitext(f_name)[0]  # remove ext
-            if mask is not None:
+            if mask_setting is not None:
                 print("INFO: mask file '{}' is saved at {}"
                       .format(mask_fn, root_dir))
                 np.save(os.path.join(root_dir, mask_fn),
-                        mask)  # default is .npy from np.save
+                        mask_setting)  # default is .npy from np.save
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
@@ -328,9 +331,9 @@ def integrate_and_save(headers, dark_sub_bool=True,
                                    [chi_fn_Q, chi_fn_2th],
                                    [header_rv_list_Q, header_rv_list_2theta]):
                 print("INFO: save chi file: {}".format(fn))
-                if mask is not None:
+                if mask_setting is not None:
                     # make a copy, don't overwrite it
-                    _mask = ~mask
+                    _mask = ~mask_setting
 
                 rv = ai.integrate1d(img, npt, filename=fn, mask=_mask,
                                     polarization_factor=polarization_factor,
@@ -425,7 +428,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     """
     integrate_and_save(handler.exp_db[-1], dark_sub_bool=dark_sub_bool,
                        polarization_factor=polarization_factor,
-                       mask=mask, mask_dict=mask_dict,
+                       mask_setting=mask, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,

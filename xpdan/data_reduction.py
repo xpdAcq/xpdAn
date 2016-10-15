@@ -22,7 +22,7 @@ import yaml
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 from .glbl import an_glbl
-from .tools import mask_img
+from .tools import mask_img, decompress_mask
 from .utils import _clean_info, _timestampstr
 
 # top definition for minimal impacts on the code
@@ -155,7 +155,8 @@ def _prepare_header_list(headers):
 def _load_config(header):
     try:
         with open(
-                os.path.join(an_glbl.config_base, an_glbl.calib_config_name)) as f:
+                os.path.join(an_glbl.config_base,
+                             an_glbl.calib_config_name)) as f:
             config_dict = yaml.load(f)
     except FileNotFoundError:
         config_dict = header.start.get('calibration_md', None)
@@ -181,7 +182,7 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
 
 def integrate_and_save(headers, dark_sub_bool=True,
                        polarization_factor=0.99,
-                       mask='default', mask_dict=None,
+                       mask_setting='default', mask_dict=None,
                        save_image=True, root_dir=None,
                        config_dict=None, handler=xpd_data_proc,
                        sum_idx_list=None,
@@ -198,12 +199,12 @@ def integrate_and_save(headers, dark_sub_bool=True,
         polarization correction factor, ranged from -1(vertical) to +1
         (horizontal). default is 0.99. set to None for no
         correction.
-    mask : str, optional
+    mask_setting : str, ndarray optional
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
-        image. If 'None', no mask would be applied. predefined option is
-        'default'.
+        image. If 'None', no mask would be applied. If a ndarray of bools use
+        as mask. Predefined option is 'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality.
         default is defined by an_glbl.auto_mask_dict.
@@ -236,7 +237,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
     ``mask_img``
 
     customized mask can be assign to by kwargs (It must be a ndarray)
-    >>> integrate_and_save(mask=my_mask)
+    >>> integrate_and_save(mask_setting=my_mask)
 
     See also
     --------
@@ -261,7 +262,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
         # config_dict
         if config_dict is None:
             config_dict = _load_config(header)  # default dict
-            if config_dict is None: # still None
+            if config_dict is None:  # still None
                 print("INFO: can't find calibration parameter under "
                       "xpdUser/config_base/ or header metadata\n"
                       "data reduction can not be perfomed.")
@@ -293,27 +294,33 @@ def integrate_and_save(headers, dark_sub_bool=True,
 
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
-            mask = np.ones(img.shape).astype(bool)
-            if mask=='default':
+            mask = None
+            if type(mask_setting) == np.ndarray and \
+                            mask_setting.dtype == np.dtype('bool'):
+                mask = mask_setting
+            elif mask_setting == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:
                     print("INFO: no mask associated or mask information was"
                           " not set up correctly, no mask will be applied")
-                # unpack here 
-                data, ind, indptr = mask_md
-                print("INFO: pull off mask associate with your image: {}"
-                      .format(f_name))
-                mask = decompress_mask(data, ind, indtpr, img.shape)
-            elif mask=='auto':
-                mask = mask_img(img, ai, **glbl.mask_dict)
-            elif mask=='None':
+                    mask = None
+                else:
+                    # unpack here
+                    data, ind, indptr = mask_md
+                    print("INFO: pull off mask associate with your image: {}"
+                          .format(f_name))
+                    mask = decompress_mask(data, ind, indptr, img.shape)
+            elif mask_setting == 'auto':
+                mask = mask_img(img, ai, **an_glbl.mask_dict)
+            elif mask_setting == 'None':
                 mask = None
+
             mask_fn = os.path.splitext(f_name)[0]  # remove ext
-            if mask is not None:
+            if mask_setting is not None:
                 print("INFO: mask file '{}' is saved at {}"
                       .format(mask_fn, root_dir))
                 np.save(os.path.join(root_dir, mask_fn),
-                        mask)  # default is .npy from np.save
+                        mask_setting)  # default is .npy from np.save
 
             # integration logic
             stem, ext = os.path.splitext(f_name)
@@ -330,6 +337,8 @@ def integrate_and_save(headers, dark_sub_bool=True,
                 if mask is not None:
                     # make a copy, don't overwrite it
                     _mask = ~mask
+                else:
+                    _mask = None
 
                 rv = ai.integrate1d(img, npt, filename=fn, mask=_mask,
                                     polarization_factor=polarization_factor,
@@ -362,7 +371,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
 
 
 def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
-                            mask='default', mask_dict=None,
+                            mask_setting='default', mask_dict=None,
                             save_image=True, root_dir=None,
                             config_dict=None, handler=xpd_data_proc,
                             sum_idx_list=None,
@@ -377,12 +386,12 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
         polarization correction factor, ranged from -1(vertical) to 
         +1 (horizontal). default is 0.99. set to None for no
         correction.
-    mask : str, optional
+    mask_setting : str, ndarray optional
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
-        image. If 'None', no mask would be applied. predefined option is
-        'default'.
+        image. If 'None', no mask would be applied. If a ndarray of bools use
+        as mask. Predefined option is 'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality. 
         default is defined by an_glbl.auto_mask_dict. 
@@ -424,7 +433,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     """
     integrate_and_save(handler.exp_db[-1], dark_sub_bool=dark_sub_bool,
                        polarization_factor=polarization_factor,
-                       mask=mask, mask_dict=mask_dict,
+                       mask_setting=mask_setting, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,

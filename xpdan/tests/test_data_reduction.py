@@ -9,7 +9,7 @@ sum_idx_values = (
 
 integrate_params = ['dark_sub_bool',
                     'polarization_factor',
-                    'mask',
+                    'mask_setting',
                     'mask_dict',
                     'save_image',
                     'root_dir',

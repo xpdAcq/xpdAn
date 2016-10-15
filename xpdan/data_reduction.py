@@ -331,9 +331,11 @@ def integrate_and_save(headers, dark_sub_bool=True,
                                    [chi_fn_Q, chi_fn_2th],
                                    [header_rv_list_Q, header_rv_list_2theta]):
                 print("INFO: save chi file: {}".format(fn))
-                if mask_setting is not None:
+                if mask is not None:
                     # make a copy, don't overwrite it
                     _mask = ~mask
+                else:
+                    _mask = None
 
                 rv = ai.integrate1d(img, npt, filename=fn, mask=_mask,
                                     polarization_factor=polarization_factor,

@@ -366,7 +366,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
 
 
 def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
-                            mask='default', mask_dict=None,
+                            mask_setting='default', mask_dict=None,
                             save_image=True, root_dir=None,
                             config_dict=None, handler=xpd_data_proc,
                             sum_idx_list=None,
@@ -428,7 +428,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
     """
     integrate_and_save(handler.exp_db[-1], dark_sub_bool=dark_sub_bool,
                        polarization_factor=polarization_factor,
-                       mask_setting=mask, mask_dict=mask_dict,
+                       mask_setting=mask_setting, mask_dict=mask_dict,
                        save_image=save_image,
                        root_dir=root_dir,
                        config_dict=config_dict,

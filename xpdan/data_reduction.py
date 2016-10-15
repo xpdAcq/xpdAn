@@ -386,12 +386,12 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
         polarization correction factor, ranged from -1(vertical) to 
         +1 (horizontal). default is 0.99. set to None for no
         correction.
-    mask_setting : str, optional
+    mask_setting : str, ndarray optional
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
-        image. If 'None', no mask would be applied. predefined option is
-        'default'.
+        image. If 'None', no mask would be applied. If a ndarray of bools use
+        as mask. Predefined option is 'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality. 
         default is defined by an_glbl.auto_mask_dict. 

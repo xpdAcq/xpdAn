@@ -299,7 +299,7 @@ def integrate_and_save(headers, dark_sub_bool=True,
             if type(mask_setting) == np.ndarray and \
                             mask_setting.dtype == np.dtype('bool'):
                 mask = mask_setting
-            elif os.path.exists(mask_setting):
+            elif type(mask_setting) == str and os.path.exists(mask_setting):
                 mask = read_msk(mask_setting)
             elif mask_setting == 'default':
                 mask_md = header.start.get('mask', None)

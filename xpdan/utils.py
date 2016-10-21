@@ -2,7 +2,7 @@ import os
 import datetime
 import numpy as np
 import yaml
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from bluesky import RunEngine
 from bluesky.examples import Reader, motor

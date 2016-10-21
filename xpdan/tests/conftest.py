@@ -61,7 +61,7 @@ def exp_db(db, mk_glbl):
 
 @pytest.fixture(scope='module')
 def disk_mask(mk_glbl):
-    mask = np.random.random_integers(0, 1, (200, 200))
+    mask = np.random.random_integers(0, 1, (200, 200)).astype(bool)
     dirn = mk_glbl.base
     file_name = os.path.join(dirn, 'mask_test' + '.msk')
     assert ~os.path.exists(file_name)

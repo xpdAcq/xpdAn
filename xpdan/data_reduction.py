@@ -24,7 +24,7 @@ from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from .glbl import an_glbl
 from .tools import mask_img, decompress_mask
 from .utils import _clean_info, _timestampstr
-from xpdan.io import read_msk
+from skbeam.io.fit2d_io import read_fit2d_msk
 
 # top definition for minimal impacts on the code
 

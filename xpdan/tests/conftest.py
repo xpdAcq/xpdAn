@@ -12,7 +12,7 @@ from xpdan.tests.utils import insert_imgs
 from xpdan.data_reduction import DataReduction
 from xpdan.glbl import make_glbl
 from xpdan.simulation import build_pymongo_backed_broker
-from skbeam.io.fit2d_save import fit2d_save
+from xpdan.io import fit2d_save
 import numpy as np
 
 if sys.version_info >= (3, 0):

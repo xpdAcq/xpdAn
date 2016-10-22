@@ -20,8 +20,7 @@ integrate_params = ['dark_sub_bool',
 good_kwargs = [(True, False), (.99,
                                # .95, .5
                                ), ('use_saved_mask', 'default', 'auto','None',
-                                   np.random.random_integers(
-                                       0, 1, (200, 200)).astype(bool)),
+                                   'array'),
                                [None, {'alpha': 3}],
                (True, False), [None], [None], sum_idx_values]
 
@@ -59,6 +58,9 @@ def test_integrate_smoke(exp_db, handler, disk_mask, kwargs, known_fail_bool):
     if 'mask_setting' in kwargs.keys() and \
                     kwargs['mask_setting'] == 'use_saved_mask':
         kwargs['mask_setting'] = disk_mask[0]
+    elif 'mask_setting' in kwargs.keys() and kwargs['mask_setting'] == 'array':
+        kwargs['mask_setting'] = np.random.random_integers(
+            0, 1, disk_mask[1].shape).astype(bool)
     pprint(kwargs)
     a = integrate_and_save(exp_db[-1], handler=handler, **kwargs)
     if known_fail_bool and not a:
@@ -71,6 +73,9 @@ def test_integrate_and_save_last_smoke(handler, disk_mask, kwargs,
     if 'mask_setting' in kwargs.keys() and \
                     kwargs['mask_setting'] == 'use_saved_mask':
         kwargs['mask_setting'] = disk_mask[0]
+    elif 'mask_setting' in kwargs.keys() and kwargs['mask_setting'] == 'array':
+        kwargs['mask_setting'] = np.random.random_integers(
+            0, 1, disk_mask[1].shape).astype(bool)
     pprint(kwargs)
     a = integrate_and_save_last(handler=handler, **kwargs)
     if known_fail_bool and not a:

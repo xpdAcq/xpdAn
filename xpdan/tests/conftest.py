@@ -20,7 +20,8 @@ if sys.version_info >= (3, 0):
 
 @pytest.fixture(scope='module')
 def img_size():
-    yield tuple(np.random.random_integers(0, 200, (2)))
+    a = np.random.random_integers(100, 200)
+    yield (a, a)
 
 
 @pytest.fixture(scope='module')

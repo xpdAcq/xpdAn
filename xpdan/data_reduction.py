@@ -300,7 +300,10 @@ def integrate_and_save(headers, dark_sub_bool=True,
                             mask_setting.dtype == np.dtype('bool'):
                 mask = mask_setting
             elif type(mask_setting) == str and os.path.exists(mask_setting):
-                mask = read_fit2d_msk(mask_setting)
+                if os.path.splitext(mask_setting)[-1] == '.msk':
+                    mask = read_fit2d_msk(mask_setting)
+                else:
+                    mask = np.load(mask_setting)
             elif mask_setting == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:

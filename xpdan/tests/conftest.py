@@ -68,8 +68,12 @@ def exp_db(db, mk_glbl, img_size):
 def disk_mask(mk_glbl, img_size):
     mask = np.random.random_integers(0, 1, img_size).astype(bool)
     dirn = mk_glbl.base
-    file_name = os.path.join(dirn, 'mask_test' + '.msk')
-    assert ~os.path.exists(file_name)
+    file_name_msk = os.path.join(dirn, 'mask_test' + '.msk')
+    assert ~os.path.exists(file_name_msk)
     fit2d_save(mask, 'mask_test', dirn)
+    assert os.path.exists(file_name_msk)
+    file_name = os.path.join(dirn, 'mask_test' + '.npy')
+    assert ~os.path.exists(file_name)
+    np.save(file_name, mask)
     assert os.path.exists(file_name)
-    yield (file_name, mask)
+    yield (file_name_msk, file_name, mask)

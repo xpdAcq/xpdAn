@@ -1,3 +1,4 @@
+import os
 try:
     from skbeam.io.fit2d_io import fit2d_save, read_fit2d_msk
 except ImportError:
@@ -7,8 +8,8 @@ except ImportError:
 
 
     def fit2d_save(mask, filename, dir_path=None):
-        """
-        Compresses and wraps the mask for Fit2D use
+        """ Compresses and wraps the mask for Fit2D use
+
         Parameters
         ----------
         mask: ndarray
@@ -23,19 +24,18 @@ except ImportError:
 
 
     def read_fit2d_msk(filename):
-        """
-        Reads mask from file
+        """ Reads mask from fit2d `.msk` file
 
         Parameters
         ----------
         filename: str
-            Path to file
+            Filename, including path, relative path name supported
 
         Returns
         -------
         ndarray:
-            The mask as boolian array
+            The mask as boolean array
         """
-        a = fabio.open(filename)
+        a = fabio.open(os.path.expanduser(filename))
         return ~a.data.astype(bool)
 

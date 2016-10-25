@@ -4,6 +4,7 @@ from itertools import tee, product
 import pytest
 from pprint import pprint
 import numpy as np
+import os
 
 sum_idx_values = (
     None, 'all', [1, 2, 3], [(1, 3)], [[1, 2, 3], [2, 3]], [[1, 3], (1, 3)])
@@ -18,15 +19,16 @@ integrate_params = ['dark_sub_bool',
                     'sum_idx_list']
 good_kwargs = [(True, False), (.99,
                                # .95, .5
-                               ), ('default', 'auto','None',
-                                   np.random.random_integers(
-                                       0, 1, (200, 200))),
+                               ), ('use_saved_mask_msk', 'use_saved_mask',
+                                   'default', 'auto',
+                                   'None',
+                                   'array'),
                                [None, {'alpha': 3}],
                (True, False), [None], [None], sum_idx_values]
 
 bad_integrate_params = ['dark_sub_bool',
                         'polarization_factor',
-                        'auto_mask',
+                        'mask_setting',
                         'mask_dict',
                         'save_image',
                         'config_dict',
@@ -54,7 +56,15 @@ for vs in save_tiff_kwarg_values:
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
-def test_integrate_smoke(exp_db, handler, kwargs, known_fail_bool):
+def test_integrate_smoke(exp_db, handler, disk_mask, kwargs, known_fail_bool):
+    if 'mask_setting' in kwargs.keys():
+        if kwargs['mask_setting'] == 'use_saved_mask_msk':
+            kwargs['mask_setting'] = disk_mask[0]
+        elif kwargs['mask_setting'] == 'use_saved_mask':
+            kwargs['mask_setting'] = disk_mask[1]
+    elif 'mask_setting' in kwargs.keys() and kwargs['mask_setting'] == 'array':
+        kwargs['mask_setting'] = np.random.random_integers(
+            0, 1, disk_mask[-1].shape).astype(bool)
     pprint(kwargs)
     a = integrate_and_save(exp_db[-1], handler=handler, **kwargs)
     if known_fail_bool and not a:
@@ -62,8 +72,16 @@ def test_integrate_smoke(exp_db, handler, kwargs, known_fail_bool):
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
-def test_integrate_and_save_last_smoke(handler, kwargs,
+def test_integrate_and_save_last_smoke(handler, disk_mask, kwargs,
                                        known_fail_bool):
+    if 'mask_setting' in kwargs.keys():
+        if kwargs['mask_setting'] == 'use_saved_mask_msk':
+            kwargs['mask_setting'] = disk_mask[0]
+        elif kwargs['mask_setting'] == 'use_saved_mask':
+            kwargs['mask_setting'] = disk_mask[1]
+    elif 'mask_setting' in kwargs.keys() and kwargs['mask_setting'] == 'array':
+        kwargs['mask_setting'] = np.random.random_integers(
+            0, 1, disk_mask[-1].shape).astype(bool)
     pprint(kwargs)
     a = integrate_and_save_last(handler=handler, **kwargs)
     if known_fail_bool and not a:

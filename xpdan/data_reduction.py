@@ -24,6 +24,7 @@ from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from .glbl import an_glbl
 from .tools import mask_img, decompress_mask
 from .utils import _clean_info, _timestampstr
+from xpdan.io import read_fit2d_msk
 
 # top definition for minimal impacts on the code
 
@@ -298,6 +299,11 @@ def integrate_and_save(headers, dark_sub_bool=True,
             if type(mask_setting) == np.ndarray and \
                             mask_setting.dtype == np.dtype('bool'):
                 mask = mask_setting
+            elif type(mask_setting) == str and os.path.exists(mask_setting):
+                if os.path.splitext(mask_setting)[-1] == '.msk':
+                    mask = read_fit2d_msk(mask_setting)
+                else:
+                    mask = np.load(mask_setting)
             elif mask_setting == 'default':
                 mask_md = header.start.get('mask', None)
                 if mask_md is None:

@@ -57,6 +57,7 @@ def exp_db(db, mk_glbl, img_size):
     mds = db2.mds
     fs = db2.fs
     insert_imgs(mds, fs, 5, img_size, glbl.base)
+    insert_imgs(mds, fs, 5, img_size, glbl.base, pi_name='tim')
     yield db2
     print("DROPPING MDS")
     mds._connection.drop_database(mds.config['database'])

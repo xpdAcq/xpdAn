@@ -3,12 +3,40 @@ from pyxdameraulevenshtein import \
 
 
 def getFromDict(dataDict, mapList):
+    """ Get a value from a nested dictionary, given a list of keys
+
+    Parameters
+    ----------
+    dataDict: dict
+        The dictionary to be queried
+    mapList: list of str
+        A list of strings, each string is one level lower than the previous
+
+    Returns
+    -------
+    object:
+        The the value from the dict
+
+    """
     for k in mapList:
         dataDict = dataDict[k]
     return dataDict
 
 
 def nested_dict_values(d):
+    """Yield all string values inside a nested dictionary
+
+    Parameters
+    ----------
+    d: dict
+        The dictionary to be unpacked
+
+    Yields
+    -------
+    str:
+        The string value inside the dictionary
+
+    """
     for v in d.values():
         if isinstance(v, dict):
             yield from nested_dict_values(v)
@@ -20,6 +48,26 @@ def nested_dict_values(d):
 
 
 def fuzzy_search(db, keys, search_string, size=100):
+    """Fuzzy search a databroker for given keys
+
+    Parameters
+    ----------
+    db: databroker.DataBroker instance
+        The databroker to be searched
+    keys: list of str
+        The list of strings to be accessed
+    search_string: str
+        The string to be searched for
+    size: int or 'all', optional
+        The number of results to be returned, if 'all' all are returned.
+         Defaults to 100 results
+
+    Returns
+    -------
+    list:
+        A list 
+
+    """
     if isinstance(keys, list):
         scores = []
         for h in db():
@@ -43,4 +91,7 @@ def super_fuzzy_search(db, search_string, size=100):
     zipped = zip(scores, db())
     zipped = sorted(zipped, key=lambda x: x[0])
     hdrs = [x for (y, x) in zipped]
-    return hdrs[:size]
+    if size == 'all':
+        return hdrs
+    elif isinstance(size, int):
+        return hdrs[:size]

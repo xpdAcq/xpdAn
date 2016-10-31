@@ -1,3 +1,17 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 import numpy as np
 import scipy.stats as sts
 from matplotlib.path import Path
@@ -196,6 +210,7 @@ def compress_mask(mask):
     scipy.sparse.csr_matrix
     """
     cmask = csr_matrix(~mask)
+    # FIXME: we may need to also return the mask shape
     return cmask.data.tolist(), cmask.indices.tolist(), cmask.indptr.tolist()
 
 

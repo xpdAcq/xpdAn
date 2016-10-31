@@ -1,14 +1,26 @@
-import os
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 import datetime
-import numpy as np
-import yaml
+import os
 from unittest.mock import MagicMock
 
+import numpy as np
+import yaml
 from bluesky import RunEngine
 from bluesky.examples import Reader, motor
-from bluesky.plans import scan, count, relative_scan
-
-from databroker import Broker 
+from bluesky.plans import scan, count
 
 from .glbl import an_glbl
 
@@ -20,7 +32,7 @@ def _clean_info(input_str):
 def _timestampstr(timestamp):
     """ convert timestamp to strftime formate """
     timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
-            '%Y%m%d-%H%M%S')
+        '%Y%m%d-%H%M%S')
     return timestring
 
 
@@ -33,7 +45,7 @@ def start_xpdan():
     Temperary version
     """
 
-    bt_fn =os.path.join(an_glbl.config_base, 'bt_bt.yml')
+    bt_fn = os.path.join(an_glbl.config_base, 'bt_bt.yml')
     if os.path.isfile(bt_fn):
         with open(bt_fn, 'r') as f:
             an = yaml.load(f)
@@ -41,6 +53,7 @@ def start_xpdan():
         print("INFO: have you started a beamtime yet?")
         print("Please contact beamline scientist for help")
         return
+
 
 # area det for simulation
 class SimulatedPE1C(Reader):

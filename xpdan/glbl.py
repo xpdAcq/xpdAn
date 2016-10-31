@@ -1,13 +1,29 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu, Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 import os
 import shutil
 import tempfile
 from time import strftime
 
 import matplotlib
-#from databroker import db
+from xpdan.simulation import build_pymongo_backed_broker
+
+# from databroker import db
 
 matplotlib.use('qt4agg')
-from xpdan.simulation import build_pymongo_backed_broker
+
 
 def make_glbl(env_code=0):
     """ make a instance of Glbl class

@@ -1,10 +1,25 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
+from itertools import tee, product
+from pprint import pprint
+
+import numpy as np
+import pytest
+
 from xpdan.data_reduction import integrate_and_save, sum_images, \
     integrate_and_save_last, save_tiff, save_last_tiff
-from itertools import tee, product
-import pytest
-from pprint import pprint
-import numpy as np
-import os
 
 sum_idx_values = (
     None, 'all', [1, 2, 3], [(1, 3)], [[1, 2, 3], [2, 3]], [[1, 3], (1, 3)])
@@ -19,11 +34,12 @@ integrate_params = ['dark_sub_bool',
                     'sum_idx_list']
 good_kwargs = [(True, False), (.99,
                                # .95, .5
-                               ), ('use_saved_mask_msk', 'use_saved_mask',
-                                   'default', 'auto',
-                                   'None',
-                                   'array'),
-                               [None, {'alpha': 3}],
+                               ),
+               ('use_saved_mask_msk', 'use_saved_mask',
+                'default', 'auto',
+                'None',
+                'array'),
+               [None, {'alpha': 3}],
                (True, False), [None], [None], sum_idx_values]
 
 bad_integrate_params = ['dark_sub_bool',

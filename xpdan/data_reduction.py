@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# xpdacq            by Billinge Group
+# xpdan            by Billinge Group
 #                   Simon J. L. Billinge sb2896@columbia.edu
 #                   (c) 2016 trustees of Columbia University in the City of
 #                        New York.
 #                   All rights reserved
 #
-# File coded by:    Timothy Liu
+# File coded by:    Timothy Liu, Christopher J. Wright
 #
 # See AUTHORS.txt for a list of people who contributed.
 # See LICENSE.txt for license information.
@@ -296,8 +296,8 @@ def integrate_and_save(headers, dark_sub_bool=True,
             # masking logic
             # workflow for xpdAcq v0.5.1 release, will change later
             mask = None
-            if type(mask_setting) == np.ndarray and \
-                            mask_setting.dtype == np.dtype('bool'):
+            if (type(mask_setting) == np.ndarray and
+                        mask_setting.dtype == np.dtype('bool')):
                 mask = mask_setting
             elif type(mask_setting) == str and os.path.exists(mask_setting):
                 if os.path.splitext(mask_setting)[-1] == '.msk':

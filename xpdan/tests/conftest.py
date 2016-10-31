@@ -1,22 +1,33 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu, Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
+import os
 import shutil
 import sys
-import uuid
-import tempfile
-import os
 
+import numpy as np
 import pytest
-from databroker import Broker
-from filestore.handlers import NpyHandler
 
-from xpdan.tests.utils import insert_imgs
 from xpdan.data_reduction import DataReduction
 from xpdan.glbl import make_glbl
-from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.io import fit2d_save
-import numpy as np
+from xpdan.simulation import build_pymongo_backed_broker
+from xpdan.tests.utils import insert_imgs
 
 if sys.version_info >= (3, 0):
     pass
+
 
 @pytest.fixture(scope='module')
 def img_size():

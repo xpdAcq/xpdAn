@@ -1,13 +1,26 @@
-import os
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 import datetime
+import os
 from itertools import chain
-from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from .glbl import an_glbl
-import yaml
 
 """ helper function """
 
@@ -73,6 +86,7 @@ class XpdAn:
         self.search_dict = None
         self._current_table = None
         self._current_search = None
+        self.exp_db = exp_db
         if saf_num is None:
             # current saf
             saf_num = _get_current_saf()
@@ -124,7 +138,7 @@ class XpdAn:
             search_dict = self.search_dict
         # allow update
         search_dict.update(kwargs)
-        self._set_current_search(exp_db(**search_dict))
+        self._set_current_search(self.exp_db(**search_dict))
         self._table_gen(self._current_search,
                         col_name=self.header_md_fields)
 

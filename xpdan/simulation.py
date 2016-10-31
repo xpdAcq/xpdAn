@@ -1,5 +1,20 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu, Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 import uuid
 from databroker import Broker
+
 
 def build_pymongo_backed_broker(request=None):
     """Provide a function level scoped MDS instance talking to
@@ -7,7 +22,7 @@ def build_pymongo_backed_broker(request=None):
 
     """
     from metadatastore.mds import MDS
-    from filestore.utils import create_test_database 
+    from filestore.utils import create_test_database
     from filestore.fs import FileStore
     from filestore.handlers import NpyHandler
 
@@ -15,7 +30,7 @@ def build_pymongo_backed_broker(request=None):
     mds_test_conf = dict(database=db_name, host='localhost',
                          port=27017, timezone='US/Eastern')
     try:
-       # nasty details: to save MacOS user
+        # nasty details: to save MacOS user
         mds = MDS(mds_test_conf, 1, auth=False)
     except TypeError:
         mds = MDS(mds_test_conf, 1)

@@ -20,8 +20,6 @@ from time import strftime
 import matplotlib
 from xpdan.simulation import build_pymongo_backed_broker
 
-# from databroker import db
-
 matplotlib.use('qt4agg')
 
 

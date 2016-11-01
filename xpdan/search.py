@@ -1,5 +1,7 @@
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
+import numpy as np
+from databroker.broker import _munge_time
 
 
 def getFromDict(dataDict, mapList):
@@ -65,7 +67,7 @@ def fuzzy_search(db, keys, search_string, size=100):
     Returns
     -------
     list:
-        A list 
+        A list
 
     """
     if isinstance(keys, list):
@@ -95,3 +97,20 @@ def super_fuzzy_search(db, search_string, size=100):
         return hdrs
     elif isinstance(size, int):
         return hdrs[:size]
+
+
+def beamtime_dates(db, keys=['facility', 'beamline',
+                             'saf']):
+    hdrs = db()
+    safs = set([h['start']['bt_safN'] for h in hdrs])
+    returns = []
+    for s in safs:
+        hdrs = db(bt_safN=s)
+        st = [h['start']['time'] for h in hdrs]
+        start_hdr = hdrs[np.argmin[st]]
+        stop_hdr = hdrs[np.argmax[st]]
+        info = {k: start_hdr[k] for k in keys}
+        info.update({'start_time': _munge_time(start_hdr['start']['time']),
+                     'stop_time': _munge_time(stop_hdr['start']['time'])})
+        returns.append(info)
+    return returns

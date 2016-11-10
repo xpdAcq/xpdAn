@@ -80,7 +80,7 @@ class DataReduction:
         for key in self.data_fields:
             val = event['data'].get(key, None)
             if el is not None:
-                feature = "{}={}".format(key, val)
+                feature = "{}".format(val)
                 feature_list.append(feature)
             else:
                 pass

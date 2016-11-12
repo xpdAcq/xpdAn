@@ -1,18 +1,22 @@
+"""module includes Callback classes for xpdacq/xpdan"""
+
 import os
+import datetime
 import numpy as np
 from bluesky.callbacks.core import CallbackBase
-
+import doct
 
 # supplementary functions
 def _timestampstr(timestamp):
-    """ convert timestamp to strftime formate """
+    """convert timestamp to strftime formate"""
     timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
         '%Y%m%d-%H%M%S')
     return timestring
 
 
 class XpdAcqLiveTiffExporter(CallbackBase):
-    """ Exporting tiff from given header(s).
+
+    """Exporting tiff from given header(s).
 
     It is a variation of bluesky.callback.broker.LiveTiffExporter class
     It incorporate metadata and data from individual data points in
@@ -44,10 +48,6 @@ class XpdAcqLiveTiffExporter(CallbackBase):
     db : Broker, optional
         The databroker instance to use, if not provided use databroker
         singleton
-
-    Attributes
-    ----------
-    filenames : list of filenames written in ongoing or most recent run
     """
 
     def __init__(self, field, data_dir_template,
@@ -67,13 +67,13 @@ class XpdAcqLiveTiffExporter(CallbackBase):
 
         if db is None:
             # Read-only db
-            from databroker import DataBroker as db
+            from databroker.databroker import DataBroker as db
 
         self.db = db
 
         # required args
         self.field = field
-        self.template = data_dir_template
+        self.data_dir_template = data_dir_template
         # optioanal args 
         self.data_fields = data_fields  # list of keys for md to include
         self.save_dark = save_dark  # option of save dark 
@@ -87,7 +87,6 @@ class XpdAcqLiveTiffExporter(CallbackBase):
 
         It operates at event level, i.e., doc is event document
         """
-
         # convert time
         timestr = _timestampstr(doc['time'])
         # readback value for certain list of data keys
@@ -112,14 +111,14 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             event_info = event_template.format(start=self._start, event=doc)
 
         # full path + complete filename
-        filename = '_'.join(timestr, data_val_trunk, event_info)
+        filename = '_'.join([timestr, data_val_trunk, event_info])
         total_filename = os.path.join(base_dir, filename)
 
         return total_filename
 
     def _save_image(self, image, filename):
         """method to save image"""
-        dir_path, fn_tail = os.path.split(filename)
+        dir_path, fn = os.path.split(filename)
         os.makedirs(dir_path, exist_ok=True)
 
         if not self.overwrite:
@@ -129,7 +128,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         if not self.dryrun:
             self._tifffile.imsave(filename, np.asarray(image))
             print("INFO: {} has been saved at {}"
-                  .format(fn_head, fn_tail))
+                  .format(fn, dir_path))
 
         self.filenames.append(filename)
 
@@ -150,17 +149,19 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         return dark_uid
 
     def start(self, doc):
+        """method for start document"""
         self.filenames = []
         # Convert doc from dict into dottable dict, more convenient
         # in Python format strings: doc.key == doc['key']
         self._start = doct.Document('start', doc)
 
         # find dark scan uid
-        dark_uid = _pull_dark_uid(doc)
+        dark_uid = self._pull_dark_uid(doc)
         if dark_uid is None:
             self.dark_img = None
             self._find_dark = False
         else:
+            dark_header = self.db[dark_uid]
             self.dark_img = np.asarray(self.db.get_images(dark_header,
                                                           self.image_field)
                                       ).squeeze()
@@ -168,7 +169,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         super().start(doc)
 
     def event(self, doc):
-        """ tiff-saving operation applied at event level """
+        """tiff-saving operation applied at event level"""
         if self.field not in doc['data']:
             raise KeyError('required field = {} is not in header'
                            .format(self.field))
@@ -188,7 +189,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
                 self._save_image(image, os.path.join(path_dir,
                                                      'sub_'+fn))
             else:
-                self._save_image(plane,filename)
+                self._save_image(image, filename)
             # if user wants wants raw dark
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
@@ -209,14 +210,9 @@ class XpdAcqLiveTiffExporter(CallbackBase):
                     self._save_image(self.dark_img, os.path.join(path_dir,
                                                                  'dark_'+fn))
     def stop(self, doc):
+        """method for stop document"""
         # TODO: include sum logic in the future
         self._start = None
         self.filenames = []
         super().stop(doc)
 
-
-# xpdAcq standard instantiation
-template = '/direct/XF28ID1/pe2_data/xpdUser/tiff_base/{start.sample_name}'
-data_fields = ['temperature', 'diff_x', 'diff_y', 'eurotherm'] # known devices
-xpdacq_tiff_export = XpdAcqLiveTiffExporter('pe1_image', template,
-                                            data_fields, overwrite=True)

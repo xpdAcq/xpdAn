@@ -5,6 +5,7 @@ import datetime
 import numpy as np
 from bluesky.callbacks.core import CallbackBase
 import doct
+import tifffile
 
 # supplementary functions
 def _timestampstr(timestamp):
@@ -53,18 +54,6 @@ class XpdAcqLiveTiffExporter(CallbackBase):
     def __init__(self, field, data_dir_template,
                  data_fields=[], save_dark=False,
                  dryrun=False, overwrite=False, db=None):
-        try:
-            import tifffile
-        except ImportError:
-            print("Tifffile is required by this callback. Please install"
-                  "tifffile and then try again."
-                  "\n\n\tpip install tifffile\n\nor\n\n\tconda install "
-                  "tifffile")
-            raise
-        else:
-            # stash a reference so the module is accessible in self._save_image
-            self._tifffile = tifffile
-
         if db is None:
             # Read-only db
             from databroker.databroker import DataBroker as db
@@ -121,12 +110,11 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         dir_path, fn = os.path.split(filename)
         os.makedirs(dir_path, exist_ok=True)
 
-        if not self.overwrite:
-            if os.path.isfile(filename):
-                raise OSError("There is already a file at {}. Delete "
-                              "it and try again.".format(filename))
+        if not self.overwrite and os.path.isfile(filename):
+            raise OSError("There is already a file at {}. Delete "
+                          "it and try again.".format(filename))
         if not self.dryrun:
-            self._tifffile.imsave(filename, np.asarray(image))
+            tifffile.imsave(filename, np.asarray(image))
             print("INFO: {} has been saved at {}"
                   .format(fn, dir_path))
 

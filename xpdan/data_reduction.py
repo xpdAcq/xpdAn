@@ -204,9 +204,10 @@ def integrate_and_save(headers, dark_sub_bool=True,
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
-        image. If 'None', no mask would be applied. If a ndarray of bools use
-        as mask. If a path/filename to a valid fit2d or numpy mask file load
-        the file and use that. Predefined option is 'default'.
+        image. If 'None', no mask would be applied. If a ndarray of bools
+        use as mask. If a path/filename to a valid fit2d or numpy mask file
+        (with extensions of `.msk` or `.npy`) load the file and use that.
+        Predefined option is 'default'.
     mask_dict : dict, optional
         dictionary stores options for automasking functionality.
         default is defined by an_glbl.auto_mask_dict.

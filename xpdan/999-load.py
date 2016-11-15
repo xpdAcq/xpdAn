@@ -14,7 +14,6 @@
 ##############################################################################
 import os
 import sys
-from mock import MagicMock
 from PyQt4 import QtGui
 app = QtGui.QApplication(sys.argv)
 

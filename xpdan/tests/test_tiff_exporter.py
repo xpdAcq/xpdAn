@@ -1,45 +1,69 @@
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Timothy Liu
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
+
 import os
 import tempfile
+import pytest
 from itertools import product
 from tifffile import imread
 from xpdan.tests.conftest import img_size
 from xpdan.callbacks_core import XpdAcqLiveTiffExporter
 
 # standard config
-base = tempfile.mkdtemp()
-template = os.path.join(base, 'xpdUser/tiff_base/')
 data_fields = ['temperature', 'diff_x', 'diff_y', 'eurotherm'] # known devices
 
 # function options
-good_params= ['save_dark', 'dry_run', 'overwrite']
+good_params= ['save_dark']
 allowed_kwargs = [(True, False), (True, False), (True, False)]
-bad_params = ['save_dark', 'dry_run', 'overwrite']
-fail_kwargs = [['fail'] for i in range(len(allowed_kwargs))]
+#bad_params = ['save_dark', 'dryrun', 'overwrite']
+#fail_kwargs = [['fail'] for i in range(len(allowed_kwargs))]
 
 # parametrize
-param_testing_list = []
-kwargs_product = product(*allowed_kwargs)
+test_kwargs = []
+allowed_kwargs_values = product(*allowed_kwargs)
 
-for el in kwargs_product:
+for el in allowed_kwargs_values:
     d = {k:v for k,v in zip(good_params, el)}
-    param_testing_list.append(d)
+    test_kwargs.append((d, False))
 
-for el in fail_kwargs:
-    d = {k:v for k,v in zip(good_params, el)}
-    param_testing_list.append(d)
 
-def test_tiff_export(exp_db):
-    tif_export = XpdAcqLiveTiffExporter('pe1_image', template, data_fields,
-                                        overwrite=True, db=exp_db)
-    exp_db.process(exp_db[-1], tif_export)
+@pytest.mark.parametrize(("kwargs", "known_fail_bool"), test_kwargs)
+def test_tiff_export(exp_db, tif_exporter_template, img_size,
+                     kwargs, known_fail_bool):
+    tif_export = XpdAcqLiveTiffExporter('pe1_image', tif_exporter_template,
+                                        data_fields, overwrite=True,
+                                        db=exp_db, **kwargs)
+    a = exp_db.process(exp_db[-1], tif_export)
     # make sure files are sasved
     for fn in tif_export.filenames:
         assert os.path.isfile(fn)
     # confirm image is the same as input
+    dark_fn = [fn for fn in tif_export.filenames if
+               fn.startswith('dark')]
+    light_fn = list(set(tif_export.filenames) - set(dark_fn))
+    for fn in dark_fn:
+        img = imread(fn)
+        assert img.shape == img_size
+        assert np.all(img == 1)
+
     for fn in tif_export.filenames:
         img = imread(fn)
-        assert img.shape == next(img_size)
+        assert img.shape == img_size
         # logic defined in insert_img. after successful dark_sub array==0
-        # TODO: update this logic when we are ready for
-        # fs-integrated-Reader
         assert np.all(img == 0)
+        # TODO: update this logic when we are ready for db integrated
+
+    if known_fail_bool and not a:
+        pytest.xfail('Bad params')

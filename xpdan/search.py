@@ -3,6 +3,7 @@ from pyxdameraulevenshtein import \
 import numpy as np
 from databroker.broker import _munge_time
 from pprint import pprint
+import pytz
 
 
 def getFromDict(dataDict, mapList):
@@ -145,8 +146,10 @@ def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
         start_hdr = hdrs[0]
         stop_hdr = hdrs[-1]
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-        info.update({'start_time': _munge_time(start_hdr['start']['time']),
-                     'stop_time': _munge_time(stop_hdr['start']['time'])})
+        info.update({'start_time': _munge_time(start_hdr['start']['time'],
+                                               pytz.timezone('US/Eastern')),
+                     'stop_time': _munge_time(stop_hdr['start']['time'],
+                                              pytz.timezone('US/Eastern'))})
         returns.append(info)
     if print:
         pprint(returns)

@@ -48,11 +48,12 @@ def mk_glbl():
     # 'sqlite',
     'mongo'], scope='module')
 def db(request):
+    print('Making DB')
     param_map = {
         # 'sqlite': build_sqlite_backed_broker,
         'mongo': build_pymongo_backed_broker}
 
-    return param_map[request.param](request)
+    yield param_map[request.param](request)
 
 
 @pytest.fixture(scope='module')
@@ -67,8 +68,9 @@ def exp_db(db, mk_glbl, img_size):
     db2 = db
     mds = db2.mds
     fs = db2.fs
-    insert_imgs(mds, fs, 5, img_size, glbl.base)
-    insert_imgs(mds, fs, 5, img_size, glbl.base, pi_name='tim')
+    insert_imgs(mds, fs, 5, img_size, glbl.base, bt_safN=0, pi_name='chris')
+    insert_imgs(mds, fs, 5, img_size, glbl.base, pi_name='tim', bt_safN=1)
+    insert_imgs(mds, fs, 5, img_size, glbl.base, pi_name='chris', bt_safN=2)
     yield db2
     print("DROPPING MDS")
     mds._connection.drop_database(mds.config['database'])

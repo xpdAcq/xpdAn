@@ -71,7 +71,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         self.filenames = []
         self._start = None
 
-    def _generate_filename(self, doc, stack_ind=None):
+    def _generate_filename(self, doc, stack_ind):
         """method to generate filename based on template
 
         It operates at event level, i.e., doc is event document
@@ -89,15 +89,10 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         # event sequence
         base_dir = self.data_dir_template.format(start=self._start,
                                                      event=doc)
-        if stack_ind is not None:
-            # standard, do need to expose it to user
-            event_template = '{event.seq_num:03d}_{i}.tif'
-            event_info = event_template.format(i=stack_ind, start=self._start,
-                                               event=doc)
-        else:
-            # standard, do need to expose it to user
-            event_template = '{event.seq_num:03d}.tif'
-            event_info = event_template.format(start=self._start, event=doc)
+        # standard, do need to expose it to user
+        event_template = '{event.seq_num:03d}_{i}.tif'
+        event_info = event_template.format(i=stack_ind, start=self._start,
+                                           event=doc)
 
         # full path + complete filename
         filename = '_'.join([timestr, data_val_trunk, event_info])
@@ -166,37 +161,25 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         image = np.asarray(doc['data'][self.field])
 
         if self.dark_img is None:
-            # make a dummy one
+            # make a dummy dark
             self.dark_img = np.zeros_like(image)
 
         if image.ndim == 2:
-            image = np.subtract(image, self.dark_img)
-            filename = self._generate_filename(doc)
+            image = np.expand_dims(image, 0)  # extend the first axis
+
+        for i, plane in enumerate(image):
+            image = np.subtract(plane, self.dark_img)
+            filename = self._generate_filename(doc, i)
             path_dir, fn = os.path.split(filename)
             if self._find_dark:
-                self._save_image(image, os.path.join(path_dir,
+                self._save_image(plane, os.path.join(path_dir,
                                                      'sub_'+fn))
             else:
-                self._save_image(image, filename)
-            # if user wants wants raw dark
+                self._save_image(plane, filename)
+            # if user wants raw dark
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
                                                              'dark_'+fn))
-        if image.ndim == 3:
-            # multiple images in one event
-            for i, plane in enumerate(image):
-                image = np.subtract(plane, self.dark_img)
-                filename = self._generate_filename(doc, i)
-                path_dir, fn = os.path.split(filename)
-                if self._find_dark:
-                    self._save_image(plane, os.path.join(path_dir,
-                                                         'sub_'+fn))
-                else:
-                    self._save_image(plane, filename)
-                # if user wants wants raw dark
-                if self.save_dark:
-                    self._save_image(self.dark_img, os.path.join(path_dir,
-                                                                 'dark_'+fn))
     def stop(self, doc):
         """method for stop document"""
         # TODO: include sum logic in the future

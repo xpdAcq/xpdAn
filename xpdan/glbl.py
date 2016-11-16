@@ -28,7 +28,7 @@ def make_glbl(env_code=0, db=None):
     HOME_DIR_NAME = 'xpdUser'
     BLCONFIG_DIR_NAME = 'xpdConfig'
     BEAMLINE_HOST_NAME = 'xf28id1-ws2'
-    ARCHIVE_BASE_DIR_NAME = 'pe2_data/.userBeamtimeArchive'
+    ARCHIVE_BASE_DIR_NAME = '/direct/XF28ID1/pe1_data/.userBeamtimeArchive'
     USER_BACKUP_DIR_NAME = strftime('%Y')
     OWNER = 'xf28id1'
     BEAMLINE_ID = 'xpd'
@@ -49,12 +49,13 @@ def make_glbl(env_code=0, db=None):
         db = build_pymongo_backed_broker()
     else:
         # beamline
-        BASE_DIR = os.path.expanduser('~/')
+        BASE_DIR = os.path.abspath('/direct/XF28ID1/pe2_data')
+        from databroker.databroker import DataBroker as db
 
     # top directories
     HOME_DIR = os.path.join(BASE_DIR, HOME_DIR_NAME)
     BLCONFIG_DIR = os.path.join(BASE_DIR, BLCONFIG_DIR_NAME)
-    ARCHIVE_BASE_DIR = os.path.join(BASE_DIR, ARCHIVE_BASE_DIR_NAME)
+    ARCHIVE_BASE_DIR = os.path.abspath(ARCHIVE_BASE_DIR_NAME)
 
     # aquire object directories
     CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
@@ -91,8 +92,10 @@ def make_glbl(env_code=0, db=None):
         ANALYSIS_DIR
     ]
 
-    for folder in ALL_FOLDERS:
-        os.makedirs(folder, exist_ok=True)
+    # only create dirs if running test
+    if int(env_code) ==1:
+        for folder in ALL_FOLDERS:
+            os.makedirs(folder, exist_ok=True)
 
     # directories that won't be tar in the end of beamtime
     _EXCLUDE_DIR = [HOME_DIR, BLCONFIG_DIR, YAML_DIR]

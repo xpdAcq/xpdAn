@@ -1,6 +1,5 @@
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
-import numpy as np
 from databroker.broker import _munge_time
 from pprint import pprint
 import pytz
@@ -73,17 +72,21 @@ def fuzzy_search(db, keys, search_string, size=100):
         A list
 
     """
-    heap = [(-1, -1)] * size # ndld can't return less than 0
+    heap = [(-1, -1, -1)] * size  # ndld can't return less than 0
     heapify(heap)
     if isinstance(keys, list):
         for h in db():
+            # prioritize recent documents
             heappushpop(heap, (1. - ndld(get_from_dict(h['start'], keys),
-                                         search_string)), h)
+                                         search_string),
+                               h['start']['time'] * -1, h))
     else:
         for h in db():
-            heappushpop(heap, (1. - ndld(h['start'][keys], search_string), h))
-    h.sort()
-    return [g[1] for g in h if g[1] != -1]
+            heappushpop(heap, (1. - ndld(h['start'][keys], search_string),
+                               h['start']['time'] * -1, h))
+    heap.sort()
+    heap.reverse()
+    return [g[-1] for g in heap if g[0] >= 0.]
 
 
 def super_fuzzy_search(db, search_string, size=100):
@@ -105,14 +108,15 @@ def super_fuzzy_search(db, search_string, size=100):
         A list
 
     """
-    heap = [-1] * size  # ndld can't return less than 0
+    heap = [(-1, -1, -1)] * size  # ndld can't return less than 0
     heapify(heap)
     for h in db():
         internal_scores = [ndld(v, search_string) for v in
                            nested_dict_values(h['start']) if v is not None]
-        heappushpop(heap, (min(internal_scores), h))
-    h.sort()
-    return [g[1] for g in h if g[1] != -1]
+        heappushpop(heap, (min(internal_scores), h['start']['time'] * -1, h))
+    heap.sort()
+    heap.reverse()
+    return [g[-1] for g in heap if g[0] != -1]
 
 
 def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),

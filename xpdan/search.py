@@ -113,7 +113,7 @@ def super_fuzzy_search(db, search_string, size=100):
     for h in db():
         internal_scores = [1. - ndld(v, search_string) for v in
                            nested_dict_values(h['start']) if v is not None]
-        heappushpop(heap, (min(internal_scores), h['start']['time'] * -1, h))
+        heappushpop(heap, (max(internal_scores), h['start']['time'] * -1, h))
     heap.sort()
     heap.reverse()
     return [g[-1] for g in heap if g[0] != -1]

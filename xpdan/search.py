@@ -81,7 +81,7 @@ def fuzzy_search(db, keys, search_string, size=100):
                                          search_string)), h)
     else:
         for h in db():
-            heappushpop(heap, (1. - ndld(h['start'][keys], search_string)), h)
+            heappushpop(heap, (1. - ndld(h['start'][keys], search_string), h))
     h.sort()
     return [g[1] for g in h if g[1] != -1]
 

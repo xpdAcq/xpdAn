@@ -4,9 +4,10 @@ import numpy as np
 from databroker.broker import _munge_time
 from pprint import pprint
 import pytz
+from heapq import heapify, heappushpop
 
 
-def getFromDict(dataDict, mapList):
+def get_from_dict(dataDict, mapList):
     """ Get a value from a nested dictionary, given a list of keys
 
     Parameters
@@ -72,18 +73,17 @@ def fuzzy_search(db, keys, search_string, size=100):
         A list
 
     """
+    heap = [(-1, -1)] * size # ndld can't return less than 0
+    heapify(heap)
     if isinstance(keys, list):
-        scores = []
         for h in db():
-            scores.append(ndld(getFromDict(h['start'], keys), search_string))
-        scores = [ndld(getFromDict(h['start'], keys), search_string) for h in
-                  db()]
+            heappushpop(heap, (1. - ndld(get_from_dict(h['start'], keys),
+                                         search_string)), h)
     else:
-        scores = [ndld(h['start'][keys], search_string) for h in db()]
-    zipped = zip(scores, db())
-    zipped = sorted(zipped, key=lambda x: x[0])
-    hdrs = [x for (y, x) in zipped]
-    return hdrs[:size]
+        for h in db():
+            heappushpop(heap, (1. - ndld(h['start'][keys], search_string)), h)
+    h.sort()
+    return [g[1] for g in h if g[1] != -1]
 
 
 def super_fuzzy_search(db, search_string, size=100):
@@ -95,8 +95,8 @@ def super_fuzzy_search(db, search_string, size=100):
         The databroker to be searched
     search_string: str
         The string to be searched for
-    size: int or 'all', optional
-        The number of results to be returned, if 'all' all are returned.
+    size: int, optional
+        The number of results to be returned.
          Defaults to 100 results
 
     Returns
@@ -105,16 +105,14 @@ def super_fuzzy_search(db, search_string, size=100):
         A list
 
     """
-    scores = []
+    heap = [-1] * size  # ndld can't return less than 0
+    heapify(heap)
     for h in db():
         internal_scores = [ndld(v, search_string) for v in
                            nested_dict_values(h['start']) if v is not None]
-        scores.append(min(internal_scores))
-    hdrs = [x for (y, x) in sorted(zip(scores, db()), key=lambda x: x[0])]
-    if size == 'all':
-        return hdrs
-    elif isinstance(size, int):
-        return hdrs[:size]
+        heappushpop(heap, (min(internal_scores), h))
+    h.sort()
+    return [g[1] for g in h if g[1] != -1]
 
 
 def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
@@ -183,4 +181,6 @@ def fuzzy_set_search(db, key, search_string, size=100):
     zipped = zip(scores, values)
     zipped = sorted(zipped, key=lambda x: x[0])
     val = [x for (y, x) in zipped]
+    if size == 'all':
+        return val
     return val[:size]

@@ -119,8 +119,9 @@ def super_fuzzy_search(db, search_string, size=100):
     return [g[-1] for g in heap if g[0] != -1]
 
 
-def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
-                   saf_key='bt_safN',
+def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
+                             'facility', 'beamline'),
+                   beamtime_key='beamtime_uid',
                    print=True):
     """Get info for each beamtime
 
@@ -130,8 +131,8 @@ def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
         The databroker to be searched
     keys: iterable of str
         The keys to be included in the return
-    saf_key: str
-        The key for the SAF number
+    beamtime_key: str
+        The key for the unique beamtime key
     print: bool
         If true prints the information
 
@@ -141,10 +142,10 @@ def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
         The list of beamtimes and their associated information
     """
     hdrs = db()
-    safs = set([h['start'][saf_key] for h in hdrs])
+    bts = set([h['start'][beamtime_key] for h in hdrs])
     returns = []
-    for s in safs:
-        hdrs = db(bt_safN=s)
+    for s in bts:
+        hdrs = db(**{beamtime_key: s})
         start_hdr = hdrs[0]
         stop_hdr = hdrs[-1]
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}

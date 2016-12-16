@@ -159,8 +159,7 @@ def beamtime_dates(db, keys=('facility', 'beamline', 'bt_safN'),
 
 
 def fuzzy_set_search(db, key, search_string, size=100):
-    """Return the most similar set of values to the search string for a
-    databroker
+    """Return the most similar set of values to the search string.
 
     Parameters
     ----------
@@ -179,12 +178,17 @@ def fuzzy_set_search(db, key, search_string, size=100):
     list:
         A list
 
-        """
+    Examples
+    --------
+    >>> db = Broker(...) # Contains runs from Bob, Alice, Bob, and Eve
+    >>> fuzzy_set_search(db, 'bt_piLast', 'Bob')
+    ['Bob', 'Alice', 'Eve']
+    """
     heap = [(-1, -1)] * size  # ndld can't return less than 0
     heapify(heap)
     values = set([h['start'][key] for h in db()])
     for v in values:
-        heappushpop(heap, (1. - ndld(v), v))
+        heappushpop(heap, (1. - ndld(v, search_string), v))
     heap.sort()
     heap.reverse()
     return [g[-1] for g in heap if g[0] >= 0.]

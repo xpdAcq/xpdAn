@@ -1,3 +1,4 @@
+"""Provide tools for searching the databroker"""
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 from databroker.broker import _munge_time
@@ -7,7 +8,7 @@ from heapq import heapify, heappushpop
 
 
 def get_from_dict(data_dict, map_list):
-    """ Get a value from a nested dictionary, given a list of keys
+    """Get a value from a nested dictionary, given a list of keys
 
     Parameters
     ----------
@@ -122,7 +123,7 @@ def super_fuzzy_search(db, search_string, size=100):
 def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
                              'facility', 'beamline'),
                    beamtime_key='beamtime_uid',
-                   print=True):
+                   print_results=True):
     """Get info for each beamtime
 
     Parameters
@@ -133,7 +134,7 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
         The keys to be included in the return
     beamtime_key: str
         The key for the unique beamtime key
-    print: bool
+    print_results: bool
         If true prints the information
 
     Returns
@@ -154,7 +155,7 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
                      'stop_time': _munge_time(stop_hdr['start']['time'],
                                               pytz.timezone('US/Eastern'))})
         returns.append(info)
-    if print:
+    if print_results:
         pprint(returns)
     return returns
 

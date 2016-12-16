@@ -6,14 +6,14 @@ import pytz
 from heapq import heapify, heappushpop
 
 
-def get_from_dict(dataDict, mapList):
+def get_from_dict(data_dict, map_list):
     """ Get a value from a nested dictionary, given a list of keys
 
     Parameters
     ----------
-    dataDict: dict
+    data_dict: dict
         The dictionary to be queried
-    mapList: list of str
+    map_list: list of str
         A list of strings, each string is one level lower than the previous
 
     Returns
@@ -22,9 +22,9 @@ def get_from_dict(dataDict, mapList):
         The the value from the dict
 
     """
-    for k in mapList:
-        dataDict = dataDict[k]
-    return dataDict
+    for k in map_list:
+        data_dict = data_dict[k]
+    return data_dict
 
 
 def nested_dict_values(d):
@@ -162,29 +162,29 @@ def fuzzy_set_search(db, key, search_string, size=100):
     """Return the most similar set of values to the search string for a
     databroker
 
-        Parameters
-        ----------
-        db: databroker.DataBroker instance
-            The databroker to be searched
-        key: list of str
-            The list of strings to be accessed
-        search_string: str
-            The string to be searched for
-        size: int or 'all', optional
-            The number of results to be returned, if 'all' all are returned.
-             Defaults to 100 results
+    Parameters
+    ----------
+    db: databroker.DataBroker instance
+        The databroker to be searched
+    key: list of str
+        The list of strings to be accessed
+    search_string: str
+        The string to be searched for
+    size: int, optional
+        The number of results to be returned.
+         Defaults to 100 results
 
-        Returns
-        -------
-        list:
-            A list
+    Returns
+    -------
+    list:
+        A list
 
         """
+    heap = [(-1, -1)] * size  # ndld can't return less than 0
+    heapify(heap)
     values = set([h['start'][key] for h in db()])
-    scores = [ndld(v, search_string) for v in values]
-    zipped = zip(scores, values)
-    zipped = sorted(zipped, key=lambda x: x[0])
-    val = [x for (y, x) in zipped]
-    if size == 'all':
-        return val
-    return val[:size]
+    for v in values:
+        heappushpop(heap, (1. - ndld(v), v))
+    heap.sort()
+    heap.reverse()
+    return [g[-1] for g in heap if g[0] >= 0.]

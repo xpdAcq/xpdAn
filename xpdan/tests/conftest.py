@@ -24,6 +24,7 @@ from xpdan.glbl import make_glbl
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs
+from xpdan.search import FuzzyBroker
 
 if sys.version_info >= (3, 0):
     pass
@@ -91,3 +92,7 @@ def disk_mask(mk_glbl, img_size):
     np.save(file_name, mask)
     assert os.path.exists(file_name)
     yield (file_name_msk, file_name, mask)
+
+@pytest.fixture(scope='module')
+def fuzzdb(exp_db):
+    yield FuzzyBroker(exp_db.mds, exp_db.fs)

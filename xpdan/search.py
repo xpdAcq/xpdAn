@@ -34,7 +34,7 @@ class FuzzyBroker(Broker):
         if isinstance(keys, list):
             for h in self():
                 # prioritize recent documents
-                heappushpop(heap, (1. - ndld(get_from_dict(h['start'], keys),
+                heappushpop(heap, (1. - ndld(_get_from_dict(h['start'], keys),
                                              search_string),
                                    h['start']['time'] * -1, h))
         else:
@@ -66,7 +66,7 @@ class FuzzyBroker(Broker):
         heapify(heap)
         for h in self():
             internal_scores = [1. - ndld(v, search_string) for v in
-                               nested_dict_values(h['start']) if v is not None]
+                               _nested_dict_values(h['start']) if v is not None]
             heappushpop(heap,
                         (max(internal_scores), h['start']['time'] * -1, h))
         heap.sort()
@@ -169,7 +169,7 @@ else:
     DataBroker = FuzzyBroker(MDSRO(mds_config), FileStoreRO(fs_config))
 
 
-def get_from_dict(data_dict, map_list):
+def _get_from_dict(data_dict, map_list):
     """Get a value from a nested dictionary, given a list of keys
 
     Parameters
@@ -190,7 +190,7 @@ def get_from_dict(data_dict, map_list):
     return data_dict
 
 
-def nested_dict_values(d):
+def _nested_dict_values(d):
     """Yield all string values inside a nested dictionary
 
     Parameters
@@ -206,7 +206,7 @@ def nested_dict_values(d):
     """
     for v in d.values():
         if isinstance(v, dict):
-            yield from nested_dict_values(v)
+            yield from _nested_dict_values(v)
         else:
             if isinstance(v, str):
                 yield v
@@ -240,7 +240,7 @@ def fuzzy_search(db, keys, search_string, size=100):
     if isinstance(keys, list):
         for h in db():
             # prioritize recent documents
-            heappushpop(heap, (1. - ndld(get_from_dict(h['start'], keys),
+            heappushpop(heap, (1. - ndld(_get_from_dict(h['start'], keys),
                                          search_string),
                                h['start']['time'] * -1, h))
     else:
@@ -275,7 +275,7 @@ def super_fuzzy_search(db, search_string, size=100):
     heapify(heap)
     for h in db():
         internal_scores = [1. - ndld(v, search_string) for v in
-                           nested_dict_values(h['start']) if v is not None]
+                           _nested_dict_values(h['start']) if v is not None]
         heappushpop(heap, (max(internal_scores), h['start']['time'] * -1, h))
     heap.sort()
     heap.reverse()

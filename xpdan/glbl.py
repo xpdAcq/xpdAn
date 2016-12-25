@@ -54,12 +54,12 @@ def make_glbl(env_code=0):
     CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
     # change this to be handled by an environment variable later
-    if int(env_code) == 'test':
+    if env_code == 'test':
         # test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
         db = build_pymongo_backed_broker()
-    elif int(env_code) == 'sim':
+    elif env_code == 'sim':
         # simulation
         BASE_DIR = os.getcwd()
         db = build_pymongo_backed_broker()

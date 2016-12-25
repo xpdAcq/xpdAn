@@ -25,7 +25,7 @@ from xpdan.simulation import build_pymongo_backed_broker
 matplotlib.use('qt4agg')
 
 
-def make_glbl(env_code=0):
+def make_glbl(env_code='prod'):
     """ make a instance of Glbl class
 
     Glbl class is used to handle attributes and directories
@@ -33,12 +33,8 @@ def make_glbl(env_code=0):
 
     Parameters
     ----------
-    env_code : int
+    env_code : str
         environment variable to specify current situation
-
-    Note
-    ----
-    by default: env_var 0 means beamline, 1 means test, 2 means simulation
     """
 
     HOME_DIR_NAME = 'xpdUser'
@@ -109,7 +105,7 @@ def make_glbl(env_code=0):
     ]
 
     # only create dirs if running test
-    if int(env_code) ==1:
+    if env_code == 'test':
         for folder in ALL_FOLDERS:
             os.makedirs(folder, exist_ok=True)
 

@@ -1,4 +1,18 @@
-"""Provide tools for searching the databroker"""
+"""Enhanced databroker with fuzzy search options"""
+##############################################################################
+#
+# xpdan            by Billinge Group
+#                   Simon J. L. Billinge sb2896@columbia.edu
+#                   (c) 2016 trustees of Columbia University in the City of
+#                        New York.
+#                   All rights reserved
+#
+# File coded by:    Christopher J. Wright
+#
+# See AUTHORS.txt for a list of people who contributed.
+# See LICENSE.txt for license information.
+#
+##############################################################################
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 from databroker.broker import _munge_time
@@ -27,6 +41,12 @@ class FuzzyBroker(Broker):
         -------
         list:
             A list
+
+        Notes
+        ------
+        This search can take a long time as they turn over the entire
+        databroker searching for the ``search_string`` please make a point to
+        filter the databroker to shorten the total search time
 
         """
         heap = [(-1, -1, -1)] * size  # ndld can't return less than 0
@@ -60,6 +80,13 @@ class FuzzyBroker(Broker):
         -------
         list:
             A list of headers which contain close matches
+
+        Notes
+        ------
+        This search can take a long time as they turn over the entire
+        databroker (and all of the dictionaries inside) searching for the
+        ``search_string`` please make a point to filter the databroker to
+        shorten the total search time.
 
         """
         heap = [(-1, -1, -1)] * size  # ndld can't return less than 0

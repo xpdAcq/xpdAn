@@ -24,7 +24,7 @@ from xpdan.glbl import make_glbl
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs
-from xpdan.search import FuzzyBroker
+from xpdan.fuzzybroker import FuzzyBroker
 
 if sys.version_info >= (3, 0):
     pass

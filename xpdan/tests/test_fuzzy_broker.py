@@ -1,4 +1,4 @@
-from xpdan.search import fuzzy_search, super_fuzzy_search, beamtime_dates, \
+from xpdan.fuzzybroker import fuzzy_search, super_fuzzy_search, beamtime_dates, \
     fuzzy_set_search
 import pytest
 

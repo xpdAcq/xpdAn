@@ -50,7 +50,7 @@ def make_glbl(env_code='prod'):
     CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
     # change this to be handled by an environment variable later
-    print(env_code)
+    print(env_code == 'test')
     if env_code == 'test':
         # test
         BASE_DIR = tempfile.mkdtemp()

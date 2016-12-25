@@ -25,7 +25,7 @@ from xpdan.simulation import build_pymongo_backed_broker
 matplotlib.use('qt4agg')
 
 
-def make_glbl(env_code='prod'):
+def make_glbl(env_code=0):
     """ make a instance of Glbl class
 
     Glbl class is used to handle attributes and directories
@@ -33,8 +33,12 @@ def make_glbl(env_code='prod'):
 
     Parameters
     ----------
-    env_code : str
+    env_code : int
         environment variable to specify current situation
+
+    Note
+    ----
+    by default: env_var 0 means beamline, 1 means test, 2 means simulation
     """
 
     HOME_DIR_NAME = 'xpdUser'
@@ -50,13 +54,12 @@ def make_glbl(env_code='prod'):
     CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
     # change this to be handled by an environment variable later
-    print(env_code == 'test')
-    if env_code == 'test':
+    if int(env_code) == 1:
         # test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
         db = build_pymongo_backed_broker()
-    elif env_code == 'sim':
+    elif int(env_code) == 2:
         # simulation
         BASE_DIR = os.getcwd()
         db = build_pymongo_backed_broker()
@@ -73,7 +76,7 @@ def make_glbl(env_code='prod'):
     # aquire object directories
     CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
     # copying pyFAI calib dict yml for test
-    if env_code == 'test':
+    if int(env_code) == 1:
         a = os.path.dirname(os.path.abspath(__file__))
         b = a.split('glbl.py')[0]
         os.makedirs(CONFIG_BASE, exist_ok=True)
@@ -106,7 +109,7 @@ def make_glbl(env_code='prod'):
     ]
 
     # only create dirs if running test
-    if env_code == 'test':
+    if int(env_code) ==1:
         for folder in ALL_FOLDERS:
             os.makedirs(folder, exist_ok=True)
 
@@ -151,6 +154,6 @@ def make_glbl(env_code='prod'):
 try:
     env_code = os.environ['XPDAN_SETUP']
 except KeyError:
-    env_code = 'test'
+    env_code = 1
 print('ENV_CODE = {}'.format(env_code))
 an_glbl = make_glbl(env_code)

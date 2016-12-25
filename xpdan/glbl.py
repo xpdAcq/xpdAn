@@ -76,7 +76,7 @@ def make_glbl(env_code=0):
     # aquire object directories
     CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
     # copying pyFAI calib dict yml for test
-    if int(env_code) == 1:
+    if env_code == 'test':
         a = os.path.dirname(os.path.abspath(__file__))
         b = a.split('glbl.py')[0]
         os.makedirs(CONFIG_BASE, exist_ok=True)

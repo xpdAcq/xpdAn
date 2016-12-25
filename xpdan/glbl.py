@@ -54,12 +54,12 @@ def make_glbl(env_code=0):
     CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
 
     # change this to be handled by an environment variable later
-    if int(env_code) == 1:
+    if int(env_code) == 'test':
         # test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
         db = build_pymongo_backed_broker()
-    elif int(env_code) == 2:
+    elif int(env_code) == 'sim':
         # simulation
         BASE_DIR = os.getcwd()
         db = build_pymongo_backed_broker()
@@ -154,6 +154,6 @@ def make_glbl(env_code=0):
 try:
     env_code = os.environ['XPDAN_SETUP']
 except KeyError:
-    env_code = 1
+    env_code = 'test'
 print('ENV_CODE = {}'.format(env_code))
 an_glbl = make_glbl(env_code)

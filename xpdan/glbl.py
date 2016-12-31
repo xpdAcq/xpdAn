@@ -25,7 +25,7 @@ from xpdan.simulation import build_pymongo_backed_broker
 matplotlib.use('qt4agg')
 
 
-def make_glbl(env_code=0):
+def make_glbl(env_code=0, db=None):
     """ make a instance of Glbl class
 
     Glbl class is used to handle attributes and directories
@@ -58,7 +58,6 @@ def make_glbl(env_code=0):
         # test
         BASE_DIR = tempfile.mkdtemp()
         print('creating {}'.format(BASE_DIR))
-        db = build_pymongo_backed_broker()
     elif int(env_code) == 2:
         # simulation
         BASE_DIR = os.getcwd()

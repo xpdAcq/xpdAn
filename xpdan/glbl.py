@@ -4,12 +4,12 @@ import tempfile
 from time import strftime
 
 import matplotlib
-#from databroker import db
+from databroker import db
 
 matplotlib.use('qt4agg')
 from xpdan.simulation import build_pymongo_backed_broker
 
-def make_glbl(env_code=0):
+def make_glbl(env_code=0, db=None):
     """ make a instance of Glbl class
 
     Glbl class is used to handle attributes and directories
@@ -134,4 +134,4 @@ def make_glbl(env_code=0):
 
 env_code = os.environ['XPDAN_SETUP']
 print('ENV_CODE = {}'.format(env_code))
-an_glbl = make_glbl(env_code)
+an_glbl = make_glbl(env_code, db=db)

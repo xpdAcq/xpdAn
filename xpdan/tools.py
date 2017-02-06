@@ -118,10 +118,11 @@ def mask_img(img, geo,
         The number of edge pixels to mask. Defaults to 30. If None, no edge
         mask is applied
     lower_thresh: float, optional
-        Pixels with values lower than this threshold will be masked.
+        Pixels with values less than or equal to this threshold will be masked.
         Defaults to 0.0. If None, no lower threshold mask is applied
     upper_thresh: float, optional
-        Pixels with values higher than this threshold will be masked.
+        Pixels with values greater than or equal to this threshold will be
+        masked.
         Defaults to None. If None, no upper threshold mask is applied.
     bs_width: int, optional
         The width of the beamstop in pixels. Defaults to 13.
@@ -160,9 +161,9 @@ def mask_img(img, geo,
     if edge:
         working_mask *= margin(img.shape, edge)
     if lower_thresh:
-        working_mask *= (img > lower_thresh).astype(bool)
+        working_mask *= (img >= lower_thresh).astype(bool)
     if upper_thresh:
-        working_mask *= (img < upper_thresh).astype(bool)
+        working_mask *= (img <= upper_thresh).astype(bool)
     if all([a is not None for a in [bs_width, tri_offset, v_asym]]):
         center_x, center_y = [geo.getFit2D()[k] for k in
                               ['centerX', 'centerY']]

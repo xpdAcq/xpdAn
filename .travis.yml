@@ -48,7 +48,7 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI -c lightsource2 -c conda-forge -c soft-matter
+  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c lightsource2 -c conda-forge -c soft-matter
   - source activate testenv
 #  - 'pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model'
 #  - conda remove metadatastore databroker filestore --yes

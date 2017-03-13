@@ -83,24 +83,8 @@ def test_integrate_smoke(exp_db, handler, disk_mask, kwargs, known_fail_bool):
             0, 1, disk_mask[-1].shape).astype(bool)
     pprint(kwargs)
     a = integrate_and_save(exp_db[-1], handler=handler, **kwargs)
-    if known_fail_bool and not a:
-        pytest.xfail('Bad params')
-
-
-@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
-def test_integrate_and_save_last_smoke(handler, disk_mask, kwargs,
-                                       known_fail_bool):
-    if 'mask_setting' in kwargs.keys():
-        if kwargs['mask_setting'] == 'use_saved_mask_msk':
-            kwargs['mask_setting'] = disk_mask[0]
-        elif kwargs['mask_setting'] == 'use_saved_mask':
-            kwargs['mask_setting'] = disk_mask[1]
-    elif 'mask_setting' in kwargs.keys() and kwargs['mask_setting'] == 'array':
-        kwargs['mask_setting'] = np.random.random_integers(
-            0, 1, disk_mask[-1].shape).astype(bool)
-    pprint(kwargs)
-    a = integrate_and_save_last(handler=handler, **kwargs)
-    if known_fail_bool and not a:
+    b = integrate_and_save_last(handler=handler, **kwargs)
+    if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
 
 
@@ -108,15 +92,8 @@ def test_integrate_and_save_last_smoke(handler, disk_mask, kwargs,
 def test_save_tiff_smoke(exp_db, handler, kwargs, known_fail_bool):
     pprint(kwargs)
     a = save_tiff(exp_db[-1], handler=handler, **kwargs)
-    if known_fail_bool and not a:
-        pytest.xfail('Bad params')
-
-
-@pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
-def test_save_last_tiff_smoke(handler, kwargs, known_fail_bool):
-    pprint(kwargs)
-    a = save_last_tiff(handler=handler, **kwargs)
-    if known_fail_bool and not a:
+    b = save_last_tiff(handler=handler, **kwargs)
+    if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
 
 

@@ -6,11 +6,12 @@ import yaml
 
 from xpdan.simulation import build_pymongo_backed_broker
 import logging
+from pkg_resources import resource_filename as rs_fn
 
 logger = logging.getLogger(__name__)
 
 
-def load_configuration(name, prefix=None, fields=None):
+def load_configuration(name):
     """
     Load configuration data from a cascading series of locations.
 
@@ -18,12 +19,11 @@ def load_configuration(name, prefix=None, fields=None):
 
     1. The conda environment
        - CONDA_ENV/etc/{name}.yaml (if CONDA_ETC_ is defined for the env)
-    2. At the system level
+    2. The shipped version
+    3. At the system level
        - /etc/{name}.yml
-    3. In the user's home directory
+    4. In the user's home directory
        - ~/.config/{name}/connection.yml
-    4. Environmental variables
-       - {PREFIX}_{FIELD}
 
     where
         {name} is metadatastore
@@ -47,9 +47,9 @@ def load_configuration(name, prefix=None, fields=None):
         Dictionary keyed on ``fields`` with the values extracted
     """
     filenames = [
+        os.path.join(rs_fn('xpdan', 'config/xpdan.yml')),
         os.path.join('/etc', name + '.yml'),
-        os.path.join(os.path.expanduser('~'), '.config', name,
-                     '.yml'),
+        os.path.join(os.path.expanduser('~'), '.config', name, '.yml'),
     ]
 
     if 'CONDA_ETC_' in os.environ:
@@ -63,19 +63,6 @@ def load_configuration(name, prefix=None, fields=None):
                 config.update(yaml.load(f))
             logger.debug("Using glbl specified in config file. \n%r",
                          config)
-
-    for field in fields:
-        var_name = prefix + '_' + field.upper().replace(' ', '_')
-        config[field] = os.environ.get(var_name, config.get(field, None))
-        # Valid values for 'port' are None or castable to int.
-        if field == 'port' and config[field] is not None:
-            config[field] = int(config[field])
-
-    missing = [k for k, v in config.items() if v is None]
-    if missing:
-        raise KeyError("The configuration field(s) {0} "
-                       "were not found in any file or environmental "
-                       "variable.".format(missing))
     return config
 
 

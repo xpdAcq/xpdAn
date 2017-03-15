@@ -6,5 +6,7 @@ setup(
     packages=find_packages(),
     description='data processing module',
     zip_safe=False,
+    package_data={'xpdan': ['config/*']},
+    include_package_data=True,
     url='http:/github.com/xpdAcq/xpdAn'
 )

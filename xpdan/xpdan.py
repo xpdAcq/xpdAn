@@ -26,12 +26,12 @@ from .glbl import an_glbl
 
 
 def _get_current_saf():
-    bt_list = [f for f in os.listdir(an_glbl.yaml_dir) if f.startswith('bt_')]
+    bt_list = [f for f in os.listdir(an_glbl['yaml_dir']) if f.startswith('bt_')]
     if len(bt_list) != 1:
         raise RuntimeError("There are more than one beamtime objects in"
                            "{}. Please either gives specific saf or"
-                           .format(an_glbl.yaml_dir))
-    with open(os.path.join(an_glbl.yaml_dir, bt_list[0]), 'r') as f:
+                           .format(an_glbl['yaml_dir']))
+    with open(os.path.join(an_glbl['yaml_dir'], bt_list[0]), 'r') as f:
         bt = yaml.load(f)
         saf = bt['bt_safN']
         return saf
@@ -80,7 +80,7 @@ class XpdAn:
 
     _default_dict = {'group': 'XPD'}
 
-    def __init__(self, exp_db=an_glbl.exp_db, *, saf_num=None, **kwargs):
+    def __init__(self, exp_db=an_glbl['exp_db'], *, saf_num=None, **kwargs):
         self.header_md_fields = ['sa_name', 'time']
         self.event_md_fiedls = None
         self.search_dict = None

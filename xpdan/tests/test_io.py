@@ -19,7 +19,7 @@ from numpy.testing import assert_array_equal
 
 
 def test_save_output_fit2d(mk_glbl):
-    filename = os.path.join(mk_glbl.base, "function_values")
+    filename = os.path.join(mk_glbl['base'], "function_values")
     msk = np.random.random_integers(
         0, 1, (np.random.random_integers(0, 200),
                np.random.random_integers(0, 200))).astype(bool)

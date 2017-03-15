@@ -45,7 +45,7 @@ def start_xpdan():
     Temperary version
     """
 
-    bt_fn = os.path.join(an_glbl.config_base, 'bt_bt.yml')
+    bt_fn = os.path.join(an_glbl['config_base'], 'bt_bt.yml')
     if os.path.isfile(bt_fn):
         with open(bt_fn, 'r') as f:
             an = yaml.load(f)
@@ -97,7 +97,7 @@ def _generate_simulation_data():
                          {'pe1_image': lambda: np.random.randn(25, 25)})
     # TODO : add md schema later
     RE = RunEngine({})
-    RE.subscribe('all', an_glbl.exp_db.mds.insert)
+    RE.subscribe('all', an_glbl['exp_db'].mds.insert)
     RE(count([pe1c]))
     RE(scan([pe1c], motor, 1, 5, 5))
     RE(scan([pe1c], motor, 1, 10, 10))

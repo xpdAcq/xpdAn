@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def load_configuration(name, prefix, fields):
+def load_configuration(name, prefix=None, fields=None):
     """
     Load configuration data from a cascading series of locations.
 

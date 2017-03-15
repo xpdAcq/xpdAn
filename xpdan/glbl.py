@@ -25,4 +25,4 @@ try:
 except KeyError:
     env_code = 1
 print('ENV_CODE = {}'.format(env_code))
-an_glbl = make_glbl(load_configuration(), env_code)
+an_glbl = make_glbl(load_configuration('xpdan'), env_code)

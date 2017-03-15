@@ -39,105 +39,105 @@ def make_glbl(env_code=0, db=None):
     by default: env_var 0 means beamline, 1 means test, 2 means simulation
     """
 
-    HOME_DIR_NAME = 'xpdUser'
-    BLCONFIG_DIR_NAME = 'xpdConfig'
-    BEAMLINE_HOST_NAME = 'xf28id1-ws2'
-    ARCHIVE_BASE_DIR_NAME = '/direct/XF28ID1/pe1_data/.userBeamtimeArchive'
-    USER_BACKUP_DIR_NAME = strftime('%Y')
-    OWNER = 'xf28id1'
-    BEAMLINE_ID = 'xpd'
-    GROUP = 'XPD'
-    DET_IMAGE_FIELD = 'pe1_image'
-    DARK_FIELD_KEY = 'sc_dk_field_uid'
-    CALIB_CONFIG_NAME = 'pyFAI_calib.yml'
+    home_dir_name = 'xpdUser'
+    blconfig_dir_name = 'xpdConfig'
+    beamline_host_name = 'xf28id1-ws2'
+    archive_base_dir_name = '/direct/XF28ID1/pe1_data/.userBeamtimeArchive'
+    user_backup_dir_name = strftime('%Y')
+    owner = 'xf28id1'
+    beamline_id = 'xpd'
+    group = 'XPD'
+    det_image_field = 'pe1_image'
+    dark_field_key = 'sc_dk_field_uid'
+    calib_config_name = 'pyFAI_calib.yml'
 
     # change this to be handled by an environment variable later
     if int(env_code) == 1:
         # test
-        BASE_DIR = tempfile.mkdtemp()
-        print('creating {}'.format(BASE_DIR))
+        base_dir = tempfile.mkdtemp()
+        print('creating {}'.format(base_dir))
     elif int(env_code) == 2:
         # simulation
-        BASE_DIR = os.getcwd()
+        base_dir = os.getcwd()
         db = build_pymongo_backed_broker()
     else:
         # beamline
-        BASE_DIR = os.path.abspath('/direct/XF28ID1/pe2_data')
+        base_dir = os.path.abspath('/direct/XF28ID1/pe2_data')
         from databroker.databroker import DataBroker as db
 
     # top directories
-    HOME_DIR = os.path.join(BASE_DIR, HOME_DIR_NAME)
-    BLCONFIG_DIR = os.path.join(BASE_DIR, BLCONFIG_DIR_NAME)
-    ARCHIVE_BASE_DIR = os.path.abspath(ARCHIVE_BASE_DIR_NAME)
+    home_dir = os.path.join(base_dir, home_dir_name)
+    blconfig_dir = os.path.join(base_dir, blconfig_dir_name)
+    archive_base_dir = os.path.abspath(archive_base_dir_name)
 
     # aquire object directories
-    CONFIG_BASE = os.path.join(HOME_DIR, 'config_base')
+    config_base = os.path.join(home_dir, 'config_base')
     # copying pyFAI calib dict yml for test
     if int(env_code) == 1:
         a = os.path.dirname(os.path.abspath(__file__))
         b = a.split('glbl.py')[0]
-        os.makedirs(CONFIG_BASE, exist_ok=True)
+        os.makedirs(config_base, exist_ok=True)
         shutil.copyfile(os.path.join(b, 'tests/pyFAI_calib.yml'),
-                        os.path.join(CONFIG_BASE, 'pyFAI_calib.yml'))
-    YAML_DIR = os.path.join(HOME_DIR, 'config_base', 'yml')
-    BT_DIR = YAML_DIR
-    SAMPLE_DIR = os.path.join(YAML_DIR, 'samples')
-    EXPERIMENT_DIR = os.path.join(YAML_DIR, 'experiments')
-    SCANPLAN_DIR = os.path.join(YAML_DIR, 'scanplans')
+                        os.path.join(config_base, 'pyFAI_calib.yml'))
+    yaml_dir = os.path.join(home_dir, 'config_base', 'yml')
+    bt_dir = yaml_dir
+    sample_dir = os.path.join(yaml_dir, 'samples')
+    experiment_dir = os.path.join(yaml_dir, 'experiments')
+    scanplan_dir = os.path.join(yaml_dir, 'scanplans')
     # other dirs
-    IMPORT_DIR = os.path.join(HOME_DIR, 'Import')
-    ANALYSIS_DIR = os.path.join(HOME_DIR, 'userAnalysis')
-    USERSCRIPT_DIR = os.path.join(HOME_DIR, 'userScripts')
-    TIFF_BASE = os.path.join(HOME_DIR, 'tiff_base')
-    USER_BACKUP_DIR = os.path.join(ARCHIVE_BASE_DIR, USER_BACKUP_DIR_NAME)
+    import_dir = os.path.join(home_dir, 'Import')
+    analysis_dir = os.path.join(home_dir, 'userAnalysis')
+    userscript_dir = os.path.join(home_dir, 'userScripts')
+    tiff_base = os.path.join(home_dir, 'tiff_base')
+    user_backup_dir = os.path.join(archive_base_dir, user_backup_dir_name)
 
-    ALL_FOLDERS = [
-        HOME_DIR,
-        BLCONFIG_DIR,
-        YAML_DIR,
-        CONFIG_BASE,
-        SAMPLE_DIR,
-        EXPERIMENT_DIR,
-        SCANPLAN_DIR,
-        TIFF_BASE,
-        USERSCRIPT_DIR,
-        IMPORT_DIR,
-        ANALYSIS_DIR
+    all_folders = [
+        home_dir,
+        blconfig_dir,
+        yaml_dir,
+        config_base,
+        sample_dir,
+        experiment_dir,
+        scanplan_dir,
+        tiff_base,
+        userscript_dir,
+        import_dir,
+        analysis_dir
     ]
 
     # only create dirs if running test
     if int(env_code) ==1:
-        for folder in ALL_FOLDERS:
+        for folder in all_folders:
             os.makedirs(folder, exist_ok=True)
 
     # directories that won't be tar in the end of beamtime
-    _EXCLUDE_DIR = [HOME_DIR, BLCONFIG_DIR, YAML_DIR]
-    _EXPORT_TAR_DIR = [CONFIG_BASE, USERSCRIPT_DIR]
+    _exclude_dir = [home_dir, blconfig_dir, yaml_dir]
+    _export_tar_dir = [config_base, userscript_dir]
 
     class Glbl:
-        beamline_host_name = BEAMLINE_HOST_NAME
-        base = BASE_DIR
-        home = HOME_DIR
-        _export_tar_dir = _EXPORT_TAR_DIR
-        xpdconfig = BLCONFIG_DIR
-        import_dir = IMPORT_DIR
-        config_base = CONFIG_BASE
-        tiff_base = TIFF_BASE
-        usrScript_dir = USERSCRIPT_DIR
-        usrAnalysis_dir = ANALYSIS_DIR
-        yaml_dir = YAML_DIR
-        bt_dir = BT_DIR
-        sample_dir = SAMPLE_DIR
-        experiment_dir = EXPERIMENT_DIR
-        scanplan_dir = SCANPLAN_DIR
-        allfolders = ALL_FOLDERS
-        archive_dir = USER_BACKUP_DIR
-        owner = OWNER
-        beamline_id = BEAMLINE_ID
-        group = GROUP
-        det_image_field = DET_IMAGE_FIELD
-        dark_field_key = DARK_FIELD_KEY
-        calib_config_name = CALIB_CONFIG_NAME
+        beamline_host_name = beamline_host_name
+        base = base_dir
+        home = home_dir
+        _export_tar_dir = _export_tar_dir
+        xpdconfig = blconfig_dir
+        import_dir = import_dir
+        config_base = config_base
+        tiff_base = tiff_base
+        usrScript_dir = userscript_dir
+        usrAnalysis_dir = analysis_dir
+        yaml_dir = yaml_dir
+        bt_dir = bt_dir
+        sample_dir = sample_dir
+        experiment_dir = experiment_dir
+        scanplan_dir = scanplan_dir
+        allfolders = all_folders
+        archive_dir = user_backup_dir
+        owner = owner
+        beamline_id = beamline_id
+        group = group
+        det_image_field = det_image_field
+        dark_field_key = dark_field_key
+        calib_config_name = calib_config_name
         exp_db = db
         # default masking dict
         mask_dict = {'edge': 30, 'lower_thresh': 0.0,

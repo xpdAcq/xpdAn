@@ -2,7 +2,7 @@ home_dir_name : xpdUser
 blconfig_dir_name : xpdConfig
 beamline_host_name : xf28id1-ws2
 archive_base_dir_name : /direct/XF28ID1/pe1_data/.userBeamtimeArchive
-user_backup_dir_name : 2017
+user_backup_dir_name : '2017'
 owner : xf28id1
 beamline_id : xpd
 group : XPD

@@ -23,7 +23,7 @@ def load_configuration(name):
     3. At the system level
        - /etc/{name}.yml
     4. In the user's home directory
-       - ~/.config/{name}/connection.yml
+       - ~/.config/{name}.yml
 
     where
         {name} is metadatastore
@@ -49,7 +49,7 @@ def load_configuration(name):
     filenames = [
         os.path.join(rs_fn('xpdan', 'config/xpdan.yml')),
         os.path.join('/etc', name + '.yml'),
-        os.path.join(os.path.expanduser('~'), '.config', name, '.yml'),
+        os.path.join(os.path.expanduser('~'), '.config', name + '.yml'),
     ]
 
     if 'CONDA_ETC_' in os.environ:
@@ -134,7 +134,7 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
 
     config['bt_dir'] = config['yaml_dir']
     config.update({k: os.path.join(config['yaml_dir'], z) for k, z in zip(
-        ['sample_dir', 'experiment_dir' 'scanplan_dir'],
+        ['sample_dir', 'experiment_dir', 'scanplan_dir'],
         ['samples', 'experiments', 'scanplans']
     )})
     # other dirs
@@ -142,16 +142,16 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
                                              config['user_backup_dir_name'])
 
     config['all_folders'] = [config[k] for k in ['home_dir',
-                   'blconfig_dir',
-                   'yaml_dir',
-                   'config_base',
-                   'sample_dir',
-                   'experiment_dir',
-                   'scanplan_dir',
-                   'tiff_base',
-                   'userscript_dir',
-                   'import_dir',
-                   'analysis_dir']]
+                                                 'blconfig_dir',
+                                                 'yaml_dir',
+                                                 'config_base',
+                                                 'sample_dir',
+                                                 'experiment_dir',
+                                                 'scanplan_dir',
+                                                 'tiff_base',
+                                                 'userscript_dir',
+                                                 'import_dir',
+                                                 'analysis_dir']]
 
     # only create dirs if running test
     if int(env_code) == 1:
@@ -159,6 +159,8 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
             os.makedirs(folder, exist_ok=True)
 
     # directories that won't be tar in the end of beamtime
-    config['_exclude_dir'] = [config[k] for k in ['home_dir', 'blconfig_dir', 'yaml_dir']]
-    config['_export_tar_dir'] = [config[k] for k in ['config_base', 'userscript_dir']]
+    config['_exclude_dir'] = [config[k] for k in
+                              ['home_dir', 'blconfig_dir', 'yaml_dir']]
+    config['_export_tar_dir'] = [config[k] for k in
+                                 ['config_base', 'userscript_dir']]
     return config

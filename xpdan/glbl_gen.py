@@ -4,7 +4,6 @@ import tempfile
 
 import yaml
 
-from xpdan.glbl import logger
 from xpdan.simulation import build_pymongo_backed_broker
 import logging
 

@@ -1,0 +1,20 @@
+home_dir_name : xpdUser
+blconfig_dir_name : xpdConfig
+beamline_host_name : xf28id1-ws2
+archive_base_dir_name : /direct/XF28ID1/pe1_data/.userBeamtimeArchive
+user_backup_dir_name : 2017
+owner : xf28id1
+beamline_id : xpd
+group : XPD
+det_image_field : pe1_image
+dark_field_key : sc_dk_field_uid
+calib_config_name : pyFAI_calib.yml
+mask_dict:
+  edge: 30
+  lower_thresh: 0.0
+  upper_thresh: None
+  bs_width: 13
+  tri_offset: 13
+  v_asym: 0
+  alpha: 2.5
+  tmsk: None

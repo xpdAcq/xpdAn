@@ -21,7 +21,7 @@ import pytest
 import tempfile
 
 from xpdan.data_reduction import DataReduction
-from xpdan.glbl import make_glbl
+from xpdan.glbl_gen import make_glbl
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs

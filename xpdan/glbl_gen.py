@@ -81,15 +81,21 @@ def load_configuration(name, prefix, fields):
 
 
 def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
-    """ make a instance of Glbl class
+    """ make a glbl dict
 
-    Glbl class is used to handle attributes and directories
+    glbl dict is used to handle attributes and directories
      depends on environment variable
 
     Parameters
     ----------
-    env_code : int
+    config: dict
+        Configuration dictionary
+    env_code: int, optional
         environment variable to specify current situation
+    db_xptal: databroker.broker instance
+        The experimental databroker
+    db_an: databroker.broker instance
+        The anaysis databroker
 
     Note
     ----

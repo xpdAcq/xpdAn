@@ -12,7 +12,6 @@ calib_config_name : pyFAI_calib.yml
 mask_dict:
   edge: 30
   lower_thresh: 0.0
-  upper_thresh: None
   bs_width: 13
   tri_offset: 13
   v_asym: 0

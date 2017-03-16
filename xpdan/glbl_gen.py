@@ -26,20 +26,12 @@ def load_configuration(name):
        - ~/.config/{name}.yml
 
     where
-        {name} is metadatastore
-        {PREFIX} is MDS
-        {FIELD} is one of {host, database, port, timezone}
+        {name} is xpdan
 
     Parameters
     ----------
     name : str
         The expected base-name of the configuration files
-
-    prefix : str
-        The prefix when looking for environmental variables
-
-    fields : iterable of strings
-        The required configuration fields
 
     Returns
     ------

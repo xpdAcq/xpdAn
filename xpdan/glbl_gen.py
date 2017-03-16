@@ -26,9 +26,7 @@ def load_configuration(name):
        - ~/.config/{name}.yml
 
     where
-        {name} is metadatastore
-        {PREFIX} is MDS
-        {FIELD} is one of {host, database, port, timezone}
+        {name} is xpdan
 
     Parameters
     ----------

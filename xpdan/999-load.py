@@ -30,4 +30,4 @@ from xpdan.glbl import an_glbl
 from xpdan.qt_gui import XpdanSearch, an
 from xpdan.data_reduction import *
 
-db = an_glbl.exp_db # alias
+db = an_glbl['exp_db'] # alias

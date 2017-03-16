@@ -21,7 +21,7 @@ import pytest
 import tempfile
 
 from xpdan.data_reduction import DataReduction
-from xpdan.glbl import make_glbl
+from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs
@@ -46,11 +46,11 @@ def img_size():
 
 @pytest.fixture(scope='module')
 def mk_glbl(exp_db):
-    a = make_glbl(1, exp_db)
+    a = make_glbl(load_configuration('xpdan'), 1, exp_db)
     yield a
-    if os.path.exists(a.base):
-        print('removing {}'.format(a.base))
-        shutil.rmtree(a.base)
+    if os.path.exists(a['base_dir']):
+        print('removing {}'.format(a['base_dir']))
+        shutil.rmtree(a['base_dir'])
 
 
 @pytest.fixture(params=[

@@ -26,3 +26,8 @@ coverage:
       tests:
         target: 97.9%
         paths: '*/tests/.*'
+
+flags:
+  tests:
+    paths:
+      - tests/

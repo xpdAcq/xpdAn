@@ -170,12 +170,13 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         for i, plane in enumerate(image):
             image = np.subtract(plane, self.dark_img)
             filename = self._generate_filename(doc, i)
+            self.filenames.append(filename)
             path_dir, fn = os.path.split(filename)
             if self._find_dark:
-                self._save_image(plane, os.path.join(path_dir,
+                self._save_image(image, os.path.join(path_dir,
                                                      'sub_'+fn))
             else:
-                self._save_image(plane, filename)
+                self._save_image(image, filename)
             # if user wants raw dark
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
@@ -184,6 +185,5 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         """method for stop document"""
         # TODO: include sum logic in the future
         self._start = None
-        self.filenames = []
         super().stop(doc)
 

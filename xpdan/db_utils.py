@@ -21,10 +21,11 @@ def need_name_here(hdrs, key, verbose=True):
     """
     d = {}
     for i, hdr in enumerate(hdrs):
-        if hdr.start[key] in d.keys():
-            d[key].append(i)
-        else:
-            d[key] = [i]
+        if key in hdr.start.keys():
+            if hdr.start[key] in d.keys():
+                d[hdr.start[key]].append(i)
+            else:
+                d[hdr.start[key]] = [i]
     if verbose:
         pprint(d)
     return d
@@ -49,7 +50,7 @@ def scan_diff(hdrs, verbose=True):
     keys = set([k for hdr in hdrs for k in hdr.start.keys()])
     kv = {}
     for k in keys:
-        v = [hdr[k] for hdr in hdrs]
+        v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys()]
         if len(set(v)) != 1:
            kv[k] = v
     if verbose:
@@ -59,11 +60,12 @@ def scan_diff(hdrs, verbose=True):
 
 def scan_headlines(hdrs, fields=None, verbose=True):
     if fields is None:
-        fields = ['temperature', 'diff_x', 'diff_y', 'eurotherm']
-    fields = ['timestamp'] + fields
+        fields = ['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']
+    fields = ['time'] + fields
     datas = []
     for i, hdr in enumerate(hdrs):
-        data = [hdr.start.get(key, '') for key in fields]
+        data = [hdr.start[key] for key in fields if key in hdr.start.keys()]
+        data = [str(d) for d in data]
         data = '_'.join(data)
         if verbose:
             pprint((i, data))

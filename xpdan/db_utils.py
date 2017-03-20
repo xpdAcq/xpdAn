@@ -11,8 +11,8 @@ def need_name_here(hdrs, key, verbose=True):
         The headers to be searched
     key: str
         The key to be searched for
-    verbose: bool
-        If true prints the results
+    verbose: bool, optional
+        If true prints the results. Defaults to True
 
     Returns
     -------
@@ -28,3 +28,30 @@ def need_name_here(hdrs, key, verbose=True):
     if verbose:
         pprint(d)
     return d
+
+
+def scan_diff(hdrs, verbose=True):
+    """Get the metadata differences between scans
+
+    Parameters
+    ----------
+    hdrs: list of Header objects
+        The headers to be diffed
+    verbose: bool, optional
+        If true prints the results. Defaults to True
+
+    Returns
+    -------
+    dict:
+        The dictionary of keys with different values across the scans.
+        The values are the results for each header.
+    """
+    keys = set([k for hdr in hdrs for k in hdr.keys()])
+    kv = {}
+    for k in keys:
+        v = [hdr[k] for hdr in hdrs]
+        if len(set(v)) != 1:
+           kv[k] = v
+    if verbose:
+        pprint(kv)
+    return kv

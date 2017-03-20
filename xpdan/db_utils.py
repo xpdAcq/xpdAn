@@ -46,7 +46,7 @@ def scan_diff(hdrs, verbose=True):
         The dictionary of keys with different values across the scans.
         The values are the results for each header.
     """
-    keys = set([k for hdr in hdrs for k in hdr.keys()])
+    keys = set([k for hdr in hdrs for k in hdr.start.keys()])
     kv = {}
     for k in keys:
         v = [hdr[k] for hdr in hdrs]
@@ -55,3 +55,17 @@ def scan_diff(hdrs, verbose=True):
     if verbose:
         pprint(kv)
     return kv
+
+
+def scan_headlines(hdrs, fields=None, verbose=True):
+    if fields is None:
+        fields = ['temperature', 'diff_x', 'diff_y', 'eurotherm']
+    fields = ['timestamp'] + fields
+    datas = []
+    for i, hdr in enumerate(hdrs):
+        data = [hdr.start.get(key, '') for key in fields]
+        data = '_'.join(data)
+        if verbose:
+            pprint((i, data))
+        datas.append(data)
+    return datas

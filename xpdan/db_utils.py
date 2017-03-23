@@ -60,6 +60,24 @@ def scan_diff(hdrs, verbose=True):
 
 
 def scan_headlines(hdrs, fields=None, verbose=True):
+    """Provide one line summaries of headers
+
+    Parameters
+    ----------
+    hdrs: list of headers
+        The headers from the databroker
+    fields: list of str, optional
+        The fields to be included in the summary, if None use
+        `['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']`
+        defaults to None
+    verbose: bool, optional
+        If True print the summary
+
+    Returns
+    -------
+    list:
+        List of summary strings
+    """
     if fields is None:
         fields = ['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']
     fields = fields

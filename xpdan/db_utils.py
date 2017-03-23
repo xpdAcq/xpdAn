@@ -1,4 +1,5 @@
 from pprint import pprint
+from .utils import _timestampstr
 
 
 def need_name_here(hdrs, key, verbose=True):
@@ -61,13 +62,21 @@ def scan_diff(hdrs, verbose=True):
 def scan_headlines(hdrs, fields=None, verbose=True):
     if fields is None:
         fields = ['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']
-    fields = ['time'] + fields
+    fields = fields
     datas = []
     for i, hdr in enumerate(hdrs):
         data = [hdr.start[key] for key in fields if key in hdr.start.keys()]
+        data2 = {key: hdr.start[key] for key in fields if key in hdr.start.keys()}
+
+        data2['time'] = _timestampstr(hdr.start['time'])
+        data = [_timestampstr(hdr.start['time'])] + data
+
+        data2['uid'] = hdr.start['uid'][:6]
+        data += [hdr.start['uid'][:6]]
+
         data = [str(d) for d in data]
         data = '_'.join(data)
         if verbose:
-            pprint((i, data))
+            print((i, data2))
         datas.append(data)
     return datas

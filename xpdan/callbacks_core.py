@@ -181,6 +181,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
                                                              'dark_'+fn))
+
     def stop(self, doc):
         """method for stop document"""
         # TODO: include sum logic in the future

@@ -42,7 +42,8 @@ class DataReduction:
         # for file name 
         self.fields = ['sample_name', 'sp_type', 'sp_requested_exposure']
         self.labels = ['dark_frame']
-        self.data_fields = ['temperature']
+        self.data_fields = [('temperature','K'), ('ss_stg2_x',''),
+			    ('cryostat_T','K')]
         self.root_dir_name = 'sample_name'
         self.exp_db = exp_db
         if image_field is None:
@@ -77,10 +78,14 @@ class DataReduction:
             else:
                 pass
         # get data fields
-        for key in self.data_fields:
+        for meta in self.data_fields:
+            key, unit = meta
             val = event['data'].get(key, None)
-            if el is not None:
-                feature = "{}={}".format(key, val)
+            if val is not None:
+                if type(val) is float: 
+                    feature = "{:.2f}{}".format(val, unit)
+                else:
+                    feature = "{}{}".format(val, unit)
                 feature_list.append(feature)
             else:
                 pass

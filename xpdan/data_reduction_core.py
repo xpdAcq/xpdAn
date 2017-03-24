@@ -178,7 +178,8 @@ def integrate_and_save(headers, db, save_dir,
                        path_append_keys='sample_name',
                        dark_sub_bool=True,
                        polarization_factor=0.99,
-                       mask_setting='default', mask_dict=None,
+                       mask_setting='default',
+                       mask_dict=None,
                        save_image=True, root_dir=None,
                        config_dict=None,
                        sum_idx_list=None,
@@ -285,18 +286,21 @@ def integrate_and_save(headers, db, save_dir,
                     img -= dark_img
                     f_name = 'sub_' + f_name
 
-                path = os.path.join(save_dir, f_name)
-
                 mask = None
-                if (type(mask_setting) == np.ndarray and
-                            mask_setting.dtype == np.dtype('bool')):
+                # If we are handed a mask array use it
+                if (isinstance(mask_setting, np.ndarray) and
+                            mask_setting.dtype == np.bool):
                     mask = mask_setting
-                elif type(mask_setting) == str and os.path.exists(
+
+                # if we are handed a filename/path load it
+                elif isinstance(mask_setting, str) and os.path.exists(
                         mask_setting):
                     if os.path.splitext(mask_setting)[-1] == '.msk':
                         mask = read_fit2d_msk(mask_setting)
                     else:
                         mask = np.load(mask_setting)
+
+                # default to the mask in the header
                 elif mask_setting == 'default':
                     mask_md = header.start.get('mask', None)
                     if mask_md is None:
@@ -308,11 +312,13 @@ def integrate_and_save(headers, db, save_dir,
                         # unpack here
                         data, ind, indptr = mask_md
                         print(
-                            "INFO: pull off mask associate with your image: {}"
-                            .format(f_name))
+                            "INFO: pull off mask "
+                            "associate with your image: {}".format(f_name))
                         mask = decompress_mask(data, ind, indptr, img.shape)
+                # if auto build a mask
                 elif mask_setting == 'auto':
-                    mask = mask_img(img, ai, **an_glbl['mask_dict'])
+                    mask = mask_img(img, ai, **mask_dict)
+                # if string None, do nothing
                 elif mask_setting == 'None':
                     mask = None
 
@@ -323,7 +329,7 @@ def integrate_and_save(headers, db, save_dir,
                     np.save(os.path.join(root_dir, mask_fn),
                             mask_setting)  # default is .npy from np.save
 
-
+                path = os.path.join(save_dir, f_name)
 
                 if not dryrun:
                     tif.imsave(path, img)

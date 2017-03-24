@@ -67,6 +67,16 @@ def _feature_gen(event, labels, fields, data_fields):
     feature_list.append(uid)
     return "_".join(feature_list)
 
+
+def _file_name(event, event_timestamp, ind):
+    """ priviate method operates on event level """
+    f_name = _feature_gen(event)
+    f_name = '_'.join([_timestampstr(event_timestamp),
+                       f_name])
+    f_name = '{}_{:04d}.tif'.format(f_name, ind)
+    return f_name
+
+
 class DataReduction:
     """ class that handle operations on images from databroker header
 
@@ -116,14 +126,6 @@ class DataReduction:
                                                                   dark_img)
             yield sub_img, timestamp, ind, dark_img, header.start, ev
 
-    def _file_name(self, event, event_timestamp, ind):
-        """ priviate method operates on event level """
-        f_name = self._feature_gen(event)
-        f_name = '_'.join([_timestampstr(event_timestamp),
-                           f_name])
-        f_name = '{}_{:04d}.tif'.format(f_name, ind)
-        return f_name
-
     def construct_event_stream(self, header):
         for event in self.exp_db.get_events(header, fill=True):
             yield event['data'][self.image_field], \
@@ -132,8 +134,6 @@ class DataReduction:
 
 
 # init
-xpd_data_proc = DataReduction()
-ai = AzimuthalIntegrator()
 
 """ analysis function operates at header level """
 
@@ -148,11 +148,9 @@ def _prepare_header_list(headers):
     return header_list
 
 
-def _load_config(header):
+def _load_config(header, config_base, calib_config_name):
     try:
-        with open(
-                os.path.join(an_glbl['config_base'],
-                             an_glbl['calib_config_name'])) as f:
+        with open(os.path.join(config_base, calib_config_name)) as f:
             config_dict = yaml.load(f)
     except FileNotFoundError:
         config_dict = header.start.get('calibration_md', None)
@@ -176,12 +174,15 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate_and_save(headers, dark_sub_bool=True,
+def integrate_and_save(headers, db, save_dir,
+                       path_append_keys='sample_name',
+                       dark_sub_bool=True,
                        polarization_factor=0.99,
                        mask_setting='default', mask_dict=None,
                        save_image=True, root_dir=None,
-                       config_dict=None, handler=xpd_data_proc,
+                       config_dict=None,
                        sum_idx_list=None,
+                       image_data_key='pe1_image',
                        **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
@@ -242,42 +243,115 @@ def integrate_and_save(headers, dark_sub_bool=True,
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-    # normalize list
     header_list = _prepare_header_list(headers)
+    ai = AzimuthalIntegrator()
 
     total_rv_list_Q = []
     total_rv_list_2theta = []
 
+    if not isinstance(path_append_keys, (list, tuple)):
+        path_append_keys = [path_append_keys]
+
+    for header in header_list:
+        for name, doc in db.restream(header):
+            if name == 'start':
+                # config_dict
+                if config_dict is None:
+                    config_dict = _load_config(header)  # default dict
+                    if config_dict is None:  # still None
+                        print("INFO: can't find calibration parameter under "
+                              "xpdUser/config_base/ or header metadata\n"
+                              "data reduction can not be perfomed.")
+                        return
+
+                for s in path_append_keys:
+                    path = os.path.join(path, doc[s])
+
+                if dark_sub_bool:
+                    dark_uid = doc['sc_dark_uid']  # Or something
+                    dark_hdr = db[dark_uid]
+                    dark_img = next(db.get_events(
+                        dark_hdr, fill=True))['data'][image_data_key]
+
+                # setting up geometry
+                ai.setPyFAI(**config_dict)
+                npt = _npt_cal(config_dict)
+            elif name == 'descriptor':
+                pass
+            elif name == 'event':
+                f_name = _feature_gen(doc)
+                img = doc['data'][image_data_key]
+                if dark_sub_bool:
+                    img -= dark_img
+                    f_name = 'sub_' + f_name
+
+                path = os.path.join(save_dir, f_name)
+
+                mask = None
+                if (type(mask_setting) == np.ndarray and
+                            mask_setting.dtype == np.dtype('bool')):
+                    mask = mask_setting
+                elif type(mask_setting) == str and os.path.exists(
+                        mask_setting):
+                    if os.path.splitext(mask_setting)[-1] == '.msk':
+                        mask = read_fit2d_msk(mask_setting)
+                    else:
+                        mask = np.load(mask_setting)
+                elif mask_setting == 'default':
+                    mask_md = header.start.get('mask', None)
+                    if mask_md is None:
+                        print(
+                            "INFO: no mask associated or mask information was"
+                            " not set up correctly, no mask will be applied")
+                        mask = None
+                    else:
+                        # unpack here
+                        data, ind, indptr = mask_md
+                        print(
+                            "INFO: pull off mask associate with your image: {}"
+                            .format(f_name))
+                        mask = decompress_mask(data, ind, indptr, img.shape)
+                elif mask_setting == 'auto':
+                    mask = mask_img(img, ai, **an_glbl['mask_dict'])
+                elif mask_setting == 'None':
+                    mask = None
+
+                mask_fn = os.path.splitext(f_name)[0]  # remove ext
+                if mask_setting is not None:
+                    print("INFO: mask file '{}' is saved at {}"
+                          .format(mask_fn, root_dir))
+                    np.save(os.path.join(root_dir, mask_fn),
+                            mask_setting)  # default is .npy from np.save
+
+
+
+                if not dryrun:
+                    tif.imsave(path, img)
+                    if os.path.isfile(path):
+                        print('image "%s" has been saved at "%s"' %
+                              (f_name, path))
+                    else:
+                        print(
+                            'Sorry, something went wrong with your tif saving')
+                        return
+                else:
+                    print('dryrun: image "%s" has been saved at "%s"' %
+                          (f_name, path))
+            elif name == 'stop':
+                # save run_start
+                stem, ext = os.path.splitext(path)
+                config_name = path.replace(ext, '.yml')
+                with open(config_name, 'w') as f:
+                    yaml.dump(header.start, f)  # save all md in start
+
+    print(" *** {} *** ".format('Saving process finished'))
+
     # iterate over header
     for header in header_list:
-        root = header.start.get(handler.root_dir_name, None)
-        if root is not None:
-            root_dir = os.path.join(W_DIR, root)
-            os.makedirs(root_dir, exist_ok=True)
-        else:
-            root_dir = W_DIR
-
-        # config_dict
-        if config_dict is None:
-            config_dict = _load_config(header)  # default dict
-            if config_dict is None:  # still None
-                print("INFO: can't find calibration parameter under "
-                      "xpdUser/config_base/ or header metadata\n"
-                      "data reduction can not be perfomed.")
-                return
-
-        # setting up geometry
-        ai.setPyFAI(**config_dict)
-        npt = _npt_cal(config_dict)
 
         header_rv_list_Q = []
         header_rv_list_2theta = []
 
-        # dark logic
-        if dark_sub_bool:
-            event_stream = handler.dark_sub(header)
-        else:
-            event_stream = handler.construct_event_stream(header)
         for img, event_timestamp, ind, *rest, event in sum_images(
                 event_stream, sum_idx_list):
 
@@ -443,7 +517,7 @@ def integrate_and_save_last(dark_sub_bool=True, polarization_factor=0.99,
                        handler=handler, sum_idx_list=sum_idx_list, **kwargs)
 
 
-def save_tiff(headers, db, save_dir,
+def save_tiff(headers, db, save_dir, path_append_keys='sample_name',
               dark_sub_bool=True, dryrun=False,
               image_data_key='pe1_image'
               ):
@@ -469,10 +543,14 @@ def save_tiff(headers, db, save_dir,
     """
     # normalize list
     header_list = _prepare_header_list(headers)
+    if not isinstance(path_append_keys, (list, tuple)):
+        path_append_keys = [path_append_keys]
 
     for header in header_list:
         for name, doc in db.restream(header):
             if name == 'start':
+                for s in path_append_keys:
+                    path = os.path.join(path, doc[s])
                 if dark_sub_bool:
                     dark_uid = doc['sc_dark_uid']  # Or something
                     dark_hdr = db[dark_uid]

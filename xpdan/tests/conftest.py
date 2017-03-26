@@ -65,6 +65,7 @@ def db(request):
     yield rv
     clean_database(rv)
 
+
 @pytest.fixture(scope='module')
 def tif_exporter_template():
     base = tempfile.mkdtemp()
@@ -73,6 +74,7 @@ def tif_exporter_template():
     if os.path.isdir(export_dir_template):
         print('tearing {}'.format(export_dir_template))
         shutil.rmtree(export_dir_template)
+
 
 @pytest.fixture(scope='module')
 def handler(exp_db):

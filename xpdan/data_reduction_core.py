@@ -179,6 +179,8 @@ def integrate_and_save(headers, *, db, save_dir,
                        save_image=True,
                        config_dict=None,
                        image_data_key='pe1_image',
+                       config_base='',
+                       calib_config_name='',
                        **kwargs):
     """ integrate and save dark subtracted images for given list of headers
 
@@ -261,7 +263,8 @@ def integrate_and_save(headers, *, db, save_dir,
                 start = True
                 # config_dict
                 if config_dict is None:
-                    config_dict = _load_config(header)  # default dict
+                    config_dict = _load_config(header, config_base='',
+                                               calib_config_name='')
                     if config_dict is None:  # still None
                         raise RuntimeError(
                             "Can't find calibration parameter under "

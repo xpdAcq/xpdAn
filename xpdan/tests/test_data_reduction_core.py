@@ -111,7 +111,7 @@ def test_save_tiff_core_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
                  os.listdir(fast_tmp_dir)]
     pprint(kwargs)
     a = save_tiff(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir, **kwargs)
-    b = save_last_tiff(exp_db, fast_tmp_dir, **kwargs)
+    b = save_last_tiff(db=exp_db, save_dir=fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
     if kwargs.get('dryrun'):

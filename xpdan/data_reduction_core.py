@@ -144,7 +144,6 @@ def _prepare_header_list(headers):
 
 
 def _load_config(header, config_base='', calib_config_name=''):
-
     try:
         with open(os.path.join(config_base, calib_config_name)) as f:
             config_dict = yaml.load(f)
@@ -189,9 +188,11 @@ def integrate_and_save(headers, *, db, save_dir,
     headers : list
         a list of databroker.header objects
     db: databroker.broker.Broker instance
-        The databroker which has all the data
+        The databroker holding the data, this must be specified as a `db=` in 
+        the function call (keyword only argument)
     save_dir: str
-        The path to the folder where the data will be saved
+        The folder in which to save the data, this must be specified as a 
+        `save_dir=` in the function call (keyword only argument)
     path_append_keys: str or list of str, optional
         The keys of data to be appended to the path, defaults to 'sample_name'
     dark_sub_bool : bool, optional
@@ -215,15 +216,16 @@ def integrate_and_save(headers, *, db, save_dir,
     save_image : bool, optional
         option to save dark subtracted images. images will be
         saved to the same directory of chi files. default is True.
-    root_dir : str, optional
-        path of chi files that are going to be saved. default is
-        the same as your image file
     config_dict : dict, optional
         dictionary stores integration parameters of pyFAI azimuthal
         integrator. default is the most recent parameters saved in
         xpdUser/conifg_base
     image_data_key: str, optional
         The key for the image data, defaults to `pe1_image`
+    calib_config_name: str, optional
+        The filename for the calibration file
+    config_base: str, optional
+        The folder holding the calibration file
     kwargs :
         addtional keywords to overwrite integration behavior. Please
         refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
@@ -263,14 +265,24 @@ def integrate_and_save(headers, *, db, save_dir,
                 start = True
                 # config_dict
                 if config_dict is None:
-                    config_dict = _load_config(header, config_base='',
-                                               calib_config_name='')
+                    config_dict = _load_config(
+                        header, config_base=config_base,
+                        calib_config_name=calib_config_name)
                     if config_dict is None:  # still None
                         raise RuntimeError(
                             "Can't find calibration parameter under "
                             "xpdUser/config_base/ or header metadata\n"
-                            "data reduction can not be perfomed.")
-                        # return
+                            "data reduction can not be perfomed."
+                            "This is likely because a run_calibration() "
+                            "was not carried out before the data "
+                            "were collected during data acquisition.\n"
+                            "If you have a calibration file, please rerun "
+                            "integrate_and_save() giving it a path to the "
+                            "calib file, e.g., integrate_and_save(header, "
+                            "config_base='', calib_config_name=''). "
+                            "If you have many files that take the same "
+                            "calibration file, define config_base and "
+                            "calib_config_name in your config file.")
 
                 if not path_append_keys:
                     path = save_dir
@@ -335,9 +347,8 @@ def integrate_and_save(headers, *, db, save_dir,
                         print('image "%s" has been saved at "%s"' %
                               (tiff_fn, path))
                     else:
-                        print(
-                            'Sorry, something went wrong with your tif saving')
-                        return
+                        raise FileNotFoundError('Sorry, something went '
+                                                'wrong with your tif saving')
 
                 # save run_start
                 stem, ext = os.path.splitext(f_name)
@@ -359,9 +370,11 @@ def integrate_and_save_last(**kwargs):
     Parameters
     ----------
     db: databroker.broker.Broker instance
-        The databroker which has all the data
+        The databroker holding the data, this must be specified as a `db=` in 
+        the function call (keyword only argument)
     save_dir: str
-        The path to the folder where the data will be saved
+        The folder in which to save the data, this must be specified as a 
+        `save_dir=` in the function call (keyword only argument)
     path_append_keys: str or list of str, optional
         The keys of data to be appended to the path, defaults to 'sample_name'
     dark_sub_bool : bool, optional
@@ -394,6 +407,10 @@ def integrate_and_save_last(**kwargs):
         xpdUser/conifg_base
     image_data_key: str, optional
         The key for the image data, defaults to `pe1_image`
+    calib_config_name: str, optional
+        The filename for the calibration file
+    config_base: str, optional
+        The folder holding the calibration file
     kwargs :
         addtional keywords to overwrite integration behavior. Please
         refer to pyFAI.azimuthalIntegrator.AzimuthalIntegrator for
@@ -427,9 +444,13 @@ def save_tiff(headers, *, db, save_dir,
     headers : list
         a list of header objects obtained from a query to dataBroker.
     db: databroker.broker.Broker instance
-        The databroker holding the data
+        The databroker holding the data, this must be specified as a `db=` in 
+        the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data
+        The folder in which to save the data, this must be specified as a 
+        `save_dir=` in the function call (keyword only argument)
+    path_append_keys: str or list of str, optional
+        The keys of data to be appended to the path, defaults to 'sample_name'
     dark_sub_bool : bool, optional
         Default is True, which allows dark/background subtraction to
         be done before saving each image. If header doesn't contain
@@ -491,9 +512,11 @@ def save_last_tiff(**kwargs):
     Parameters
     ----------
     db: databroker.broker.Broker instance
-        The databroker holding the data
+        The databroker holding the data, this must be specified as a `db=` in 
+        the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data
+        The folder in which to save the data, this must be specified as a 
+        `save_dir=` in the function call (keyword only argument)
     dark_sub_bool : bool, optional
         Default is True, which allows dark/background subtraction to
         be done before saving each image. If header doesn't contain
@@ -529,12 +552,9 @@ def sum_images(event_stream, idxs_list=None):
 
     >>> from databroker import db
     >>> hdr = db[-1]
-    >>> total_imgs = sum_images(hdr) # Sum all the images
-    >>> assert len(total_imgs) == 1
-    >>> total_imgs = sum_images(hdr, [1, 2, 3])
-    >>> assert len(total_imgs) == 1
-    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)])
-    >>> assert len(total_imgs) == 2
+    >>> total_imgs = sum_images(hdr) # returns one image which is the sum of all the images in hdr
+    >>> total_imgs = sum_images(hdr, [1, 2, 3]) # returns one image that is the sum of the images in image-events (an event that contains an image) 1, 2 and 3 in hdr
+    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)]) # returns two images, the first is the sum of the images in image-events 1,2 and 3, the second is the sum of the images in all the image-events from 5 to 10.
     """
     if idxs_list is None:
         yield from event_stream

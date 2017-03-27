@@ -130,8 +130,6 @@ def _file_name(event, event_timestamp, ind):
     return f_name
 
 
-# init
-
 """ analysis function operates at header level """
 
 

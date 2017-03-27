@@ -31,8 +31,7 @@ integrate_params = ['dark_sub_bool',
                     'mask_dict',
                     'save_image',
                     'root_dir',
-                    'config_dict',
-                    'sum_idx_list']
+                    'config_dict',]
 good_kwargs = [(True, False), (.99,
                                # .95, .5
                                ),
@@ -41,15 +40,14 @@ good_kwargs = [(True, False), (.99,
                 'None',
                 'array'),
                [None, {'alpha': 3}],
-               (True, False), [None], [None], sum_idx_values]
+               (True, False), [None], [None]]
 
 bad_integrate_params = ['dark_sub_bool',
                         'polarization_factor',
                         'mask_setting',
                         'mask_dict',
                         'save_image',
-                        'config_dict',
-                        'sum_idx_list']
+                        'config_dict']
 
 bad_kwargs = [['str'] for i in range(len(bad_integrate_params))]
 
@@ -77,7 +75,11 @@ for d in [save_tiff_kwargs, integrate_kwargs]:
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
-def test_integrate_smoke(exp_db, disk_mask, tmp_dir, kwargs, known_fail_bool):
+def test_integrate_core_smoke(exp_db, disk_mask, fast_tmp_dir, kwargs,
+                              known_fail_bool):
+    old_files = os.listdir(fast_tmp_dir)
+    old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]
     if 'mask_setting' in kwargs.keys():
         if kwargs['mask_setting'] == 'use_saved_mask_msk':
             kwargs['mask_setting'] = disk_mask[0]
@@ -87,21 +89,42 @@ def test_integrate_smoke(exp_db, disk_mask, tmp_dir, kwargs, known_fail_bool):
         kwargs['mask_setting'] = np.random.random_integers(
             0, 1, disk_mask[-1].shape).astype(bool)
     pprint(kwargs)
-    a = integrate_and_save(exp_db[-1], db=exp_db, save_dir=tmp_dir, **kwargs)
-    b = integrate_and_save_last(db=exp_db, save_dir=tmp_dir, **kwargs)
+    a = integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir, **kwargs)
+    b = integrate_and_save_last(db=exp_db, save_dir=fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
-    assert os.listdir(tmp_dir) != []
+    if kwargs.get('dryrun', None):
+        assert (
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
+            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+             os.listdir(fast_tmp_dir)]))
+    else:
+        assert (
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
+            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+             os.listdir(fast_tmp_dir)]))
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
-def test_save_tiff_smoke(exp_db, tmp_dir, kwargs, known_fail_bool):
+def test_save_tiff_core_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
+    old_files = os.listdir(fast_tmp_dir)
+    old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]
     pprint(kwargs)
-    a = save_tiff(exp_db[-1], db=exp_db, save_dir=tmp_dir, **kwargs)
-    b = save_last_tiff(exp_db, tmp_dir, **kwargs)
+    a = save_tiff(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir, **kwargs)
+    b = save_last_tiff(exp_db, fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
-    assert os.listdir(tmp_dir) != []
+    if kwargs['dryrun']:
+        assert (
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
+            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+             os.listdir(fast_tmp_dir)]))
+    else:
+        assert (
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
+            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+             os.listdir(fast_tmp_dir)]))
 
 
 @pytest.mark.parametrize("idxs", sum_idx_values)

@@ -121,3 +121,13 @@ def tmp_dir():
     if os.path.exists(td):
         print('removing {}'.format(td))
         shutil.rmtree(td)
+
+
+@pytest.fixture(scope='function')
+def fast_tmp_dir():
+    td = tempfile.mkdtemp()
+    print('creating {}'.format(td))
+    yield td
+    if os.path.exists(td):
+        print('removing {}'.format(td))
+        shutil.rmtree(td)

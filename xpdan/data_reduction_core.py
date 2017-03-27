@@ -146,6 +146,7 @@ def _prepare_header_list(headers):
 
 
 def _load_config(header, config_base='', calib_config_name=''):
+
     try:
         with open(os.path.join(config_base, calib_config_name)) as f:
             config_dict = yaml.load(f)
@@ -241,6 +242,8 @@ def integrate_and_save(headers, db, save_dir,
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
+    if mask_dict is None:
+        mask_dict = {}
     header_list = _prepare_header_list(headers)
     ai = AzimuthalIntegrator()
 
@@ -252,22 +255,31 @@ def integrate_and_save(headers, db, save_dir,
 
     for header in header_list:
         header_rv_list_Q, header_rv_list_2theta = [], []
+        start = False
+        event = False
+        stop = False
         for name, doc in db.restream(header, fill=True):
             if name == 'start':
+                start = True
                 # config_dict
                 if config_dict is None:
                     config_dict = _load_config(header)  # default dict
                     if config_dict is None:  # still None
-                        print("INFO: can't find calibration parameter under "
-                              "xpdUser/config_base/ or header metadata\n"
-                              "data reduction can not be perfomed.")
-                        return
+                        raise RuntimeError(
+                            "Can't find calibration parameter under "
+                            "xpdUser/config_base/ or header metadata\n"
+                            "data reduction can not be perfomed.")
+                        # return
 
+                if not path_append_keys:
+                    path = save_dir
                 for s in path_append_keys:
-                    path = os.path.join(path, doc[s])
+                    path = os.path.join(save_dir, doc[s])
+                if not os.path.isdir(path):
+                    os.mkdir(path)
 
                 if dark_sub_bool:
-                    dark_uid = doc['sc_dark_uid']  # Or something
+                    dark_uid = doc['sc_dk_field_uid']
                     dark_hdr = db[dark_uid]
                     dark_img = next(db.get_events(
                         dark_hdr, fill=True))['data'][image_data_key]
@@ -278,6 +290,8 @@ def integrate_and_save(headers, db, save_dir,
             elif name == 'descriptor':
                 pass
             elif name == 'event':
+                if not start:
+                    raise RuntimeError('Event before Start')
                 f_name = _feature_gen(doc)
                 img = doc['data'][image_data_key]
                 if dark_sub_bool:
@@ -285,7 +299,7 @@ def integrate_and_save(headers, db, save_dir,
                     f_name = 'sub_' + f_name
 
                 mask = _mask_logic(header, mask_setting, ai, mask_dict,
-                                   save_dir, f_name, img)
+                                   path, f_name, img)
 
                 # integration logic
                 stem, ext = os.path.splitext(f_name)
@@ -293,8 +307,8 @@ def integrate_and_save(headers, db, save_dir,
                 chi_name_2th = '2th_' + stem + '.chi'  # deg^-1
                 print("INFO: integrating image: {}".format(f_name))
                 # Q-integration
-                chi_fn_Q = os.path.join(root_dir, chi_name_Q)
-                chi_fn_2th = os.path.join(root_dir, chi_name_2th)
+                chi_fn_Q = os.path.join(path, chi_name_Q)
+                chi_fn_2th = os.path.join(path, chi_name_2th)
                 for unit, fn, l in zip(["q_nm^-1", "2th_deg"],
                                        [chi_fn_Q, chi_fn_2th],
                                        [header_rv_list_Q,
@@ -313,29 +327,29 @@ def integrate_and_save(headers, db, save_dir,
 
                 # save image logic
                 tiff_fn = f_name
-                w_name = os.path.join(root_dir, tiff_fn)
+                w_name = os.path.join(path, tiff_fn)
                 if save_image:
                     tif.imsave(w_name, img)
                     if os.path.isfile(w_name):
                         print('image "%s" has been saved at "%s"' %
-                              (tiff_fn, root_dir))
+                              (tiff_fn, path))
                     else:
                         print(
                             'Sorry, something went wrong with your tif saving')
                         return
 
-            # save run_start
-            stem, ext = os.path.splitext(w_name)
-            config_name = w_name.replace(ext, '.yml')
-            with open(config_name, 'w') as f:
-                yaml.dump(header.start, f)  # save all md in start
+                # save run_start
+                stem, ext = os.path.splitext(f_name)
+                config_name = f_name.replace(ext, '.yml')
+                with open(config_name, 'w') as f:
+                    yaml.dump(header.start, f)  # save all md in start
 
-            # each header generate  a list of rv
-            total_rv_list_Q.append(header_rv_list_Q)
-            total_rv_list_2theta.append(header_rv_list_2theta)
+        # each header generate  a list of rv
+        total_rv_list_Q.append(header_rv_list_Q)
+        total_rv_list_2theta.append(header_rv_list_2theta)
 
         print("INFO: chi/image files are saved at {}".format(root_dir))
-        return total_rv_list_Q, total_rv_list_2theta
+    return total_rv_list_Q, total_rv_list_2theta
 
 
 def integrate_and_save_last(db, save_dir, **kwargs):
@@ -435,7 +449,7 @@ def save_tiff(headers, db, save_dir, path_append_keys='sample_name',
                 for s in path_append_keys:
                     path = os.path.join(save_dir, doc[s])
                 if dark_sub_bool:
-                    dark_uid = doc['dark_uid']  # Or something
+                    dark_uid = doc['sc_dk_field_uid']  # Or something
                     dark_hdr = db[dark_uid]
                     dark_img = next(db.get_events(
                         dark_hdr, fill=True))['data'][image_data_key]

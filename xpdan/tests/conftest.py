@@ -77,12 +77,6 @@ def tif_exporter_template():
 
 
 @pytest.fixture(scope='module')
-def handler(exp_db):
-    h = DataReduction(exp_db=exp_db)
-    return h
-
-
-@pytest.fixture(scope='module')
 def exp_db(db, tmp_dir, img_size):
     db2 = db
     mds = db2.mds

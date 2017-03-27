@@ -30,7 +30,6 @@ integrate_params = ['dark_sub_bool',
                     'mask_setting',
                     'mask_dict',
                     'save_image',
-                    'root_dir',
                     'config_dict',]
 good_kwargs = [(True, False), (.99,
                                # .95, .5
@@ -40,7 +39,7 @@ good_kwargs = [(True, False), (.99,
                 'None',
                 'array'),
                [None, {'alpha': 3}],
-               (True, False), [None], [None]]
+               (True, False), [None]]
 
 bad_integrate_params = ['dark_sub_bool',
                         'polarization_factor',
@@ -127,19 +126,19 @@ def test_save_tiff_core_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
              os.listdir(fast_tmp_dir)]))
 
 
-@pytest.mark.parametrize("idxs", sum_idx_values)
-def test_sum_logic_smoke(exp_db, handler, idxs):
-    hdr = exp_db[-1]
-    event_stream = handler.exp_db.get_events(hdr, fill=True)
-
-    sub_event_streams = tee(event_stream, 2)
-    a = sum_images(sub_event_streams[0], idxs)
-    if idxs is None:
-        assert len(list(a)) == len(list(sub_event_streams[1]))
-    elif idxs is 'all':
-        assert len(list(a)) == 1
-    elif not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
-                 idxs):
-        assert len(list(a)) == 1
-    else:
-        assert len(list(a)) == len(idxs)
+# @pytest.mark.parametrize("idxs", sum_idx_values)
+# def test_sum_logic_smoke(exp_db, idxs):
+#     hdr = exp_db[-1]
+#     event_stream = handler.exp_db.get_events(hdr, fill=True)
+#
+#     sub_event_streams = tee(event_stream, 2)
+#     a = sum_images(sub_event_streams[0], idxs)
+#     if idxs is None:
+#         assert len(list(a)) == len(list(sub_event_streams[1]))
+#     elif idxs is 'all':
+#         assert len(list(a)) == 1
+#     elif not all(isinstance(e1, list) or isinstance(e1, tuple) for e1 in
+#                  idxs):
+#         assert len(list(a)) == 1
+#     else:
+#         assert len(list(a)) == len(idxs)

@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 import tempfile
 
-from xpdan.data_reduction import DataReduction
+# from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker

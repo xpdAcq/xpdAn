@@ -22,7 +22,7 @@ import yaml
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 from .tools import mask_img, decompress_mask
-from .utils import _clean_info, _timestampstr
+from xpdan.dev_utils import _clean_info, _timestampstr
 from xpdan.io import read_fit2d_msk
 
 
@@ -172,13 +172,13 @@ def _npt_cal(config_dict, total_shape=(2048, 2048)):
     return dist
 
 
-def integrate_and_save(headers, db, save_dir,
+def integrate_and_save(headers, *, db, save_dir,
                        path_append_keys='sample_name',
                        dark_sub_bool=True,
                        polarization_factor=0.99,
                        mask_setting='default',
                        mask_dict=None,
-                       save_image=True, root_dir=None,
+                       save_image=True,
                        config_dict=None,
                        image_data_key='pe1_image',
                        **kwargs):
@@ -348,11 +348,11 @@ def integrate_and_save(headers, db, save_dir,
         total_rv_list_Q.append(header_rv_list_Q)
         total_rv_list_2theta.append(header_rv_list_2theta)
 
-        print("INFO: chi/image files are saved at {}".format(root_dir))
+        print("INFO: chi/image files are saved at {}".format(path))
     return total_rv_list_Q, total_rv_list_2theta
 
 
-def integrate_and_save_last(db, save_dir, **kwargs):
+def integrate_and_save_last(**kwargs):
     """ integrate and save dark subtracted images for the latest header
 
     Parameters
@@ -411,10 +411,11 @@ def integrate_and_save_last(db, save_dir, **kwargs):
     xpdan.tools.mask_img
     pyFAI.azimuthalIntegrator.AzimuthalIntegrator
     """
-    integrate_and_save(db[-1], db, save_dir, **kwargs)
+    integrate_and_save(kwargs['db'][-1], **kwargs)
 
 
-def save_tiff(headers, db, save_dir, path_append_keys='sample_name',
+def save_tiff(headers, *, db, save_dir,
+              path_append_keys='sample_name',
               dark_sub_bool=True, dryrun=False,
               image_data_key='pe1_image'
               ):
@@ -483,7 +484,7 @@ def save_tiff(headers, db, save_dir, path_append_keys='sample_name',
     print(" *** {} *** ".format('Saving process finished'))
 
 
-def save_last_tiff(*args, **kwargs):
+def save_last_tiff(**kwargs):
     """Save images from latest data set as tiff format files.
 
     Parameters
@@ -503,7 +504,7 @@ def save_last_tiff(*args, **kwargs):
         The key for event['data'] which gives back the image
     """
 
-    save_tiff(args[0][-1], *args, **kwargs)
+    save_tiff(kwargs['db'][-1], **kwargs)
 
 
 def sum_images(event_stream, idxs_list=None):

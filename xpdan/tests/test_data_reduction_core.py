@@ -92,7 +92,7 @@ def test_integrate_core_smoke(exp_db, disk_mask, fast_tmp_dir, kwargs,
     b = integrate_and_save_last(db=exp_db, save_dir=fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
-    if kwargs.get('dryrun', None):
+    if kwargs.get('dryrun'):
         assert (
             set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
             [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
@@ -114,7 +114,7 @@ def test_save_tiff_core_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
     b = save_last_tiff(exp_db, fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
-    if kwargs['dryrun']:
+    if kwargs.get('dryrun'):
         assert (
             set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
             [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in

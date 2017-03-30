@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 import tempfile
 
-from xpdan.data_reduction import DataReduction
+# from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
@@ -65,6 +65,7 @@ def db(request):
     yield rv
     clean_database(rv)
 
+
 @pytest.fixture(scope='module')
 def tif_exporter_template():
     base = tempfile.mkdtemp()
@@ -73,11 +74,6 @@ def tif_exporter_template():
     if os.path.isdir(export_dir_template):
         print('tearing {}'.format(export_dir_template))
         shutil.rmtree(export_dir_template)
-
-@pytest.fixture(scope='module')
-def handler(exp_db):
-    h = DataReduction(exp_db=exp_db)
-    return h
 
 
 @pytest.fixture(scope='module')
@@ -113,6 +109,16 @@ def fuzzdb(exp_db):
 
 @pytest.fixture(scope='module')
 def tmp_dir():
+    td = tempfile.mkdtemp()
+    print('creating {}'.format(td))
+    yield td
+    if os.path.exists(td):
+        print('removing {}'.format(td))
+        shutil.rmtree(td)
+
+
+@pytest.fixture(scope='function')
+def fast_tmp_dir():
     td = tempfile.mkdtemp()
     print('creating {}'.format(td))
     yield td

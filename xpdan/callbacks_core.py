@@ -113,7 +113,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             print("INFO: {} has been saved at {}"
                   .format(fn, dir_path))
 
-        self.filenames.append(filename)
+        # self.filenames.append(filename)
 
     def _pull_dark_uid(self, doc, dark_field_key='sc_dk_field_uid'):
         """method to relate dark to images
@@ -145,9 +145,8 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             self._find_dark = False
         else:
             dark_header = self.db[dark_uid]
-            self.dark_img = np.asarray(self.db.get_images(dark_header,
-                                                          self.image_field)
-                                      ).squeeze()
+            self.dark_img = np.asarray(self.db.get_images(
+                dark_header, self.field)).squeeze()
             self._find_dark = True
         super().start(doc)
 
@@ -170,17 +169,19 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         for i, plane in enumerate(image):
             image = np.subtract(plane, self.dark_img)
             filename = self._generate_filename(doc, i)
-            self.filenames.append(filename)
             path_dir, fn = os.path.split(filename)
             if self._find_dark:
-                self._save_image(image, os.path.join(path_dir,
-                                                     'sub_'+fn))
+                self._save_image(image, os.path.join(path_dir, 'sub_' + fn))
+                self.filenames.append(os.path.join(path_dir, 'sub_' + fn))
+
             else:
                 self._save_image(image, filename)
+                self.filenames.append(filename)
             # if user wants raw dark
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
                                                              'dark_'+fn))
+
     def stop(self, doc):
         """method for stop document"""
         # TODO: include sum logic in the future

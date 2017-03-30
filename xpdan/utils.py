@@ -12,28 +12,16 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-import datetime
 import os
 from unittest.mock import MagicMock
 
 import numpy as np
 import yaml
+
 from bluesky import RunEngine
 from bluesky.examples import Reader, motor
 from bluesky.plans import scan, count
-
 from .glbl import an_glbl
-
-
-def _clean_info(input_str):
-    return input_str.strip().replace(' ', '_')
-
-
-def _timestampstr(timestamp):
-    """ convert timestamp to strftime formate """
-    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
-        '%Y%m%d-%H%M%S')
-    return timestring
 
 
 def start_xpdan():

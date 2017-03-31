@@ -255,6 +255,7 @@ def integrate_and_save(headers, *, db, save_dir,
     if not isinstance(path_append_keys, (list, tuple)):
         path_append_keys = [path_append_keys]
 
+    save_dir = os.path.expanduser(save_dir)
     for header in header_list:
         header_rv_list_Q, header_rv_list_2theta = [], []
         start = False
@@ -342,8 +343,8 @@ def integrate_and_save(headers, *, db, save_dir,
                 tiff_fn = f_name
                 w_name = os.path.join(path, tiff_fn)
                 if save_image:
-                    tif.imsave(w_name, img)
-                    if os.path.isfile(w_name):
+                    tif.imsave(w_name+'.tiff', img)
+                    if os.path.isfile(w_name+'.tiff'):
                         print('image "%s" has been saved at "%s"' %
                               (tiff_fn, path))
                     else:
@@ -466,6 +467,7 @@ def save_tiff(headers, *, db, save_dir,
     if not isinstance(path_append_keys, (list, tuple)):
         path_append_keys = [path_append_keys]
 
+    save_dir = os.path.expanduser(save_dir)
     for header in header_list:
         for name, doc in db.restream(header, fill=True):
             if name == 'start':
@@ -485,8 +487,8 @@ def save_tiff(headers, *, db, save_dir,
                     img -= dark_img
                 path = os.path.join(save_dir, f_name)
                 if not dryrun:
-                    tif.imsave(path, img)
-                    if os.path.isfile(path):
+                    tif.imsave(path+'.tiff', img)
+                    if os.path.isfile(path+'.tiff'):
                         print('image "%s" has been saved at "%s"' %
                               (f_name, path))
                     else:
@@ -500,8 +502,12 @@ def save_tiff(headers, *, db, save_dir,
                 # save run_start
                 stem, ext = os.path.splitext(path)
                 config_name = stem + '.yml'
-                with open(config_name, 'w') as f:
-                    yaml.dump(header.start, f)  # save all md in start
+                if not dryrun:
+                    with open(config_name, 'w') as f:
+                        yaml.dump(header.start, f)  # save all md in start
+                else:
+                    print('dryrun: config "%s" has been saved at "%s"' %
+                          (stem, path))
 
     print(" *** {} *** ".format('Saving process finished'))
 

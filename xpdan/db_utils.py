@@ -1,17 +1,27 @@
 from pprint import pprint
-from .utils import _timestampstr
+from .dev_utils import _timestampstr
 
 
-def need_name_here(hdrs, key, verbose=True):
-    """Build a dictionary where the keys are the unique values for the given
-    key and the values are the positions of the headers for that key
+def sort_scans_by_hdr_key(hdrs, key, verbose=True):
+    """In a list of hdrs, group the scans by header-key.
+
+        Use this function to find all the scans in the list of headers that 
+        have a particular key value, such as 'sample_name'='Ni'
+
+        Function returns a list of indices for the position in the list, 
+        associated with the metadata key values.
+
 
     Parameters
     ----------
     hdrs: list of Header objects
-        The headers to be searched
+        The dictionary containing {'key-value':[list of scan indices]}. 
+        For example a search over 'sample_name' might return 
+        {'Ni':[0,1,2,3,4,9,10],'gold nanoparticles':[5,6,7,8]}
+
     key: str
-        The key to be searched for
+        The scans will be sorted by the values of this metadata key, 
+        e.g., 'sample_name'
     verbose: bool, optional
         If true prints the results. Defaults to True
 
@@ -59,7 +69,7 @@ def scan_diff(hdrs, verbose=True):
     return kv
 
 
-def scan_headlines(hdrs, fields=None, verbose=True):
+def scan_summary(hdrs, fields=None, verbose=True):
     """Provide one line summaries of headers
 
     Parameters
@@ -79,7 +89,7 @@ def scan_headlines(hdrs, fields=None, verbose=True):
         List of summary strings
     """
     if fields is None:
-        fields = ['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']
+        fields = ['sample_name', 'sp_type', 'sp_startingT', 'sp_endingT']
     fields = fields
     datas = []
     for i, hdr in enumerate(hdrs):

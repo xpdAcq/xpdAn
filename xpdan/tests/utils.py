@@ -19,6 +19,28 @@ from uuid import uuid4
 
 import numpy as np
 
+pyFAI_calib = {'calibration_collection_uid': 'uuid1234',
+               'centerX': 1019.8886820814655,
+               'centerY': 1026.5636273165978,
+               'detector': 'Perkin detector',
+               'directDist': 208.36071181911709,
+               'dist': 0.208359323484,
+               'file_name': 'pyFAI_calib_Ni_20160813-1659.poni',
+               'pixel1': 0.0002,
+               'pixel2': 0.0002,
+               'pixelX': 200.0,
+               'pixelY': 200.0,
+               'poni1': 0.204863292224,
+               'poni2': 0.203364094157,
+               'rot1': -0.00294510691846,
+               'rot2': 0.00215699775598,
+               'rot3': -8.04331174483e-08,
+               'splineFile': None,
+               'tilt': 0.20915926627927123,
+               'tiltPlanRotation': 36.219147551081498,
+               'time': '20160813-1815',
+               'wavelength': 1.8333e-11}
+
 
 def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
                 **kwargs):
@@ -41,13 +63,15 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
     # Insert the dark images
     dark_img = np.ones(shape)
     dark_uid = str(uuid4())
-    run_start = mds.insert_run_start(uid=str(uuid4()), time=time.time(),
-                                     name='test-dark', dark_uid=dark_uid,
+    run_start = mds.insert_run_start(uid=dark_uid, time=time.time(),
+                                     name='test-dark',
                                      beamtime_uid=beamtime_uid,
-                                     is_dark_img=True, **kwargs)
+                                     sample_name='hi',
+                                     calibration_md=pyFAI_calib,
+                                     **kwargs)
     data_keys = {
-        'img': dict(source='testing', external='FILESTORE:',
-                    dtype='array')}
+        'pe1_image': dict(source='testing', external='FILESTORE:',
+                          dtype='array')}
     data_hdr = dict(run_start=run_start,
                     data_keys=data_keys,
                     time=time.time(), uid=str(uuid4()))
@@ -63,7 +87,7 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
             descriptor=descriptor,
             uid=str(uuid4()),
             time=time.time(),
-            data={'img': fs_uid},
+            data={'pe1_image': fs_uid},
             timestamps={},
             seq_num=i)
     mds.insert_run_stop(run_start=run_start,
@@ -72,8 +96,10 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
 
     imgs = [np.ones(shape)] * n
     run_start = mds.insert_run_start(uid=str(uuid4()), time=time.time(),
-                                     name='test', dark_uid=dark_uid,
+                                     name='test', sc_dk_field_uid=dark_uid,
                                      beamtime_uid=beamtime_uid,
+                                     sample_name='hi',
+                                     calibration_md=pyFAI_calib,
                                      **kwargs)
     data_keys = {
         'pe1_image': dict(source='testing', external='FILESTORE:',

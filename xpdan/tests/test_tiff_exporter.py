@@ -61,11 +61,13 @@ def test_tiff_export(exp_db, tif_exporter_template, img_size,
         # Need to fix the schema first
         # assert np.all(img == 1)
 
-    for fn in tif_export.filenames:
+    for in_img, fn in zip(exp_db.get_images(exp_db[-1], 'pe1_image'),
+                          tif_export.filenames):
         img = imread(fn)
         assert img.shape == img_size
         # logic defined in insert_img. after successful dark_sub array==0
-        assert_array_equal(img, np.subtract(img, tif_export.dark_img))
+        print(kwargs)
+        assert_array_equal(img, np.subtract(in_img, tif_export.dark_img))
         # TODO: update this logic when we are ready for db integrated
 
     if known_fail_bool and not a:

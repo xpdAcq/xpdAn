@@ -1,10 +1,10 @@
 from xpdan.db_utils import *
 
 
-def test_need_name_here(exp_db):
+def test_sort_scans_by_hdr_key(exp_db):
     hdrs = exp_db()
     print(hdrs[0].start)
-    d = need_name_here(hdrs, 'pi_name')
+    d = sort_scans_by_hdr_key(hdrs, 'pi_name')
     print(d)
     assert len(d) == 2
     assert 'tim' in d.keys()
@@ -20,8 +20,8 @@ def test_scan_diff(exp_db):
     return
 
 
-def test_scan_headlines(exp_db):
+def test_scan_summary(exp_db):
     hdrs = exp_db()
-    d = scan_headlines(hdrs)
+    d = scan_summary(hdrs)
     assert len(d) != 0
 

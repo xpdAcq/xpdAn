@@ -71,6 +71,8 @@ def scan_diff(hdrs, verbose=True, blacklist=None):
                 if k not in blacklist])
     kv = {}
     for k in keys:
+        # TODO: eventually support dict differences
+        # See http://stackoverflow.com/a/11092607/5100330
         v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys() if
              isinstance(hdr.start[k], collections.Hashable)]
         if len(set(v)) != 1:

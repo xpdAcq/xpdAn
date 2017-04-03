@@ -1,5 +1,6 @@
 from pprint import pprint
 from .dev_utils import _timestampstr
+import collections
 
 
 def sort_scans_by_hdr_key(hdrs, key, verbose=True):
@@ -70,9 +71,10 @@ def scan_diff(hdrs, verbose=True, blacklist=None):
                 if k not in blacklist])
     kv = {}
     for k in keys:
-        v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys()]
+        v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys() if
+             isinstance(hdr.start[k], collections.Hashable)]
         if len(set(v)) != 1:
-           kv[k] = v
+            kv[k] = v
     if verbose:
         pprint(kv)
     return kv
@@ -104,7 +106,8 @@ def scan_summary(hdrs, fields=None, verbose=True):
     datas = []
     for i, hdr in enumerate(hdrs):
         data = [hdr.start[key] for key in fields if key in hdr.start.keys()]
-        data2 = {key: hdr.start[key] for key in fields if key in hdr.start.keys()}
+        data2 = {key: hdr.start[key] for key in fields if
+                 key in hdr.start.keys()}
 
         data2['time'] = _timestampstr(hdr.start['time'])
         data = [_timestampstr(hdr.start['time'])] + data

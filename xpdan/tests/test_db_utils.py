@@ -17,6 +17,7 @@ def test_scan_diff(exp_db):
     d = scan_diff(hdrs)
     print(d)
     assert 'pi_name' in d
+    assert 'uid' not in d
     return
 
 

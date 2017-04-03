@@ -28,7 +28,10 @@ def sort_scans_by_hdr_key(hdrs, key, verbose=True):
     Returns
     -------
     dict:
-        The dictionary of unique values and positions
+        The dictionary containing {'key-value':[list of scan indices]}. 
+        For example a search over 'sample_name' might return 
+        {'Ni':[0,1,2,3,4,9,10],'gold nanoparticles':[5,6,7,8]}
+
     """
     d = {}
     for i, hdr in enumerate(hdrs):
@@ -42,8 +45,8 @@ def sort_scans_by_hdr_key(hdrs, key, verbose=True):
     return d
 
 
-def scan_diff(hdrs, verbose=True):
-    """Get the metadata differences between scans
+def scan_diff(hdrs, verbose=True, blacklist=None):
+    """Get the metadata differences between scans in hdrs list
 
     Parameters
     ----------
@@ -51,14 +54,20 @@ def scan_diff(hdrs, verbose=True):
         The headers to be diffed
     verbose: bool, optional
         If true prints the results. Defaults to True
+    blacklist: list of str, optional
+        List of keys to not be included in diff. If None, defaults to `uid`
 
     Returns
     -------
     dict:
-        The dictionary of keys with different values across the scans.
+        The dictionary of keys with at least one different value across the 
+        scans.
         The values are the results for each header.
     """
-    keys = set([k for hdr in hdrs for k in hdr.start.keys()])
+    if blacklist is None:
+        blacklist = ['uid']
+    keys = set([k for hdr in hdrs for k in hdr.start.keys()
+                if k not in blacklist])
     kv = {}
     for k in keys:
         v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys()]
@@ -77,8 +86,9 @@ def scan_summary(hdrs, fields=None, verbose=True):
     hdrs: list of headers
         The headers from the databroker
     fields: list of str, optional
-        The fields to be included in the summary, if None use
-        `['sample_name', 'temperature', 'diff_x', 'diff_y', 'eurotherm']`
+        'Specify a list of fields to summarize. If None, the following 
+        will be returned'
+        `['sample_name', 'sp_type', 'sp_startingT', 'sp_endingT']`
         defaults to None
     verbose: bool, optional
         If True print the summary

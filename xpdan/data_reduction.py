@@ -101,11 +101,11 @@ class DataReduction:
             return None, header.start.time
         else:
             dark_search = {'group': 'XPD', 'uid': dark_uid}
-            dark_header = self.exp_db(**dark_search)
+            dark_header = next(iter(self.exp_db(**dark_search)))
             dark_img = np.asarray(self.exp_db.get_images(dark_header,
                                                          self.image_field)
                                   ).squeeze()
-        return dark_img, dark_header[0].start.time
+        return dark_img, dark_header.start.time
 
     def _dark_sub(self, event, dark_img):
         """ priviate method operates on event level """

@@ -2,15 +2,9 @@ language: python
 sudo: false
 env:
   global:
-    BUILD_DOCS_BRANCH: master
-    DOCS_SUBDIR: doc/
-    TARGET_DEV_SUBDIR: bluesky/
-    HTML_SUBDIR: build/html
-    DOCS_CONDA_DEPS: "bluesky"
-    DOCS_PIP_DEPS: "tqdm"
+    secure: "c4TpUlz4tasCncCPBJQnrA5CV1MOyRcdwoVW0bXU2tKkTY+3HubKkhv8JaaaOlSUWUwK1udJgadH6yowQskZTBgbUt35jxznyICzKKvxT+Bto7w9OLJlDSG4dLxD2yg6OygQ09+34b3fxe09SEJFfLVU3ktJ2PWzr2K/iWTpkW6CICtRbJiTNRRNqKcuOMQZkWZEpqO/q35m+DVyDI6QWplZIbyAj0p9vecPVmbYT7oROCBrSGte0Dd4tksEiEtxUe6/AZFxeAZqyyrI/8l5uGNk73KnntA7U53VNnO792jEuZ3eQpNHZpdgFRpocRbdBMZFToqH6GLYmD5iu7v93zV47WfKbIm2ods8PbVPOQOn1zMmVNpoCRfBUJYhZkLVPWGeJEM46wMRyLQw2uHFe2CIaHCmMQyueCpujGfvpxKfFkK2AZoQoiaRDs6O9vQSGfz3UdBSNmovws3waf+Mc2D/7vRGFBhqcicDJohPNaTOraCi0rEs+ioOpzD9z2QPfEdwwVcmMIx7CeNL83c4d13sEUJxVlj+SjsyUc2JEkYOWJrd7z6vnw8F875oaKMlFXTDcbPupeCZjjzn8VtRrXJ41ckvOWNJ6Cm78nXX5DbckPwDrQA2bMBBj3cs51yZt0J775qJoGCiPrmaHngeeKLEF11WxLV3fRy7tMLc5fs="
   matrix:
     - CUTTING_EDGE=true
-
 
 cache:
   directories:
@@ -66,9 +60,16 @@ install:
   - pip install codecov pytest-env
 
 script:
+  - set -e
   - coverage run run_tests.py
   - coverage report -m
+  - flake8 xpdan
+  - conda install --yes sphinx sphinx_rtd_theme
+  - pip install git+git://github.com/drdoctr/doctr.git
+  - cd docs
+  - make html
+  - cd ..
+  - doctr deploy . --built-docs ./docs/_build/html;
 
 after_success:
-  - flake8 xpdan
   - codecov

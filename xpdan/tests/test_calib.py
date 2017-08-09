@@ -10,6 +10,7 @@ from pathlib import Path
 
 from pyFAI.calibration import Calibration
 from pyFAI.geometry import Geometry
+from xpdan.calib import _configure_calib_instance
 
 from pkg_resources import resource_filename as rs_fn
 #rs_dir = rs_fn('xpdan', '/')

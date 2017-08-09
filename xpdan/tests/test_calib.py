@@ -15,7 +15,7 @@ from pkg_resources import resource_filename as rs_fn
 #rs_dir = rs_fn('xpdan', '/')
 #pytest_dir = rs_fn('xpdan', 'tests/')
 
-def test_configure_calib(self):
+def test_configure_calib():
     c = _configure_calib_instance(None, None, wavelength=1234)
     # calibrant is None, which default to Ni
     assert c.calibrant.__repr__().split(' ')[0] == 'Ni'  # no magic

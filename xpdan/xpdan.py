@@ -26,7 +26,8 @@ from .glbl import an_glbl
 
 
 def _get_current_saf():
-    bt_list = [f for f in os.listdir(an_glbl['yaml_dir']) if f.startswith('bt_')]
+    bt_list = [f for f in os.listdir(an_glbl['yaml_dir']) if
+               f.startswith('bt_')]
     if len(bt_list) != 1:
         raise RuntimeError("There are more than one beamtime objects in"
                            "{}. Please either gives specific saf or"

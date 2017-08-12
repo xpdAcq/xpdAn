@@ -36,7 +36,7 @@ def start_xpdan():
     bt_fn = os.path.join(an_glbl['config_base'], 'bt_bt.yml')
     if os.path.isfile(bt_fn):
         with open(bt_fn, 'r') as f:
-            an = yaml.load(f)
+            yaml.load(f)
     else:
         print("INFO: have you started a beamtime yet?")
         print("Please contact beamline scientist for help")

@@ -90,14 +90,16 @@ def test_integrate_smoke(exp_db, fast_tmp_dir, disk_mask, kwargs,
         pytest.xfail('Bad params')
     if kwargs.get('dryrun'):
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(
+                old_times) == set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
     else:
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
+                old_times) != set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
@@ -114,11 +116,13 @@ def test_save_tiff_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
         pytest.xfail('Bad params')
     if kwargs.get('dryrun'):
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and
+            set(old_times) == set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
     else:
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
+                old_times) != set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))

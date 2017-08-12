@@ -12,14 +12,14 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-from itertools import tee, product
+import os
+from itertools import product
 from pprint import pprint
 
 import numpy as np
 import pytest
-import os
 
-from xpdan.data_reduction_core import integrate_and_save, sum_images, \
+from xpdan.data_reduction_core import integrate_and_save, \
     integrate_and_save_last, save_tiff, save_last_tiff
 
 sum_idx_values = (
@@ -30,7 +30,7 @@ integrate_params = ['dark_sub_bool',
                     'mask_setting',
                     'mask_dict',
                     'save_image',
-                    'config_dict',]
+                    'config_dict', ]
 good_kwargs = [(True, False), (.99,
                                # .95, .5
                                ),
@@ -88,20 +88,23 @@ def test_integrate_core_smoke(exp_db, disk_mask, fast_tmp_dir, kwargs,
         kwargs['mask_setting'] = np.random.random_integers(
             0, 1, disk_mask[-1].shape).astype(bool)
     pprint(kwargs)
-    a = integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir, **kwargs)
+    a = integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir,
+                           **kwargs)
     b = integrate_and_save_last(db=exp_db, save_dir=fast_tmp_dir, **kwargs)
     if known_fail_bool and not a and not b:
         pytest.xfail('Bad params')
     if kwargs.get('dryrun'):
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(
+                old_times) == set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
     else:
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
+                old_times) != set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), save_tiff_kwargs)
@@ -116,15 +119,16 @@ def test_save_tiff_core_smoke(exp_db, fast_tmp_dir, kwargs, known_fail_bool):
         pytest.xfail('Bad params')
     if kwargs.get('dryrun'):
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) and set(old_times) == set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+            set(old_files) != set(os.listdir(fast_tmp_dir)) and
+            set(old_times) == set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
     else:
         assert (
-            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
-
+            set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
+                old_times) != set(
+                [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+                 os.listdir(fast_tmp_dir)]))
 
 # @pytest.mark.parametrize("idxs", sum_idx_values)
 # def test_sum_logic_smoke(exp_db, idxs):

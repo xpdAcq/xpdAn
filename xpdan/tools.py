@@ -43,7 +43,6 @@ except ImportError:
         mask[edge_size:-edge_size, edge_size:-edge_size] = 0.
         return ~mask
 
-
     def binned_outlier(img, r, alpha, bins, mask=None):
         """ Generates a mask by identifying outlier pixels.
 
@@ -59,8 +58,9 @@ except ImportError:
             This is usually given by pyFAI.geometry.Geometry.rArray
         alpha: float or tuple or, 1darray
             The number of acceptable standard deviations.
-            If tuple then we use a linear distribution of alphas from alpha[0] to
-            alpha[1], if array then we use that as the distribution of alphas
+            If tuple then we use a linear distribution of alphas from alpha[0]
+            to alpha[1], if array then we use that as the distribution of
+            alphas
         bins: list
             The bin edges
         mask: 1darray

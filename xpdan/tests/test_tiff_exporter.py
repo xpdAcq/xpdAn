@@ -14,13 +14,14 @@
 ##############################################################################
 
 import os
-import tempfile
-import pytest
 from itertools import product
-from tifffile import imread
-from xpdan.callbacks_core import XpdAcqLiveTiffExporter
+
 import numpy as np
+import pytest
 from numpy.testing import assert_array_equal
+from tifffile import imread
+
+from xpdan.callbacks_core import XpdAcqLiveTiffExporter
 
 # standard config
 data_fields = ['temperature', 'diff_x', 'diff_y', 'eurotherm']  # known devices
@@ -54,7 +55,7 @@ def test_tiff_export(exp_db, tif_exporter_template, img_size,
     # confirm image is the same as input
     dark_fn = [fn for fn in tif_export.filenames if
                fn.startswith('dark')]
-    light_fn = list(set(tif_export.filenames) - set(dark_fn))
+    # light_fn = list(set(tif_export.filenames) - set(dark_fn))
     for fn in dark_fn:
         img = imread(fn)
         assert img.shape == img_size

@@ -15,18 +15,17 @@
 import os
 import shutil
 import sys
+import tempfile
 
 import numpy as np
 import pytest
-import tempfile
 
+from xpdan.fuzzybroker import FuzzyBroker
 # from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs
-from xpdan.fuzzybroker import FuzzyBroker
-import tempfile
 
 if sys.version_info >= (3, 0):
     pass

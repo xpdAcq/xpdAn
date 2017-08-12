@@ -68,7 +68,7 @@ def get_metadata(headers):
         header_list = headers
     md_df_list = []
     for h in header_list:
-        md_df_list.append(pd.DataFrame.from_dict(h.start, 'index'))
+        md_df_list.append(pd.DataFrame.from_dict(h['start'], 'index'))
     return md_df_list
 
 

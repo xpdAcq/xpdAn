@@ -34,11 +34,11 @@ def sort_scans_by_hdr_key(hdrs, key, verbose=True):
     """
     d = {}
     for i, hdr in enumerate(hdrs):
-        if key in hdr.start.keys():
-            if hdr.start[key] in d.keys():
-                d[hdr.start[key]].append(i)
+        if key in hdr['start'].keys():
+            if hdr['start'][key] in d.keys():
+                d[hdr['start'][key]].append(i)
             else:
-                d[hdr.start[key]] = [i]
+                d[hdr['start'][key]] = [i]
     if verbose:
         pprint(d)
     return d
@@ -64,14 +64,14 @@ def scan_diff(hdrs, verbose=True, blacklist=None):
     """
     if blacklist is None:
         blacklist = ['uid']
-    keys = set([k for hdr in hdrs for k in hdr.start.keys()
+    keys = set([k for hdr in hdrs for k in hdr['start'].keys()
                 if k not in blacklist])
     kv = {}
     for k in keys:
         # TODO: eventually support dict differences
         # See http://stackoverflow.com/a/11092607/5100330
-        v = [hdr.start[k] for hdr in hdrs if k in hdr.start.keys() if
-             isinstance(hdr.start[k], collections.Hashable)]
+        v = [hdr['start'][k] for hdr in hdrs if k in hdr['start'].keys() if
+             isinstance(hdr['start'][k], collections.Hashable)]
         if len(set(v)) != 1:
             kv[k] = v
     if verbose:
@@ -104,15 +104,15 @@ def scan_summary(hdrs, fields=None, verbose=True):
     fields = fields
     datas = []
     for i, hdr in enumerate(hdrs):
-        data = [hdr.start[key] for key in fields if key in hdr.start.keys()]
-        data2 = {key: hdr.start[key] for key in fields if
-                 key in hdr.start.keys()}
+        data = [hdr['start'][key] for key in fields if key in hdr['start'].keys()]
+        data2 = {key: hdr['start'][key] for key in fields if
+                 key in hdr['start'].keys()}
 
-        data2['time'] = _timestampstr(hdr.start['time'])
-        data = [_timestampstr(hdr.start['time'])] + data
+        data2['time'] = _timestampstr(hdr['start']['time'])
+        data = [_timestampstr(hdr['start']['time'])] + data
 
-        data2['uid'] = hdr.start['uid'][:6]
-        data += [hdr.start['uid'][:6]]
+        data2['uid'] = hdr['start']['uid'][:6]
+        data += [hdr['start']['uid'][:6]]
 
         data = [str(d) for d in data]
         data = '_'.join(data)

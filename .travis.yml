@@ -54,10 +54,12 @@ install:
   - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c conda-forge -c lightsource2 -c soft-matter
   - source activate testenv
   - if [[ "${CUTTING_EDGE}" == true ]]; then
-    conda remove metadatastore databroker filestore bluesky --yes;
-    pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model;
-    pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
-    pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
+      conda remove metadatastore databroker filestore bluesky --yes;
+      pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model;
+      pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
+      pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
+    else
+      python -c "from filestore import utils, conf; utils.install_sentinels(conf.connection_config, 1)"
     fi
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
 #  - python setup.py install
@@ -65,7 +67,6 @@ install:
   # Need to clean the python build directory (and other cruft) or pytest is
   # going to find the build directory and get confused why there are two sets
   # of every test file
-  - python -c "from filestore import utils, conf; utils.install_sentinels(conf.connection_config, 1)"
   # make sure the sqlite file exists to avoid race conditions
   - python -c "from bluesky.utils import get_history; get_history()"
   - pip install codecov pytest-env python-coveralls

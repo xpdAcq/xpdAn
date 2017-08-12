@@ -45,7 +45,7 @@ def _mask_logic(header, mask_setting, ai=None, mask_dict=None, root_dir=None,
 
     # default to the mask in the header
     elif mask_setting == 'default':
-        mask_md = header.start.get('mask', None)
+        mask_md = header['start'].get('mask', None)
         if mask_md is None:
             print(
                 "INFO: no mask associated or mask information was"
@@ -88,7 +88,7 @@ def _feature_gen(event, labels=None, fields=None, data_fields=None):
     if labels is None:
         labels = ['dark_frame']
     feature_list = []
-    run_start = event.descriptor['run_start']
+    run_start = event['descriptor']['run_start']
     uid = run_start['uid'][:6]
     # get special label
     for el in labels:
@@ -149,10 +149,10 @@ def _load_config(header, config_base='', calib_config_name=''):
         with open(os.path.join(config_base, calib_config_name)) as f:
             config_dict = yaml.load(f)
     except FileNotFoundError:
-        config_dict = header.start.get('calibration_md', None)
+        config_dict = header['start'].get('calibration_md', None)
         if config_dict is None:
             # back support
-            config_dict = header.start.get('sc_calibration_md', None)
+            config_dict = header['start'].get('sc_calibration_md', None)
 
     return config_dict
 
@@ -358,7 +358,7 @@ def integrate_and_save(headers, *, db, save_dir,
                 stem, ext = os.path.splitext(f_name)
                 config_name = f_name.replace(ext, '.yml')
                 with open(config_name, 'w') as f:
-                    yaml.dump(header.start, f)  # save all md in start
+                    yaml.dump(header['start'], f)  # save all md in start
 
         # each header generate  a list of rv
         total_rv_list_Q.append(header_rv_list_Q)
@@ -507,7 +507,7 @@ def save_tiff(headers, *, db, save_dir,
                 config_name = stem + '.yml'
                 if not dryrun:
                     with open(config_name, 'w') as f:
-                        yaml.dump(header.start, f)  # save all md in start
+                        yaml.dump(header['start'], f)  # save all md in start
                 else:
                     print('dryrun: config "%s" has been saved at "%s"' %
                           (stem, path))

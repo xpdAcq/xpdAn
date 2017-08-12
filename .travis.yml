@@ -8,6 +8,9 @@ env:
     HTML_SUBDIR: build/html
     DOCS_CONDA_DEPS: "bluesky"
     DOCS_PIP_DEPS: "tqdm"
+  matrix:
+    - CUTTING_EDGE=true
+    - CUTTING_EDGE=false
 
 cache:
   directories:
@@ -48,16 +51,18 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c lightsource2 -c conda-forge -c soft-matter
+  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c conda-forge -c lightsource2 -c soft-matter
   - source activate testenv
-#  - 'pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model'
-#  - conda remove metadatastore databroker filestore --yes
-#  - 'pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker'
-#  - 'pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore'
-#  - 'pip install https://github.com/NSLS-II/metadatastore/zipball/master#egg=metadatastore'
-#  - 'pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds'
-#  - 'pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs'
-#  - 'pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky'
+  - if [[ "${CUTTING_EDGE}" == true ]]; then
+    conda remove metadatastore databroker filestore bluesky --yes
+    'pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model'
+    'pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker'
+    'pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore'
+    'pip install https://github.com/NSLS-II/metadatastore/zipball/master#egg=metadatastore'
+    'pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds'
+    'pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs'
+    'pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky'
+    fi
   - python setup.py install
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
   # Need to clean the python build directory (and other cruft) or pytest is

@@ -30,8 +30,9 @@ def _mask_logic(header, mask_setting, ai=None, mask_dict=None, root_dir=None,
                 f_name=None, img=None):
     mask = None
     # If we are handed a mask array use it
-    if (isinstance(mask_setting, np.ndarray) and
-                mask_setting.dtype == np.bool):
+    if (isinstance(
+            mask_setting, np.ndarray) and
+            mask_setting.dtype == np.bool):
         mask = mask_setting
 
     # if we are handed a filename/path load it
@@ -188,10 +189,10 @@ def integrate_and_save(headers, *, db, save_dir,
     headers : list
         a list of databroker.header objects
     db: databroker.broker.Broker instance
-        The databroker holding the data, this must be specified as a `db=` in 
+        The databroker holding the data, this must be specified as a `db=` in
         the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data, this must be specified as a 
+        The folder in which to save the data, this must be specified as a
         `save_dir=` in the function call (keyword only argument)
     path_append_keys: str or list of str, optional
         The keys of data to be appended to the path, defaults to 'sample_name'
@@ -201,7 +202,7 @@ def integrate_and_save(headers, *, db, save_dir,
         polarization correction factor, ranged from -1(vertical) to +1
         (horizontal). default is 0.99. set to None for no
         correction.
-    mask_setting : str, ndarray optional
+    mask_setting : {str, ndarray} optional
         string for mask option. Valid options are 'default', 'auto' and
         'None'. If 'default', mask included in metadata will be
         used. If 'auto', a new mask would be generated from current
@@ -334,9 +335,11 @@ def integrate_and_save(headers, *, db, save_dir,
                     else:
                         _mask = None
 
-                    rv = ai.integrate1d(img, npt, filename=fn, mask=_mask,
-                                        polarization_factor=polarization_factor,
-                                        unit=unit, **kwargs)
+                    rv = ai.integrate1d(
+                        img, npt,
+                        filename=fn, mask=_mask,
+                        polarization_factor=polarization_factor,
+                        unit=unit, **kwargs)
                     l.append(rv)
 
                 # save image logic
@@ -371,10 +374,10 @@ def integrate_and_save_last(**kwargs):
     Parameters
     ----------
     db: databroker.broker.Broker instance
-        The databroker holding the data, this must be specified as a `db=` in 
+        The databroker holding the data, this must be specified as a `db=` in
         the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data, this must be specified as a 
+        The folder in which to save the data, this must be specified as a
         `save_dir=` in the function call (keyword only argument)
     path_append_keys: str or list of str, optional
         The keys of data to be appended to the path, defaults to 'sample_name'
@@ -445,10 +448,10 @@ def save_tiff(headers, *, db, save_dir,
     headers : list
         a list of header objects obtained from a query to dataBroker.
     db: databroker.broker.Broker instance
-        The databroker holding the data, this must be specified as a `db=` in 
+        The databroker holding the data, this must be specified as a `db=` in
         the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data, this must be specified as a 
+        The folder in which to save the data, this must be specified as a
         `save_dir=` in the function call (keyword only argument)
     path_append_keys: str or list of str, optional
         The keys of data to be appended to the path, defaults to 'sample_name'
@@ -518,10 +521,10 @@ def save_last_tiff(**kwargs):
     Parameters
     ----------
     db: databroker.broker.Broker instance
-        The databroker holding the data, this must be specified as a `db=` in 
+        The databroker holding the data, this must be specified as a `db=` in
         the function call (keyword only argument)
     save_dir: str
-        The folder in which to save the data, this must be specified as a 
+        The folder in which to save the data, this must be specified as a
         `save_dir=` in the function call (keyword only argument)
     dark_sub_bool : bool, optional
         Default is True, which allows dark/background subtraction to
@@ -556,11 +559,24 @@ def sum_images(event_stream, idxs_list=None):
     event_stream:
         The event stream, with the images (in the first position) summed
 
+    Examples
+    ---------
+    Returns one image which is the sum of all the images in hdr
+
     >>> from databroker import db
     >>> hdr = db[-1]
-    >>> total_imgs = sum_images(hdr) # returns one image which is the sum of all the images in hdr
-    >>> total_imgs = sum_images(hdr, [1, 2, 3]) # returns one image that is the sum of the images in image-events (an event that contains an image) 1, 2 and 3 in hdr
-    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)]) # returns two images, the first is the sum of the images in image-events 1,2 and 3, the second is the sum of the images in all the image-events from 5 to 10.
+    >>> total_imgs = sum_images(hdr)
+
+    Returns one image that is the sum of the images in image-events
+    (an event that contains an image) 1, 2 and 3 in hdr
+
+    >>> total_imgs = sum_images(hdr, [1, 2, 3])
+
+    Returns two images, the first is the sum of the images in image-events
+    1, 2 and 3, the second is the sum of the images in all the image-events
+    from 5 to 10.
+
+    >>> total_imgs = sum_images(hdr, [[1, 2, 3], (5,10)])
     """
     if idxs_list is None:
         yield from event_stream

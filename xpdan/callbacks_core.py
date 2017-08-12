@@ -7,6 +7,7 @@ from bluesky.callbacks.core import CallbackBase
 import doct
 import tifffile
 
+
 # supplementary functions
 def _timestampstr(timestamp):
     """convert timestamp to strftime formate"""
@@ -16,7 +17,6 @@ def _timestampstr(timestamp):
 
 
 class XpdAcqLiveTiffExporter(CallbackBase):
-
     """Exporting tiff from given header(s).
 
     It is a variation of bluesky.callback.broker.LiveTiffExporter class
@@ -52,8 +52,10 @@ class XpdAcqLiveTiffExporter(CallbackBase):
     """
 
     def __init__(self, field, data_dir_template,
-                 data_fields=[], save_dark=False,
+                 data_fields=None, save_dark=False,
                  dryrun=False, overwrite=False, db=None):
+        if data_fields is None:
+            data_fields = []
         if db is None:
             # Read-only db
             from databroker.databroker import DataBroker as db
@@ -63,9 +65,9 @@ class XpdAcqLiveTiffExporter(CallbackBase):
         # required args
         self.field = field
         self.data_dir_template = data_dir_template
-        # optioanal args 
+        # optioanal args
         self.data_fields = data_fields  # list of keys for md to include
-        self.save_dark = save_dark  # option of save dark 
+        self.save_dark = save_dark  # option of save dark
         self.dryrun = dryrun
         self.overwrite = overwrite
         self.filenames = []
@@ -88,7 +90,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
 
         # event sequence
         base_dir = self.data_dir_template.format(start=self._start,
-                                                     event=doc)
+                                                 event=doc)
         # standard, do need to expose it to user
         event_template = '{event.seq_num:03d}_{i}.tif'
         event_info = event_template.format(i=stack_ind, start=self._start,
@@ -113,7 +115,7 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             print("INFO: {} has been saved at {}"
                   .format(fn, dir_path))
 
-        # self.filenames.append(filename)
+            # self.filenames.append(filename)
 
     def _pull_dark_uid(self, doc, dark_field_key='sc_dk_field_uid'):
         """method to relate dark to images
@@ -180,11 +182,10 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             # if user wants raw dark
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
-                                                             'dark_'+fn))
+                                                             'dark_' + fn))
 
     def stop(self, doc):
         """method for stop document"""
         # TODO: include sum logic in the future
         self._start = None
         super().stop(doc)
-

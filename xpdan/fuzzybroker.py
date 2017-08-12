@@ -13,14 +13,15 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+from heapq import heapify, heappushpop
+from pprint import pprint
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
-from databroker.broker import _munge_time
-from pprint import pprint
+
 import pytz
-from heapq import heapify, heappushpop
-import warnings
+
 from databroker.broker import Broker
+from databroker.broker import _munge_time
 
 
 class FuzzyBroker(Broker):
@@ -93,7 +94,8 @@ class FuzzyBroker(Broker):
         heapify(heap)
         for h in self():
             internal_scores = [1. - ndld(v, search_string) for v in
-                               _nested_dict_values(h['start']) if v is not None]
+                               _nested_dict_values(h['start'])
+                               if v is not None]
             heappushpop(heap,
                         (max(internal_scores), h['start']['time'] * -1, h))
         heap.sort()

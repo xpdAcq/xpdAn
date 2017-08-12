@@ -24,8 +24,9 @@ from xpdan.fuzzybroker import FuzzyBroker
 # from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
-from xpdan.simulation import build_pymongo_backed_broker
 from xpdan.tests.utils import insert_imgs
+from filestore.handlers import NpyHandler
+from databroker.tests.utils import build_pymongo_backed_broker
 
 if sys.version_info >= (3, 0):
     pass
@@ -80,6 +81,7 @@ def exp_db(db, tmp_dir, img_size):
     db2 = db
     mds = db2.mds
     fs = db2.fs
+    fs.register_handler('npy', NpyHandler)
     insert_imgs(mds, fs, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
     insert_imgs(mds, fs, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
     insert_imgs(mds, fs, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)

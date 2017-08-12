@@ -63,8 +63,9 @@ install:
     pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs;
     pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
     fi
-  - python setup.py install
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
+#  - python setup.py install
+  - pip install -ve .
   # Need to clean the python build directory (and other cruft) or pytest is
   # going to find the build directory and get confused why there are two sets
   # of every test file
@@ -72,7 +73,7 @@ install:
   # make sure the sqlite file exists to avoid race conditions
   - python -c "from bluesky.utils import get_history; get_history()"
   - pip install codecov pytest-env python-coveralls
-  - git clean -xfd
+#  - git clean -xfd
 
 script:
   - coverage run run_tests.py

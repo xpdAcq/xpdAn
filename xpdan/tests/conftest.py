@@ -26,7 +26,10 @@ from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.tests.utils import insert_imgs
 from filestore.handlers import NpyHandler
-from databroker.tests.utils import build_pymongo_backed_broker
+try:
+    from databroker.tests.utils import build_pymongo_backed_broker
+except ImportError:
+    from xpdan.simulation import build_pymongo_backed_broker
 
 if sys.version_info >= (3, 0):
     pass

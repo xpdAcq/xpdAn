@@ -25,7 +25,10 @@ from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.tests.utils import insert_imgs
-from filestore.handlers import NpyHandler
+try:
+    from filestore.handlers import NpyHandler
+except ImportError:
+    from databroker.assets.handlers import NpyHandler
 try:
     from databroker.tests.utils import build_pymongo_backed_broker
 except ImportError:

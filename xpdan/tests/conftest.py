@@ -25,14 +25,29 @@ from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.tests.utils import insert_imgs
+
 try:
     from filestore.handlers import NpyHandler
 except ImportError:
     from databroker.assets.handlers import NpyHandler
+
 try:
-    from databroker.tests.utils import build_pymongo_backed_broker
+    from databroker.tests.conftest import db
 except ImportError:
     from xpdan.simulation import build_pymongo_backed_broker
+
+
+    @pytest.fixture(params=[
+        # 'sqlite',
+        'mongo'], scope='module')
+    def db(request):
+        print('Making DB')
+        param_map = {
+            # 'sqlite': build_sqlite_backed_broker,
+            'mongo': build_pymongo_backed_broker}
+        rv = param_map[request.param](request)
+        yield rv
+        clean_database(rv)
 
 if sys.version_info >= (3, 0):
     pass
@@ -57,19 +72,6 @@ def mk_glbl(exp_db):
     if os.path.exists(a['base_dir']):
         print('removing {}'.format(a['base_dir']))
         shutil.rmtree(a['base_dir'])
-
-
-@pytest.fixture(params=[
-    # 'sqlite',
-    'mongo'], scope='module')
-def db(request):
-    print('Making DB')
-    param_map = {
-        # 'sqlite': build_sqlite_backed_broker,
-        'mongo': build_pymongo_backed_broker}
-    rv = param_map[request.param](request)
-    yield rv
-    clean_database(rv)
 
 
 @pytest.fixture(scope='module')

@@ -6,22 +6,21 @@ import collections
 def sort_scans_by_hdr_key(hdrs, key, verbose=True):
     """In a list of hdrs, group the scans by header-key.
 
-        Use this function to find all the scans in the list of headers that 
-        have a particular key value, such as 'sample_name'='Ni'
+    Use this function to find all the scans in the list of headers that
+    have a particular key value, such as 'sample_name'='Ni'
 
-        Function returns a list of indices for the position in the list, 
-        associated with the metadata key values.
+    Function returns a list of indices for the position in the list,
+    associated with the metadata key values.
 
 
     Parameters
     ----------
     hdrs: list of Header objects
-        The dictionary containing {'key-value':[list of scan indices]}. 
-        For example a search over 'sample_name' might return 
+        The dictionary containing {'key-value':[list of scan indices]}.
+        For example a search over 'sample_name' might return
         {'Ni':[0,1,2,3,4,9,10],'gold nanoparticles':[5,6,7,8]}
-
     key: str
-        The scans will be sorted by the values of this metadata key, 
+        The scans will be sorted by the values of this metadata key,
         e.g., 'sample_name'
     verbose: bool, optional
         If true prints the results. Defaults to True
@@ -29,10 +28,9 @@ def sort_scans_by_hdr_key(hdrs, key, verbose=True):
     Returns
     -------
     dict:
-        The dictionary containing {'key-value':[list of scan indices]}. 
-        For example a search over 'sample_name' might return 
+        The dictionary containing {'key-value':[list of scan indices]}.
+        For example a search over 'sample_name' might return
         {'Ni':[0,1,2,3,4,9,10],'gold nanoparticles':[5,6,7,8]}
-
     """
     d = {}
     for i, hdr in enumerate(hdrs):
@@ -61,9 +59,8 @@ def scan_diff(hdrs, verbose=True, blacklist=None):
     Returns
     -------
     dict:
-        The dictionary of keys with at least one different value across the 
-        scans.
-        The values are the results for each header.
+        The dictionary of keys with at least one different value across the
+        scans. The values are the results for each header.
     """
     if blacklist is None:
         blacklist = ['uid']
@@ -90,9 +87,9 @@ def scan_summary(hdrs, fields=None, verbose=True):
     hdrs: list of headers
         The headers from the databroker
     fields: list of str, optional
-        'Specify a list of fields to summarize. If None, the following 
-        will be returned'
-        `['sample_name', 'sp_type', 'sp_startingT', 'sp_endingT']`
+        'Specify a list of fields to summarize. If None, the following
+        will be returned
+        ``['sample_name', 'sp_type', 'sp_startingT', 'sp_endingT']``
         defaults to None
     verbose: bool, optional
         If True print the summary

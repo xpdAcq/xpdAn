@@ -79,7 +79,7 @@ script:
   - coverage report -m
 
 after_script:
-  - flake8 .
+  - flake8 xpdan
 
 after_success:
   - codecov

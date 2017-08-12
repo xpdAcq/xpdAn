@@ -57,10 +57,6 @@ install:
     conda remove metadatastore databroker filestore bluesky --yes;
     pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model;
     pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
-    pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore;
-    pip install https://github.com/NSLS-II/metadatastore/zipball/master#egg=metadatastore;
-    pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds;
-    pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs;
     pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
     fi
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml

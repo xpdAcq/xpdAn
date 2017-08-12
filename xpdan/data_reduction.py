@@ -45,4 +45,3 @@ integrate_and_save_last = partial(integrate_and_save_last, **int_save_kwargs)
 save_tiff = partial(save_tiff, **tiff_save_kwargs)
 
 save_last_tiff = partial(save_last_tiff, **tiff_save_kwargs)
-

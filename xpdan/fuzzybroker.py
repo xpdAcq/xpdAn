@@ -127,8 +127,10 @@ class FuzzyBroker(Broker):
         returns = []
         for s in bts:
             hdrs = self(**{beamtime_key: s})
-            start_hdr = hdrs[0]
-            stop_hdr = hdrs[-1]
+            start_hdr = next(iter(hdrs))
+            for hdr in hdrs:
+                pass
+            stop_hdr = hdr
             info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
             info.update({'start_time': _munge_time(start_hdr['start']['time'],
                                                    pytz.timezone(
@@ -317,8 +319,10 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
     returns = []
     for s in bts:
         hdrs = db(**{beamtime_key: s})
-        start_hdr = hdrs[0]
-        stop_hdr = hdrs[-1]
+        start_hdr = next(iter(hdrs))
+        for hdr in hdrs:
+            pass
+        stop_hdr = hdr
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
         info.update({'start_time': _munge_time(start_hdr['start']['time'],
                                                pytz.timezone('US/Eastern')),

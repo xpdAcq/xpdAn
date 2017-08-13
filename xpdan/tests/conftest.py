@@ -39,7 +39,7 @@ except ImportError:
 
     @pytest.fixture(params=[
         # 'sqlite',
-        'mongo'], scope='module')
+        'mongo'], scope='function')
     def db(request):
         print('Making DB')
         param_map = {
@@ -65,7 +65,7 @@ def img_size():
     yield (a, a)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def mk_glbl(exp_db):
     a = make_glbl(load_configuration('xpdan'), 1, exp_db)
     yield a
@@ -84,7 +84,7 @@ def tif_exporter_template():
         shutil.rmtree(export_dir_template)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def exp_db(db, tmp_dir, img_size):
     db2 = db
     mds = db2.mds
@@ -111,7 +111,7 @@ def disk_mask(tmp_dir, img_size):
     yield (file_name_msk, file_name, mask)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def fuzzdb(exp_db):
     yield FuzzyBroker(exp_db.mds, exp_db.fs)
 

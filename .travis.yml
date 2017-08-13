@@ -69,16 +69,13 @@ install:
   # of every test file
   # make sure the sqlite file exists to avoid race conditions
   - python -c "from bluesky.utils import get_history; get_history()"
-  - pip install codecov pytest-env python-coveralls
+  - pip install codecov pytest-env
 #  - git clean -xfd
 
 script:
   - coverage run run_tests.py
   - coverage report -m
 
-after_script:
-  - flake8 xpdan
-
 after_success:
+  - flake8 xpdan
   - codecov
-  - coveralls

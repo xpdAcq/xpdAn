@@ -60,6 +60,8 @@ install:
       pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
       pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
     else
+      pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds;
+      pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs;
       python -c "from filestore import utils, conf; utils.install_sentinels(conf.connection_config, 1)" ;
     fi
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml

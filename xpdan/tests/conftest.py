@@ -25,6 +25,8 @@ from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
 from xpdan.io import fit2d_save
 from xpdan.tests.utils import insert_imgs
+from bluesky.tests.conftest import fresh_RE
+from bluesky.examples import ReaderWithRegistryHandler
 
 try:
     from filestore.handlers import NpyHandler
@@ -85,14 +87,17 @@ def tif_exporter_template():
 
 
 @pytest.fixture(scope='function')
-def exp_db(db, tmp_dir, img_size):
+def exp_db(db, tmp_dir, img_size, fresh_RE):
     db2 = db
-    mds = db2.mds
     fs = db2.fs
     fs.register_handler('npy', NpyHandler)
-    insert_imgs(mds, fs, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
-    insert_imgs(mds, fs, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
-    insert_imgs(mds, fs, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)
+    fs.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
+    RE = fresh_RE
+    RE.subscribe(db.insert)
+
+    insert_imgs(RE, fs, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
+    insert_imgs(RE, fs, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
+    insert_imgs(RE, fs, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)
     yield db2
 
 

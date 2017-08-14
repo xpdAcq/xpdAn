@@ -18,6 +18,8 @@ import time
 from uuid import uuid4
 
 import numpy as np
+from bluesky.examples import ReaderWithRegistry
+from bluesky.plans import count
 
 pyFAI_calib = {'calibration_collection_uid': 'uuid1234',
                'centerX': 1019.8886820814655,
@@ -42,15 +44,14 @@ pyFAI_calib = {'calibration_collection_uid': 'uuid1234',
                'wavelength': 1.8333e-11}
 
 
-def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
-                **kwargs):
+def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     """
     Insert images into mds and fs for testing
 
     Parameters
     ----------
-    mds
-    fs
+    RE: bluesky.run_engine.RunEngine instance
+    db
     n
     shape
     save_dir
@@ -59,70 +60,26 @@ def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
     -------
 
     """
+    # Create detectors
+    dark_det = ReaderWithRegistry('pe1_image',
+                                  {'pe1_image': lambda: np.ones(shape)},
+                                  reg=reg, save_path=save_dir)
+    light_det = ReaderWithRegistry('pe1_image',
+                                   {'pe1_image': lambda: np.ones(shape)},
+                                   reg=reg, save_path=save_dir)
     beamtime_uid = str(uuid4())
-    # Insert the dark images
-    dark_img = np.ones(shape)
-    dark_uid = str(uuid4())
-    run_start = mds.insert_run_start(uid=dark_uid, time=time.time(),
-                                     name='test-dark',
-                                     beamtime_uid=beamtime_uid,
-                                     sample_name='hi',
-                                     calibration_md=pyFAI_calib,
-                                     **kwargs)
-    data_keys = {
-        'pe1_image': dict(source='testing', external='FILESTORE:',
-                          dtype='array')}
-    data_hdr = dict(run_start=run_start,
-                    data_keys=data_keys,
-                    time=time.time(), uid=str(uuid4()))
-    descriptor = mds.insert_descriptor(**data_hdr)
-    for i, img in enumerate([dark_img]):
-        fs_uid = str(uuid4())
-        fn = os.path.join(save_dir, fs_uid + '.npy')
-        np.save(fn, img)
-        # insert into FS
-        fs_res = fs.insert_resource('npy', fn, resource_kwargs={})
-        fs.insert_datum(fs_res, fs_uid, datum_kwargs={})
-        mds.insert_event(
-            descriptor=descriptor,
-            uid=str(uuid4()),
-            time=time.time(),
-            data={'pe1_image': fs_uid},
-            timestamps={},
-            seq_num=i)
-    mds.insert_run_stop(run_start=run_start,
-                        uid=str(uuid4()),
-                        time=time.time())
+    base_md = dict(beamtime_uid=beamtime_uid,
+                   sample_name='hi', calibration_md=pyFAI_calib, **kwargs)
 
-    imgs = [np.ones(shape)] * n
-    run_start = mds.insert_run_start(uid=str(uuid4()), time=time.time(),
-                                     name='test', sc_dk_field_uid=dark_uid,
-                                     beamtime_uid=beamtime_uid,
-                                     sample_name='hi',
-                                     calibration_md=pyFAI_calib,
-                                     **kwargs)
-    data_keys = {
-        'pe1_image': dict(source='testing', external='FILESTORE:',
-                          dtype='array')}
-    data_hdr = dict(run_start=run_start,
-                    data_keys=data_keys,
-                    time=time.time(), uid=str(uuid4()))
-    descriptor = mds.insert_descriptor(**data_hdr)
-    for i, img in enumerate(imgs):
-        fs_uid = str(uuid4())
-        fn = os.path.join(save_dir, fs_uid + '.npy')
-        np.save(fn, img)
-        # insert into FS
-        fs_res = fs.insert_resource('npy', fn, resource_kwargs={})
-        fs.insert_datum(fs_res, fs_uid, datum_kwargs={})
-        mds.insert_event(
-            descriptor=descriptor,
-            uid=str(uuid4()),
-            time=time.time(),
-            data={'pe1_image': fs_uid},
-            timestamps={'pe1_image': time.time()},
-            seq_num=i)
-    mds.insert_run_stop(run_start=run_start,
-                        uid=str(uuid4()),
-                        time=time.time())
+    # Insert the dark images
+    dark_md = base_md.copy()
+    dark_md.update(name='test-dark')
+
+    dark_uid = RE(count([dark_det]), **dark_md)
+
+    # Insert the light images
+    light_md = base_md.copy()
+    light_md.update(name='test', sc_dk_field_uid=dark_uid)
+    RE(count([light_det], num=n), **light_md)
+
     return save_dir

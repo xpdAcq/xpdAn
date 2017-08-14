@@ -66,7 +66,7 @@ install:
     fi
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
 #  - python setup.py install
-  - pip install -ve .
+  - pip install .
   # Need to clean the python build directory (and other cruft) or pytest is
   # going to find the build directory and get confused why there are two sets
   # of every test file

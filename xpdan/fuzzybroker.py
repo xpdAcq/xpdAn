@@ -19,9 +19,28 @@ from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 
 import pytz
+import datetime
 
 from databroker.broker import Broker
-from databroker.broker import _munge_time
+
+
+def _munge_time(t, timezone):
+    """Close your eyes and trust @arkilic
+
+    Parameters
+    ----------
+    t : float
+        POSIX (seconds since 1970)
+    timezone : pytz object
+        e.g. ``pytz.timezone('US/Eastern')``
+
+    Return
+    ------
+    time
+        as ISO-8601 format
+    """
+    t = datetime.date.fromtimestamp(t)
+    return timezone.localize(t).replace(microsecond=0).isoformat()
 
 
 class FuzzyBroker(Broker):

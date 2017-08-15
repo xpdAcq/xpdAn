@@ -1,29 +1,15 @@
 """Example for XPD data"""
-from itertools import islice
-from pprint import pprint
+from operator import add, sub
 
 import numpy as np
-from bluesky.callbacks.broker import LiveImage
-from bluesky.callbacks.core import LiveTable, LivePlot
+import shed.event_streams as es
+
+from databroker import db
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from streams.core import Stream
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import shed.event_streams as es
-from shed.event_streams import dstar, star
-
-# pull from local data, not needed at beamline
-from portable_fs.sqlite.fs import FileStoreRO
-from portable_mds.sqlite.mds import MDSRO
-from databroker.broker import Broker
-from databroker.resource_registry.handlers import AreaDetectorTiffHandler, \
-    DebugHandler
-import tzlocal
-import os
-from pprint import pprint
+from xpdan.db_utils import query_dark, query_background, temporal_prox
 from xpdan.tools import better_mask_img
-from xpdview.callbacks import LiveWaterfall
-from databroker import db
+
 
 # def better_mask_img(geo, img, binner):
 #     pass
@@ -39,14 +25,6 @@ def refine_structure(stuff):
 
 def LiveStructure(stuff):
     pass
-
-
-def subs(img1, img2):
-    return img1 - img2
-
-
-def add(img1, img2):
-    return img1 + img2
 
 
 def pull_array(img2):
@@ -99,28 +77,6 @@ def div(img, count):
     return img / count
 
 
-def query_dark(db, docs):
-    doc = docs[0]
-    return db(uid=doc['sc_dk_field_uid'])
-
-
-def query_background(db, docs):
-    doc = docs[0]
-    return db(sample_name=doc['bkgd_sample_name'],
-              is_dark={'$exists': False})
-
-
-def temporal_prox(res, docs):
-    doc = docs[0]
-    t = doc['time']
-    # print(t)
-    dt_sq = [(t - r['start']['time']) ** 2 for r in res]
-    i = dt_sq.index(min(dt_sq))
-    min_r = next(islice(res, i, i + 1))
-    # print(min_r['start']['time'])
-    return min_r
-
-
 def load_geo(cal_params):
     from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
     ai = AzimuthalIntegrator()
@@ -130,14 +86,6 @@ def load_geo(cal_params):
 
 def event_count(x):
     return x['count'] + 1
-
-
-def SinkToDB(x):
-    pass
-
-
-def StubSinkToDB(x):
-    pass
 
 
 source = Stream(name='Raw')
@@ -159,7 +107,7 @@ bg_dark_stream = es.QueryUnpacker(db, es.Query(db, bg_stream,
                                                name='Query for BG Dark'))
 
 # Perform dark subtraction on everything
-dark_sub_bg = es.map(dstar(subs),
+dark_sub_bg = es.map((sub),
                      es.zip(bg_stream, bg_dark_stream),
                      input_info={'img1': ('pe1_image', 0),
                                  'img2': ('pe1_image', 1)},
@@ -171,7 +119,7 @@ bg_bundle = es.BundleSingleStream(dark_sub_bg, bg_query_stream,
                                   name='Background Bundle')
 
 # sum the backgrounds
-summed_bg = es.accumulate(dstar(add), bg_bundle, start=dstar(pull_array),
+summed_bg = es.accumulate((add), bg_bundle, start=(pull_array),
                           state_key='img1',
                           input_info={'img2': 'img'},
                           output_info=[('img', {
@@ -184,7 +132,7 @@ count_bg = es.accumulate(event_count, bg_bundle, start=1,
                              'dtype': 'int',
                              'source': 'testing'})])
 
-ave_bg = es.map(dstar(div), es.zip(summed_bg, count_bg),
+ave_bg = es.map((div), es.zip(summed_bg, count_bg),
                 input_info={'img': ('img', 0), 'count': ('count', 1)},
                 output_info=[('img', {
                     'dtype': 'array',
@@ -192,7 +140,7 @@ ave_bg = es.map(dstar(div), es.zip(summed_bg, count_bg),
                 # name='Average Background'
                 )
 
-dark_sub_fg = es.map(dstar(subs),
+dark_sub_fg = es.map(sub,
                      es.zip(source,
                             fg_dark_stream),
                      input_info={'img1': ('pe1_image', 0),
@@ -206,7 +154,7 @@ dark_sub_fg = es.map(dstar(subs),
 fg_bg = es.combine_latest(dark_sub_fg, ave_bg, emit_on=dark_sub_fg)
 
 # subtract the background images
-fg_sub_bg = es.map(dstar(subs),
+fg_sub_bg = es.map(sub,
                    fg_bg,
                    input_info={'img1': ('img', 0),
                                'img2': ('img', 1)},
@@ -221,7 +169,7 @@ cal_md_stream = es.Eventify(source, start_key='calibration_md',
                                           {'dtype': 'dict',
                                            'source': 'workflow'})],
                             md=dict(name='Calibration'))
-cal_stream = es.map(dstar(load_geo), cal_md_stream,
+cal_stream = es.map(load_geo, cal_md_stream,
                     input_info={'cal_params': 'calibration_md'},
                     output_info=[('geo',
                                   {'dtype': 'object', 'source': 'workflow'})])
@@ -229,7 +177,7 @@ cal_stream = es.map(dstar(load_geo), cal_md_stream,
 # polarization correction
 # SPLIT INTO TWO NODES
 pfactor = .99
-p_corrected_stream = es.map(dstar(polarization_correction),
+p_corrected_stream = es.map(polarization_correction,
                             es.lossless_combine_latest(fg_sub_bg, cal_stream),
                             input_info={'img': ('img', 0),
                                         'geo': ('geo', 1)},
@@ -239,7 +187,7 @@ p_corrected_stream = es.map(dstar(polarization_correction),
 
 # generate masks
 mask_kwargs = {'bs_width': None}
-mask_stream = es.map(dstar(better_mask_img),
+mask_stream = es.map(better_mask_img,
                      es.lossless_combine_latest(p_corrected_stream,
                                                 cal_stream),
                      input_info={'img': ('img', 0),
@@ -249,23 +197,23 @@ mask_stream = es.map(dstar(better_mask_img),
                      **mask_kwargs)
 
 # generate binner stream
-binner_stream = es.map(dstar(generate_binner),
+binner_stream = es.map(generate_binner,
                        cal_stream,
                        input_info={'geo': 'geo'},
                        output_info=[('binner', {'dtype': 'function',
                                                 'source': 'testing'})],
                        img_shape=(2048, 2048))
 
-iq_stream = es.map(dstar(integrate),
-                   es.lossless_combine_latest(p_corrected_stream, binner_stream),
+iq_stream = es.map(integrate,
+                   es.lossless_combine_latest(p_corrected_stream,
+                                              binner_stream),
                    input_info={'img': ('img', 0),
                                'binner': ('binner', 1)},
                    output_info=[('iq', {'dtype': 'array',
                                         'source': 'testing'})])
-iq_stream.sink(star(LiveWaterfall('iq')))
 
 # z-score the data
-z_score_stream = es.map(dstar(z_score_image),
+z_score_stream = es.map(z_score_image,
                         es.lossless_combine_latest(p_corrected_stream,
                                                    binner_stream),
                         input_info={'img': ('img', 0),
@@ -273,10 +221,4 @@ z_score_stream = es.map(dstar(z_score_image),
                         output_info=[('z_score_img', {'dtype': 'array',
                                                       'source': 'testing'})])
 
-z_score_stream.sink(star(LiveImage('z_score_img',
-                                   limit_func=lambda x: (-3, 3),
-                                   cmap='viridis',
-                                   window_title='Background Corrected Foreground')))
-
-
-pdf_stream = es.map(dstar(iq_to_pdf), es.zip(iq_stream, source))
+pdf_stream = es.map(iq_to_pdf, es.zip(iq_stream, source))

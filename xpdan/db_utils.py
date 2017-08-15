@@ -1,3 +1,4 @@
+from itertools import islice
 from pprint import pprint
 from .dev_utils import _timestampstr
 import collections
@@ -120,3 +121,36 @@ def scan_summary(hdrs, fields=None, verbose=True):
             print((i, data2))
         datas.append(data)
     return datas
+
+
+def query_dark(db, docs, schema=1):
+    """Get dark data from databroker
+
+    Parameters
+    ----------
+    db: Broker instance
+    docs: tuple of dict
+
+    Returns
+    -------
+
+    """
+    if schema == 1:
+        doc = docs[0]
+        return db(uid=doc['sc_dk_field_uid'])
+
+
+def query_background(db, docs, schema=1):
+    if schema == 1:
+        doc = docs[0]
+        return db(sample_name=doc['bkgd_sample_name'],
+                  is_dark={'$exists': False})
+
+
+def temporal_prox(res, docs):
+    doc = docs[0]
+    t = doc['time']
+    dt_sq = [(t - r['start']['time']) ** 2 for r in res]
+    i = dt_sq.index(min(dt_sq))
+    min_r = next(islice(res, i, i + 1))
+    return min_r

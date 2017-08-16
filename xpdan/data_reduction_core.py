@@ -88,7 +88,7 @@ def _feature_gen(event, labels=None, fields=None, data_fields=None):
     if labels is None:
         labels = ['dark_frame']
     feature_list = []
-    run_start = db[event['descriptor']['run_start']
+    run_start = event['descriptor']['run_start']
     uid = run_start['uid'][:6]
     # get special label
     for el in labels:

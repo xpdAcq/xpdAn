@@ -19,6 +19,8 @@ from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 
 # Ideally we would pull these functions from scikit-beam
+from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
+
 try:
     from skbeam.core.mask import margin, binned_outlier
 # Otherwise we make them ourselves
@@ -243,6 +245,66 @@ def decompress_mask(data, indices, indptr, shape):
         tuple([np.asarray(a) for a in [data, indices, indptr]]), shape=shape)
     return ~cmask.toarray().astype(bool)
 
+
+def iq_to_pdf(stuff):
+    pass
+
+
+def pull_array(img2):
+    return img2
+
+
+def generate_binner(geo, img_shape, mask=None):
+    r = geo.rArray(img_shape)
+    q = geo.qArray(img_shape) / 10
+    q_dq = geo.deltaQ(img_shape) / 10
+
+    pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
+    rres = np.hypot(*pixel_size)
+    rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres / 2.)
+    rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
+
+    qbin_sizes = rbinned(q_dq.ravel())
+    qbin_sizes = np.nan_to_num(qbin_sizes)
+    qbin = np.cumsum(qbin_sizes)
+    if mask:
+        mask = mask.flatten()
+    return BinnedStatistic1D(q.flatten(), bins=qbin, mask=mask)
+
+
+def z_score_image(img, binner):
+    img_shape = img.shape
+    img = img.flatten()
+    xy = binner.xy
+    binner.statistic = 'mean'
+    means = binner(img)
+    binner.statistic = 'std'
+    stds = binner(img)
+    for i in np.unique(xy):
+        tv = (xy == i)
+        img[tv] -= means[i]
+        img[tv] /= stds[i]
+    img = img.reshape(img_shape)
+    return img
+
+
+def integrate(img, binner):
+    return binner.bin_centers, binner(img.flatten())
+
+
+def polarization_correction(img, geo, polarization_factor=.99):
+    return img / geo.polarization(img.shape, polarization_factor)
+
+
+def load_geo(cal_params):
+    from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+    ai = AzimuthalIntegrator()
+    ai.setPyFAI(**cal_params)
+    return ai
+
+
+def event_count(x):
+    return x['count'] + 1
 
 def _timestampstr(timestamp):
     """convert timestamp to strftime formate"""

@@ -3,12 +3,17 @@
 import os
 import datetime
 import numpy as np
+
+from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.core import CallbackBase
 import doct
 import tifffile
 
 
 # supplementary functions
+from databroker import DataBroker as db
+
+
 def _timestampstr(timestamp):
     """convert timestamp to strftime formate"""
     timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
@@ -16,7 +21,83 @@ def _timestampstr(timestamp):
     return timestring
 
 
-class XpdAcqLiveTiffExporter(CallbackBase):
+class FeatureGen(CallbackBase):
+    def __init__(self, data_fields):
+        self.db = db
+        self.data_fields = data_fields  # list of keys for md to include
+        self._start = None
+
+    def _generate_filename(self, doc, stack_ind):
+        """method to generate filename based on template
+
+        It operates at event level, i.e., doc is event document
+        """
+        # convert time
+        timestr = _timestampstr(doc['time'])
+        # readback value for certain list of data keys
+        data_val_list = []
+        for key in self.data_fields:
+            val = doc.get(key, None)
+            if val is not None:
+                data_val_list.append(val)
+        data_val_trunk = '_'.join(data_val_list)
+
+        # event sequence
+        base_dir = self.data_dir_template.format(start=self._start,
+                                                 event=doc)
+        # standard, do need to expose it to user
+        event_template = '{event.seq_num:03d}_{i}.tif'
+        event_info = event_template.format(i=stack_ind, start=self._start,
+                                           event=doc)
+
+        # full path + complete filename
+        filename = '_'.join([timestr, data_val_trunk, event_info])
+        total_filename = os.path.join(base_dir, filename)
+
+        return total_filename
+
+    def _pull_dark_uid(self, doc, dark_field_key='sc_dk_field_uid'):
+        """method to relate dark to images
+
+        Simply replace this method if scheme is changed in the future
+        """
+        if 'dark_frame' in doc:
+            # found a dark header
+            dark_uid = None  # dark header, pass
+        else:
+            dark_uid = doc.get(dark_field_key, None)
+            if dark_uid is None:
+                print("INFO: no dark frame is associated in this header, "
+                      "subtraction will not be processed")
+                dark_uid = None  # can't find a dark
+        return dark_uid
+
+    def start(self, docs):
+        """method for start document"""
+        self.filenames = []
+        doc = docs[0]
+        self._start = doc
+
+        # find dark scan uid
+        dark_uid = self._pull_dark_uid(doc)
+        if dark_uid is None:
+            self.dark_img = None
+            self._find_dark = False
+        else:
+            dark_header = self.db[dark_uid]
+            self.dark_img = np.asarray(self.db.get_images(
+                dark_header, self.field)).squeeze()
+            self._find_dark = True
+        super().start(doc)
+
+    def stop(self, doc):
+        """method for stop document"""
+        # TODO: include sum logic in the future
+        self._start = None
+        super().stop(doc)
+
+
+class XpdAcqLiveTiffExporter(FeatureGen):
     """Exporting tiff from given header(s).
 
     It is a variation of bluesky.callback.broker.LiveTiffExporter class
@@ -60,47 +141,14 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             # Read-only db
             from databroker.databroker import DataBroker as db
 
-        self.db = db
-
         # required args
         self.field = field
         self.data_dir_template = data_dir_template
         # optioanal args
-        self.data_fields = data_fields  # list of keys for md to include
         self.save_dark = save_dark  # option of save dark
         self.dryrun = dryrun
         self.overwrite = overwrite
         self.filenames = []
-        self._start = None
-
-    def _generate_filename(self, doc, stack_ind):
-        """method to generate filename based on template
-
-        It operates at event level, i.e., doc is event document
-        """
-        # convert time
-        timestr = _timestampstr(doc['time'])
-        # readback value for certain list of data keys
-        data_val_list = []
-        for key in self.data_fields:
-            val = doc.get(key, None)
-            if val is not None:
-                data_val_list.append(val)
-        data_val_trunk = '_'.join(data_val_list)
-
-        # event sequence
-        base_dir = self.data_dir_template.format(start=self._start,
-                                                 event=doc)
-        # standard, do need to expose it to user
-        event_template = '{event.seq_num:03d}_{i}.tif'
-        event_info = event_template.format(i=stack_ind, start=self._start,
-                                           event=doc)
-
-        # full path + complete filename
-        filename = '_'.join([timestr, data_val_trunk, event_info])
-        total_filename = os.path.join(base_dir, filename)
-
-        return total_filename
 
     def _save_image(self, image, filename):
         """method to save image"""
@@ -116,41 +164,6 @@ class XpdAcqLiveTiffExporter(CallbackBase):
                   .format(fn, dir_path))
 
             # self.filenames.append(filename)
-
-    def _pull_dark_uid(self, doc, dark_field_key='sc_dk_field_uid'):
-        """method to relate dark to images
-
-        Simply replace this method if scheme is changed in the future
-        """
-        if 'dark_frame' in doc:
-            # found a dark header
-            dark_uid = None  # dark header, pass
-        else:
-            dark_uid = doc.get(dark_field_key, None)
-            if dark_uid is None:
-                print("INFO: no dark frame is associated in this header, "
-                      "subtraction will not be processed")
-                dark_uid = None  # can't find a dark
-        return dark_uid
-
-    def start(self, doc):
-        """method for start document"""
-        self.filenames = []
-        # Convert doc from dict into dottable dict, more convenient
-        # in Python format strings: doc.key == doc['key']
-        self._start = doct.Document('start', doc)
-
-        # find dark scan uid
-        dark_uid = self._pull_dark_uid(doc)
-        if dark_uid is None:
-            self.dark_img = None
-            self._find_dark = False
-        else:
-            dark_header = self.db[dark_uid]
-            self.dark_img = np.asarray(self.db.get_images(
-                dark_header, self.field)).squeeze()
-            self._find_dark = True
-        super().start(doc)
 
     def event(self, doc):
         """tiff-saving operation applied at event level"""
@@ -183,9 +196,3 @@ class XpdAcqLiveTiffExporter(CallbackBase):
             if self.save_dark:
                 self._save_image(self.dark_img, os.path.join(path_dir,
                                                              'dark_' + fn))
-
-    def stop(self, doc):
-        """method for stop document"""
-        # TODO: include sum logic in the future
-        self._start = None
-        super().stop(doc)

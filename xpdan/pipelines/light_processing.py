@@ -2,7 +2,7 @@
 from operator import add, sub, truediv
 
 import shed.event_streams as es
-from streams.core import Stream
+from streamz.core import Stream
 
 from databroker import db
 from xpdan.db_utils import query_dark, query_background, temporal_prox

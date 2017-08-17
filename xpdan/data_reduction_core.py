@@ -182,7 +182,7 @@ def integrate_and_save(headers, *, db, save_dir,
                        config_base='',
                        calib_config_name='',
                        **kwargs):
-    """ integrate and save dark subtracted images for given list of headers
+    """Integrate and save dark subtracted images for given list of headers
 
     Parameters
     ----------

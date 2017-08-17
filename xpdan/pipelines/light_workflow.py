@@ -19,7 +19,7 @@ from .light_processing import (source, dark_sub_fg, mask_stream, iq_stream,
 light_template = os.path.join(
     an_glbl['tiff_base'],
     '{sample_name}/{folder_tag}/{{{analysis_stage}}}/'
-    '{{human_timestamp}}{{auxiliary}}{{{{ext}}}}')
+    '{{human_timestamp}}{{auxiliary}}{{{ext}}}')
 
 eventify_raw = es.eventify(source)
 
@@ -55,8 +55,8 @@ template_stream_2 = es.map(templater2_func,
 
 
 # further format with data from analysis stage
-def templater3_func(doc, template):
-    return template.format(doc.get('analysis_stage', 'raw'))
+def templater3_func(template, analysis_stage='raw', ext='.tiff'):
+    return template.format(analysis_stage=analysis_stage, ext=ext)
 
 
 eventifies = [eventify_raw] + [es.eventify(s) for s in
@@ -69,25 +69,25 @@ templater_streams_3 = [es.map(templater3_func,
                               es.zip_latest(template_stream_2, e),
                               full_event=True,
                               output_info=[('template',
-                                            {'dtype': 'str'})]
-                              ) for e in eventifies]
+                                            {'dtype': 'str'})],
+                              ext=ext
+                              ) for e, ext in zip(eventifies,
+                                                  ['.tiff', '.tiff', '.msk',
+                                                   '_Q.chi', '.gr'])]
 
 
 # write and format with ext
 def writer_templater_tiff(img, template):
-    template.format(ext='.tiff')
     tifffile.imsave(template, img)
     return template
 
 
 def writer_templater_mask(mask, template):
-    template.format(ext='.msk')
     fit2d_save(mask, template)
     return template
 
 
 def writer_templater_chi(x, y, template):
-    template.format(ext='_Q.chi')
     save_output(x, y, template, 'Q', ext='')
     return template
 
@@ -97,13 +97,11 @@ def writer_templater_chi(x, y, template):
 
 
 def writer_templater_pdf(x, y, template):
-    template.format(ext='.gr')
     pdf_saver(x, y, template)
     return template
 
 
 def writer_templater_fq(x, y, template):
-    template.format(ext='.fq')
     fq_saver(x, y, template)
     return template
 

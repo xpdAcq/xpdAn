@@ -13,15 +13,18 @@ source = Stream(name='Raw Dark')
 
 
 def dark_template_func(timestamp, template):
-    """
+    """Format template for dark images
 
     Parameters
     ----------
-    doc: dict
+    timestamp: float
+        The time in unix epoch
     template: str
+        The string to be formatted
 
     Returns
     -------
+    str:
 
     """
     d = {'human_timestamp': _timestampstr(timestamp), 'ext': 'tiff'}

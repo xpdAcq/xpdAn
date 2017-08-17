@@ -2,8 +2,7 @@ import os
 from xpdan.pipelines.dark_workflow import source, dark_template_stream
 
 
-def test_dark_workflow(exp_db, mk_glbl):
-    g = mk_glbl
+def test_dark_workflow(exp_db):
     dark_hdr = next(iter(exp_db(is_dark={'$exists': True})))
     L1 = dark_template_stream.sink_to_list()
 

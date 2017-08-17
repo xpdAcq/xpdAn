@@ -108,7 +108,7 @@ cal_stream = es.map(load_geo, cal_md_stream,
 # SPLIT INTO TWO NODES
 pfactor = .99
 p_corrected_stream = es.map(polarization_correction,
-                            es.lossless_combine_latest(fg_sub_bg, cal_stream),
+                            es.zip_latest(fg_sub_bg, cal_stream),
                             input_info={'img': ('img', 0),
                                         'geo': ('geo', 1)},
                             output_info=[('img', {'dtype': 'array',
@@ -118,8 +118,8 @@ p_corrected_stream = es.map(polarization_correction,
 # generate masks
 mask_kwargs = {'bs_width': None}
 mask_stream = es.map(better_mask_img,
-                     es.lossless_combine_latest(p_corrected_stream,
-                                                cal_stream),
+                     es.zip_latest(p_corrected_stream,
+                                   cal_stream),
                      input_info={'img': ('img', 0),
                                  'geo': ('geo', 1)},
                      output_info=[('mask', {'dtype': 'array',
@@ -135,8 +135,8 @@ binner_stream = es.map(generate_binner,
                        img_shape=(2048, 2048))
 
 iq_stream = es.map(integrate,
-                   es.lossless_combine_latest(p_corrected_stream,
-                                              binner_stream),
+                   es.zip_latest(p_corrected_stream,
+                                 binner_stream),
                    input_info={'img': ('img', 0),
                                'binner': ('binner', 1)},
                    output_info=[('iq', {'dtype': 'array',
@@ -144,8 +144,8 @@ iq_stream = es.map(integrate,
 
 # z-score the data
 z_score_stream = es.map(z_score_image,
-                        es.lossless_combine_latest(p_corrected_stream,
-                                                   binner_stream),
+                        es.zip_latest(p_corrected_stream,
+                                      binner_stream),
                         input_info={'img': ('img', 0),
                                     'binner': ('binner', 1)},
                         output_info=[('z_score_img', {'dtype': 'array',
@@ -153,7 +153,7 @@ z_score_stream = es.map(z_score_image,
 
 pdf_stream = es.map(iq_to_pdf, es.zip(iq_stream, source))
 
-# writers
+# write to human readable files
 
 # base string
 light_template = os.path.join(
@@ -189,8 +189,8 @@ def templater2_func(doc, template, aux=None):
 
 
 template_stream_2 = es.map(templater2_func,
-                           es.lossless_combine_latest(source,
-                                                      template_stream_1),
+                           es.zip_latest(source,
+                                         template_stream_1),
                            output_info=[('template', {'dtype': 'str'})])
 
 
@@ -206,7 +206,7 @@ eventifies = [eventify_raw] + [es.eventify(s) for s in
                                 pdf_stream]]
 
 templater_streams_3 = [es.map(templater3_func,
-                              es.lossless_combine_latest(template_stream_2, e),
+                              es.zip_latest(template_stream_2, e),
                               full_event=True,
                               output_info=[('template',
                                             {'dtype': 'str'})]
@@ -232,6 +232,10 @@ def writer_templater_chi(x, y, template):
     return template
 
 
+# TODO: need tth writer
+# https://github.com/scikit-beam/scikit-beam/blob/master/skbeam/core/utils.py#L1054
+
+
 def writer_templater_pdf(x, y, template):
     template.format(ext='.gr')
     pdf_saver(x, y, template)
@@ -254,7 +258,7 @@ iis = [
 
 writer_streams = [
     es.map(writer_templater,
-           es.lossless_combine_latest(s1, s2),
+           es.zip_latest(s1, s2),
            input_info=ii,
            output_info=[('final_filename',
                          {'dtype': 'str'})],

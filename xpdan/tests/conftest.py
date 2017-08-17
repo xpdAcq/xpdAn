@@ -34,7 +34,7 @@ except ImportError:
     from databroker.assets.handlers import NpyHandler
 
 try:
-    from databroker.tests.conftest import db
+    from bluesky.tests.conftest import db
 except ImportError:
     from xpdan.simulation import build_pymongo_backed_broker
 
@@ -90,7 +90,6 @@ def tif_exporter_template():
 def exp_db(db, tmp_dir, img_size, fresh_RE):
     db2 = db
     fs = db2.fs
-    fs.register_handler('npy', NpyHandler)
     fs.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
     RE = fresh_RE
     RE.subscribe(db.insert)

@@ -2,7 +2,7 @@
 import os
 
 import shed.event_streams as es
-from streams.core import Stream
+from streamz.core import Stream
 
 from xpdan.db_utils import _timestampstr
 from ..glbl import an_glbl
@@ -12,15 +12,36 @@ import tifffile
 source = Stream(name='Raw Dark')
 
 
-def write_dark(doc, template):
-    d = {'human_timestamp': _timestampstr(doc.ge('timestamp', None)),
-         'ext': 'tiff'}
-    full_file_path = template.format(**d)
-    tifffile.imsave(full_file_path)
+def dark_template_func(timestamp, template):
+    """
 
+    Parameters
+    ----------
+    doc: dict
+    template: str
+
+    Returns
+    -------
+
+    """
+    d = {'human_timestamp': _timestampstr(timestamp), 'ext': 'tiff'}
+    t = template.format(**d)
+    os.makedirs(os.path.split(t)[0])
+    return t
+
+print(an_glbl)
 
 dark_template = os.path.join(
     an_glbl['tiff_base'], 'dark/{human_timestamp}.{ext}')
 
-dark_writer = es.map(write_dark, source, dark_template, full_event=True)
+dark_template_stream = es.map(dark_template_func, source,
+                              template=dark_template,
+                              full_event=True,
+                              input_info={'timestamp': 'time'},
+                              output_info=[('file_path', {'dtype': 'str'})])
 
+dark_writer = es.map(tifffile.imsave,
+                     es.zip(source, dark_template_stream),
+                     input_info={'data': ('pe1_image', 0),
+                                 'file': ('file_path', 1)},
+                     output_info=[('output_file', {'dtype': None})])

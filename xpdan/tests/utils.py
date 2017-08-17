@@ -73,7 +73,7 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
 
     # Insert the dark images
     dark_md = base_md.copy()
-    dark_md.update(name='test-dark')
+    dark_md.update(name='test-dark', is_dark=True)
 
     dark_uid = RE(count([dark_det]), **dark_md)
 

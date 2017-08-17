@@ -18,7 +18,7 @@ import matplotlib
 
 from xpdan.glbl_gen import make_glbl, load_configuration
 
-matplotlib.use('qt4agg')
+# matplotlib.use('qt4agg')
 
 try:
     env_code = os.environ['XPDAN_SETUP']

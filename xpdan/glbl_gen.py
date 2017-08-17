@@ -147,6 +147,7 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
 
     # only create dirs if running test
     if int(env_code) == 1:
+        print('making dirs')
         for folder in config['all_folders']:
             os.makedirs(folder, exist_ok=True)
 

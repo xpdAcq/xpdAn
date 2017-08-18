@@ -1,34 +1,62 @@
 """Decider between pipelines"""
-from xpdan.pipelines.light_workflow import source as light_source
-from xpdan.pipelines.dark_workflow import source as dark_source
-from xpdan.pipelines.calibration_workflow import source
-from streamz import Stream
+
 import shed.event_streams as es
 
+from streamz import Stream
+from xpdan.pipelines.dark_workflow import source as dark_source
+from xpdan.pipelines.pipeline_chunks import (fg_dark_stream_source,
+                                             dark_sub_fg,
+                                             if_not_dark_stream_source,
+                                             foreground_stream,
+                                             get_make_calibration)
 
-def is_dark_stream():
-    pass
+# from databroker import db
+db = None
+
+source = Stream(stream_name='Raw Data')
 
 
-def is_light_stream():
-    pass
+# Dark logic
+def if_dark(docs):
+    doc = docs[0]
+    tv = 'is_dark' in doc
+    return tv
 
 
-def is_calibration_stream():
-    pass
+def if_not_dark(docs):
+    doc = docs[0]
+    tv = 'is_dark' in doc
+    return ~tv
 
 
-master_source = Stream()
+# If Dark send to disk
+if_dark_stream = es.filter(if_dark, source, document_name='start',
+                           input_info=None)
+if_dark_stream.connect(dark_source)
 
-dark_filter = es.filter(is_dark_stream, master_source, document_name='start')
-dark_filter.connect(dark_source)
+# If Not Dark continue
+if_not_dark_stream = es.filter(if_not_dark, source, document_name='start',
+                               input_info=None)
 
-light_filter = es.filter(is_light_stream, master_source, document_name='start')
-light_filter.connect(light_source)
+if_not_dark_stream.connect(fg_dark_stream_source)
 
-calibration_filter = es.filter(is_calibration_stream, master_source,
-                               document_name='start')
+# push dark corrected data into background subtraction setup
+dark_sub_fg.connect(if_not_dark_stream_source)
 
-calibration_filter.connect(source)
+# pull data from background subtraction
+foreground_stream.connect(get_make_calibration)
+# if calibration stream go run calibration and get calibration data back
 
-master_source.visualize()
+# if not calibration stream get calibration data
+
+# polarization correction
+
+# mask
+
+# integration
+
+# PDF
+
+# Refinement
+
+source.visualize()

@@ -20,13 +20,29 @@ mds = MDSRO(d)
 fs = RegistryRO(d)
 fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
-
 source = conf_master_pipeline(db)
-
+# source.visualize()
+seen = False
 for e in db[-1].stream(fill=True):
     if e[0] == 'event':
         plt.pause(.5)
-    # print(e)
-    source.emit(e)
+        if not seen:
+            seen = True
+            source.emit(e)
+    else:
+        source.emit(e)
+
+print('start second run ----------------------------------------------------')
+
+seen = False
+for e in db[-1].stream(fill=True):
+    if e[0] == 'event':
+        plt.pause(.5)
+        if not seen:
+            seen = True
+            source.emit(e)
+    else:
+        source.emit(e)
 
 plt.show()
+plt.close("all")

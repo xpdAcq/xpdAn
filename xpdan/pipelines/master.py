@@ -140,7 +140,7 @@ def conf_master_pipeline(db):
                     )
 
     # combine the fg with the summed_bg
-    fg_bg = es.zip_latest(dark_sub_fg, ave_bg, emit_on=dark_sub_fg,
+    fg_bg = es.zip_latest(dark_sub_fg, ave_bg,
                           stream_name='Combine fg with bg')
 
     # subtract the background images
@@ -162,6 +162,7 @@ def conf_master_pipeline(db):
     # union of background and not background branch
     foreground_stream = fg_sub_bg.union(if_not_background_stream)
     foreground_stream.stream_name = 'Pull from either bgsub or not sub'
+    # foreground_stream.sink(star(LiveImage('img')))
 
     # CALIBRATION PROCESSING
 
@@ -183,12 +184,14 @@ def conf_master_pipeline(db):
                                           input_info=None,
                                           document_name='start',
                                           stream_name='If not calibration')
+    if_not_calibration_stream.sink(pprint)
     cal_md_stream = es.Eventify(if_not_calibration_stream,
                                 start_key='calibration_md',
                                 output_info=[('calibration_md',
                                               {'dtype': 'dict',
                                                'source': 'workflow'})],
                                 stream_name='Eventify Calibration')
+    # cal_md_stream.sink(pprint)
     cal_stream = es.map(load_geo, cal_md_stream,
                         input_info={'cal_params': 'calibration_md'},
                         output_info=[('geo',
@@ -202,31 +205,34 @@ def conf_master_pipeline(db):
     loaded_calibration_stream = cal_stream.union(run_calibration_stream)
     loaded_calibration_stream.stream_name = 'Pull from either md or ' \
                                             'run calibration'
+    # loaded_calibration_stream.sink(pprint)
+    # foreground_stream.sink(pprint)
 
     # send calibration and corrected images to main workflow
     # polarization correction
     # SPLIT INTO TWO NODES
-    # foreground_stream.sink(star(LiveImage('img')))
+    zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream)
+    # zlfl.sink(pprint)
     pfactor = .99
     p_corrected_stream = es.map(polarization_correction,
-                                es.zip_latest(foreground_stream,
-                                              loaded_calibration_stream),
+                                zlfl,
                                 input_info={'img': ('img', 0),
                                             'geo': ('geo', 1)},
                                 output_info=[('img', {'dtype': 'array',
                                                       'source': 'testing'})],
                                 polarization_factor=pfactor,
                                 stream_name='Polarization corrected img')
-
+    # p_corrected_stream.sink(pprint)
     # generate masks
-    # """
+    zlfc = es.zip_latest(es.filter(lambda x: x == 1,
+                                   p_corrected_stream,
+                                   input_info={0: 'seq_num'},
+                                   full_event=True),
+                         cal_stream)
+    # zlfc.sink(pprint)
     mask_kwargs = {'bs_width': None}
     mask_stream = es.map(mask_img,
-                         es.zip_latest(es.filter(lambda x: x == 1,
-                                                 p_corrected_stream,
-                                                 input_info={0: 'seq_num'},
-                                                 full_event=True),
-                                       cal_stream),
+                         zlfc,
                          input_info={'img': ('img', 0),
                                      'geo': ('geo', 1)},
                          output_info=[('mask', {'dtype': 'array',
@@ -237,27 +243,21 @@ def conf_master_pipeline(db):
     # mask_stream.sink(star(LiveImage('mask')))
 
     # generate binner stream
+    zlmc = es.zip_latest(mask_stream, cal_stream)
+    # zlmc.sink(pprint)
     binner_stream = es.map(generate_binner,
-                           es.zip_latest(mask_stream, cal_stream),
+                           zlmc,
                            input_info={'geo': ('geo', 1),
                                        'mask': ('mask', 0)},
                            output_info=[('binner', {'dtype': 'function',
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    """
-    binner_stream = es.map(generate_binner,
-                           cal_stream,
-                           input_info={'geo': ('geo', 0)},
-                           output_info=[('binner', {'dtype': 'function',
-                                                    'source': 'testing'})],
-                           img_shape=(2048, 2048),
-                           stream_name='Binners')
-    binner_stream.sink(pprint)
-    """
-
+    # binner_stream.sink(pprint)
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+    # zlpb.sink(pprint)
     iq_stream = es.map(integrate,
-                       es.zip_latest(p_corrected_stream, binner_stream),
+                       zlpb,
                        input_info={'img': ('img', 0),
                                    'binner': ('binner', 1)},
                        output_info=[('q', {'dtype': 'array',
@@ -265,8 +265,9 @@ def conf_master_pipeline(db):
                                     ('iq', {'dtype': 'array',
                                             'source': 'testing'})],
                        stream_name='I(Q)')
+
     # iq_stream.sink(pprint)
-    iq_stream.sink(star(LiveWaterfall('q', 'iq')))
+    # iq_stream.sink(star(LiveWaterfall('q', 'iq', units=['Q (A^-1)', 'Arb'])))
 
     def pdf_getter(*args, **kwargs):
         pg = PDFGetter()
@@ -277,7 +278,7 @@ def conf_master_pipeline(db):
                                      output_info=[('composition',
                                                    {'dtype': 'str'})],
                                      stream_name='Sample Composition')
-    composition_stream.sink(pprint)
+    # composition_stream.sink(pprint)
     pdf_stream = es.map(pdf_getter,
                         es.zip_latest(iq_stream, composition_stream),
                         input_info={0: ('q', 0), 1: ('iq', 0),
@@ -285,7 +286,8 @@ def conf_master_pipeline(db):
                         output_info=[('r', {'dtype': 'array'}),
                                      ('pdf', {'dtype': 'array'})],
                         dataformat='QA', qmaxinst=28, qmax=22)
-    pdf_stream.sink(star(LiveWaterfall('r', 'pdf')))
+    # pdf_stream.sink(pprint)
+    # pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=['r (A)', 'G(r) A^-3'])))
     """
     # z-score the data
     z_score_stream = es.map(z_score_image,
@@ -311,6 +313,5 @@ def conf_master_pipeline(db):
     structure = es.map(refine_structure, es.zip_latest(pdf_stream,
                                                        trial_structure_stream))
 
-    # source.visualize()
     # """
     return source

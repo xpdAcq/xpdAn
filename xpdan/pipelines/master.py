@@ -4,11 +4,11 @@ import shed.event_streams as es
 
 from streamz import Stream
 from xpdan.pipelines.dark_workflow import source as dark_source
-from xpdan.pipelines.pipeline_chunks import (fg_dark_stream_source,
-                                             dark_sub_fg,
-                                             if_not_dark_stream_source,
+from xpdan.pipelines.pipeline_chunks import (if_not_dark_stream_source,
                                              foreground_stream,
-                                             get_make_calibration)
+                                             get_or_make_calibration,
+                                             calibration_results)
+from xpdan.pipelines.dark_subtraction_logic import fg_dark_stream_source, dark_sub_fg
 
 # from databroker import db
 db = None
@@ -43,11 +43,9 @@ if_not_dark_stream.connect(fg_dark_stream_source)
 # push dark corrected data into background subtraction setup
 dark_sub_fg.connect(if_not_dark_stream_source)
 
-# pull data from background subtraction
-foreground_stream.connect(get_make_calibration)
-# if calibration stream go run calibration and get calibration data back
+# pull data from background subtraction and push into calibration
+foreground_stream.connect(get_or_make_calibration)
 
-# if not calibration stream get calibration data
 
 # polarization correction
 

@@ -137,7 +137,7 @@ def query_dark(db, docs, schema=1):
     """
     if schema == 1:
         doc = docs[0]
-        return db(uid=doc['sc_dk_field_uid'])
+        return db[doc['sc_dk_field_uid']]
 
 
 def query_background(db, docs, schema=1):

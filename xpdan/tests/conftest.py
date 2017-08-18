@@ -89,14 +89,14 @@ def tif_exporter_template():
 @pytest.fixture(scope='function')
 def exp_db(db, tmp_dir, img_size, fresh_RE):
     db2 = db
-    fs = db2.fs
-    fs.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
+    reg = db2.reg
+    reg.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
     RE = fresh_RE
     RE.subscribe(db.insert)
 
-    insert_imgs(RE, fs, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
-    insert_imgs(RE, fs, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
-    insert_imgs(RE, fs, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)
     yield db2
 
 

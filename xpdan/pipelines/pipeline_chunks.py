@@ -1,31 +1,15 @@
-import shed.event_streams as es
-from streamz import Stream
-
 from operator import sub, add, truediv
 
+import shed.event_streams as es
+
+from streamz import Stream
 from xpdan.db_utils import query_dark, temporal_prox, query_background
+from xpdan.pipelines.dark_subtraction_logic import dark_sub_fg
 from xpdan.tools import pull_array, event_count
 
 db = None
 
-fg_dark_stream_source = Stream(name='Foreground for background subtraction')
 
-# Find the dark data and un-pack it
-fg_dark_stream = es.QueryUnpacker(db, es.Query(db, fg_dark_stream_source,
-                                               query_function=query_dark,
-                                               query_decider=temporal_prox,
-                                               name='Query for FG Dark'))
-# Do the dark subtraction
-dark_sub_fg = es.map(sub,
-                     es.zip_latest(fg_dark_stream_source,
-                                   fg_dark_stream),
-                     input_info={'img1': ('pe1_image', 0),
-                                 'img2': ('pe1_image', 1)},
-                     output_info=[('img', {'dtype': 'array',
-                                           'source': 'testing'})],
-                     name='Dark Subtracted Foreground',
-                     analysis_stage='dark_sub'
-                     )
 
 # Figure out if there is a background to subtract
 if_not_dark_stream_source = Stream(name='dark_corrected_data')
@@ -104,7 +88,7 @@ fg_sub_bg = es.map(sub,
 
 foreground_stream = fg_sub_bg.union(if_not_background_stream)
 
-get_make_calibration = Stream()
+get_or_make_calibration = Stream()
 
 
 def if_calibration(docs):
@@ -116,10 +100,22 @@ def if_not_calibration(docs):
     doc = docs[0]
     return not 'calibration_server_uid' in doc
 
-if_calibration_stream = es.filter(if_calibration, get_make_calibration,
-                                 full_event=True, input_info=None,
-                                 document_name='start')
+# if calibration stream go run calibration and get calibration data back
+if_calibration_stream = es.filter(if_calibration, get_or_make_calibration,
+                                  full_event=True, input_info=None,
+                                  document_name='start')
 
-if_not_calibration_stream = es.filter(if_calibration, get_make_calibration,
-                                 full_event=True, input_info=None,
-                                 document_name='start')
+# if not calibration stream get calibration data
+if_not_calibration_stream = es.filter(if_calibration, get_or_make_calibration,
+                                      full_event=True, input_info=None,
+                                      document_name='start')
+
+cal_md_stream = es.Eventify(source, start_key='calibration_md',
+                            output_info=[('calibration_md',
+                                          {'dtype': 'dict',
+                                           'source': 'workflow'})],
+                            md=dict(name='Calibration'))
+cal_stream = es.map(load_geo, cal_md_stream,
+                    input_info={'cal_params': 'calibration_md'},
+                    output_info=[('geo',
+                                  {'dtype': 'object', 'source': 'workflow'})])

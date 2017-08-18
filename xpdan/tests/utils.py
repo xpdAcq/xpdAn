@@ -81,5 +81,6 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     light_md = base_md.copy()
     light_md.update(name='test', sc_dk_field_uid=dark_uid)
     uid = RE(count([light_det], num=n), **light_md)
+    print(dark_uid, uid)
 
     return uid

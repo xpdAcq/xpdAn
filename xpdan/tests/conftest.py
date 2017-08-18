@@ -94,9 +94,14 @@ def exp_db(db, tmp_dir, img_size, fresh_RE):
     RE = fresh_RE
     RE.subscribe(db.insert)
 
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, bt_safN=0, pi_name='chris')
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='tim', bt_safN=1)
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2)
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, bt_safN=0,
+                pi_name='chris', sample_name='hi', sample_composition='Au')
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='tim',
+                bt_safN=1, sample_name='hi2', bkgd_sample_name='hi',
+                sample_composition='Au')
+    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2,
+                sample_name='hi2', bkgd_sample_name='hi',
+                sample_composition='Au')
     yield db2
 
 

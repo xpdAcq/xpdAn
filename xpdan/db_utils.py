@@ -130,6 +130,8 @@ def query_dark(db, docs, schema=1):
     ----------
     db: Broker instance
     docs: tuple of dict
+    schema: int
+        Schema version
 
     Returns
     -------

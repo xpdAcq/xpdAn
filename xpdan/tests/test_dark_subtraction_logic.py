@@ -1,4 +1,4 @@
-from xpdan.pipelines.dark_subtraction_logic import (configure_dark_sub)
+from xpdan.pipelines.dark_subtraction_chunk import (configure_dark_sub)
 from numpy.testing import assert_allclose
 import numpy as np
 

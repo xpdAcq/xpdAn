@@ -3,6 +3,7 @@ from operator import sub
 from streamz import Stream
 from xpdan.db_utils import query_dark, temporal_prox
 import shed.event_streams as es
+from xpdan.glbl import an_glbl
 
 
 def configure_dark_sub(db):
@@ -29,3 +30,6 @@ def configure_dark_sub(db):
     return (fg_dark_stream_source, dark_query,
             dark_query_results,
             dark_sub_fg)
+
+(fg_dark_stream_source, dark_query,
+ dark_query_results, dark_sub_fg) = configure_dark_sub(an_glbl)

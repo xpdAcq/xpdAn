@@ -4,12 +4,10 @@ import shed.event_streams as es
 
 from streamz import Stream
 from xpdan.db_utils import query_dark, temporal_prox, query_background
-from xpdan.pipelines.dark_subtraction_logic import dark_sub_fg
+from xpdan.pipelines.dark_subtraction_chunk import dark_sub_fg
 from xpdan.tools import pull_array, event_count
 
 db = None
-
-
 
 # Figure out if there is a background to subtract
 if_not_dark_stream_source = Stream(name='dark_corrected_data')

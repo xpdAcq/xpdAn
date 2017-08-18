@@ -267,9 +267,11 @@ def generate_binner(geo, img_shape, mask=None):
     qbin_sizes = rbinned(q_dq.ravel())
     qbin_sizes = np.nan_to_num(qbin_sizes)
     qbin = np.cumsum(qbin_sizes)
-    if mask:
+    if mask is not None:
         mask = mask.flatten()
-    return BinnedStatistic1D(q.flatten(), bins=qbin, mask=mask)
+    return BinnedStatistic1D(q.flatten(), bins=qbin,
+                             mask=mask
+                             )
 
 
 def z_score_image(img, binner):
@@ -289,7 +291,7 @@ def z_score_image(img, binner):
 
 
 def integrate(img, binner):
-    return binner.bin_centers, binner(img.flatten())
+    return binner.bin_centers, np.nan_to_num(binner(img.flatten()))
 
 
 def polarization_correction(img, geo, polarization_factor=.99):

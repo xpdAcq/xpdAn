@@ -11,7 +11,7 @@ import tifffile
 
 
 # supplementary functions
-from databroker import DataBroker as db
+from databroker import db
 
 
 def _timestampstr(timestamp):

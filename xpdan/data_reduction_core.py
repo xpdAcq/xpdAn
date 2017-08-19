@@ -23,7 +23,7 @@ from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
 from .tools import mask_img, decompress_mask
 from xpdan.dev_utils import _clean_info, _timestampstr
-from xpdan.io import read_fit2d_msk
+from skbeam.io.fit2d import read_fit2d_msk
 
 
 def _mask_logic(header, mask_setting, ai=None, mask_dict=None, root_dir=None,

@@ -23,7 +23,7 @@ import pytest
 from xpdan.fuzzybroker import FuzzyBroker
 # from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
-from xpdan.io import fit2d_save
+from skbeam.io.fit2d import fit2d_save
 from xpdan.tests.utils import insert_imgs
 from bluesky.tests.conftest import fresh_RE
 from bluesky.examples import ReaderWithRegistryHandler

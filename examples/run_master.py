@@ -10,6 +10,7 @@ from databroker.broker import Broker
 from databroker.assets.sqlite import RegistryRO
 from databroker.headersource.sqlite import MDSRO
 from xpdan.pipelines.master import conf_master_pipeline
+from tempfile import TemporaryDirectory
 
 # from xpdan.tools import better_mask_img
 
@@ -20,29 +21,17 @@ mds = MDSRO(d)
 fs = RegistryRO(d)
 fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
-source = conf_master_pipeline(db)
-# source.visualize()
-seen = False
-for e in db[-1].stream(fill=True):
-    if e[0] == 'event':
-        plt.pause(.5)
-        if not seen:
-            seen = True
-            source.emit(e)
-    else:
-        source.emit(e)
-
-print('start second run ----------------------------------------------------')
-
-seen = False
-for e in db[-1].stream(fill=True):
-    if e[0] == 'event':
-        plt.pause(.5)
-        if not seen:
-            seen = True
-            source.emit(e)
-    else:
+td = TemporaryDirectory()
+source = conf_master_pipeline(db, td.name,
+                              vis=False
+                              )
+source.visualize()
+for hdr in list((db[-1], )):
+    for e in hdr.stream(fill=True):
+        if e[0] == 'event':
+            plt.pause(.1)
         source.emit(e)
 
 plt.show()
 plt.close("all")
+td.cleanup()

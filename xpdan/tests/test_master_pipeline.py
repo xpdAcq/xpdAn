@@ -1,13 +1,13 @@
 import os
 
-from xpdan.pipelines.master import conf_master_pipeline
+from xpdan.pipelines.main import conf_main_pipeline
 
 
 def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
     """Decider between pipelines"""
 
-    source = conf_master_pipeline(exp_db, fast_tmp_dir,
-                                  # vis=False,
+    source = conf_main_pipeline(exp_db, fast_tmp_dir,
+                                # vis=False,
                                   write_to_disk=True)
     source.visualize('/home/christopher/dev/xpdAn/examples/mystream.png')
     for nd in exp_db[-1].documents(fill=True):

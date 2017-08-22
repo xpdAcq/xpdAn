@@ -9,7 +9,7 @@ from databroker.broker import Broker
 # pull from local data, not needed at beamline
 from databroker.assets.sqlite import RegistryRO
 from databroker.headersource.sqlite import MDSRO
-from xpdan.pipelines.master import conf_master_pipeline
+from xpdan.pipelines.main import conf_main_pipeline
 from tempfile import TemporaryDirectory
 
 # from xpdan.tools import better_mask_img
@@ -22,9 +22,9 @@ fs = RegistryRO(d)
 fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
 td = TemporaryDirectory()
-source = conf_master_pipeline(db, td.name,
-                              vis=False
-                              )
+source = conf_main_pipeline(db, td.name,
+                            vis=False
+                            )
 source.visualize()
 for hdr in list((db[-1], )):
     for e in hdr.stream(fill=True):

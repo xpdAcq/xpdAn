@@ -19,8 +19,7 @@ from xpdan.dev_utils import _timestampstr
 from xpdan.formatters import PartialFormatter, CleanFormatter
 from xpdan.io import pdf_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
-                                            if_calibration, if_not_calibration,
-                                            dark_template_func)
+                                            if_calibration, if_not_calibration)
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
@@ -28,16 +27,74 @@ from xpdan.tools import (pull_array, event_count,
 from xpdview.callbacks import LiveWaterfall
 
 
-def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
+def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
+                       polarization_factor=.99,
+                       image_data_key='pe1_image',
+                       mask_setting='default',
+                       mask_kwargs=None,
+                       pdf_config=None):
+    """Total data processing pipeline for XPD
+
+    Parameters
+    ----------
+    db: databroker.broker.Broker instance
+        The databroker holding the data, this must be specified as a `db=` in
+        the function call (keyword only argument)
+    write_to_disk: bool, optional
+        If True write files to disk, defaults to False
+    save_dir: str
+        The folder in which to save the data, this must be specified as a
+        `save_dir=` in the function call (keyword only argument)
+    vis: bool, optional
+        If True visualize the data. Defaults to False
+    polarization_factor : float, optional
+        polarization correction factor, ranged from -1(vertical) to +1
+        (horizontal). default is 0.99. set to None for no
+        correction.
+    mask_setting : str optional
+        If 'default' reuse mask created for first image, otherwise mask all
+        images. Defaults to 'default'
+    mask_kwargs : dict, optional
+        dictionary stores options for automasking functionality.
+        default is defined by an_glbl.auto_mask_dict.
+        Please refer to documentation for more details
+    image_data_key: str, optional
+        The key for the image data, defaults to `pe1_image`
+    pdf_config: dict, optional
+        Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+        ``dict(dataformat='QA', qmaxinst=28, qmax=22)``
+
+    Returns
+    -------
+    source: Stream
+        The source for the graph
+
+    See also
+    --------
+    xpdan.tools.mask_img
+    """
+    if pdf_config is None:
+        pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
+    if mask_kwargs is None:
+        mask_kwargs = {}
+    light_template = os.path.join(
+        save_dir,
+        '{sample_name}/{folder_tag}/{analysis_stage}/'
+        '{sample_name}_{human_timestamp}'
+        '_[temp={temperature:1.2f}]'
+        '_[dx={diff_x:1.3f}]'
+        '_[dy={diff_y:1.3f}]'
+        '_{uid:.6}'
+        '_{seq_num:03d}{ext}')
     fmt = PartialFormatter()
     source = Stream(stream_name='Raw Data')
     # source.sink(pprint)
 
     # DARK PROCESSING
     # if dark send to dark writer
-    if_dark_stream = es.filter(if_dark, source, input_info=None,
-                               document_name='start',
-                               stream_name='If dark')
+    # if_dark_stream = es.filter(if_dark, source, input_info=None,
+    #                            document_name='start',
+    #                            stream_name='If dark')
 
     # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,
@@ -56,8 +113,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                          es.zip_latest(if_not_dark_stream,
                                        dark_query_results,
                                        stream_name='Combine darks and lights'),
-                         input_info={0: ('pe1_image', 0),
-                                     1: ('pe1_image', 1)},
+                         input_info={0: (image_data_key, 0),
+                                     1: (image_data_key, 1)},
                          output_info=[('img', {'dtype': 'array',
                                                'source': 'testing'})],
                          md=dict(stream_name='Dark Subtracted Foreground',
@@ -91,8 +148,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
     dark_sub_bg = es.map(sub,
                          es.zip_latest(bg_stream, bg_dark_stream,
                                        stream_name='Combine bg and bg dark'),
-                         input_info={0: ('pe1_image', 0),
-                                     1: ('pe1_image', 1)},
+                         input_info={0: (image_data_key, 0),
+                                     1: (image_data_key, 1)},
                          output_info=[('img', {'dtype': 'array',
                                                'source': 'testing'})],
                          stream_name='Dark Subtracted Background')
@@ -148,7 +205,6 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
     if_not_background_split_stream = es.split(if_not_background_stream, 2)
 
     # union of background and not background branch
-    # XXX: this needs to pull from the dark sub FG
     foreground_stream = fg_sub_bg.union(
         if_not_background_split_stream.split_streams[0])
     foreground_stream.stream_name = 'Pull from either bgsub or not sub'
@@ -202,24 +258,25 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
     zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
                          stream_name='Combine FG and Calibration')
     # zlfl.sink(pprint)
-    pfactor = .99
     p_corrected_stream = es.map(polarization_correction,
                                 zlfl,
                                 input_info={'img': ('img', 0),
                                             'geo': ('geo', 1)},
                                 output_info=[('img', {'dtype': 'array',
                                                       'source': 'testing'})],
-                                polarization_factor=pfactor,
+                                polarization_factor=polarization_factor,
                                 stream_name='Polarization corrected img')
     # p_corrected_stream.sink(pprint)
     # generate masks
-    zlfc = es.zip_latest(es.filter(lambda x: x == 1,
-                                   p_corrected_stream,
-                                   input_info={0: 'seq_num'},
-                                   full_event=True),
-                         cal_stream)
+    if mask_setting == 'default':
+        zlfc = es.zip_latest(es.filter(lambda x: x == 1,
+                                       p_corrected_stream,
+                                       input_info={0: 'seq_num'},
+                                       full_event=True),
+                             cal_stream)
+    else:
+        zlfc = es.zip_latest(p_corrected_stream, cal_stream)
     # zlfc.sink(pprint)
-    mask_kwargs = {'bs_width': None}
     mask_stream = es.map(mask_img,
                          zlfc,
                          input_info={'img': ('img', 0),
@@ -282,7 +339,7 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                         output_info=[('r', {'dtype': 'array'}),
                                      ('pdf', {'dtype': 'array'}),
                                      ('config', {'dtype': 'dict'})],
-                        dataformat='QA', qmaxinst=28, qmax=22,
+                        **pdf_config,
                         md=dict(analysis_stage='pdf'))
     # pdf_stream.sink(pprint)
     """
@@ -323,15 +380,6 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
 
     # dark_template = os.path.join(tiff_base,
     #                              'dark/{human_timestamp}_{uid}{ext}')
-    light_template = os.path.join(
-        tiff_base,
-        '{sample_name}/{folder_tag}/{analysis_stage}/'
-        '{sample_name}_{human_timestamp}'
-        '_[temp={temperature:1.2f}]'
-        '_[dx={diff_x:1.3f}]'
-        '_[dy={diff_y:1.3f}]'
-        '_{uid:.6}'
-        '_{seq_num:03d}{ext}')
     # dark_template_stream = es.map(dark_template_func, if_dark_stream,
     #                               template=dark_template,
     #                               full_event=True,

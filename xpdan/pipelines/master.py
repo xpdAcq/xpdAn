@@ -27,6 +27,7 @@ from xpdview.callbacks import LiveWaterfall
 from collections import defaultdict
 import re
 from pathlib import Path
+import yaml
 
 import string
 
@@ -404,10 +405,6 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
         '_[dx={diff_x:1.3f}]'
         '_[dy={diff_y:1.3f}]'
         '_{uid}_{seq_num:03d}{ext}')
-    md_template = os.path.join(
-        tiff_base,
-        '{sample_name}/{folder_tag}/'
-        '{human_timestamp}_{uid}_{sample_name}_md.yml')
     dark_template_stream = es.map(dark_template_func, if_dark_stream,
                                   template=dark_template,
                                   full_event=True,
@@ -436,11 +433,11 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                       full_event=True,
                       output_info=[('template', {'dtype': 'str'})])
 
-    eventifies = [eventify_raw] + [es.Eventify(s) for s in
-                                   [dark_sub_fg,
-                                    mask_stream,
-                                    iq_stream,
-                                    pdf_stream]]
+    eventifies = [es.Eventify(s) for s in
+                  [dark_sub_fg,
+                   mask_stream,
+                   iq_stream,
+                   pdf_stream]]
 
     def render_2_func(a, x, ext):
         return fmt.format(a, ext=ext, **x)
@@ -453,7 +450,7 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                                      {'dtype': 'str'})],
                        ext=ext
                        ) for e, ext in zip(eventifies,
-                                           ['.tiff', '.tiff',
+                                           ['.tiff',
                                             '.msk',
                                             '_Q.chi', '.gr'])]
 
@@ -479,42 +476,58 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                             input_info={0: 'template'},
                             output_info=[('filename', {'dtype': 'str'})]
                             ) for s in render_2]
+    make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
+                                              exist_ok=True), cs,
+                        input_info={0: 'filename'}
+                        ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
-    es.map(lambda **x: pprint(x['data']['filename']), clean_streams[-1],
-           full_event=True)
-    """
-    templater_streams_3[-1].sink(pprint)
+    # [es.map(lambda **x: pprint(x['data']['filename']), cs,
+    #         full_event=True) for cs in clean_streams]
+
+    render_md_0 = es.map(lambda a, **x: fmt.format(a, **x),
+                         eventify_raw,
+                         a=light_template,
+                         output_info=[('template', {'dtype': 'str'})],
+                         ext='md.yml')
+    md_cleanup = es.map(clean_template, render_md_0,
+                        input_info={0: 'template'},
+                        output_info=[('filename', {'dtype': 'str'})])
+    # md_cleanup.sink(pprint)
+
+    # """
     if write_to_disk:
         iis = [
-            {'data': ('pe1_image', 0), 'file': ('template', 1)},
-            {'data': ('img', 0), 'file': ('template', 1)},
-            {'mask': ('mask', 0), 'filename': ('template', 1)},
-            {'tth': ('q', 0), 'intensity': ('iq', 1),
-             'output_name': ('template', 1)},
-            {'x': ('r', 0), 'y': ('pdf', 1), 'template': ('template', 1)},
+            {'data': ('img', 0), 'file': ('filename', 1)},
+            {'mask': ('mask', 0), 'filename': ('filename', 1)},
+            {'tth': ('q', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
+            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1)},
         ]
 
-        dark_writer = es.map(tifffile.imsave,
-                             es.zip(source, dark_template_stream),
-                             input_info={'data': ('pe1_image', 0),
-                                         'file': ('file_path', 1)},
-                             output_info=[('output_file', {'dtype': None})])
         writer_streams = [
             es.map(writer_templater,
                    es.zip_latest(s1, s2),
                    input_info=ii,
-                   output_info=[('final_filename',
-                                 {'dtype': 'str'})],
+                   output_info=[('final_filename', {'dtype': 'str'})],
                    **kwargs) for s1, s2, ii, writer_templater, kwargs in
             zip(
-                [if_not_dark_stream, dark_sub_fg, mask_stream, iq_stream,
-                 pdf_stream],
-                templater_streams_3,
+                [dark_sub_fg, mask_stream, iq_stream, pdf_stream],
+                clean_streams,
                 iis,
-                [tifffile.imsave, tifffile.imsave,
-                 fit2d_save,
-                 save_output, pdf_saver],
-                [{}, {}, {}, {'q_or_2theta': 'Q', 'ext': ''}]
+                [tifffile.imsave, fit2d_save, save_output, pdf_saver],
+                [{}, {}, {'q_or_2theta': 'Q', 'ext': ''}, {}]
             )]
-    """
+
+        def dump_yml(filename, data):
+            if not os.path.exists(filename):
+                os.makedirs(os.path.split(filename)[0])
+            with open(filename, 'w') as f:
+                yaml.dump(data, f)
+
+        md_writer = es.map(dump_yml, es.zip(eventify_raw, md_cleanup),
+                           input_info={0: (('data', 'filename'), 1),
+                                       1: (('data',), 0)},
+                           full_event=True)
+
+    # """
     return source

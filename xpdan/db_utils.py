@@ -139,7 +139,7 @@ def query_dark(db, docs, schema=1):
     """
     if schema == 1:
         doc = docs[0]
-        return db(uid=doc['sc_dk_field_uid'])
+        return db[doc['sc_dk_field_uid']]
 
 
 def query_background(db, docs, schema=1):
@@ -150,8 +150,7 @@ def query_background(db, docs, schema=1):
 
 
 def temporal_prox(res, docs):
-    if not isinstance(res, tuple):
-        res = res
+    print(res)
     doc = docs[0]
     t = doc['time']
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]

@@ -61,9 +61,29 @@ def clean_database(database):
         sub_db._connection.drop_database(sub_db.config['database'])
 
 
+@pytest.fixture(scope='function')
+def start_uid1(exp_db):
+    print(exp_db[1])
+    assert 'start_uid1' in exp_db[2]['start']
+    return str(exp_db[2]['start']['uid'])
+
+
+@pytest.fixture(scope='function')
+def start_uid2(exp_db):
+    assert 'start_uid2' in exp_db[4]['start']
+    return str(exp_db[4]['start']['uid'])
+
+
+@pytest.fixture(scope='function')
+def start_uid3(exp_db):
+    assert 'start_uid3' in exp_db[6]['start']
+    return str(exp_db[6]['start']['uid'])
+
+
 @pytest.fixture(scope='module')
 def img_size():
-    a = np.random.random_integers(100, 200)
+    # a = np.random.random_integers(100, 200)
+    a = 2048
     yield (a, a)
 
 
@@ -95,13 +115,16 @@ def exp_db(db, tmp_dir, img_size, fresh_RE):
     RE.subscribe(db.insert)
 
     insert_imgs(RE, reg, 5, img_size, tmp_dir, bt_safN=0,
-                pi_name='chris', sample_name='hi', sample_composition='Au')
+                pi_name='chris', sample_name='kapton', sample_composition='C',
+                start_uid1=True)
     insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='tim',
-                bt_safN=1, sample_name='hi2', bkgd_sample_name='hi',
-                sample_composition='Au')
+                bt_safN=1, sample_name='Au', bkgd_sample_name='kapton',
+                sample_composition='Au',
+                start_uid2=True)
     insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2,
-                sample_name='hi2', bkgd_sample_name='hi',
-                sample_composition='Au')
+                sample_name='Au', bkgd_sample_name='kapton',
+                sample_composition='Au',
+                start_uid3=True)
     yield db2
 
 

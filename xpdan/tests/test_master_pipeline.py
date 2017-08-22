@@ -14,7 +14,7 @@ def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
         source.emit(nd)
     for root, dirs, files in os.walk(fast_tmp_dir):
         level = root.replace(fast_tmp_dir, '').count(os.sep)
-        indent = ' ' * 4 * (level)
+        indent = ' ' * 4 * level
         print('{}{}/'.format(indent, os.path.basename(root)))
         subindent = ' ' * 4 * (level + 1)
         for f in files:

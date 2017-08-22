@@ -13,13 +13,13 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+
 from heapq import heapify, heappushpop
 from pprint import pprint
+import datetime
+import pytz
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
-
-import pytz
-import datetime
 
 from databroker.broker import Broker
 

@@ -39,12 +39,9 @@ def _prepare_header_list(headers):
     return header_list
 
 
-def integrate_and_save(headers, *, db, save_dir,
-                       visualize=False,
-                       polarization_factor=0.99,
-                       mask_setting='default',
-                       mask_kwargs=None,
-                       image_data_key='pe1_image',
+def integrate_and_save(headers, *, db, save_dir, visualize=False,
+                       polarization_factor=0.99, mask_setting='default',
+                       mask_kwargs=None, image_data_key='pe1_image',
                        pdf_config=None):
     """Integrate and save dark subtracted images for given list of headers
 
@@ -87,7 +84,7 @@ def integrate_and_save(headers, *, db, save_dir,
     xpdan.tools.mask_img
     """
     hdrs = _prepare_header_list(headers)
-    source = conf_main_pipeline(db=db, vis=visualize, save_dir=save_dir,
+    source = conf_main_pipeline(db, save_dir, vis=visualize,
                                 write_to_disk=True,
                                 polarization_factor=polarization_factor,
                                 image_data_key=image_data_key,
@@ -96,7 +93,7 @@ def integrate_and_save(headers, *, db, save_dir,
                                 pdf_config=pdf_config)
     for hdr in hdrs:
         for nd in hdr.documents(fill=True):
-            source.sink(nd)
+            source.emit(nd)
 
 
 def integrate_and_save_last(**kwargs):
@@ -145,8 +142,7 @@ def integrate_and_save_last(**kwargs):
 
 def save_tiff(headers, *, db, save_dir,
               visualize=False,
-              image_data_key='pe1_image'
-              ):
+              image_data_key='pe1_image'):
     """Save images obtained from dataBroker as tiff format files.
 
     Parameters
@@ -172,7 +168,7 @@ def save_tiff(headers, *, db, save_dir,
                                      )
     for hdr in hdrs:
         for nd in hdr.documents(fill=True):
-            source.sink(nd)
+            source.emit(nd)
 
 
 def save_last_tiff(**kwargs):

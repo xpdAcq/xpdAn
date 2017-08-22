@@ -25,6 +25,7 @@ from xpdan.tools import (pull_array, event_count,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
+from pprint import pprint
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -51,8 +52,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         polarization correction factor, ranged from -1(vertical) to +1
         (horizontal). default is 0.99. set to None for no
         correction.
-    mask_setting : str optional
-        If 'default' reuse mask created for first image, otherwise mask all
+    mask_setting : str, optional
+        If 'default' reuse mask created for first image, if auto mask all
         images. Defaults to 'default'
     mask_kwargs : dict, optional
         dictionary stores options for automasking functionality.
@@ -77,6 +78,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
     if mask_kwargs is None:
         mask_kwargs = {}
+    print('start pipeline configuration')
     light_template = os.path.join(
         save_dir,
         '{sample_name}/{folder_tag}/{analysis_stage}/'
@@ -274,7 +276,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
                              cal_stream)
-    else:
+    elif mask_setting == 'auto':
         zlfc = es.zip_latest(p_corrected_stream, cal_stream)
     # zlfc.sink(pprint)
     mask_stream = es.map(mask_img,
@@ -466,8 +468,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                         stream_name='Make dirs {}'.format(cs.stream_name)
                         ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
-    # [es.map(lambda **x: pprint(x['data']['filename']), cs,
-    #         full_event=True) for cs in clean_streams]
+    [es.map(lambda **x: pprint(x['data']['filename']), cs,
+            full_event=True) for cs in clean_streams]
 
     render_md_0 = es.map(lambda a, **x: fmt.format(a, **x),
                          eventify_raw,

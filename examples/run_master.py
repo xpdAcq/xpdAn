@@ -23,9 +23,9 @@ fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
 td = TemporaryDirectory()
 source = conf_main_pipeline(db, td.name,
-                            vis=False
+                            # vis=False,
+                            write_to_disk=False
                             )
-source.visualize()
 for hdr in list((db[-1], )):
     for e in hdr.stream(fill=True):
         if e[0] == 'event':

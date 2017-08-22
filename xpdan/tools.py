@@ -15,6 +15,7 @@
 import numpy as np
 import datetime
 import scipy.stats as sts
+from diffpy.pdfgetx import PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 
@@ -307,6 +308,25 @@ def load_geo(cal_params):
 
 def event_count(x):
     return x['count'] + 1
+
+
+def add_img(img1, img2):
+    # Note that this exists because accumulate doesn't take args yet
+    return img1 + img2
+
+
+def pdf_getter(*args, **kwargs):
+    pg = PDFGetter()
+    res = pg(*args, **kwargs)
+    return res[0], res[1], pg.config
+
+
+def fq_getter(*args, **kwargs):
+    pg = PDFGetter()
+    pg(*args, **kwargs)
+    res = pg.fq
+    return res[0], res[1], pg.config
+
 
 def _timestampstr(timestamp):
     """convert timestamp to strftime formate"""

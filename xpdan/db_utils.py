@@ -105,7 +105,8 @@ def scan_summary(hdrs, fields=None, verbose=True):
     fields = fields
     datas = []
     for i, hdr in enumerate(hdrs):
-        data = [hdr['start'][key] for key in fields if key in hdr['start'].keys()]
+        data = [hdr['start'][key] for key in fields if key in
+                hdr['start'].keys()]
         data2 = {key: hdr['start'][key] for key in fields if
                  key in hdr['start'].keys()}
 

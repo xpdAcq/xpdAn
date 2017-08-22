@@ -1,99 +1,31 @@
 """Decider between pipelines"""
 import os
+import re
+from collections import defaultdict
 from operator import sub, truediv
-from pprint import pprint
+from pathlib import Path
 
 import shed.event_streams as es
 import tifffile
-from diffpy.pdfgetx import PDFGetter
+import yaml
 from shed.event_streams import dstar, star
 
 from bluesky.callbacks.broker import LiveImage
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from streamz import Stream
-from xpdan.dev_utils import _timestampstr
 from xpdan.db_utils import query_dark, temporal_prox, query_background
+from xpdan.dev_utils import _timestampstr
+from xpdan.formatters import PartialFormatter, CleanFormatter
 from xpdan.io import pdf_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
                                             if_calibration, if_not_calibration,
-                                            dark_template_func,
-                                            templater1_func,
-                                            templater2_func, templater3_func)
+                                            dark_template_func)
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
-                         polarization_correction, mask_img)
+                         polarization_correction, mask_img, add_img,
+                         pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
-from collections import defaultdict
-import re
-from pathlib import Path
-import yaml
-
-import string
-
-
-class PartialFormatter(string.Formatter):
-    def get_field(self, field_name, args, kwargs):
-        # Handle a key not found
-        try:
-            val = super(PartialFormatter, self).get_field(field_name, args,
-                                                          kwargs)
-            # Python 3, 'super().get_field(field_name, args, kwargs)' works
-        except (KeyError, AttributeError):
-            val = '{' + field_name + '}', field_name
-        return val
-
-    def format_field(self, value, spec):
-        # handle an invalid format
-        if value is None:
-            return spec
-        try:
-            return super(PartialFormatter, self).format_field(value, spec)
-        except ValueError:
-            return value[:-1] + ':' + spec + value[-1]
-
-
-class PartialFormatterCleaner(string.Formatter):
-    def get_field(self, field_name, args, kwargs):
-        # Handle a key not found
-        try:
-            val = super(PartialFormatterCleaner, self).get_field(field_name,
-                                                                 args,
-                                                                 kwargs)
-            # Python 3, 'super().get_field(field_name, args, kwargs)' works
-        except (KeyError, AttributeError):
-            val = '', field_name
-        return val
-
-    def format_field(self, value, spec):
-        # handle an invalid format
-        if value is None:
-            return spec
-        try:
-            return super(PartialFormatterCleaner, self).format_field(value,
-                                                                     spec)
-        except ValueError:
-            return ''
-
-
-def clean_path(path):
-    cfmt = PartialFormatterCleaner()
-    d = cfmt.format(path, (defaultdict(str)))
-    print(d)
-    y = re.sub(r"_\[(?s)(.*)=\]_", "_", d)
-    print(y)
-    x = re.sub(r"_\((?s)(.*)=\).", ".", y)
-    print(x)
-    z = re.sub(r"__+", "_", x)
-    print(z)
-    e = z.replace('[', '')
-    e = e.replace(']', '')
-    e = e.replace('(', '')
-    e = e.replace(')', '')
-    print(e)
-    f = Path(e).as_posix()
-    print(f)
-    return f
 
 
 def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
@@ -170,8 +102,6 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                                       name='Background Bundle')
 
     # sum the backgrounds
-    def add_img(img1, img2):
-        return img1 + img2
 
     summed_bg = es.accumulate(dstar(add_img), bg_bundle,
                               start=dstar(pull_array),
@@ -269,7 +199,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
     # send calibration and corrected images to main workflow
     # polarization correction
     # SPLIT INTO TWO NODES
-    zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream)
+    zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
+                         stream_name='Combine FG and Calibration')
     # zlfl.sink(pprint)
     pfactor = .99
     p_corrected_stream = es.map(polarization_correction,
@@ -325,16 +256,9 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                        md=dict(analysis_stage='iq'))
 
     # iq_stream.sink(pprint)
-    def pdf_getter(*args, **kwargs):
-        pg = PDFGetter()
-        return pg(*args, **kwargs)
-
-    def fq_getter(*args, **kwargs):
-        pg = PDFGetter()
-        pg(*args, **kwargs)
-        return pg.fq
 
     composition_stream = es.Eventify(if_not_dark_stream,
+                                     # Change this to sample_composition
                                      'sample_name',
                                      output_info=[('composition',
                                                    {'dtype': 'str'})],
@@ -346,7 +270,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                        input_info={0: ('q', 0), 1: ('iq', 0),
                                    'composition': ('composition', 1)},
                        output_info=[('q', {'dtype': 'array'}),
-                                    ('fq', {'dtype': 'array'})],
+                                    ('fq', {'dtype': 'array'}),
+                                    ('config', {'dtype': 'dict'})],
                        dataformat='QA', qmaxinst=28, qmax=22,
                        md=dict(analysis_stage='fq'))
     # pdf_stream.sink(pprint)
@@ -355,7 +280,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                         input_info={0: ('q', 0), 1: ('iq', 0),
                                     'composition': ('composition', 1)},
                         output_info=[('r', {'dtype': 'array'}),
-                                     ('pdf', {'dtype': 'array'})],
+                                     ('pdf', {'dtype': 'array'}),
+                                     ('config', {'dtype': 'dict'})],
                         dataformat='QA', qmaxinst=28, qmax=22,
                         md=dict(analysis_stage='pdf'))
     # pdf_stream.sink(pprint)
@@ -395,8 +321,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=['r (A)',
                                                               'G(r) A^-3'])))
 
-    dark_template = os.path.join(tiff_base,
-                                 'dark/{human_timestamp}_{uid}{ext}')
+    # dark_template = os.path.join(tiff_base,
+    #                              'dark/{human_timestamp}_{uid}{ext}')
     light_template = os.path.join(
         tiff_base,
         '{sample_name}/{folder_tag}/{analysis_stage}/'
@@ -404,40 +330,47 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
         '_[temp={temperature:1.2f}]'
         '_[dx={diff_x:1.3f}]'
         '_[dy={diff_y:1.3f}]'
-        '_{uid}_{seq_num:03d}{ext}')
-    dark_template_stream = es.map(dark_template_func, if_dark_stream,
-                                  template=dark_template,
-                                  full_event=True,
-                                  input_info={'timestamp': 'time'},
-                                  output_info=[
-                                      ('file_path', {'dtype': 'str'})])
+        '_{uid:.6}'
+        '_{seq_num:03d}{ext}')
+    # dark_template_stream = es.map(dark_template_func, if_dark_stream,
+    #                               template=dark_template,
+    #                               full_event=True,
+    #                               input_info={'timestamp': 'time'},
+    #                               output_info=[
+    #                                   ('file_path', {'dtype': 'str'})])
 
-    eventify_raw = es.Eventify(if_not_dark_stream, )
+    eventify_raw = es.Eventify(if_not_dark_stream, stream_name='eventify raw')
 
     h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
                                 input_info={0: 'time'},
                                 output_info=[('human_timestamp',
                                               {'dtype': 'str'})],
-                                full_event=True)
+                                full_event=True,
+                                stream_name='human timestamp')
 
     render_0 = es.map(lambda a, **x: fmt.format(a, **x),
                       es.zip_latest(es.zip(h_timestamp_stream,
                                            if_not_dark_stream),
                                     eventify_raw),
                       a=light_template,
-                      output_info=[('template', {'dtype': 'str'})])
+                      output_info=[('template', {'dtype': 'str'})],
+                      stream_name='render 0')
+
     render_1 = es.map(lambda a, x: fmt.format(a, **x),
                       es.zip(if_not_dark_stream, render_0),
                       input_info={'x': ((), 0),
                                   0: (('data', 'template'), 1)},
                       full_event=True,
-                      output_info=[('template', {'dtype': 'str'})])
+                      output_info=[('template', {'dtype': 'str'})],
+                      stream_name='render 1')
 
-    eventifies = [es.Eventify(s) for s in
-                  [dark_sub_fg,
-                   mask_stream,
-                   iq_stream,
-                   pdf_stream]]
+    eventifies = [
+        es.Eventify(s,
+                    stream_name='eventify {}'.format(s.stream_name)) for s in
+        [dark_sub_fg,
+         mask_stream,
+         iq_stream,
+         pdf_stream]]
 
     def render_2_func(a, x, ext):
         return fmt.format(a, ext=ext, **x)
@@ -448,7 +381,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
                                    1: (('data',), 1)},
                        output_info=[('template',
                                      {'dtype': 'str'})],
-                       ext=ext
+                       ext=ext,
+                       stream_name='render 2 {}'.format(e.stream_name)
                        ) for e, ext in zip(eventifies,
                                            ['.tiff',
                                             '.msk',
@@ -456,7 +390,7 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
 
     # render_2[-1].sink(pprint)
     def clean_template(template, removals=None):
-        cfmt = PartialFormatterCleaner()
+        cfmt = CleanFormatter()
         if removals is None:
             removals = ['temp', 'dx', 'dy']
         d = cfmt.format(template, defaultdict(str))
@@ -474,11 +408,14 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
 
     clean_streams = [es.map(clean_template, s,
                             input_info={0: 'template'},
-                            output_info=[('filename', {'dtype': 'str'})]
+                            output_info=[('filename', {'dtype': 'str'})],
+                            stream_name='clean template '
+                                        '{}'.format(s.stream_name)
                             ) for s in render_2]
     make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
                                               exist_ok=True), cs,
-                        input_info={0: 'filename'}
+                        input_info={0: 'filename'},
+                        stream_name='Make dirs {}'.format(cs.stream_name)
                         ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
     # [es.map(lambda **x: pprint(x['data']['filename']), cs,
@@ -501,7 +438,8 @@ def conf_master_pipeline(db, tiff_base, write_to_disk=False, vis=True):
             {'mask': ('mask', 0), 'filename': ('filename', 1)},
             {'tth': ('q', 0), 'intensity': ('iq', 0),
              'output_name': ('filename', 1)},
-            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1)},
+            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
+             'config': ('config', 0)},
         ]
 
         writer_streams = [

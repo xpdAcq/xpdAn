@@ -15,4 +15,4 @@ mask_dict:
   bs_width: 13
   tri_offset: 13
   v_asym: 0
-  alpha: 2.5
+  alpha: 3.0

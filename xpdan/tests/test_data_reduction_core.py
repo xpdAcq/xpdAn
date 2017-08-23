@@ -16,15 +16,11 @@ import os
 from itertools import product
 from pprint import pprint
 
-import numpy as np
 import pytest
 
 from xpdan.data_reduction_core import (integrate_and_save,
                                        integrate_and_save_last,
                                        save_tiff, save_last_tiff)
-
-sum_idx_values = (
-    None, 'all', [1, 2, 3], [(1, 3)], [[1, 2, 3], [2, 3]], [[1, 3], (1, 3)])
 
 integrate_params = [
     'polarization_factor',
@@ -62,7 +58,6 @@ for d in [save_tiff_kwargs, integrate_kwargs]:
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
 def test_integrate_core_smoke(exp_db, fast_tmp_dir, kwargs,
                               known_fail_bool):
-    print(kwargs)
     if known_fail_bool:
         pytest.xfail('Bad params')
     old_files = os.listdir(fast_tmp_dir)

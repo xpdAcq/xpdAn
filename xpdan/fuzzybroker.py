@@ -339,7 +339,7 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
     returns = []
     for s in bts:
         hdrs = db(**{beamtime_key: s})
-        for i, hdr in range(hdrs):
+        for i, hdr in enumerate(hdrs):
             if i == 0:
                 start_hdr = hdr
             pass

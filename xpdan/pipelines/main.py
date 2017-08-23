@@ -1,4 +1,4 @@
-"""Decider between pipelines"""
+"""Main XPD analysis pipeline"""
 import os
 import re
 from collections import defaultdict
@@ -26,6 +26,7 @@ from xpdan.tools import (pull_array, event_count,
                          pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
 from pprint import pprint
+from skbeam.core.utils import q_to_twotheta
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -89,7 +90,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         '_{uid:.6}'
         '_{seq_num:03d}{ext}')
     fmt = PartialFormatter()
-    source = Stream(stream_name='Raw Data')
+    raw_source = Stream(stream_name='Raw Data')
+    source = es.fill_events(db, raw_source)
     # source.sink(pprint)
 
     # DARK PROCESSING
@@ -314,6 +316,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq'))
 
+    # convert to tth
+    tth_iq_stream = es.map()
     # iq_stream.sink(pprint)
 
     composition_stream = es.Eventify(if_not_dark_stream,

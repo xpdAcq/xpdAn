@@ -95,10 +95,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # source.sink(pprint)
 
     # DARK PROCESSING
-    # if dark send to dark writer
-    # if_dark_stream = es.filter(if_dark, source, input_info=None,
-    #                            document_name='start',
-    #                            stream_name='If dark')
 
     # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,

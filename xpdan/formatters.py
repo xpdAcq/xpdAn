@@ -66,3 +66,26 @@ def clean_path(path):
     f = Path(e).as_posix()
     print(f)
     return f
+
+
+def clean_template(template, removals=None):
+    cfmt = CleanFormatter()
+    if removals is None:
+        removals = ['temp', 'dx', 'dy']
+    d = cfmt.format(template, defaultdict(str))
+
+    for r in removals:
+        d = d.replace('[{}=]'.format(r), '')
+    z = re.sub(r"__+", "_", d)
+    z = z.replace('_.', '.')
+    e = z.replace('[', '')
+    e = e.replace(']', '')
+    e = e.replace('(', '')
+    e = e.replace(')', '')
+    f = Path(e).as_posix()
+    return f
+
+
+def render_and_clean(fmt, a, **x):
+    formatted_string = fmt.format(a, **x)
+    return clean_template(formatted_string)

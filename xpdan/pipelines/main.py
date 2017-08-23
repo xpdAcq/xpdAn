@@ -1,9 +1,7 @@
 """Main XPD analysis pipeline"""
 import os
-import re
-from collections import defaultdict
 from operator import sub, truediv
-from pathlib import Path
+from pprint import pprint
 
 import shed.event_streams as es
 import tifffile
@@ -17,7 +15,7 @@ from skbeam.io.save_powder_output import save_output
 from streamz import Stream
 from xpdan.db_utils import query_dark, temporal_prox, query_background
 from xpdan.dev_utils import _timestampstr
-from xpdan.formatters import PartialFormatter, CleanFormatter
+from xpdan.formatters import PartialFormatter, clean_template, render_and_clean
 from xpdan.io import pdf_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
                                             if_calibration, if_not_calibration)
@@ -26,7 +24,21 @@ from xpdan.tools import (pull_array, event_count,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
-from pprint import pprint
+
+base_template = (''
+                 '{raw_start[sample_name]}/'
+                 '{raw_start[folder_tag]}/'
+                 '{analysis_stage}/'
+                 '{raw_start[sample_name]}_'
+                 '{human_timestamp}_'
+                 '[temp={raw_event[data][temperature]:1.2f}'
+                 '{raw_descriptor[data_keys][temperature][units]}]_'
+                 '[dx={raw_event[data][diff_x]:1.3f}'
+                 '{raw_descriptor[data_keys][diff_x][units]}]_'
+                 '[dy={raw_event[data][diff_y]:1.3f}'
+                 '{raw_descriptor[data_keys][diff_y][units]}]_'
+                 '{raw_start[uid]:.6}_'
+                 '{raw_event[seq_num]:03d}{ext}')
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -82,13 +94,14 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     print('start pipeline configuration')
     light_template = os.path.join(
         save_dir,
-        '{sample_name}/{folder_tag}/{analysis_stage}/'
-        '{sample_name}_{human_timestamp}'
-        '_[temp={temperature:1.2f}]'
-        '_[dx={diff_x:1.3f}]'
-        '_[dy={diff_y:1.3f}]'
-        '_{uid:.6}'
-        '_{seq_num:03d}{ext}')
+        '{raw_start[sample_name]}/{raw_start[folder_tag]}/{analysis_stage}/'
+        '{raw_start[sample_name]}_{human_timestamp}'
+        '_[temp={raw_event[temperature]:1.2f}'
+        '{raw_descriptor[temperature][units]}]'
+        '_[dx={raw_event[diff_x]:1.3f}{raw_descriptor[diff_x][units]}]'
+        '_[dy={raw_event[diff_y]:1.3f}{raw_descriptor[diff_y][units]}]'
+        '_{raw_start[uid]:.6}'
+        '_{raw_event[seq_num]:03d}{ext}')
     fmt = PartialFormatter()
     raw_source = Stream(stream_name='Raw Data')
     source = es.fill_events(db, raw_source)
@@ -101,7 +114,12 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    input_info=None,
                                    document_name='start',
                                    stream_name='If not dark')
-    eventify_raw = es.Eventify(if_not_dark_stream, stream_name='eventify raw')
+    eventify_raw_start = es.Eventify(if_not_dark_stream,
+                                     stream_name='eventify raw start')
+    eventify_raw_descriptor = es.Eventify(
+        if_not_dark_stream, stream_name='eventify raw descriptor',
+        document='descriptor')
+
     dark_query = es.Query(db,
                           if_not_dark_stream,
                           query_function=query_dark,
@@ -315,7 +333,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # convert to tth
     tth_stream = es.map(q_to_twotheta,
-                        es.zip_latest(iq_stream, eventify_raw),
+                        es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={'q': ('q', 0),
                                     'wavelength': ('bt_wavelength', 1)},
                         output_info=[('tth', {'dtype': 'array'})])
@@ -390,12 +408,12 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if vis:
         foreground_stream.sink(star(LiveImage('img')))
         mask_stream.sink(star(LiveImage('mask')))
-        iq_stream.sink(star(LiveWaterfall('q', 'iq', units=['Q (A^-1)',
-                                                            'Arb'])))
-        fq_stream.sink(star(LiveWaterfall('q', 'fq', units=['Q (A^-1)',
-                                                            'F(Q)'])))
-        pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=['r (A)',
-                                                              'G(r) A^-3'])))
+        iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('Q (A^-1)',
+                                                            'Arb'))))
+        fq_stream.sink(star(LiveWaterfall('q', 'fq', units=('Q (A^-1)',
+                                                            'F(Q)'))))
+        pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
+                                                              'G(r) A^-3'))))
 
     # dark_template = os.path.join(tiff_base,
     #                              'dark/{human_timestamp}_{uid}{ext}')
@@ -413,22 +431,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                 full_event=True,
                                 stream_name='human timestamp')
 
-    render_0 = es.map(lambda a, **x: fmt.format(a, **x),
-                      es.zip_latest(es.zip(h_timestamp_stream,
-                                           if_not_dark_stream),
-                                    eventify_raw),
-                      a=light_template,
-                      output_info=[('template', {'dtype': 'str'})],
-                      stream_name='render 0')
-
-    render_1 = es.map(lambda a, x: fmt.format(a, **x),
-                      es.zip(if_not_dark_stream, render_0),
-                      input_info={'x': ((), 0),
-                                  0: (('data', 'template'), 1)},
-                      full_event=True,
-                      output_info=[('template', {'dtype': 'str'})],
-                      stream_name='render 1')
-
     eventifies = [
         es.Eventify(s,
                     stream_name='eventify {}'.format(s.stream_name)) for s in
@@ -437,67 +439,49 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
          iq_stream,
          tth_iq_stream,
          pdf_stream]]
+    exts = ['.tiff', '.msk', '_Q.chi', '_tth.chi', '.gr']
 
-    def render_2_func(a, x, ext):
-        return fmt.format(a, ext=ext, **x)
+    clean_streams = [
+        es.map(render_and_clean,
+               es.zip_latest(
+                   es.zip(h_timestamp_stream,  # human readable event timestamp
+                          if_not_dark_stream  # raw events
+                          ),
+                   eventify_raw_start,
+                   eventify_raw_descriptor,
+                   analysed_eventify
+               ),
+               fmt=fmt,
+               input_info={
+                   'human_timestamp': ('data', 'human_timestamp', 0),
+                   'raw_event': ((), 1),
+                   'raw_start': ((), 2),
+                   'raw_descriptor': ((), 3),
+                   'analyzed_start': ((), 4)
+               },
+               ext=ext,
+               full_event=True
+               )
+        for ext, analysed_eventify in zip(exts, eventifies)]
 
-    render_2 = [es.map(render_2_func,
-                       es.zip_latest(render_1, e),
-                       input_info={0: ('template', 0),
-                                   1: (('data',), 1)},
-                       output_info=[('template',
-                                     {'dtype': 'str'})],
-                       ext=ext,
-                       stream_name='render 2 {}'.format(e.stream_name)
-                       ) for e, ext in zip(eventifies,
-                                           ['.tiff',
-                                            '.msk',
-                                            '_Q.chi',
-                                            '_tth.chi',
-                                            '.gr'])]
-
-    # render_2[-1].sink(pprint)
-    def clean_template(template, removals=None):
-        cfmt = CleanFormatter()
-        if removals is None:
-            removals = ['temp', 'dx', 'dy']
-        d = cfmt.format(template, defaultdict(str))
-
-        for r in removals:
-            d = d.replace('[{}=]'.format(r), '')
-        z = re.sub(r"__+", "_", d)
-        z = z.replace('_.', '.')
-        e = z.replace('[', '')
-        e = e.replace(']', '')
-        e = e.replace('(', '')
-        e = e.replace(')', '')
-        f = Path(e).as_posix()
-        return f
-
-    clean_streams = [es.map(clean_template, s,
-                            input_info={0: 'template'},
-                            output_info=[('filename', {'dtype': 'str'})],
-                            stream_name='clean template '
-                                        '{}'.format(s.stream_name)
-                            ) for s in render_2]
     make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
                                               exist_ok=True), cs,
                         input_info={0: 'filename'},
                         stream_name='Make dirs {}'.format(cs.stream_name)
                         ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
+
     [es.map(lambda **x: pprint(x['data']['filename']), cs,
             full_event=True) for cs in clean_streams]
 
-    render_md_0 = es.map(lambda a, **x: fmt.format(a, **x),
-                         eventify_raw,
-                         a=light_template,
-                         output_info=[('template', {'dtype': 'str'})],
-                         ext='md.yml')
-    md_cleanup = es.map(clean_template, render_md_0,
-                        input_info={0: 'template'},
-                        output_info=[('filename', {'dtype': 'str'})])
-    # md_cleanup.sink(pprint)
+    md_render = es.map(render_and_clean,
+                       eventify_raw_start,
+                       fmt=fmt,
+                       a=light_template,
+                       input_info={'raw_start': ((), 0), },
+                       output_info=[('template', {'dtype': 'str'})],
+                       ext='md.yml')
+    # md_render.sink(pprint)
 
     # """
     if write_to_disk:
@@ -536,7 +520,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
             with open(filename, 'w') as f:
                 yaml.dump(data, f)
 
-        md_writer = es.map(dump_yml, es.zip(eventify_raw, md_cleanup),
+        md_writer = es.map(dump_yml, es.zip(eventify_raw_start, md_render),
                            input_info={0: (('data', 'filename'), 1),
                                        1: (('data',), 0)},
                            full_event=True)

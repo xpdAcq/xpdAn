@@ -72,6 +72,7 @@ install:
 #  - python setup.py install
   - 'pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz'
   - 'pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed'
+  - 'pip install https://github.com/xpdView/SHED/zipball/master#egg=xpdview'
   - pip install .
   # Need to clean the python build directory (and other cruft) or pytest is
   # going to find the build directory and get confused why there are two sets

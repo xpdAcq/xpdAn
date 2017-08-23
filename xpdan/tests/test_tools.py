@@ -42,7 +42,7 @@ def test_ring_blur_mask():
     )
     r = g.rArray((2048, 2048))
     # make some sample data
-    iq = 100 * np.cos(50 * r) ** 2 + 150
+    iq = 100 * np.cos(50 * r) ** 2 + 150  # type: np.ndarray
 
     np.random.seed(10)
     pixels = []

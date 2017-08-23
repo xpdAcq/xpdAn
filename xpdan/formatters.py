@@ -52,8 +52,7 @@ cfmt = CleanFormatter()
 pfmt = PartialFormatter()
 
 
-def clean_template(template, removals=None):
-    cfmt = CleanFormatter()
+def clean_template(template, removals=None, cfmt=cfmt):
     if removals is None:
         removals = ['temp', 'dx', 'dy']
     d = cfmt.format(template, defaultdict(str))

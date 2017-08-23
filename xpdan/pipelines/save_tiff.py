@@ -18,6 +18,7 @@ from xpdan.formatters import PartialFormatter, CleanFormatter
 from xpdan.pipelines.pipeline_utils import (if_dark)
 
 
+# TODO: refactor templating
 def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             image_data_key='pe1_image'):
     """Total data processing pipeline for XPD
@@ -114,7 +115,7 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     eventifies = [
         es.Eventify(s,
                     stream_name='eventify {}'.format(s.stream_name)) for s in
-        [dark_sub_fg,]]
+        [dark_sub_fg, ]]
 
     def render_2_func(a, x, ext):
         return fmt.format(a, ext=ext, **x)
@@ -177,7 +178,7 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # """
     if write_to_disk:
-        iis = [{'data': ('img', 0), 'file': ('filename', 1)},]
+        iis = [{'data': ('img', 0), 'file': ('filename', 1)}, ]
 
         writer_streams = [
             es.map(writer_templater,

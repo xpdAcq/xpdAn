@@ -85,7 +85,7 @@ def _generate_simulation_data():
                          {'pe1_image': lambda: np.random.randn(25, 25)})
     # TODO : add md schema later
     RE = RunEngine({})
-    RE.subscribe('all', an_glbl['exp_db'].mds.insert)
+    RE.subscribe(an_glbl['exp_db'].db.insert, 'all', )
     RE(count([pe1c]))
     RE(scan([pe1c], motor, 1, 5, 5))
     RE(scan([pe1c], motor, 1, 10, 10))

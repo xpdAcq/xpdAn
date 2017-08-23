@@ -36,21 +36,7 @@ except ImportError:
 try:
     from bluesky.tests.conftest import db
 except ImportError:
-    from xpdan.simulation import build_pymongo_backed_broker
-
-
-    @pytest.fixture(params=[
-        # 'sqlite',
-        'mongo'], scope='function')
-    def db(request):
-        print('Making DB')
-        param_map = {
-            # 'sqlite': build_sqlite_backed_broker,
-            'mongo': build_pymongo_backed_broker}
-        rv = param_map[request.param](request)
-        yield rv
-        clean_database(rv)
-
+    from xpdsim import db
 if sys.version_info >= (3, 0):
     pass
 

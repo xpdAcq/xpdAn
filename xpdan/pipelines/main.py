@@ -66,8 +66,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         (horizontal). default is 0.99. set to None for no
         correction.
     mask_setting : str, optional
-        If 'default' reuse mask created for first image, if auto mask all
-        images. Defaults to 'default'
+        If 'default' reuse mask created for first image, if 'auto' mask all
+        images, if None use no mask. Defaults to 'default'
     mask_kwargs : dict, optional
         dictionary stores options for automasking functionality.
         default is defined by an_glbl.auto_mask_dict.
@@ -311,7 +311,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
                                  cal_stream)
-        elif mask_setting == 'auto':
+        else:
             zlfc = es.zip_latest(p_corrected_stream, cal_stream)
         mask_stream = es.map(mask_img,
                              zlfc,

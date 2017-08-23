@@ -12,12 +12,12 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-import os
 import tempfile
-import time
+from itertools import product
 from uuid import uuid4
 
 import numpy as np
+
 from bluesky.examples import ReaderWithRegistry
 from bluesky.plans import count
 
@@ -51,9 +51,11 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     Parameters
     ----------
     RE: bluesky.run_engine.RunEngine instance
-    db
-    n
-    shape
+    reg: Registry instance
+    n: int
+        Number of images to take
+    shape: tuple of ints
+        The shape of the resulting images
     save_dir
 
     Returns
@@ -98,3 +100,40 @@ class PDFGetterShim:
               "The data that comes from this is for testing purposes only"
               "and has no bearing on reality")
         return np.ones(10), np.ones(10)
+
+
+integrate_params = [
+    'polarization_factor',
+    'mask_setting',
+    'mask_kwargs',
+]
+good_kwargs = [
+    (.99,),
+    (
+        # 'default',
+        # 'auto',
+        None,
+    ),
+    [None, {'alpha': 3}],
+]
+
+bad_integrate_params = ['polarization_factor',
+                        'mask_setting',
+                        'mask_kwargs']
+
+bad_kwargs = [['str'] for i in range(len(bad_integrate_params))]
+
+integrate_kwarg_values = product(*good_kwargs)
+integrate_kwargs = []
+for vs in integrate_kwarg_values:
+    d = {k: v for (k, v) in zip(integrate_params, vs)}
+    integrate_kwargs.append((d, False))
+
+for vs in bad_kwargs:
+    d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
+    integrate_kwargs.append((d, True))
+
+save_tiff_kwargs = []
+for d in [save_tiff_kwargs, integrate_kwargs]:
+    for d2 in d:
+        d2[0]['image_data_key'] = 'pe1_image'

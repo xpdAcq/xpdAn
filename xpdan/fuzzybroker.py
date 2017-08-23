@@ -146,7 +146,8 @@ class FuzzyBroker(Broker):
         returns = []
         for s in bts:
             hdrs = self(**{beamtime_key: s})
-            start_hdr = next(iter(hdrs))
+            hdr = next(iter(hdrs))
+            start_hdr = hdr
             for hdr in hdrs:
                 pass
             stop_hdr = hdr
@@ -338,8 +339,9 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
     returns = []
     for s in bts:
         hdrs = db(**{beamtime_key: s})
-        start_hdr = next(iter(hdrs))
-        for hdr in hdrs:
+        for i, hdr in range(hdrs):
+            if i == 0:
+                start_hdr = hdr
             pass
         stop_hdr = hdr
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}

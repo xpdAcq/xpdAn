@@ -4,7 +4,7 @@ import tempfile
 
 import yaml
 
-from xpdan.simulation import build_pymongo_backed_broker
+from xpdsim import db
 import logging
 from pkg_resources import resource_filename as rs_fn
 
@@ -88,7 +88,7 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
     elif int(env_code) == 2:
         # simulation
         base_dir = os.getcwd()
-        db_xptal = build_pymongo_backed_broker()
+        db_xptal = db
     else:
         # beamline
         base_dir = os.path.abspath('/direct/XF28ID1/pe2_data')

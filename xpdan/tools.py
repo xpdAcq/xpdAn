@@ -67,23 +67,23 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
 
     Parameters
     ----------
-    img: np.array
+    img: np.ndarray
         The image
     geo: pyFAI.geometry.Geometry instance
         The detector geometry information
     alpha: float
         The number of standard deviations to clip
-    tmsk: np.array, optional
+    tmsk: np.ndarray, optional
         Prior mask. If None don't use a prior mask, defaults to None.
 
     Returns
     -------
-    np.array:
+    np.ndarray:
         The mask
     """
     r = geo.rArray(img.shape)
-    q = geo.qArray(img.shape) / 10
-    delta_q = geo.deltaQ(img.shape) / 10
+    q = geo.qArray(img.shape) / 10  # type: np.ndarray
+    delta_q = geo.deltaQ(img.shape) / 10  # type: np.ndarray
 
     pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
     rres = np.hypot(*pixel_size)
@@ -130,7 +130,7 @@ def old_mask_img(img, geo,
 
     Parameters
     ----------
-    img: ndarray
+    img: np.ndarray
         The image to be masked
     geo: pyFAI.geometry.Geometry
         The pyFAI description of the detector orientation or any
@@ -159,13 +159,13 @@ def old_mask_img(img, geo,
         a linear distribution of alphas from alpha[0] to alpha[1], if array
         then we just use that as the distribution of alphas. Defaults to 2.5.
         If None, no outlier masking applied.
-    tmsk: ndarray, optional
+    tmsk: np.ndarray, optional
         The starting mask to be compounded on. Defaults to None. If None mask
         generated from scratch.
 
     Returns
     -------
-    tmsk: ndarray
+    tmsk: np.ndarray
         The mask as a boolean array. True pixels are good pixels, False pixels
         are masked out.
 
@@ -222,7 +222,7 @@ def mask_img(img, geo,
 
     Parameters
     ----------
-    img: ndarray
+    img: np.ndarray
         The image to be masked
     geo: pyFAI.geometry.Geometry
         The pyFAI description of the detector orientation or any
@@ -251,13 +251,13 @@ def mask_img(img, geo,
         a linear distribution of alphas from alpha[0] to alpha[1], if array
         then we just use that as the distribution of alphas. Defaults to 2.5.
         If None, no outlier masking applied.
-    tmsk: ndarray, optional
+    tmsk: np.ndarray, optional
         The starting mask to be compounded on. Defaults to None. If None mask
         generated from scratch.
 
     Returns
     -------
-    tmsk: ndarray
+    tmsk: np.ndarray
         The mask as a boolean array. True pixels are good pixels, False pixels
         are masked out.
 
@@ -354,18 +354,14 @@ def decompress_mask(data, indices, indptr, shape):
     return ~cmask.toarray().astype(bool)
 
 
-def iq_to_pdf(stuff):
-    pass
-
-
 def pull_array(img2):
     return img2
 
 
 def generate_binner(geo, img_shape, mask=None):
     r = geo.rArray(img_shape)
-    q = geo.qArray(img_shape) / 10
-    q_dq = geo.deltaQ(img_shape) / 10
+    q = geo.qArray(img_shape) / 10  # type: np.ndarray
+    q_dq = geo.deltaQ(img_shape) / 10  # type: np.ndarray
 
     pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
     rres = np.hypot(*pixel_size)

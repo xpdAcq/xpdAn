@@ -62,6 +62,7 @@ install:
   - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
   - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed
   - pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview
+  - pip install https://github.com/xpdAcq/xpdSim/zipball/master#egg=xpdsim
   - pip install .
   - pip install codecov pytest-env
 

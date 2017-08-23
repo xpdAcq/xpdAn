@@ -28,6 +28,22 @@ from skbeam.core.mask import margin, binned_outlier
 
 # TODO: speed this up
 def mask_ring(v_list, p_list, a_std=3.):
+    """Find outlier pixels in a single ring
+
+    Parameters
+    ----------
+    v_list: list
+        Values in ring
+    p_list: list
+        Positions in ring
+    a_std: float
+        Acceptable number of standard deviations
+
+    Returns
+    -------
+    list:
+        The positions to be masked
+    """
     mask_list = []
     while len(v_list) > 0:
         norm_v_list = np.abs(v_list - np.mean(v_list)) / np.std(v_list)
@@ -47,6 +63,24 @@ def mask_ring(v_list, p_list, a_std=3.):
 
 # TODO: speed this up
 def new_masking_method(img, geo, alpha=3, tmsk=None):
+    """Sigma Clipping based masking
+
+    Parameters
+    ----------
+    img: np.array
+        The image
+    geo: pyFAI.geometry.Geometry instance
+        The detector geometry information
+    alpha: float
+        The number of standard deviations to clip
+    tmsk: np.array, optional
+        Prior mask. If None don't use a prior mask, defaults to None.
+
+    Returns
+    -------
+    np.array:
+        The mask
+    """
     r = geo.rArray(img.shape)
     q = geo.qArray(img.shape) / 10
     delta_q = geo.deltaQ(img.shape) / 10

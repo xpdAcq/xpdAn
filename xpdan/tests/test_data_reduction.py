@@ -22,29 +22,20 @@ import os
 from xpdan.data_reduction import integrate_and_save, integrate_and_save_last, \
     save_tiff, save_last_tiff
 
-integrate_params = ['dark_sub_bool',
-                    'polarization_factor',
-                    'mask_setting',
-                    'mask_dict',
-                    'save_image',
-                    'config_dict', ]
-good_kwargs = [(True, False), (.99,
-                               # .95, .5
-                               ),
-               ('use_saved_mask_msk', 'use_saved_mask',
-                'default', 'auto',
-                'None',
-                'array'),
-               [None, {'alpha': 3}],
-               (True, False), [None]]
+integrate_params = [
+    'polarization_factor',
+    'mask_setting',
+    'mask_kwargs',
+]
+good_kwargs = [
+    (.99,),
+    ('default', 'auto'),
+    [None, {'alpha': 3}],
+]
 
-bad_integrate_params = ['dark_sub_bool',
-                        'polarization_factor',
+bad_integrate_params = ['polarization_factor',
                         'mask_setting',
-                        'mask_dict',
-                        'save_image',
-                        'config_dict',
-                        'sum_idx_list']
+                        'mask_kwargs']
 
 bad_kwargs = [['str'] for i in range(len(bad_integrate_params))]
 
@@ -59,12 +50,9 @@ for vs in bad_kwargs:
     integrate_kwargs.append((d, True))
 
 save_tiff_kwargs = []
-save_tiff_params = ['dark_sub_bool', 'dryrun']
-save_tiff_kwarg_values = [(True, False), (True, False)]
-
-for vs in save_tiff_kwarg_values:
-    d = {k: v for (k, v) in zip(save_tiff_params, vs)}
-    save_tiff_kwargs.append((d, False))
+for d in [save_tiff_kwargs, integrate_kwargs]:
+    for d2 in d:
+        d2[0]['image_data_key'] = 'pe1_image'
 
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)

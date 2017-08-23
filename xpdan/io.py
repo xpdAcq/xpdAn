@@ -1,4 +1,8 @@
+import os
+
 import numpy as np
+import yaml
+
 from .formatters import CleanFormatter, PartialFormatter
 from collections import defaultdict
 
@@ -43,3 +47,9 @@ def pdf_saver(r, pdf, filename, config):
     header = pfmt.format(template_hdr, **config_dict)
     header = cfmt.format(header, defaultdict(str))
     np.savetxt(filename, rpdf, header=header)
+
+
+def dump_yml(filename, data):
+    os.makedirs(os.path.split(filename)[0], exist_ok=True)
+    with open(filename, 'w') as f:
+        yaml.dump(data, f)

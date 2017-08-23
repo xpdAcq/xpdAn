@@ -296,6 +296,7 @@ def mask_img(img, geo,
     if alpha:
         working_mask *= new_masking_method(img, geo, alpha=alpha,
                                            tmsk=working_mask)
+    working_mask = working_mask.astype(np.bool)
     return working_mask
 
 

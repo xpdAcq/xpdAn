@@ -48,24 +48,8 @@ class CleanFormatter(string.Formatter):
             return ''
 
 
-def clean_path(path):
-    cfmt = CleanFormatter()
-    d = cfmt.format(path, (defaultdict(str)))
-    print(d)
-    y = re.sub(r"_\[(?s)(.*)=\]_", "_", d)
-    print(y)
-    x = re.sub(r"_\((?s)(.*)=\).", ".", y)
-    print(x)
-    z = re.sub(r"__+", "_", x)
-    print(z)
-    e = z.replace('[', '')
-    e = e.replace(']', '')
-    e = e.replace('(', '')
-    e = e.replace(')', '')
-    print(e)
-    f = Path(e).as_posix()
-    print(f)
-    return f
+cfmt = CleanFormatter()
+pfmt = PartialFormatter()
 
 
 def clean_template(template, removals=None):
@@ -83,9 +67,10 @@ def clean_template(template, removals=None):
     e = e.replace('(', '')
     e = e.replace(')', '')
     f = Path(e).as_posix()
+    f = f.replace('/_', '/')
     return f
 
 
-def render_and_clean(fmt, a, **x):
-    formatted_string = fmt.format(a, **x)
+def render_and_clean(string, formatter=pfmt, **kwargs):
+    formatted_string = formatter.format(string, **kwargs)
     return clean_template(formatted_string)

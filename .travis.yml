@@ -10,10 +10,6 @@ env:
     DOCS_PIP_DEPS: "tqdm"
   matrix:
     - CUTTING_EDGE=true
-    - CUTTING_EDGE=false
-matrix:
-  allow_failures:
-    - env: CUTTING_EDGE=false
 
 
 cache:
@@ -59,28 +55,15 @@ install:
   - source activate testenv
   - pip install https://github.com/NSLS-II/ophyd/zipball/master#egg=ophyd;
   - pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model;
-  - if [[ "${CUTTING_EDGE}" == true ]]; then
-      conda remove metadatastore databroker filestore bluesky --yes;
-      pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
-      pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
-    else
-      pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds;
-      pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs;
-      python -c "from filestore import utils, conf; utils.install_sentinels(conf.connection_config, 1)" ;
-    fi
+  - conda remove metadatastore databroker filestore bluesky --yes;
+  - pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
+  - pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
-#  - python setup.py install
-  - 'pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz'
-  - 'pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed'
-  - 'pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview'
+  - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
+  - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed
+  - pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview
   - pip install .
-  # Need to clean the python build directory (and other cruft) or pytest is
-  # going to find the build directory and get confused why there are two sets
-  # of every test file
-  # make sure the sqlite file exists to avoid race conditions
-  - python -c "from bluesky.utils import get_history; get_history()"
   - pip install codecov pytest-env
-#  - git clean -xfd
 
 script:
   - coverage run run_tests.py

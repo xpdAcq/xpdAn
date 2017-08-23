@@ -21,22 +21,14 @@ import numpy as np
 import pytest
 
 from xpdan.fuzzybroker import FuzzyBroker
-# from xpdan.data_reduction import DataReduction
 from xpdan.glbl_gen import make_glbl, load_configuration
 from skbeam.io.fit2d import fit2d_save
 from xpdan.tests.utils import insert_imgs
 from bluesky.tests.conftest import fresh_RE
 from bluesky.examples import ReaderWithRegistryHandler
+from databroker.assets.handlers import NpyHandler
+from bluesky.tests.conftest import db
 
-try:
-    from filestore.handlers import NpyHandler
-except ImportError:
-    from databroker.assets.handlers import NpyHandler
-
-try:
-    from bluesky.tests.conftest import db
-except ImportError:
-    from xpdsim import db
 if sys.version_info >= (3, 0):
     pass
 

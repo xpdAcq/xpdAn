@@ -15,7 +15,10 @@
 import numpy as np
 import datetime
 import scipy.stats as sts
-from diffpy.pdfgetx import PDFGetter
+try:
+    from diffpy.pdfgetx import PDFGetter
+except ImportError:
+    from xpdan.tests.utils import PDFGetterShim as PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 

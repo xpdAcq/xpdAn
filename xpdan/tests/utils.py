@@ -86,3 +86,15 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     print(dark_uid, uid)
 
     return uid
+
+
+class PDFGetterShim:
+    def __init__(self):
+        self.config = {'qmax': 'testing'}
+
+    def __call__(self, *args, **kwargs):
+        print("This is a testing shim for PDFgetx if you see this message then"
+              "you don't have PDFgetx3 installed. "
+              "The data that comes from this is for testing purposes only"
+              "and has no bearing on reality")
+        return np.ones(10), np.ones(10)

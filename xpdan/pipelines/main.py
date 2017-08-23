@@ -304,6 +304,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              )
     else:
         if mask_setting == 'default':
+            # note that this could become a much fancier filter
+            # eg make a mask every 5th image
             zlfc = es.zip_latest(es.filter(lambda x: x == 1,
                                            p_corrected_stream,
                                            input_info={0: 'seq_num'},
@@ -368,6 +370,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            )
     # iq_stream.sink(pprint)
 
+    # TODO: replace this with a pull from raw_eventify
     composition_stream = es.Eventify(if_not_dark_stream,
                                      # Change this to sample_composition
                                      'sample_name',
@@ -498,8 +501,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # """
     if write_to_disk:
         make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
-                                                  exist_ok=True), cs,
+                                                  exist_ok=True),
+                            cs,
                             input_info={0: 'filename'},
+                            output_info=[('filename', {'dtype': 'str'})],
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
         iis = [

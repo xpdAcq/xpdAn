@@ -1,7 +1,8 @@
 import os
+import time
 
 from xpdan.pipelines.main import conf_main_pipeline
-import time
+
 
 def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
     """Decider between pipelines"""

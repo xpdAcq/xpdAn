@@ -294,7 +294,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
                              cal_stream)
-        mask_stream = es.map(lambda x: None,
+        mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
                              output_info=[('mask', {'dtype': 'array',

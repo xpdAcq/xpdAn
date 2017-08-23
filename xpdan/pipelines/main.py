@@ -11,6 +11,7 @@ import yaml
 from shed.event_streams import dstar, star
 
 from bluesky.callbacks.broker import LiveImage
+from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from streamz import Stream
@@ -26,7 +27,6 @@ from xpdan.tools import (pull_array, event_count,
                          pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
 from pprint import pprint
-from skbeam.core.utils import q_to_twotheta
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -101,6 +101,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    input_info=None,
                                    document_name='start',
                                    stream_name='If not dark')
+    eventify_raw = es.Eventify(if_not_dark_stream, stream_name='eventify raw')
     dark_query = es.Query(db,
                           if_not_dark_stream,
                           query_function=query_dark,
@@ -310,10 +311,26 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                     ('iq', {'dtype': 'array',
                                             'source': 'testing'})],
                        stream_name='I(Q)',
-                       md=dict(analysis_stage='iq'))
+                       md=dict(analysis_stage='iq_q'))
 
     # convert to tth
-    tth_iq_stream = es.map()
+    tth_stream = es.map(q_to_twotheta,
+                        es.zip_latest(iq_stream, eventify_raw),
+                        input_info={'q': ('q', 0),
+                                    'wavelength': ('bt_wavelength', 1)},
+                        output_info=[('tth', {'dtype': 'array'})])
+
+    tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
+                           es.zip(tth_stream, iq_stream),
+                           input_info={'tth': ('tth', 0),
+                                       'iq': ('iq', 1)},
+                           output_info=[('tth', {'dtype': 'array',
+                                                 'source': 'testing'}),
+                                        ('iq', {'dtype': 'array',
+                                                'source': 'testing'})],
+                           stream_name='Combine tth and iq',
+                           md=dict(analysis_stage='iq_tth')
+                           )
     # iq_stream.sink(pprint)
 
     composition_stream = es.Eventify(if_not_dark_stream,
@@ -389,8 +406,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     #                               output_info=[
     #                                   ('file_path', {'dtype': 'str'})])
 
-    eventify_raw = es.Eventify(if_not_dark_stream, stream_name='eventify raw')
-
     h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
                                 input_info={0: 'time'},
                                 output_info=[('human_timestamp',
@@ -420,6 +435,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         [dark_sub_fg,
          mask_stream,
          iq_stream,
+         tth_iq_stream,
          pdf_stream]]
 
     def render_2_func(a, x, ext):
@@ -436,7 +452,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        ) for e, ext in zip(eventifies,
                                            ['.tiff',
                                             '.msk',
-                                            '_Q.chi', '.gr'])]
+                                            '_Q.chi',
+                                            '_tth.chi',
+                                            '.gr'])]
 
     # render_2[-1].sink(pprint)
     def clean_template(template, removals=None):
@@ -488,6 +506,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
             {'mask': ('mask', 0), 'filename': ('filename', 1)},
             {'tth': ('q', 0), 'intensity': ('iq', 0),
              'output_name': ('filename', 1)},
+            {'tth': ('tth', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
             {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
              'config': ('config', 0)},
         ]
@@ -497,13 +517,17 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                    es.zip_latest(s1, s2),
                    input_info=ii,
                    output_info=[('final_filename', {'dtype': 'str'})],
+                   stream_name='Write {}'.format(s1.stream_name),
                    **kwargs) for s1, s2, ii, writer_templater, kwargs in
             zip(
-                [dark_sub_fg, mask_stream, iq_stream, pdf_stream],
+                [dark_sub_fg, mask_stream, iq_stream, tth_iq_stream,
+                 pdf_stream],
                 clean_streams,
                 iis,
-                [tifffile.imsave, fit2d_save, save_output, pdf_saver],
-                [{}, {}, {'q_or_2theta': 'Q', 'ext': ''}, {}]
+                [tifffile.imsave, fit2d_save, save_output, save_output,
+                 pdf_saver],
+                [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
+                 {'q_or_2theta': '2theta', 'ext': ''}, {}]
             )]
 
         def dump_yml(filename, data):

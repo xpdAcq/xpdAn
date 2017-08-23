@@ -22,6 +22,6 @@ def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
     assert 'Au' in os.listdir(fast_tmp_dir)
     assert 'Au_{:.6}_md.yml'.format(start_uid3) in os.listdir(
         os.path.join(fast_tmp_dir, 'Au'))
-    for f in ['dark_sub', 'mask', 'iq', 'pdf']:
+    for f in ['dark_sub', 'mask', 'iq_q', 'iq_tth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))

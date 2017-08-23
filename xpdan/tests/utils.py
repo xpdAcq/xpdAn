@@ -69,7 +69,9 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
                                    reg=reg, save_path=save_dir)
     beamtime_uid = str(uuid4())
     base_md = dict(beamtime_uid=beamtime_uid,
-                   calibration_md=pyFAI_calib, **kwargs)
+                   calibration_md=pyFAI_calib,
+                   bt_wavelength=0.1847,
+                   **kwargs)
 
     # Insert the dark images
     dark_md = base_md.copy()

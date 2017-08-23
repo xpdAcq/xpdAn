@@ -28,11 +28,11 @@ from skbeam.core.mask import binned_outlier, margin
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from numba import jit
 
-# Ideally we would pull these functions from scikit-beam
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
 
 
+# TODO: speed this up
 def mask_ring(v_list, p_list, a_std=3.):
     mask_list = []
     while len(v_list) > 0:
@@ -51,6 +51,7 @@ def mask_ring(v_list, p_list, a_std=3.):
     return mask_list
 
 
+# TODO: speed this up
 def new_masking_method(img, geo, alpha=3, tmsk=None):
     r = geo.rArray(img.shape)
     q = geo.qArray(img.shape) / 10
@@ -67,8 +68,11 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     xy = qbinned.xy
     if tmsk is None:
         tmsk = np.ones(img.shape)
+
     ring_values = []
     ring_positions = []
+
+    # TODO: include tmsk into this to speed things up?
     for i in np.unique(xy):
         ring_values.append(img.ravel()[xy == i])
         ring_positions.append(ipos.ravel()[xy == i])
@@ -86,13 +90,13 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     return mask.astype(bool)
 
 
-def mask_img(img, geo,
-             edge=30,
-             lower_thresh=0.0,
-             upper_thresh=None,
-             bs_width=13, tri_offset=13, v_asym=0,
-             alpha=2.5,
-             tmsk=None):
+def old_mask_img(img, geo,
+                 edge=30,
+                 lower_thresh=0.0,
+                 upper_thresh=None,
+                 bs_width=13, tri_offset=13, v_asym=0,
+                 alpha=2.5,
+                 tmsk=None):
     """
     Mask an image based off of various methods
 
@@ -178,13 +182,13 @@ def mask_img(img, geo,
     return working_mask
 
 
-def better_mask_img(img, geo,
-                    edge=30,
-                    lower_thresh=0.0,
-                    upper_thresh=None,
-                    bs_width=13, tri_offset=13, v_asym=0,
-                    alpha=2.5,
-                    tmsk=None):
+def mask_img(img, geo,
+             edge=30,
+             lower_thresh=0.0,
+             upper_thresh=None,
+             bs_width=13, tri_offset=13, v_asym=0,
+             alpha=2.5,
+             tmsk=None):
     """
     Mask an image based off of various methods
 

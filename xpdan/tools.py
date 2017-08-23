@@ -13,8 +13,6 @@
 #
 ##############################################################################
 import numpy as np
-import datetime
-import scipy.stats as sts
 
 try:
     from diffpy.pdfgetx import PDFGetter
@@ -23,10 +21,6 @@ except ImportError:
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 from multiprocessing import Pool, cpu_count
-from functools import partial
-from skbeam.core.mask import binned_outlier, margin
-from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
-from numba import jit
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
@@ -404,10 +398,3 @@ def fq_getter(*args, **kwargs):
     pg(*args, **kwargs)
     res = pg.fq
     return res[0], res[1], pg.config
-
-
-def _timestampstr(timestamp):
-    """convert timestamp to strftime formate"""
-    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
-        '%Y%m%d-%H%M')
-    return timestring

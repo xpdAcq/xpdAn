@@ -78,6 +78,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     pdf_config: dict, optional
         Configuration for making PDFs, see pdfgetx3 docs. Defaults to
         ``dict(dataformat='QA', qmaxinst=28, qmax=22)``
+    verbose: bool, optional
+        If True print many outcomes from the pipeline, for debuging use
+        only, defaults to False
 
     Returns
     -------

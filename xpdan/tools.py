@@ -89,8 +89,10 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     rres = np.hypot(*pixel_size)
     rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres / 2.)
     rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins)
+
     qbin_sizes = np.nan_to_num(rbinned(delta_q.ravel()))
     qbin = np.cumsum(qbin_sizes)
+
     ipos = np.arange(0, np.size(img)).reshape(img.shape)
     qbinned = BinnedStatistic1D(q.ravel(), bins=qbin)
     xy = qbinned.xy
@@ -111,11 +113,9 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
         ss = p.starmap(mask_ring, vp)
         print('finished mask')
     mask_list = [i for s in ss for i in s]
-    mask = np.ones(img.shape)
-    mask[np.unravel_index(mask_list, img.shape)] = False
+    tmsk[np.unravel_index(mask_list, img.shape)] = False
     # mask = mask.astype(bool)
-    mask *= tmsk
-    return mask.astype(bool)
+    return tmsk.astype(bool)
 
 
 def old_mask_img(img, geo,

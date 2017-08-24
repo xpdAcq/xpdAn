@@ -41,7 +41,7 @@ def clean_database(database):
 
 @pytest.fixture(scope='function')
 def start_uid1(exp_db):
-    print(exp_db[1])
+    # print(exp_db[1])
     assert 'start_uid1' in exp_db[2]['start']
     return str(exp_db[2]['start']['uid'])
 

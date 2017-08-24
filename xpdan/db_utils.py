@@ -2,6 +2,7 @@ from itertools import islice
 from pprint import pprint
 from .dev_utils import _timestampstr
 import collections
+from databroker._core import Header
 
 
 def sort_scans_by_hdr_key(hdrs, key, verbose=True):
@@ -151,7 +152,9 @@ def query_background(db, docs, schema=1):
 
 
 def temporal_prox(res, docs):
-    print(res)
+    # If there is only one result just use that one
+    if isinstance(res, Header):
+        return res
     doc = docs[0]
     t = doc['time']
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]

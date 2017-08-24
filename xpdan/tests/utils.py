@@ -85,7 +85,6 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     light_md = base_md.copy()
     light_md.update(name='test', sc_dk_field_uid=dark_uid)
     uid = RE(count([light_det], num=n), **light_md)
-    print(dark_uid, uid)
 
     return uid
 
@@ -132,9 +131,9 @@ for vs in integrate_kwarg_values:
     d = {k: v for (k, v) in zip(integrate_params, vs)}
     integrate_kwargs.append((d, False))
 
-for vs in bad_kwargs:
-    d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
-    integrate_kwargs.append((d, True))
+# for vs in bad_kwargs:
+#     d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
+#     integrate_kwargs.append((d, True))
 
 save_tiff_kwargs = []
 for d in [save_tiff_kwargs, integrate_kwargs]:

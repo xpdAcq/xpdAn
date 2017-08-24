@@ -30,6 +30,7 @@ for hdr in list((db[-1], )):
     for e in hdr.documents(fill=True):
         if e[0] == 'event':
             plt.pause(.1)
+            pass
         source.emit(e)
 
 plt.show()

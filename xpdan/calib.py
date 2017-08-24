@@ -26,14 +26,6 @@ from pyFAI.gui.utils import update_fig
 from pyFAI.calibration import Calibration, PeakPicker
 
 
-def _configure_calib_instance(calibrant, detector, wavelength):
-    """function to configure calibration instance"""
-    c = Calibration(calibrant=calibrant, detector=detector,
-                    wavelength=wavelength * 10 ** (-10))
-
-    return c, c.calibrant.dSpacing
-
-
 def _save_calib_param(calib_c, timestr, calib_yml_fp):
     """save calibration parameters to designated location
 

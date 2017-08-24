@@ -123,7 +123,7 @@ def disk_mask(tmp_dir, img_size):
 
 @pytest.fixture(scope='function')
 def fuzzdb(exp_db):
-    yield FuzzyBroker(exp_db.mds, exp_db.fs)
+    yield FuzzyBroker(exp_db.mds, exp_db.reg)
 
 
 @pytest.fixture(scope='module')

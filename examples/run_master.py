@@ -27,7 +27,7 @@ source = conf_main_pipeline(db, td.name,
                             write_to_disk=False
                             )
 for hdr in list((db[-1], )):
-    for e in hdr.stream(fill=True):
+    for e in hdr.documents(fill=True):
         if e[0] == 'event':
             plt.pause(.1)
         source.emit(e)

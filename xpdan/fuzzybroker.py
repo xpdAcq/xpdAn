@@ -16,31 +16,13 @@
 
 from heapq import heapify, heappushpop
 from pprint import pprint
-import datetime
-import pytz
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 
+import pytz
+
 from databroker.broker import Broker
-
-
-def _munge_time(t, timezone):
-    """Close your eyes and trust @arkilic
-
-    Parameters
-    ----------
-    t : float
-        POSIX (seconds since 1970)
-    timezone : pytz object
-        e.g. ``pytz.timezone('US/Eastern')``
-
-    Return
-    ------
-    time
-        as ISO-8601 format
-    """
-    t = datetime.date.fromtimestamp(t)
-    return timezone.localize(t).replace(microsecond=0).isoformat()
+from .dev_utils import _timestampstr
 
 
 class FuzzyBroker(Broker):
@@ -152,12 +134,9 @@ class FuzzyBroker(Broker):
                 pass
             stop_hdr = hdr
             info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-            info.update({'start_time': _munge_time(start_hdr['start']['time'],
-                                                   pytz.timezone(
-                                                       'US/Eastern')),
-                         'stop_time': _munge_time(stop_hdr['start']['time'],
-                                                  pytz.timezone(
-                                                      'US/Eastern'))})
+            info.update(
+                {'start_time': _timestampstr(start_hdr['start']['time']),
+                 'stop_time': _timestampstr(stop_hdr['start']['time'])})
             returns.append(info)
         if print_results:
             pprint(returns)
@@ -345,9 +324,9 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
             pass
         stop_hdr = hdr
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-        info.update({'start_time': _munge_time(start_hdr['start']['time'],
+        info.update({'start_time': _timestampstr(start_hdr['start']['time'],
                                                pytz.timezone('US/Eastern')),
-                     'stop_time': _munge_time(stop_hdr['start']['time'],
+                     'stop_time': _timestampstr(stop_hdr['start']['time'],
                                               pytz.timezone('US/Eastern'))})
         returns.append(info)
     if print_results:

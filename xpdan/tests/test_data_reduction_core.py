@@ -26,6 +26,7 @@ from .utils import integrate_kwargs, save_tiff_kwargs
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
 def test_integrate_core_smoke(exp_db, fast_tmp_dir, kwargs,
                               known_fail_bool):
+    print(kwargs)
     if known_fail_bool:
         pytest.xfail('Bad params')
     old_files = os.listdir(fast_tmp_dir)

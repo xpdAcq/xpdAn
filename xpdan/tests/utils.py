@@ -115,7 +115,9 @@ good_kwargs = [
         # 'auto',
         None,
     ),
-    [None, {'alpha': 3}],
+    [None,
+     # {'alpha': 10}
+     ],
 ]
 
 bad_integrate_params = ['polarization_factor',

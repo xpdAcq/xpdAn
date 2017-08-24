@@ -96,6 +96,7 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     ipos = np.arange(0, np.size(img)).reshape(img.shape)
     qbinned = BinnedStatistic1D(q.ravel(), bins=qbin)
     xy = qbinned.xy
+
     if tmsk is None:
         tmsk = np.ones(img.shape)
 

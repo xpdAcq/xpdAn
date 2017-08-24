@@ -22,7 +22,8 @@ def test_integrate_core_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
-    integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir)
+    integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir,
+                       mask_setting=None)
     assert (set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
         old_times) != set(
         [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
@@ -33,7 +34,8 @@ def test_integrate_last_core_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
-    integrate_and_save_last(db=exp_db, save_dir=fast_tmp_dir)
+    integrate_and_save_last(db=exp_db, save_dir=fast_tmp_dir,
+                            mask_setting=None)
     assert (set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
         old_times) != set(
         [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in

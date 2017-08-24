@@ -51,13 +51,12 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c conda-forge -c lightsource2-dev -c lightsource-tag -c lightsource2 -c soft-matter
+  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip xlrd scikit-beam pyFAI pyxdameraulevenshtein -c conda-forge -c lightsource2-dev -c lightsource-tag -c lightsource2 -c soft-matter
   - source activate testenv
-  - conda remove metadatastore databroker filestore bluesky event_model --yes;
-  - pip install https://github.com/NSLS-II/ophyd/zipball/master#egg=ophyd;
-  - pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model;
-  - pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker;
-  - pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky;
+  - pip install https://github.com/NSLS-II/ophyd/zipball/master#egg=ophyd
+  - pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model
+  - pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker
+  - pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
   - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
   - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed

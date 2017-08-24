@@ -46,7 +46,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        image_data_key='pe1_image',
                        mask_setting='default',
                        mask_kwargs=None,
-                       pdf_config=None):
+                       pdf_config=None,
+                       verbose=False):
     """Total data processing pipeline for XPD
 
     Parameters
@@ -106,7 +107,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         '_{raw_event[seq_num]:03d}{ext}')
     raw_source = Stream(stream_name='Raw Data')
     source = es.fill_events(db, raw_source)
-    # source.sink(pprint)
 
     # DARK PROCESSING
 
@@ -248,14 +248,12 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                           input_info=None,
                                           document_name='start',
                                           stream_name='If not calibration')
-    # if_not_calibration_stream.sink(pprint)
     cal_md_stream = es.Eventify(if_not_calibration_stream,
                                 'calibration_md',
                                 output_info=[('calibration_md',
                                               {'dtype': 'dict',
                                                'source': 'workflow'})],
                                 stream_name='Eventify Calibration')
-    # cal_md_stream.sink(pprint)
     cal_stream = es.map(load_geo, cal_md_stream,
                         input_info={'cal_params': 'calibration_md'},
                         output_info=[('geo',
@@ -269,15 +267,12 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     loaded_calibration_stream = cal_stream.union(run_calibration_stream)
     loaded_calibration_stream.stream_name = 'Pull from either md or ' \
                                             'run calibration'
-    # loaded_calibration_stream.sink(pprint)
-    # foreground_stream.sink(pprint)
 
     # send calibration and corrected images to main workflow
     # polarization correction
     # SPLIT INTO TWO NODES
     zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
                          stream_name='Combine FG and Calibration')
-    # zlfl.sink(pprint)
     p_corrected_stream = es.map(polarization_correction,
                                 zlfl,
                                 input_info={'img': ('img', 0),
@@ -286,7 +281,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                       'source': 'testing'})],
                                 polarization_factor=polarization_factor,
                                 stream_name='Polarization corrected img')
-    # p_corrected_stream.sink(pprint)
     # generate masks
     if mask_setting is None:
         zlfc = es.zip_latest(es.filter(lambda x: x == 1,
@@ -322,12 +316,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              **mask_kwargs,
                              stream_name='Mask',
                              md=dict(analysis_stage='mask'))
-    # zlfc.sink(pprint)
-    # mask_stream.sink(pprint)
 
     # generate binner stream
     zlmc = es.zip_latest(mask_stream, cal_stream)
-    # zlmc.sink(pprint)
+
     binner_stream = es.map(generate_binner,
                            zlmc,
                            input_info={'geo': ('geo', 1),
@@ -336,9 +328,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    # binner_stream.sink(pprint)
     zlpb = es.zip_latest(p_corrected_stream, binner_stream)
-    # zlpb.sink(pprint)
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),
@@ -368,7 +358,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            stream_name='Combine tth and iq',
                            md=dict(analysis_stage='iq_tth')
                            )
-    # iq_stream.sink(pprint)
 
     # TODO: replace this with a pull from raw_eventify
     composition_stream = es.Eventify(if_not_dark_stream,
@@ -377,7 +366,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                      output_info=[('composition',
                                                    {'dtype': 'str'})],
                                      stream_name='Sample Composition')
-    # composition_stream.sink(pprint)
 
     fq_stream = es.map(fq_getter,
                        es.zip_latest(iq_stream, composition_stream),
@@ -388,7 +376,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                     ('config', {'dtype': 'dict'})],
                        dataformat='QA', qmaxinst=28, qmax=22,
                        md=dict(analysis_stage='fq'))
-    # pdf_stream.sink(pprint)
     pdf_stream = es.map(pdf_getter,
                         es.zip_latest(iq_stream, composition_stream),
                         input_info={0: ('q', 0), 1: ('iq', 0),
@@ -398,7 +385,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                      ('config', {'dtype': 'dict'})],
                         **pdf_config,
                         md=dict(analysis_stage='pdf'))
-    # pdf_stream.sink(pprint)
     """
     # z-score the data
     z_score_stream = es.map(z_score_image,
@@ -440,66 +426,58 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     #                               input_info={'timestamp': 'time'},
     #                               output_info=[
     #                                   ('file_path', {'dtype': 'str'})])
-
-    h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
-                                input_info={0: 'time'},
-                                output_info=[('human_timestamp',
-                                              {'dtype': 'str'})],
-                                full_event=True,
-                                stream_name='human timestamp')
-
-    eventifies = [
-        es.Eventify(s,
-                    stream_name='eventify {}'.format(s.stream_name)) for s in
-        [dark_sub_fg,
-         mask_stream,
-         iq_stream,
-         tth_iq_stream,
-         pdf_stream]]
-    exts = ['.tiff', '', '_Q.chi', '_tth.chi', '.gr']
-
-    mega_render = [
-        es.map(render_and_clean,
-               es.zip_latest(
-                   es.zip(h_timestamp_stream,  # human readable event timestamp
-                          if_not_dark_stream  # raw events
-                          ),
-                   eventify_raw_start,
-                   eventify_raw_descriptor,
-                   analysed_eventify
-               ),
-               string=light_template,
-               input_info={
-                   'human_timestamp': (('data', 'human_timestamp'), 0),
-                   'raw_event': ((), 1),
-                   'raw_start': (('data',), 2),
-                   'raw_descriptor': (('data',), 3),
-                   'analyzed_start': (('data',), 4)
-               },
-               ext=ext,
-               full_event=True,
-               output_info=[('filename', {'dtype': 'str'})],
-               stream_name='mega render '
-                           '{}'.format(analysed_eventify.stream_name)
-               )
-        for ext, analysed_eventify in zip(exts, eventifies)]
-
-    # mega_render[-1].sink(pprint)
-
-    [es.map(lambda **x: pprint(x['data']['filename']), cs,
-            full_event=True) for cs in mega_render]
-
-    md_render = es.map(render_and_clean,
-                       eventify_raw_start,
-                       string=light_template,
-                       input_info={'raw_start': (('data', ), 0), },
-                       output_info=[('filename', {'dtype': 'str'})],
-                       ext='md.yml',
-                       full_event=True)
-    # md_render.sink(pprint)
-
-    # """
     if write_to_disk:
+        h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
+                                    input_info={0: 'time'},
+                                    output_info=[('human_timestamp',
+                                                  {'dtype': 'str'})],
+                                    full_event=True,
+                                    stream_name='human timestamp')
+
+        eventifies = [
+            es.Eventify(s,
+                        stream_name='eventify {}'.format(s.stream_name)) for s in
+            [dark_sub_fg,
+             mask_stream,
+             iq_stream,
+             tth_iq_stream,
+             pdf_stream]]
+        exts = ['.tiff', '', '_Q.chi', '_tth.chi', '.gr']
+
+        mega_render = [
+            es.map(render_and_clean,
+                   es.zip_latest(
+                       es.zip(h_timestamp_stream,  # human readable event timestamp
+                              if_not_dark_stream  # raw events
+                              ),
+                       eventify_raw_start,
+                       eventify_raw_descriptor,
+                       analysed_eventify
+                   ),
+                   string=light_template,
+                   input_info={
+                       'human_timestamp': (('data', 'human_timestamp'), 0),
+                       'raw_event': ((), 1),
+                       'raw_start': (('data',), 2),
+                       'raw_descriptor': (('data',), 3),
+                       'analyzed_start': (('data',), 4)
+                   },
+                   ext=ext,
+                   full_event=True,
+                   output_info=[('filename', {'dtype': 'str'})],
+                   stream_name='mega render '
+                               '{}'.format(analysed_eventify.stream_name)
+                   )
+            for ext, analysed_eventify in zip(exts, eventifies)]
+
+        md_render = es.map(render_and_clean,
+                           eventify_raw_start,
+                           string=light_template,
+                           input_info={'raw_start': (('data', ), 0), },
+                           output_info=[('filename', {'dtype': 'str'})],
+                           ext='md.yml',
+                           full_event=True)
+
         make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
                                                   exist_ok=True),
                             cs,
@@ -543,6 +521,24 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        1: (('data',), 0)},
                            full_event=True)
 
-    # """
+    if verbose:
+        source.sink(pprint)
+        md_render.sink(pprint)
+        if_not_calibration_stream.sink(pprint)
+        cal_md_stream.sink(pprint)
+        loaded_calibration_stream.sink(pprint)
+        foreground_stream.sink(pprint)
+        zlfl.sink(pprint)
+        p_corrected_stream.sink(pprint)
+        zlmc.sink(pprint)
+        binner_stream.sink(pprint)
+        zlpb.sink(pprint)
+        iq_stream.sink(pprint)
+        composition_stream.sink(pprint)
+        pdf_stream.sink(pprint)
+        if write_to_disk:
+            [es.map(lambda **x: pprint(x['data']['filename']), cs,
+                    full_event=True) for cs in mega_render]
+
     return source
 # TODO: remove _md

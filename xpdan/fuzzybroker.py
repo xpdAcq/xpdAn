@@ -324,10 +324,8 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
             pass
         stop_hdr = hdr
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-        info.update({'start_time': _timestampstr(start_hdr['start']['time'],
-                                               pytz.timezone('US/Eastern')),
-                     'stop_time': _timestampstr(stop_hdr['start']['time'],
-                                              pytz.timezone('US/Eastern'))})
+        info.update({'start_time': _timestampstr(start_hdr['start']['time']),
+                     'stop_time': _timestampstr(stop_hdr['start']['time'])})
         returns.append(info)
     if print_results:
         pprint(returns)

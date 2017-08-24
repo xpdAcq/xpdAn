@@ -13,9 +13,11 @@ from pyFAI.geometry import Geometry
 from xpdan.calib import _configure_calib_instance
 
 from pkg_resources import resource_filename as rs_fn
-#rs_dir = rs_fn('xpdan', '/')
-#pytest_dir = rs_fn('xpdan', 'tests/')
+rs_dir = rs_fn('xpdan', '/')
+pytest_dir = rs_fn('xpdan', 'tests/')
 
+
+@unittest.skip("refactor as pipeline bakcend, no default logic now")
 def test_configure_calib():
     c = _configure_calib_instance(None, None, wavelength=1234)
     # calibrant is None, which default to Ni

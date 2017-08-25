@@ -111,7 +111,7 @@ def _calibration(img, calibration, save_dir, **kwargs):
 
     return c, timestr
 
-#NOTE: following function is not finished yet.
+
 def img_calibration(img, wavelength, calibrant=None,
                     detector=None, **kwargs):
     """function to calibrate experimental geometry wrt an image
@@ -169,8 +169,12 @@ def img_calibration(img, wavelength, calibrant=None,
     pyFAI documentation:
     http://pyfai.readthedocs.io/en/latest/
     """
+    if detector is None:
+        detector = 'perkin_elmer'
+    if calibrant is None:
+        calibrant = 'Ni'
     # configure calibration instance
-    c = _configure_calib_instance(calibrant, detector, wavelength)
+    c = Calibration(calibrant, detector, wavelength)
     # pyFAI calibration
     calib_c, timestr = _calibration(img, c, **kwargs)
 

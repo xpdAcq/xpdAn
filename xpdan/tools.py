@@ -13,6 +13,7 @@
 #
 ##############################################################################
 import numpy as np
+import datetime
 import scipy.stats as sts
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
@@ -241,3 +242,10 @@ def decompress_mask(data, indices, indptr, shape):
     cmask = csr_matrix(
         tuple([np.asarray(a) for a in [data, indices, indptr]]), shape=shape)
     return ~cmask.toarray().astype(bool)
+
+
+def _timestampstr(timestamp):
+    """convert timestamp to strftime formate"""
+    timestring = datetime.datetime.fromtimestamp(float(timestamp)).strftime(
+        '%Y%m%d-%H%M')
+    return timestring

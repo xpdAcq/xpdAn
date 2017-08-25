@@ -14,9 +14,8 @@ def if_query_results(docs, doc_to_inspect=0):
     return doc['n_hdrs'] > 0
 
 
-def if_calibration(docs):
-    doc = docs[0]
-    return 'calibration_server_uid' in doc
+def if_calibration(start):
+    return 'calibration_server_uid' in start
 
 
 def if_not_calibration(docs):

@@ -53,3 +53,7 @@ def dump_yml(filename, data):
     os.makedirs(os.path.split(filename)[0], exist_ok=True)
     with open(filename, 'w') as f:
         yaml.dump(data, f)
+
+
+def poni_saver(filename, calibration):
+    calibration.geoRef.save(filename)

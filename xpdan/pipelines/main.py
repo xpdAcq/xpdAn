@@ -16,7 +16,7 @@ from streamz import Stream
 from xpdan.db_utils import query_dark, temporal_prox, query_background
 from xpdan.dev_utils import _timestampstr
 from xpdan.formatters import render_and_clean
-from xpdan.io import pdf_saver, dump_yml
+from xpdan.io import pdf_saver, dump_yml, poni_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
                                             if_calibration, if_not_calibration)
 from xpdan.tools import (pull_array, event_count,
@@ -24,6 +24,7 @@ from xpdan.tools import (pull_array, event_count,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter)
 from xpdview.callbacks import LiveWaterfall
+from ..calib import img_calibration
 
 base_template = (''
                  '{raw_start[sample_name]}/'
@@ -98,16 +99,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     print('start pipeline configuration')
     light_template = os.path.join(
         save_dir,
-        '{raw_start[sample_name]}/'
-        '{raw_start[folder_tag]}/'
-        '{analyzed_start[analysis_stage]}/'
-        '{raw_start[sample_name]}_{human_timestamp}'
-        '_[temp={raw_event[temperature]:1.2f}'
-        '{raw_descriptor[temperature][units]}]'
-        '_[dx={raw_event[diff_x]:1.3f}{raw_descriptor[diff_x][units]}]'
-        '_[dy={raw_event[diff_y]:1.3f}{raw_descriptor[diff_y][units]}]'
-        '_{raw_start[uid]:.6}'
-        '_{raw_event[seq_num]:03d}{ext}')
+        base_template)
     raw_source = Stream(stream_name='Raw Data')
     source = es.fill_events(db, raw_source)
 
@@ -234,16 +226,39 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # CALIBRATION PROCESSING
 
     # if calibration send to calibration maker
-    if_calibration_stream = es.filter(if_calibration, if_not_dark_stream,
-                                      input_info=None,
+    if_calibration_stream = es.filter(if_calibration,
+                                      es.zip_latest(
+                                          es.zip(foreground_stream,
+                                                 if_not_dark_stream),
+                                          eventify_raw_start,
+                                      ),
+                                      input_info={0: ((), 2)},
                                       document_name='start',
                                       stream_name='If calibration')
 
-    def run_calibration():
-        pass
+    # detector and calibration are under 'detector' and 'dSpacing'
+    calibration_stream = es.map(img_calibration, if_calibration_stream,
+                                input_info={
+                                    'img': (('data', 'img'), 0),
+                                    'wavelength': (('bt_wavelength',), 2),
+                                    'calibrant': (('calibrant',), 2),
+                                    'detector': (('detector',), 2)},
+                                output_info=[('calibrant',
+                                              {'dtype': 'object'}),
+                                             'timestamp',
+                                             {'dtype': 'float'}],
+                                stream_name='Run Calibration',
+                                md={'analysis_stage': 'calib'},
+                                full_event=True)
 
-    run_calibration_stream = es.map(run_calibration, if_calibration_stream,
-                                    stream_name='Run Calibration')
+    ai_stream = es.map(lambda x: x.ai,
+                       calibration_stream,
+                       input_info={'x': 'calibrant'},
+                       output_info=[('geo', {'dtype': 'object',
+                                             'source': 'workflow',
+                                             'instance': 'pyFAI.azimuthalIntegrator'
+                                                         '.AzimuthalIntegrator'})]
+                       )
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
@@ -264,10 +279,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        'source': 'workflow',
                                        'instance': 'pyFAI.azimuthalIntegrator'
                                                    '.AzimuthalIntegrator'})],
-                        stream_name='Load geometry ')
+                        stream_name='Load geometry')
 
     # union the calibration branches
-    loaded_calibration_stream = cal_stream.union(run_calibration_stream)
+    loaded_calibration_stream = cal_stream.union(ai_stream)
     loaded_calibration_stream.stream_name = 'Pull from either md or ' \
                                             'run calibration'
 
@@ -430,6 +445,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     #                               output_info=[
     #                                   ('file_path', {'dtype': 'str'})])
     if write_to_disk:
+        # TODO: add calibration writer for xpdAcq
+        # TODO: add calibration writer for users
         h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
                                     input_info={0: 'time'},
                                     output_info=[('human_timestamp',
@@ -437,20 +454,36 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                     full_event=True,
                                     stream_name='human timestamp')
 
+        exts = ['.tiff', '', '_Q.chi',
+                '_tth.chi', '.gr',
+                '.poni']
+        eventify_input_streams = [dark_sub_fg, mask_stream, iq_stream,
+                                  tth_iq_stream, pdf_stream,
+                                  calibration_stream]
+        iis = [
+            {'data': ('img', 0), 'file': ('filename', 1)},
+            {'mask': ('mask', 0), 'filename': ('filename', 1)},
+            {'tth': ('q', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
+            {'tth': ('tth', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
+            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
+             'config': ('config', 0)},
+            {'calibration': ('calibration', 0), 'filename': ('filename', 1)}
+        ]
+        saver_kwargs = [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
+                 {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
         eventifies = [
             es.Eventify(s,
-                        stream_name='eventify {}'.format(s.stream_name)) for s in
-            [dark_sub_fg,
-             mask_stream,
-             iq_stream,
-             tth_iq_stream,
-             pdf_stream]]
-        exts = ['.tiff', '', '_Q.chi', '_tth.chi', '.gr']
+                        stream_name='eventify {}'.format(s.stream_name)) for s
+            in
+            eventify_input_streams]
 
         mega_render = [
             es.map(render_and_clean,
                    es.zip_latest(
-                       es.zip(h_timestamp_stream,  # human readable event timestamp
+                       es.zip(h_timestamp_stream,
+                              # human readable event timestamp
                               if_not_dark_stream  # raw events
                               ),
                        eventify_raw_start,
@@ -476,9 +509,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         md_render = es.map(render_and_clean,
                            eventify_raw_start,
                            string=light_template,
-                           input_info={'raw_start': (('data', ), 0), },
+                           input_info={'raw_start': (('data',), 0), },
                            output_info=[('filename', {'dtype': 'str'})],
-                           ext='md.yml',
+                           ext='.yml',
                            full_event=True)
 
         make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
@@ -488,16 +521,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             output_info=[('filename', {'dtype': 'str'})],
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
-        iis = [
-            {'data': ('img', 0), 'file': ('filename', 1)},
-            {'mask': ('mask', 0), 'filename': ('filename', 1)},
-            {'tth': ('q', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'tth': ('tth', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
-             'config': ('config', 0)},
-        ]
 
         writer_streams = [
             es.map(writer_templater,
@@ -514,9 +537,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                 make_dirs,  # prevent run condition btwn dirs and files
                 iis,
                 [tifffile.imsave, fit2d_save, save_output, save_output,
-                 pdf_saver],
-                [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
-                 {'q_or_2theta': '2theta', 'ext': ''}, {}]
+                 pdf_saver, poni_saver],
+                saver_kwargs
             )]
 
         md_writer = es.map(dump_yml, es.zip(eventify_raw_start, md_render),
@@ -544,4 +566,3 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                     full_event=True) for cs in mega_render]
 
     return source
-# TODO: remove _md

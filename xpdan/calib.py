@@ -94,9 +94,15 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     c = calibration  # shorthand notation
     timestr = _timestampstr(time.time())
     c.gui = interactive
-    c.basename = calib_ref_fp
+    # annoying pyFAI logic, you need valid fn to start calibration
+    if calib_ref_fp is None:
+        calib_ref_fp = os.path.join(os.getcwd(), 'from_calib_func')
+    basename, ext = os.path.splitext(calib_ref_fp)
+    poni_fn = basename + ".npt"
+    c.basename = basename
+    c.pointfile = poni_fn
     c.peakPicker = PeakPicker(img, reconst=True,
-                              pointfile=poni_name,
+                              pointfile=c.pointfile,
                               calibrant=c.calibrant,
                               wavelength=c.wavelength,
                               **kwargs)
@@ -174,8 +180,6 @@ def img_calibration(img, wavelength, calibrant=None,
     # configure calibration instance
     c = Calibration(calibrant, detector, wavelength)
     # pyFAI calibration
-    if calib_ref_fp is None:
-        calib_ref_fp = os.getcwd()
     calib_c, timestr = _calibration(img, c, calib_ref_fp, **kwargs)
 
     return calib_c.ai

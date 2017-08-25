@@ -55,10 +55,9 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
     with open(calib_yml_fp, 'w') as f:
         yaml.dump(calib_config_dict, f)
     stem, fn = os.path.split(calib_yml_fp)
-    print("INFO: End of calibration process. Your parameter set will be "
-          "saved inside {}. this set of parameters will be injected "
-          "as metadata to subsequent scans until you perform this "
-          "process again\n".format(fn))
+    print("INFO: End of calibration process. This set of calibration "
+          "will be injected as metadata to subsequent scans until you "
+          "perform this process again\n")
     print("INFO: you can also use:\n>>> show_calib()\ncommand to check"
           " current calibration parameters")
     #print("INFO: To save your calibration image as a tiff file run\n"
@@ -66,19 +65,20 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
     return calib_config_dict
 
 
-def _calibration(img, calibration, save_dir, **kwargs):
+def _calibration(img, calibration, calib_ref_fp, **kwargs):
     """engine for performing calibration on a image with geometry
     correction software. current backend is ``pyFAI``.
 
     Parameters
     ----------
     img : ndarray
-        image to perfrom calibration process.
+        image will be used for calibration process.
     calibration : pyFAI.calibration.Calibration instance
-        pyFAI Calibration instance with wavelength, calibrant and
+        Calibration instance with wavelength, calibrant and
         detector configured.
-    save_dir : str
-        directory where the poni file will be saved.
+    calib_ref_fp : str
+        full file path to where the native pyFAI calibration information
+        will be saved.
     kwargs:
         additional keyword argument for calibration. please refer to
         pyFAI documentation for all options.
@@ -93,15 +93,16 @@ def _calibration(img, calibration, save_dir, **kwargs):
     # calibration
     c = calibration  # shorthand notation
     timestr = _timestampstr(time.time())
-    f_name = '_'.join([timestr, 'pyFAI_calib',
-                       c.calibrant.__repr__().split(' ')[0]])
-    w_name = os.path.join(save_dir, f_name)  # poni name
-    poni_name = w_name + ".npt"
     c.gui = interactive
-    c.basename = w_name
-    c.pointfile = poni_name
+    # annoying pyFAI logic, you need valid fn to start calibration
+    if calib_ref_fp is None:
+        calib_ref_fp = os.path.join(os.getcwd(), 'from_calib_func')
+    basename, ext = os.path.splitext(calib_ref_fp)
+    poni_fn = basename + ".npt"
+    c.basename = basename
+    c.pointfile = poni_fn
     c.peakPicker = PeakPicker(img, reconst=True,
-                              pointfile=poni_name,
+                              pointfile=c.pointfile,
                               calibrant=c.calibrant,
                               wavelength=c.wavelength,
                               **kwargs)
@@ -111,9 +112,9 @@ def _calibration(img, calibration, save_dir, **kwargs):
 
     return c, timestr
 
-#NOTE: following function is not finished yet.
+
 def img_calibration(img, wavelength, calibrant=None,
-                    detector=None, **kwargs):
+                    detector=None, calib_ref_fp=None, **kwargs):
     """function to calibrate experimental geometry wrt an image
 
     Parameters
@@ -135,6 +136,9 @@ def img_calibration(img, wavelength, calibrant=None,
     detector : str or pyFAI.detector.Detector instance, optional.
         detector used to collect data. default value is 'perkin-elmer'.
         other allowed values are in pyFAI documentation.
+    calib_ref_fp : str, optional
+        full file path to where the native pyFAI calibration information
+        will be saved. Default to current working directory.
     kwargs:
         Additional keyword argument for calibration. please refer to
         pyFAI documentation for all options.
@@ -169,9 +173,13 @@ def img_calibration(img, wavelength, calibrant=None,
     pyFAI documentation:
     http://pyfai.readthedocs.io/en/latest/
     """
+    if detector is None:
+        detector = 'perkin_elmer'
+    if calibrant is None:
+        calibrant = 'Ni'
     # configure calibration instance
-    c = _configure_calib_instance(calibrant, detector, wavelength)
+    c = Calibration(calibrant, detector, wavelength)
     # pyFAI calibration
-    calib_c, timestr = _calibration(img, c, **kwargs)
+    calib_c, timestr = _calibration(img, c, calib_ref_fp, **kwargs)
 
     return calib_c.ai

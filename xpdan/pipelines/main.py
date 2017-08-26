@@ -29,7 +29,7 @@ from ..calib import img_calibration
 base_template = (''
                  '{raw_start[sample_name]}/'
                  '{raw_start[folder_tag]}/'
-                 '{analysis_stage}/'
+                 '{analyzed_start[analysis_stage]}/'
                  '{raw_start[sample_name]}_'
                  '{human_timestamp}_'
                  '[temp={raw_event[data][temperature]:1.2f}'
@@ -547,20 +547,20 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            full_event=True)
 
     if verbose:
-        source.sink(pprint)
-        md_render.sink(pprint)
-        if_not_calibration_stream.sink(pprint)
-        cal_md_stream.sink(pprint)
-        loaded_calibration_stream.sink(pprint)
-        foreground_stream.sink(pprint)
-        zlfl.sink(pprint)
-        p_corrected_stream.sink(pprint)
-        zlmc.sink(pprint)
-        binner_stream.sink(pprint)
-        zlpb.sink(pprint)
-        iq_stream.sink(pprint)
-        composition_stream.sink(pprint)
-        pdf_stream.sink(pprint)
+        # source.sink(pprint)
+        # md_render.sink(pprint)
+        # if_not_calibration_stream.sink(pprint)
+        # cal_md_stream.sink(pprint)
+        # loaded_calibration_stream.sink(pprint)
+        # foreground_stream.sink(pprint)
+        # zlfl.sink(pprint)
+        # p_corrected_stream.sink(pprint)
+        # zlmc.sink(pprint)
+        # binner_stream.sink(pprint)
+        # zlpb.sink(pprint)
+        # iq_stream.sink(pprint)
+        # composition_stream.sink(pprint)
+        # pdf_stream.sink(pprint)
         if write_to_disk:
             [es.map(lambda **x: pprint(x['data']['filename']), cs,
                     full_event=True) for cs in mega_render]

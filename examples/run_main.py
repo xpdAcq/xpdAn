@@ -28,7 +28,7 @@ source = conf_main_pipeline(db, td.name,
                             )
 source.visualize()
 for hdr in list((db[-1], )):
-    for e in hdr.documents(fill=True):
+    for e in hdr.documents():
         if e[0] == 'event':
             # plt.pause(.1)
             pass

@@ -10,7 +10,8 @@ def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
     source = conf_main_pipeline(exp_db, fast_tmp_dir,
                                 vis=False,
                                 write_to_disk=True,
-                                mask_setting=None)
+                                mask_setting=None,
+                                verbose=True)
     # source.visualize('/home/christopher/dev/xpdAn/examples/mystream.png')
     t0 = time.time()
     for nd in exp_db[-1].documents(fill=True):
@@ -25,7 +26,7 @@ def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
         for f in files:
             print('{}{}'.format(subindent, f))
     assert 'Au' in os.listdir(fast_tmp_dir)
-    assert 'Au_{:.6}_md.yml'.format(start_uid3) in os.listdir(
+    assert 'Au_{:.6}.yml'.format(start_uid3) in os.listdir(
         os.path.join(fast_tmp_dir, 'Au'))
     for f in ['dark_sub', 'mask', 'iq_q', 'iq_tth', 'pdf']:
         assert f in os.listdir(

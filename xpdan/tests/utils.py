@@ -12,12 +12,14 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-import os
 import tempfile
-import time
+from itertools import product
 from uuid import uuid4
 
 import numpy as np
+
+from bluesky.examples import ReaderWithRegistry
+from bluesky.plans import count
 
 pyFAI_calib = {'calibration_collection_uid': 'uuid1234',
                'centerX': 1019.8886820814655,
@@ -42,87 +44,98 @@ pyFAI_calib = {'calibration_collection_uid': 'uuid1234',
                'wavelength': 1.8333e-11}
 
 
-def insert_imgs(mds, fs, n, shape, save_dir=tempfile.mkdtemp(),
-                **kwargs):
+def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     """
     Insert images into mds and fs for testing
 
     Parameters
     ----------
-    mds
-    fs
-    n
-    shape
+    RE: bluesky.run_engine.RunEngine instance
+    reg: Registry instance
+    n: int
+        Number of images to take
+    shape: tuple of ints
+        The shape of the resulting images
     save_dir
 
     Returns
     -------
 
     """
+    # Create detectors
+    dark_det = ReaderWithRegistry('pe1_image',
+                                  {'pe1_image': lambda: np.ones(shape)},
+                                  reg=reg, save_path=save_dir)
+    light_det = ReaderWithRegistry('pe1_image',
+                                   {'pe1_image': lambda: np.ones(shape)},
+                                   reg=reg, save_path=save_dir)
     beamtime_uid = str(uuid4())
-    # Insert the dark images
-    dark_img = np.ones(shape)
-    dark_uid = str(uuid4())
-    run_start = mds.insert_run_start(uid=dark_uid, time=time.time(),
-                                     name='test-dark',
-                                     beamtime_uid=beamtime_uid,
-                                     sample_name='hi',
-                                     calibration_md=pyFAI_calib,
-                                     **kwargs)
-    data_keys = {
-        'pe1_image': dict(source='testing', external='FILESTORE:',
-                          dtype='array')}
-    data_hdr = dict(run_start=run_start,
-                    data_keys=data_keys,
-                    time=time.time(), uid=str(uuid4()))
-    descriptor = mds.insert_descriptor(**data_hdr)
-    for i, img in enumerate([dark_img]):
-        fs_uid = str(uuid4())
-        fn = os.path.join(save_dir, fs_uid + '.npy')
-        np.save(fn, img)
-        # insert into FS
-        fs_res = fs.insert_resource('npy', fn, resource_kwargs={})
-        fs.insert_datum(fs_res, fs_uid, datum_kwargs={})
-        mds.insert_event(
-            descriptor=descriptor,
-            uid=str(uuid4()),
-            time=time.time(),
-            data={'pe1_image': fs_uid},
-            timestamps={},
-            seq_num=i)
-    mds.insert_run_stop(run_start=run_start,
-                        uid=str(uuid4()),
-                        time=time.time())
+    base_md = dict(beamtime_uid=beamtime_uid,
+                   calibration_md=pyFAI_calib,
+                   bt_wavelength=0.1847,
+                   **kwargs)
 
-    imgs = [np.ones(shape)] * n
-    run_start = mds.insert_run_start(uid=str(uuid4()), time=time.time(),
-                                     name='test', sc_dk_field_uid=dark_uid,
-                                     beamtime_uid=beamtime_uid,
-                                     sample_name='hi',
-                                     calibration_md=pyFAI_calib,
-                                     **kwargs)
-    data_keys = {
-        'pe1_image': dict(source='testing', external='FILESTORE:',
-                          dtype='array')}
-    data_hdr = dict(run_start=run_start,
-                    data_keys=data_keys,
-                    time=time.time(), uid=str(uuid4()))
-    descriptor = mds.insert_descriptor(**data_hdr)
-    for i, img in enumerate(imgs):
-        fs_uid = str(uuid4())
-        fn = os.path.join(save_dir, fs_uid + '.npy')
-        np.save(fn, img)
-        # insert into FS
-        fs_res = fs.insert_resource('npy', fn, resource_kwargs={})
-        fs.insert_datum(fs_res, fs_uid, datum_kwargs={})
-        mds.insert_event(
-            descriptor=descriptor,
-            uid=str(uuid4()),
-            time=time.time(),
-            data={'pe1_image': fs_uid},
-            timestamps={'pe1_image': time.time()},
-            seq_num=i)
-    mds.insert_run_stop(run_start=run_start,
-                        uid=str(uuid4()),
-                        time=time.time())
-    return save_dir
+    # Insert the dark images
+    dark_md = base_md.copy()
+    dark_md.update(name='test-dark', is_dark=True)
+
+    dark_uid = RE(count([dark_det], num=1), **dark_md)
+
+    # Insert the light images
+    light_md = base_md.copy()
+    light_md.update(name='test', sc_dk_field_uid=dark_uid)
+    uid = RE(count([light_det], num=n), **light_md)
+
+    return uid
+
+
+class PDFGetterShim:
+    def __init__(self):
+        self.config = {'qmax': 'testing'}
+        self.fq = np.ones(10), np.ones(10)
+
+    def __call__(self, *args, **kwargs):
+        print("This is a testing shim for PDFgetx if you see this message then"
+              "you don't have PDFgetx3 installed. "
+              "The data that comes from this is for testing purposes only"
+              "and has no bearing on reality")
+        return np.ones(10), np.ones(10)
+
+
+integrate_params = [
+    'polarization_factor',
+    'mask_setting',
+    'mask_kwargs',
+]
+good_kwargs = [
+    (.99,),
+    (
+        # 'default',
+        # 'auto',
+        None,
+    ),
+    [None,
+     # {'alpha': 10}
+     ],
+]
+
+bad_integrate_params = ['polarization_factor',
+                        'mask_setting',
+                        'mask_kwargs']
+
+bad_kwargs = [['str'] for i in range(len(bad_integrate_params))]
+
+integrate_kwarg_values = product(*good_kwargs)
+integrate_kwargs = []
+for vs in integrate_kwarg_values:
+    d = {k: v for (k, v) in zip(integrate_params, vs)}
+    integrate_kwargs.append((d, False))
+
+# for vs in bad_kwargs:
+#     d = {k: v for (k, v) in zip(bad_integrate_params, vs)}
+#     integrate_kwargs.append((d, True))
+
+save_tiff_kwargs = []
+for d in [save_tiff_kwargs, integrate_kwargs]:
+    for d2 in d:
+        d2[0]['image_data_key'] = 'pe1_image'

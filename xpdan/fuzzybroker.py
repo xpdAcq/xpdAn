@@ -13,14 +13,16 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+
+from heapq import heapify, heappushpop
+from pprint import pprint
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
-from databroker.broker import _munge_time
-from pprint import pprint
+
 import pytz
-from heapq import heapify, heappushpop
-import warnings
+
 from databroker.broker import Broker
+from .dev_utils import _timestampstr
 
 
 class FuzzyBroker(Broker):
@@ -93,7 +95,8 @@ class FuzzyBroker(Broker):
         heapify(heap)
         for h in self():
             internal_scores = [1. - ndld(v, search_string) for v in
-                               _nested_dict_values(h['start']) if v is not None]
+                               _nested_dict_values(h['start'])
+                               if v is not None]
             heappushpop(heap,
                         (max(internal_scores), h['start']['time'] * -1, h))
         heap.sort()
@@ -125,15 +128,15 @@ class FuzzyBroker(Broker):
         returns = []
         for s in bts:
             hdrs = self(**{beamtime_key: s})
-            start_hdr = hdrs[0]
-            stop_hdr = hdrs[-1]
+            hdr = next(iter(hdrs))
+            start_hdr = hdr
+            for hdr in hdrs:
+                pass
+            stop_hdr = hdr
             info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-            info.update({'start_time': _munge_time(start_hdr['start']['time'],
-                                                   pytz.timezone(
-                                                       'US/Eastern')),
-                         'stop_time': _munge_time(stop_hdr['start']['time'],
-                                                  pytz.timezone(
-                                                      'US/Eastern'))})
+            info.update(
+                {'start_time': _timestampstr(start_hdr['start']['time']),
+                 'stop_time': _timestampstr(stop_hdr['start']['time'])})
             returns.append(info)
         if print_results:
             pprint(returns)
@@ -315,13 +318,14 @@ def beamtime_dates(db, keys=('beamtime_uid', 'bt_safN',
     returns = []
     for s in bts:
         hdrs = db(**{beamtime_key: s})
-        start_hdr = hdrs[0]
-        stop_hdr = hdrs[-1]
+        for i, hdr in enumerate(hdrs):
+            if i == 0:
+                start_hdr = hdr
+            pass
+        stop_hdr = hdr
         info = {k: start_hdr[k] for k in keys if k in start_hdr.keys()}
-        info.update({'start_time': _munge_time(start_hdr['start']['time'],
-                                               pytz.timezone('US/Eastern')),
-                     'stop_time': _munge_time(stop_hdr['start']['time'],
-                                              pytz.timezone('US/Eastern'))})
+        info.update({'start_time': _timestampstr(start_hdr['start']['time']),
+                     'stop_time': _timestampstr(stop_hdr['start']['time'])})
         returns.append(info)
     if print_results:
         pprint(returns)

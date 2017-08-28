@@ -1,9 +1,9 @@
-from xpdan.db_utils import *
+from xpdan.db_utils import sort_scans_by_hdr_key, scan_diff, scan_summary
 
 
 def test_sort_scans_by_hdr_key(exp_db):
     hdrs = exp_db()
-    print(hdrs[0].start)
+    print(next(iter(hdrs))['start'])
     d = sort_scans_by_hdr_key(hdrs, 'pi_name')
     print(d)
     assert len(d) == 2
@@ -25,4 +25,3 @@ def test_scan_summary(exp_db):
     hdrs = exp_db()
     d = scan_summary(hdrs)
     assert len(d) != 0
-

@@ -20,7 +20,7 @@ import yaml
 import datetime
 import numpy as np
 
-from xpdan.tools import _timestampstr
+from xpdan.dev_utils import _timestampstr
 
 from pyFAI.gui.utils import update_fig
 from pyFAI.calibration import Calibration, PeakPicker
@@ -95,6 +95,7 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     timestr = _timestampstr(time.time())
     c.gui = interactive
     # annoying pyFAI logic, you need valid fn to start calibration
+    # TODO: send to tmp folder then delete tmp folder
     if calib_ref_fp is None:
         calib_ref_fp = os.path.join(os.getcwd(), 'from_calib_func')
     basename, ext = os.path.splitext(calib_ref_fp)

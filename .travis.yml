@@ -8,6 +8,9 @@ env:
     HTML_SUBDIR: build/html
     DOCS_CONDA_DEPS: "bluesky"
     DOCS_PIP_DEPS: "tqdm"
+  matrix:
+    - CUTTING_EDGE=true
+
 
 cache:
   directories:
@@ -48,34 +51,24 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip databroker ophyd historydict boltons doct pyepics super_state_machine mock xlrd scikit-beam bluesky pyFAI pyxdameraulevenshtein -c lightsource2 -c conda-forge -c soft-matter
+  - conda create --yes -n testenv numpy scipy flake8 matplotlib python=$TRAVIS_PYTHON_VERSION pytest coverage pip xlrd scikit-beam pyFAI pyxdameraulevenshtein -c conda-forge -c lightsource2-dev -c lightsource-tag -c lightsource2 -c soft-matter
   - source activate testenv
-#  - 'pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model'
-#  - conda remove metadatastore databroker filestore --yes
-#  - 'pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker'
-#  - 'pip install https://github.com/NSLS-II/filestore/zipball/master#egg=filestore'
-#  - 'pip install https://github.com/NSLS-II/metadatastore/zipball/master#egg=metadatastore'
-#  - 'pip install https://github.com/NSLS-II/portable-mds/zipball/master#egg=portable_mds'
-#  - 'pip install https://github.com/NSLS-II/portable-fs/zipball/master#egg=portable_fs'
-#  - 'pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky'
-  - python setup.py install
+  - pip install https://github.com/NSLS-II/ophyd/zipball/master#egg=ophyd
+  - pip install https://github.com/NSLS-II/event-model/zipball/master#egg=event_model
+  - pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker
+  - pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
-  # Need to clean the python build directory (and other cruft) or pytest is
-  # going to find the build directory and get confused why there are two sets
-  # of every test file
-  - python -c "from filestore import utils, conf; utils.install_sentinels(conf.connection_config, 1)"
-  # make sure the sqlite file exists to avoid race conditions
-  - python -c "from bluesky.utils import get_history; get_history()"
-  - pip install codecov pytest-env python-coveralls
-  - git clean -xfd
+  - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
+  - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed
+  - pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview
+  - pip install https://github.com/xpdAcq/xpdSim/zipball/master#egg=xpdsim
+  - pip install .
+  - pip install codecov pytest-env
 
 script:
   - coverage run run_tests.py
   - coverage report -m
 
-after_script:
-  - flake8 .
-
 after_success:
+  - flake8 xpdan
   - codecov
-  - coveralls

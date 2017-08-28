@@ -124,10 +124,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     dark_query_results = es.QueryUnpacker(db, dark_query,
                                           stream_name='Unpack FG Dark')
     # Do the dark subtraction
+    zlid = es.zip_latest(if_not_dark_stream,
+                         dark_query_results,
+                         stream_name='Combine darks and lights')
     dark_sub_fg = es.map(sub,
-                         es.zip_latest(if_not_dark_stream,
-                                       dark_query_results,
-                                       stream_name='Combine darks and lights'),
+                         zlid,
                          input_info={0: (image_data_key, 0),
                                      1: (image_data_key, 1)},
                          output_info=[('img', {'dtype': 'array',
@@ -138,7 +139,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # write to disk
     # BACKGROUND PROCESSING
     # Query for background
-    # """
     bg_query_stream = es.Query(db, if_not_dark_stream,
                                query_function=query_background,
                                query_decider=temporal_prox,
@@ -403,29 +403,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                      ('config', {'dtype': 'dict'})],
                         **pdf_config,
                         md=dict(analysis_stage='pdf'))
-    """
-    # z-score the data
-    z_score_stream = es.map(z_score_image,
-                            es.zip_latest(p_corrected_stream,
-                                          binner_stream),
-                            input_info={'img': ('img', 0),
-                                        'binner': ('binner', 1)},
-                            output_info=[('z_score_img',
-                                          {'dtype': 'array',
-                                           'source': 'testing'})],
-                            stream_name='Z-score-image')
-    def refine_structure():
-        pass
-
-    trial_structure_stream = es.Eventify(if_not_dark_stream, 'structure',
-                                         output_info=[('stru',
-                                                       {'dtype': 'object'})],
-                                         stream_name='Trial Structure')
-
-    structure = es.map(refine_structure, es.zip_latest(pdf_stream,
-                                                       trial_structure_stream))
-
-    # """
     if vis:
         foreground_stream.sink(star(LiveImage('img')))
         mask_stream.sink(star(LiveImage('mask')))
@@ -472,7 +449,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
             {'calibration': ('calibration', 0), 'filename': ('filename', 1)}
         ]
         saver_kwargs = [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
-                 {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
+                        {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
         eventifies = [
             es.Eventify(s,
                         stream_name='eventify {}'.format(s.stream_name)) for s
@@ -545,10 +522,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            input_info={0: (('data', 'filename'), 1),
                                        1: (('data',), 0)},
                            full_event=True)
-
     if verbose:
-        # source.sink(pprint)
-        # md_render.sink(pprint)
+        source.sink(pprint)
+        # if_not_dark_stream.sink(pprint)
+        # zlid.sink(pprint)
         # if_not_calibration_stream.sink(pprint)
         # cal_md_stream.sink(pprint)
         # loaded_calibration_stream.sink(pprint)
@@ -560,9 +537,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # zlpb.sink(pprint)
         # iq_stream.sink(pprint)
         # composition_stream.sink(pprint)
-        # pdf_stream.sink(pprint)
+        pdf_stream.sink(pprint)
         if write_to_disk:
+            md_render.sink(pprint)
             [es.map(lambda **x: pprint(x['data']['filename']), cs,
                     full_event=True) for cs in mega_render]
 
-    return source
+    return raw_source

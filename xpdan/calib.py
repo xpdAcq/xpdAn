@@ -14,16 +14,13 @@
 #
 ##############################################################################
 import os
-import uuid
 import time
+
 import yaml
-import datetime
-import numpy as np
+from pyFAI.calibration import Calibration, PeakPicker
+from pyFAI.gui.utils import update_fig
 
 from xpdan.dev_utils import _timestampstr
-
-from pyFAI.gui.utils import update_fig
-from pyFAI.calibration import Calibration, PeakPicker
 
 
 def _save_calib_param(calib_c, timestr, calib_yml_fp):
@@ -44,8 +41,8 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
     calib_config_dict = calib_c.geoRef.getPyFAI()
     calib_config_dict.update(calib_c.geoRef.getFit2D())
     calib_config_dict.update({'poni_file_name':
-                              calib_c.basename+'.poni'})
-    calib_config_dict.update({'time':timestr})
+                              calib_c.basename + '.poni'})
+    calib_config_dict.update({'time': timestr})
     calib_config_dict.update({'dSpacing':
                               calib_c.calibrant.dSpacing})
     calib_config_dict.update({'calibrant_name':
@@ -60,7 +57,7 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
           "perform this process again\n")
     print("INFO: you can also use:\n>>> show_calib()\ncommand to check"
           " current calibration parameters")
-    #print("INFO: To save your calibration image as a tiff file run\n"
+    # print("INFO: To save your calibration image as a tiff file run\n"
     #      "save_last_tiff()\nnow.")
     return calib_config_dict
 
@@ -89,7 +86,6 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
           .format("http://xpdacq.github.io/usb_Running.html#calib-manual\n"))
     # default params
     interactive = True
-    dist = 0.1
     # calibration
     c = calibration  # shorthand notation
     timestr = _timestampstr(time.time())

@@ -13,20 +13,9 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-import os
-from itertools import islice, tee, chain
 
-import numpy as np
-import tifffile as tif
-import yaml
-from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
-
-from .tools import mask_img, decompress_mask
-from xpdan.dev_utils import _clean_info, _timestampstr
-from skbeam.io.fit2d import read_fit2d_msk
-
-from xpdan.pipelines.save_tiff import conf_save_tiff_pipeline
 from xpdan.pipelines.main import conf_main_pipeline
+from xpdan.pipelines.save_tiff import conf_save_tiff_pipeline
 
 
 def _prepare_header_list(headers):

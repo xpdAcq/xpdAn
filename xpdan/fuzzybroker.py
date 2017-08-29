@@ -19,8 +19,6 @@ from pprint import pprint
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 
-import pytz
-
 from databroker.broker import Broker
 from .dev_utils import _timestampstr
 

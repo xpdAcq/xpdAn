@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.tests package &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="xpdAn  documentation" href="index.html"/>
+        <link rel="up" title="xpdan package" href="xpdan.html"/>
+        <link rel="prev" title="xpdan package" href="xpdan.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="xpdan.html">xpdan package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="xpdan.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">xpdan.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests.conftest">xpdan.tests.conftest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xpdan-tests-test-data-reduction-module">xpdan.tests.test_data_reduction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests.test_data_reduction_core">xpdan.tests.test_data_reduction_core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests.test_db_utils">xpdan.tests.test_db_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xpdan-tests-test-fuzzy-broker-module">xpdan.tests.test_fuzzy_broker module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests.test_tools">xpdan.tests.test_tools module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests.utils">xpdan.tests.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-data-reduction-module">xpdan.data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-module">xpdan.glbl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl_gen">xpdan.glbl_gen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.tools">xpdan.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xpdAn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="xpdan.html">xpdan package</a> &raquo;</li>
+        
+      <li>xpdan.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/xpdan.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="xpdan-tests-package">
+<h1>xpdan.tests package<a class="headerlink" href="#xpdan-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xpdan.tests.conftest">
+<span id="xpdan-tests-conftest-module"></span><h2>xpdan.tests.conftest module<a class="headerlink" href="#module-xpdan.tests.conftest" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.tests.conftest.clean_database">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">clean_database</code><span class="sig-paren">(</span><em>database</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#clean_database"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.clean_database" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.disk_mask">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">disk_mask</code><span class="sig-paren">(</span><em>tmp_dir</em>, <em>img_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#disk_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.disk_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.exp_db">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">exp_db</code><span class="sig-paren">(</span><em>db</em>, <em>tmp_dir</em>, <em>img_size</em>, <em>fresh_RE</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#exp_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.exp_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.fast_tmp_dir">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">fast_tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#fast_tmp_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.fast_tmp_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.fuzzdb">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">fuzzdb</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#fuzzdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.fuzzdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.img_size">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">img_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#img_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.img_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.mk_glbl">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">mk_glbl</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#mk_glbl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.mk_glbl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.start_uid1">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">start_uid1</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#start_uid1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.start_uid1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.start_uid2">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">start_uid2</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#start_uid2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.start_uid2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.start_uid3">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">start_uid3</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#start_uid3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.start_uid3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.tif_exporter_template">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">tif_exporter_template</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#tif_exporter_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.tif_exporter_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.tmp_dir">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#tmp_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.tmp_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="xpdan-tests-test-data-reduction-module">
+<h2>xpdan.tests.test_data_reduction module<a class="headerlink" href="#xpdan-tests-test-data-reduction-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xpdan.tests.test_data_reduction_core">
+<span id="xpdan-tests-test-data-reduction-core-module"></span><h2>xpdan.tests.test_data_reduction_core module<a class="headerlink" href="#module-xpdan.tests.test_data_reduction_core" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.tests.test_data_reduction_core.test_integrate_core_smoke">
+<code class="descclassname">xpdan.tests.test_data_reduction_core.</code><code class="descname">test_integrate_core_smoke</code><span class="sig-paren">(</span><em>exp_db</em>, <em>fast_tmp_dir</em>, <em>kwargs</em>, <em>known_fail_bool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_data_reduction_core.html#test_integrate_core_smoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_data_reduction_core.test_integrate_core_smoke" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_data_reduction_core.test_integrate_last_core_smoke">
+<code class="descclassname">xpdan.tests.test_data_reduction_core.</code><code class="descname">test_integrate_last_core_smoke</code><span class="sig-paren">(</span><em>exp_db</em>, <em>fast_tmp_dir</em>, <em>kwargs</em>, <em>known_fail_bool</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_data_reduction_core.html#test_integrate_last_core_smoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_data_reduction_core.test_integrate_last_core_smoke" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_data_reduction_core.test_save_last_tiff_core_smoke">
+<code class="descclassname">xpdan.tests.test_data_reduction_core.</code><code class="descname">test_save_last_tiff_core_smoke</code><span class="sig-paren">(</span><em>exp_db</em>, <em>fast_tmp_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_data_reduction_core.html#test_save_last_tiff_core_smoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_data_reduction_core.test_save_last_tiff_core_smoke" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_data_reduction_core.test_save_tiff_core_smoke">
+<code class="descclassname">xpdan.tests.test_data_reduction_core.</code><code class="descname">test_save_tiff_core_smoke</code><span class="sig-paren">(</span><em>exp_db</em>, <em>fast_tmp_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_data_reduction_core.html#test_save_tiff_core_smoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_data_reduction_core.test_save_tiff_core_smoke" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-xpdan.tests.test_db_utils">
+<span id="xpdan-tests-test-db-utils-module"></span><h2>xpdan.tests.test_db_utils module<a class="headerlink" href="#module-xpdan.tests.test_db_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.tests.test_db_utils.test_scan_diff">
+<code class="descclassname">xpdan.tests.test_db_utils.</code><code class="descname">test_scan_diff</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_db_utils.html#test_scan_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_db_utils.test_scan_diff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_db_utils.test_scan_summary">
+<code class="descclassname">xpdan.tests.test_db_utils.</code><code class="descname">test_scan_summary</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_db_utils.html#test_scan_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_db_utils.test_scan_summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_db_utils.test_sort_scans_by_hdr_key">
+<code class="descclassname">xpdan.tests.test_db_utils.</code><code class="descname">test_sort_scans_by_hdr_key</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_db_utils.html#test_sort_scans_by_hdr_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_db_utils.test_sort_scans_by_hdr_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="xpdan-tests-test-fuzzy-broker-module">
+<h2>xpdan.tests.test_fuzzy_broker module<a class="headerlink" href="#xpdan-tests-test-fuzzy-broker-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xpdan.tests.test_tools">
+<span id="xpdan-tests-test-tools-module"></span><h2>xpdan.tests.test_tools module<a class="headerlink" href="#module-xpdan.tests.test_tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.tests.test_tools.test_compression_decompression">
+<code class="descclassname">xpdan.tests.test_tools.</code><code class="descname">test_compression_decompression</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_tools.html#test_compression_decompression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_tools.test_compression_decompression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_tools.test_margin">
+<code class="descclassname">xpdan.tests.test_tools.</code><code class="descname">test_margin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_tools.html#test_margin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_tools.test_margin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.test_tools.test_ring_blur_mask">
+<code class="descclassname">xpdan.tests.test_tools.</code><code class="descname">test_ring_blur_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/test_tools.html#test_ring_blur_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.test_tools.test_ring_blur_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-xpdan.tests.utils">
+<span id="xpdan-tests-utils-module"></span><h2>xpdan.tests.utils module<a class="headerlink" href="#module-xpdan.tests.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xpdan.tests.utils.PDFGetterShim">
+<em class="property">class </em><code class="descclassname">xpdan.tests.utils.</code><code class="descname">PDFGetterShim</code><a class="reference internal" href="_modules/xpdan/tests/utils.html#PDFGetterShim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.utils.PDFGetterShim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.utils.insert_imgs">
+<code class="descclassname">xpdan.tests.utils.</code><code class="descname">insert_imgs</code><span class="sig-paren">(</span><em>RE</em>, <em>reg</em>, <em>n</em>, <em>shape</em>, <em>save_dir='/tmp/tmppt9cvayj'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/utils.html#insert_imgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.utils.insert_imgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert images into mds and fs for testing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>RE</strong> (<em>bluesky.run_engine.RunEngine instance</em>)</li>
+<li><strong>reg</strong> (<em>Registry instance</em>)</li>
+<li><strong>n</strong> (<em>int</em>) – Number of images to take</li>
+<li><strong>shape</strong> (<em>tuple of ints</em>) – The shape of the resulting images</li>
+<li><strong>save_dir</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xpdan.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-xpdan.tests" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="xpdan.html" class="btn btn-neutral" title="xpdan package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

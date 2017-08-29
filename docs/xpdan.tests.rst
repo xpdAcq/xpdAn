@@ -44,22 +44,6 @@ xpdan\.tests\.test\_fuzzy\_broker module
     :undoc-members:
     :show-inheritance:
 
-xpdan\.tests\.test\_io module
------------------------------
-
-.. automodule:: xpdan.tests.test_io
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-xpdan\.tests\.test\_tiff\_exporter module
------------------------------------------
-
-.. automodule:: xpdan.tests.test_tiff_exporter
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 xpdan\.tests\.test\_tools module
 --------------------------------
 

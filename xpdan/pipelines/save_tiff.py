@@ -158,10 +158,10 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                         '{}'.format(s.stream_name)
                             ) for s in render_2]
     [es.map(lambda x: os.makedirs(os.path.split(x)[0],
-                                              exist_ok=True), cs,
-                        input_info={0: 'filename'},
-                        stream_name='Make dirs {}'.format(cs.stream_name)
-                        ) for cs in clean_streams]
+                                  exist_ok=True), cs,
+            input_info={0: 'filename'},
+            stream_name='Make dirs {}'.format(cs.stream_name)
+            ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
     # [es.map(lambda **x: pprint(x['data']['filename']), cs,
     #         full_event=True) for cs in clean_streams]
@@ -201,9 +201,9 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                 yaml.dump(data, f)
 
         es.map(dump_yml, es.zip(eventify_raw, md_cleanup),
-                           input_info={0: (('data', 'filename'), 1),
-                                       1: (('data',), 0)},
-                           full_event=True)
+               input_info={0: (('data', 'filename'), 1),
+                           1: (('data',), 0)},
+               full_event=True)
 
     # """
     return source

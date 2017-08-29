@@ -256,8 +256,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        input_info={'x': 'calibrant'},
                        output_info=[('geo', {'dtype': 'object',
                                              'source': 'workflow',
-                                             'instance': 'pyFAI.azimuthalIntegrator'
-                                                         '.AzimuthalIntegrator'})]
+                                             'instance':
+                                                 'pyFAI.azimuthalIntegrator'
+                                                 '.AzimuthalIntegrator'})]
                        )
 
     # else get calibration from header
@@ -499,44 +500,43 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
 
-        writer_streams = [
-            es.map(writer_templater,
-                   es.zip_latest(s1, s2, made_dir),
-                   input_info=ii,
-                   output_info=[('final_filename', {'dtype': 'str'})],
-                   stream_name='Write {}'.format(s1.stream_name),
-                   **kwargs) for s1, s2, made_dir, ii, writer_templater, kwargs
-            in
-            zip(
-                [dark_sub_fg, mask_stream, iq_stream, tth_iq_stream,
-                 pdf_stream],
-                mega_render,
-                make_dirs,  # prevent run condition btwn dirs and files
-                iis,
-                [tifffile.imsave, fit2d_save, save_output, save_output,
-                 pdf_saver, poni_saver],
-                saver_kwargs
-            )]
+        [es.map(writer_templater,
+                es.zip_latest(s1, s2, made_dir),
+                input_info=ii,
+                output_info=[('final_filename', {'dtype': 'str'})],
+                stream_name='Write {}'.format(s1.stream_name),
+                **kwargs) for s1, s2, made_dir, ii, writer_templater, kwargs
+         in
+         zip(
+             [dark_sub_fg, mask_stream, iq_stream, tth_iq_stream,
+              pdf_stream],
+             mega_render,
+             make_dirs,  # prevent run condition btwn dirs and files
+             iis,
+             [tifffile.imsave, fit2d_save, save_output, save_output,
+              pdf_saver, poni_saver],
+             saver_kwargs
+         )]
 
-        md_writer = es.map(dump_yml, es.zip(eventify_raw_start, md_render),
-                           input_info={0: (('data', 'filename'), 1),
-                                       1: (('data',), 0)},
-                           full_event=True)
+        es.map(dump_yml, es.zip(eventify_raw_start, md_render),
+               input_info={0: (('data', 'filename'), 1),
+                           1: (('data',), 0)},
+               full_event=True)
     if verbose:
         source.sink(pprint)
-        # if_not_dark_stream.sink(pprint)
-        # zlid.sink(pprint)
-        # if_not_calibration_stream.sink(pprint)
-        # cal_md_stream.sink(pprint)
-        # loaded_calibration_stream.sink(pprint)
-        # foreground_stream.sink(pprint)
-        # zlfl.sink(pprint)
-        # p_corrected_stream.sink(pprint)
-        # zlmc.sink(pprint)
-        # binner_stream.sink(pprint)
-        # zlpb.sink(pprint)
-        # iq_stream.sink(pprint)
-        # composition_stream.sink(pprint)
+        if_not_dark_stream.sink(pprint)
+        zlid.sink(pprint)
+        if_not_calibration_stream.sink(pprint)
+        cal_md_stream.sink(pprint)
+        loaded_calibration_stream.sink(pprint)
+        foreground_stream.sink(pprint)
+        zlfl.sink(pprint)
+        p_corrected_stream.sink(pprint)
+        zlmc.sink(pprint)
+        binner_stream.sink(pprint)
+        zlpb.sink(pprint)
+        iq_stream.sink(pprint)
+        composition_stream.sink(pprint)
         pdf_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)

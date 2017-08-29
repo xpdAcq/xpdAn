@@ -24,9 +24,8 @@ from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
 from skbeam.io.fit2d import fit2d_save
 from xpdan.tests.utils import insert_imgs
-from bluesky.tests.conftest import fresh_RE
 from bluesky.examples import ReaderWithRegistryHandler
-from databroker.assets.handlers import NpyHandler
+from bluesky.tests.conftest import fresh_RE
 from bluesky.tests.conftest import db
 
 if sys.version_info >= (3, 0):

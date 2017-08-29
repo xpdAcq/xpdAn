@@ -7,5 +7,6 @@ exclude =
     build,
     dist,
     xpdan/ipython_config.py,
-    xpdan/qt_gui.py
+    xpdan/qt_gui.py,
+    xpdan/tests/conftest.py
 max-complexity = 21

@@ -157,11 +157,11 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             stream_name='clean template '
                                         '{}'.format(s.stream_name)
                             ) for s in render_2]
-    make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
-                                              exist_ok=True), cs,
-                        input_info={0: 'filename'},
-                        stream_name='Make dirs {}'.format(cs.stream_name)
-                        ) for cs in clean_streams]
+    [es.map(lambda x: os.makedirs(os.path.split(x)[0],
+                                  exist_ok=True), cs,
+            input_info={0: 'filename'},
+            stream_name='Make dirs {}'.format(cs.stream_name)
+            ) for cs in clean_streams]
     # clean_streams[-1].sink(pprint)
     # [es.map(lambda **x: pprint(x['data']['filename']), cs,
     #         full_event=True) for cs in clean_streams]
@@ -180,7 +180,7 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if write_to_disk:
         iis = [{'data': ('img', 0), 'file': ('filename', 1)}, ]
 
-        writer_streams = [
+        [
             es.map(writer_templater,
                    es.zip_latest(s1, s2),
                    input_info=ii,
@@ -200,10 +200,10 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
             with open(filename, 'w') as f:
                 yaml.dump(data, f)
 
-        md_writer = es.map(dump_yml, es.zip(eventify_raw, md_cleanup),
-                           input_info={0: (('data', 'filename'), 1),
-                                       1: (('data',), 0)},
-                           full_event=True)
+        es.map(dump_yml, es.zip(eventify_raw, md_cleanup),
+               input_info={0: (('data', 'filename'), 1),
+                           1: (('data',), 0)},
+               full_event=True)
 
     # """
     return source

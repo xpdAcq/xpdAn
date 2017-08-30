@@ -9,7 +9,8 @@ import logging
 from pkg_resources import resource_filename as rs_fn
 
 logger = logging.getLogger(__name__)
-pytest_dir = rs_fn('xpdan','tests')
+pytest_dir = rs_fn('xpdan', 'tests')
+
 
 def load_configuration(name):
     """

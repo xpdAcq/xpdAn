@@ -175,27 +175,53 @@
 <span class="kn">from</span> <span class="nn">bluesky.examples</span> <span class="k">import</span> <span class="n">ReaderWithRegistry</span>
 <span class="kn">from</span> <span class="nn">bluesky.plans</span> <span class="k">import</span> <span class="n">count</span>
 
-<span class="n">pyFAI_calib</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calibration_collection_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid1234&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;centerX&#39;</span><span class="p">:</span> <span class="mf">1019.8886820814655</span><span class="p">,</span>
-               <span class="s1">&#39;centerY&#39;</span><span class="p">:</span> <span class="mf">1026.5636273165978</span><span class="p">,</span>
+<span class="n">pyFAI_calib</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calibrant_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ni24&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;centerX&#39;</span><span class="p">:</span> <span class="mf">997.79605730878336</span><span class="p">,</span>
+               <span class="s1">&#39;centerY&#39;</span><span class="p">:</span> <span class="mf">1005.4468181991356</span><span class="p">,</span>
+               <span class="s1">&#39;dSpacing&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.0345823486199999</span><span class="p">,</span>
+                            <span class="mf">1.761935</span><span class="p">,</span>
+                            <span class="mf">1.24592214845</span><span class="p">,</span>
+                            <span class="mf">1.0625259782900001</span><span class="p">,</span>
+                            <span class="mf">1.0172911743099999</span><span class="p">,</span>
+                            <span class="mf">0.88100000000000001</span><span class="p">,</span>
+                            <span class="mf">0.80846104616000003</span><span class="p">,</span>
+                            <span class="mf">0.78799035527100003</span><span class="p">,</span>
+                            <span class="mf">0.71933348779700002</span><span class="p">,</span>
+                            <span class="mf">0.67819411620799996</span><span class="p">,</span>
+                            <span class="mf">0.62296107422500002</span><span class="p">,</span>
+                            <span class="mf">0.59566471873299998</span><span class="p">,</span>
+                            <span class="mf">0.58733333333299997</span><span class="p">,</span>
+                            <span class="mf">0.55719332372200003</span><span class="p">,</span>
+                            <span class="mf">0.53740496185200004</span><span class="p">,</span>
+                            <span class="mf">0.53126298914600001</span><span class="p">,</span>
+                            <span class="mf">0.50864558715599995</span><span class="p">,</span>
+                            <span class="mf">0.49345870161099997</span><span class="p">,</span>
+                            <span class="mf">0.48869087287399998</span><span class="p">,</span>
+                            <span class="mf">0.47091430825000002</span><span class="p">,</span>
+                            <span class="mf">0.45878572229600001</span><span class="p">,</span>
+                            <span class="mf">0.4405</span><span class="p">,</span>
+                            <span class="mf">0.43052512191199999</span><span class="p">,</span>
+                            <span class="mf">0.42734777131399998</span><span class="p">],</span>
                <span class="s1">&#39;detector&#39;</span><span class="p">:</span> <span class="s1">&#39;Perkin detector&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;directDist&#39;</span><span class="p">:</span> <span class="mf">208.36071181911709</span><span class="p">,</span>
-               <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="mf">0.208359323484</span><span class="p">,</span>
-               <span class="s1">&#39;file_name&#39;</span><span class="p">:</span> <span class="s1">&#39;pyFAI_calib_Ni_20160813-1659.poni&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;directDist&#39;</span><span class="p">:</span> <span class="mf">218.82105982728712</span><span class="p">,</span>
+               <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="mf">0.21881648512877194</span><span class="p">,</span>
+               <span class="s1">&#39;is_pytest&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
                <span class="s1">&#39;pixel1&#39;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
                <span class="s1">&#39;pixel2&#39;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
                <span class="s1">&#39;pixelX&#39;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
                <span class="s1">&#39;pixelY&#39;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
-               <span class="s1">&#39;poni1&#39;</span><span class="p">:</span> <span class="mf">0.204863292224</span><span class="p">,</span>
-               <span class="s1">&#39;poni2&#39;</span><span class="p">:</span> <span class="mf">0.203364094157</span><span class="p">,</span>
-               <span class="s1">&#39;rot1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.00294510691846</span><span class="p">,</span>
-               <span class="s1">&#39;rot2&#39;</span><span class="p">:</span> <span class="mf">0.00215699775598</span><span class="p">,</span>
-               <span class="s1">&#39;rot3&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">8.04331174483e-08</span><span class="p">,</span>
+               <span class="s1">&#39;poni1&#39;</span><span class="p">:</span> <span class="mf">0.20146140778233776</span><span class="p">,</span>
+               <span class="s1">&#39;poni2&#39;</span><span class="p">:</span> <span class="mf">0.20092436456054058</span><span class="p">,</span>
+               <span class="s1">&#39;poni_file_name&#39;</span><span class="p">:</span> <span class="s1">&#39;/home/timothy/xpdUser/config_base</span><span class="se">\</span>
+<span class="s1">                                  /20170822-190241_pyFAI_calib_Ni24.poni&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;rot1&#39;</span><span class="p">:</span> <span class="mf">0.0062387227662129112</span><span class="p">,</span>
+               <span class="s1">&#39;rot2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0017002217339242484</span><span class="p">,</span>
+               <span class="s1">&#39;rot3&#39;</span><span class="p">:</span> <span class="mf">2.7628252550568797e-08</span><span class="p">,</span>
                <span class="s1">&#39;splineFile&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="s1">&#39;tilt&#39;</span><span class="p">:</span> <span class="mf">0.20915926627927123</span><span class="p">,</span>
-               <span class="s1">&#39;tiltPlanRotation&#39;</span><span class="p">:</span> <span class="mf">36.219147551081498</span><span class="p">,</span>
-               <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;20160813-1815&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;wavelength&#39;</span><span class="p">:</span> <span class="mf">1.8333e-11</span><span class="p">}</span>
+               <span class="s1">&#39;tilt&#39;</span><span class="p">:</span> <span class="mf">0.37048878612364949</span><span class="p">,</span>
+               <span class="s1">&#39;tiltPlanRotation&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">164.75544250965393</span><span class="p">,</span>
+               <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;20170822-190241&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;wavelength&#39;</span><span class="p">:</span> <span class="mf">1.832e-11</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="insert_imgs"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.utils.insert_imgs">[docs]</a><span class="k">def</span> <span class="nf">insert_imgs</span><span class="p">(</span><span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

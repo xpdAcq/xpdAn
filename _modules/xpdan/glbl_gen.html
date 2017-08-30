@@ -163,6 +163,7 @@
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span> <span class="k">as</span> <span class="n">rs_fn</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">pytest_dir</span> <span class="o">=</span> <span class="n">rs_fn</span><span class="p">(</span><span class="s1">&#39;xpdan&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_configuration"><a class="viewcode-back" href="../../xpdan.html#xpdan.glbl_gen.load_configuration">[docs]</a><span class="k">def</span> <span class="nf">load_configuration</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -262,13 +263,13 @@
     <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
         <span class="nb">dict</span><span class="p">(</span><span class="n">config_base</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;home_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;config_base&#39;</span><span class="p">)))</span>
 
-    <span class="c1"># copying pyFAI calib dict yml for test</span>
+    <span class="c1"># copying xpdAcq_calib_info yml for test</span>
     <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">env_code</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;glbl.py&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;config_base&#39;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;tests/pyFAI_calib.yml&#39;</span><span class="p">),</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;config_base&#39;</span><span class="p">],</span> <span class="s1">&#39;pyFAI_calib.yml&#39;</span><span class="p">))</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pytest_dir</span><span class="p">,</span>
+                                     <span class="s1">&#39;xpdAcq_calib_info.yml&#39;</span><span class="p">),</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;config_base&#39;</span><span class="p">],</span>
+                                     <span class="s1">&#39;xpdAcq_calib_info.yml&#39;</span><span class="p">))</span>
 
     <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
         <span class="nb">dict</span><span class="p">(</span><span class="n">yaml_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;home_dir&#39;</span><span class="p">],</span> <span class="s1">&#39;config_base&#39;</span><span class="p">,</span> <span class="s1">&#39;yml&#39;</span><span class="p">)))</span>

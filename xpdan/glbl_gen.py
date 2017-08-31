@@ -3,8 +3,11 @@ import shutil
 import tempfile
 
 import yaml
-
-from xpdsim import db
+from databroker import Broker
+try:
+    db = Broker.named('xpd')
+except NameError:
+    from xpdsim import db
 import logging
 from pkg_resources import resource_filename as rs_fn
 

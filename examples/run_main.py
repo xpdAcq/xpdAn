@@ -23,7 +23,8 @@ fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
 td = TemporaryDirectory()
 
-vis = False
+# vis = False
+vis = True
 source = conf_main_pipeline(db, td.name,
                             vis=vis,
                             write_to_disk=False,

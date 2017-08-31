@@ -306,7 +306,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        p_corrected_stream,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
-                             cal_stream)
+                             loaded_calibration_stream)
         mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
@@ -330,9 +330,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            p_corrected_stream,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
-                                 cal_stream)
+                                 loaded_calibration_stream)
         else:
-            zlfc = es.zip_latest(p_corrected_stream, cal_stream)
+            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
         mask_stream = es.map(mask_img,
                              zlfc,
                              input_info={'img': ('img', 0),
@@ -344,7 +344,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              md=dict(analysis_stage='mask'))
 
     # generate binner stream
-    zlmc = es.zip_latest(mask_stream, cal_stream)
+    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 
     binner_stream = es.map(generate_binner,
                            zlmc,

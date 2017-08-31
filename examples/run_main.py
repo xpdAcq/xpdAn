@@ -22,19 +22,23 @@ fs = RegistryRO(d)
 fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
 td = TemporaryDirectory()
+
+vis = False
 source = conf_main_pipeline(db, td.name,
-                            # vis=False,
-                            write_to_disk=False
+                            vis=vis,
+                            write_to_disk=False,
+                            verbose=True
                             )
 # source.visualize()
+# '''
 for hdr in list((db[-1], )):
     for e in hdr.documents():
-        if e[0] == 'event':
+        if e[0] == 'event' and vis:
             plt.pause(.1)
-            pass
-        input()
+        # input()
         source.emit(e)
 
 plt.show()
 plt.close("all")
+# '''
 td.cleanup()

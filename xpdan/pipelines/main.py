@@ -22,7 +22,7 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter)
+                         pdf_getter, fq_getter, decompress_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration
 
@@ -100,8 +100,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     light_template = os.path.join(
         save_dir,
         base_template)
-    raw_source = Stream(stream_name='Raw Data')
-    source = es.fill_events(db, raw_source)
+    raw_source = Stream(stream_name='Raw Data')  # raw data
+    source = es.fill_events(db, raw_source)  # filled raw data
 
     # DARK PROCESSING
 
@@ -112,9 +112,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    stream_name='If not dark')
     eventify_raw_start = es.Eventify(if_not_dark_stream,
                                      stream_name='eventify raw start')
-    eventify_raw_descriptor = es.Eventify(
-        if_not_dark_stream, stream_name='eventify raw descriptor',
-        document='descriptor')
+    # only the primary stream
+    if_not_dark_stream_primary = es.filter(lambda x: x[0]['name'] == 'primary',
+                                           if_not_dark_stream,
+                                           document_name='descriptor',
+                                           stream_name='Primary')
 
     dark_query = es.Query(db,
                           if_not_dark_stream,
@@ -124,7 +126,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     dark_query_results = es.QueryUnpacker(db, dark_query,
                                           stream_name='Unpack FG Dark')
     # Do the dark subtraction
-    zlid = es.zip_latest(if_not_dark_stream,
+    zlid = es.zip_latest(if_not_dark_stream_primary,
                          dark_query_results,
                          stream_name='Combine darks and lights')
     dark_sub_fg = es.map(sub,
@@ -136,7 +138,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                          md=dict(stream_name='Dark Subtracted Foreground',
                                  analysis_stage='dark_sub'))
 
-    # write to disk
     # BACKGROUND PROCESSING
     # Query for background
     bg_query_stream = es.Query(db, if_not_dark_stream,
@@ -228,8 +229,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # if calibration send to calibration maker
     if_calibration_stream = es.filter(if_calibration,
                                       es.zip_latest(
-                                          es.zip(foreground_stream,
-                                                 if_not_dark_stream),
+                                          foreground_stream,
                                           eventify_raw_start,
                                       ),
                                       input_info={0: ((), 2)},
@@ -315,6 +315,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              stream_name='dummy mask',
                              md=dict(analysis_stage='mask')
                              )
+    # If setting is cache pull from start
+    elif mask_setting == 'cache':
+        mask_stream = es.map(dstar(decompress_mask),
+                             eventify_raw_start,
+                             input_info={0: ('mask_dict', 0)},
+                             stream_name='decompress cached mask',
+                             md=dict(analysis_stage='mask'))
     else:
         if mask_setting == 'default':
             # note that this could become a much fancier filter
@@ -359,46 +366,19 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
 
-    # convert to tth
-    tth_stream = es.map(q_to_twotheta,
-                        es.zip_latest(iq_stream, eventify_raw_start),
-                        input_info={'q': ('q', 0),
-                                    'wavelength': ('bt_wavelength', 1)},
-                        output_info=[('tth', {'dtype': 'array'})])
-
-    tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
-                           es.zip(tth_stream, iq_stream),
-                           input_info={'tth': ('tth', 0),
-                                       'iq': ('iq', 1)},
-                           output_info=[('tth', {'dtype': 'array',
-                                                 'source': 'testing'}),
-                                        ('iq', {'dtype': 'array',
-                                                'source': 'testing'})],
-                           stream_name='Combine tth and iq',
-                           md=dict(analysis_stage='iq_tth')
-                           )
-
-    # TODO: replace this with a pull from raw_eventify
-    composition_stream = es.Eventify(if_not_dark_stream,
-                                     # Change this to sample_composition
-                                     'sample_name',
-                                     output_info=[('composition',
-                                                   {'dtype': 'str'})],
-                                     stream_name='Sample Composition')
-
     fq_stream = es.map(fq_getter,
-                       es.zip_latest(iq_stream, composition_stream),
+                       es.zip_latest(iq_stream, eventify_raw_start),
                        input_info={0: ('q', 0), 1: ('iq', 0),
-                                   'composition': ('composition', 1)},
+                                   'composition': ('sample_name', 1)},
                        output_info=[('q', {'dtype': 'array'}),
                                     ('fq', {'dtype': 'array'}),
                                     ('config', {'dtype': 'dict'})],
                        dataformat='QA', qmaxinst=28, qmax=22,
                        md=dict(analysis_stage='fq'))
     pdf_stream = es.map(pdf_getter,
-                        es.zip_latest(iq_stream, composition_stream),
+                        es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={0: ('q', 0), 1: ('iq', 0),
-                                    'composition': ('composition', 1)},
+                                    'composition': ('sample_name', 1)},
                         output_info=[('r', {'dtype': 'array'}),
                                      ('pdf', {'dtype': 'array'}),
                                      ('config', {'dtype': 'dict'})],
@@ -414,15 +394,28 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
                                                               'G(r) A^-3'))))
 
-    # dark_template = os.path.join(tiff_base,
-    #                              'dark/{human_timestamp}_{uid}{ext}')
-    # dark_template_stream = es.map(dark_template_func, if_dark_stream,
-    #                               template=dark_template,
-    #                               full_event=True,
-    #                               input_info={'timestamp': 'time'},
-    #                               output_info=[
-    #                                   ('file_path', {'dtype': 'str'})])
     if write_to_disk:
+        # convert to tth
+        tth_stream = es.map(q_to_twotheta,
+                            es.zip_latest(iq_stream, eventify_raw_start),
+                            input_info={'q': ('q', 0),
+                                        'wavelength': ('bt_wavelength', 1)},
+                            output_info=[('tth', {'dtype': 'array'})])
+
+        tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
+                               es.zip(tth_stream, iq_stream),
+                               input_info={'tth': ('tth', 0),
+                                           'iq': ('iq', 1)},
+                               output_info=[('tth', {'dtype': 'array',
+                                                     'source': 'testing'}),
+                                            ('iq', {'dtype': 'array',
+                                                    'source': 'testing'})],
+                               stream_name='Combine tth and iq',
+                               md=dict(analysis_stage='iq_tth')
+                               )
+        eventify_raw_descriptor = es.Eventify(
+            if_not_dark_stream, stream_name='eventify raw descriptor',
+            document='descriptor')
         # TODO: add calibration writer for xpdAcq
         # TODO: add calibration writer for users
         h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
@@ -536,7 +529,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         binner_stream.sink(pprint)
         zlpb.sink(pprint)
         iq_stream.sink(pprint)
-        composition_stream.sink(pprint)
         pdf_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)

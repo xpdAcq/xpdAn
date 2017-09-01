@@ -365,6 +365,24 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                             'source': 'testing'})],
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
+    # convert to tth
+    tth_stream = es.map(q_to_twotheta,
+                        es.zip_latest(iq_stream, eventify_raw_start),
+                        input_info={'q': ('q', 0),
+                                    'wavelength': ('bt_wavelength', 1)},
+                        output_info=[('tth', {'dtype': 'array'})])
+
+    tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
+                           es.zip(tth_stream, iq_stream),
+                           input_info={'tth': ('tth', 0),
+                                       'iq': ('iq', 1)},
+                           output_info=[('tth', {'dtype': 'array',
+                                                 'source': 'testing'}),
+                                        ('iq', {'dtype': 'array',
+                                                'source': 'testing'})],
+                           stream_name='Combine tth and iq',
+                           md=dict(analysis_stage='iq_tth')
+                           )
 
     fq_stream = es.map(fq_getter,
                        es.zip_latest(iq_stream, eventify_raw_start),
@@ -389,30 +407,14 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         mask_stream.sink(star(LiveImage('mask')))
         iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('Q (A^-1)',
                                                             'Arb'))))
+        tth_iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('tth',
+                                                                'Arb'))))
         fq_stream.sink(star(LiveWaterfall('q', 'fq', units=('Q (A^-1)',
                                                             'F(Q)'))))
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
                                                               'G(r) A^-3'))))
 
     if write_to_disk:
-        # convert to tth
-        tth_stream = es.map(q_to_twotheta,
-                            es.zip_latest(iq_stream, eventify_raw_start),
-                            input_info={'q': ('q', 0),
-                                        'wavelength': ('bt_wavelength', 1)},
-                            output_info=[('tth', {'dtype': 'array'})])
-
-        tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
-                               es.zip(tth_stream, iq_stream),
-                               input_info={'tth': ('tth', 0),
-                                           'iq': ('iq', 1)},
-                               output_info=[('tth', {'dtype': 'array',
-                                                     'source': 'testing'}),
-                                            ('iq', {'dtype': 'array',
-                                                    'source': 'testing'})],
-                               stream_name='Combine tth and iq',
-                               md=dict(analysis_stage='iq_tth')
-                               )
         eventify_raw_descriptor = es.Eventify(
             if_not_dark_stream, stream_name='eventify raw descriptor',
             document='descriptor')

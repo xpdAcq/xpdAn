@@ -8,7 +8,7 @@ beamline_id : xpd
 group : XPD
 det_image_field : pe1_image
 dark_field_key : sc_dk_field_uid
-calib_config_name : pyFAI_calib.yml
+calib_config_name : xpdAcq_calib_info.yml
 mask_kwargs:
   edge: 30
   lower_thresh: 0.0

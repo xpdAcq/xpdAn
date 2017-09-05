@@ -3,12 +3,16 @@ import shutil
 import tempfile
 
 import yaml
-
-from xpdsim import db
+from databroker import Broker
+try:
+    db = Broker.named('xpd')
+except NameError:
+    from xpdsim import db
 import logging
 from pkg_resources import resource_filename as rs_fn
 
 logger = logging.getLogger(__name__)
+pytest_dir = rs_fn('xpdan', 'tests')
 
 
 def load_configuration(name):
@@ -108,13 +112,13 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
     config.update(
         dict(config_base=os.path.join(config['home_dir'], 'config_base')))
 
-    # copying pyFAI calib dict yml for test
+    # copying xpdAcq_calib_info yml for test
     if int(env_code) == 1:
-        a = os.path.dirname(os.path.abspath(__file__))
-        b = a.split('glbl.py')[0]
         os.makedirs(config['config_base'], exist_ok=True)
-        shutil.copyfile(os.path.join(b, 'tests/pyFAI_calib.yml'),
-                        os.path.join(config['config_base'], 'pyFAI_calib.yml'))
+        shutil.copyfile(os.path.join(pytest_dir,
+                                     'xpdAcq_calib_info.yml'),
+                        os.path.join(config['config_base'],
+                                     'xpdAcq_calib_info.yml'))
 
     config.update(
         dict(yaml_dir=os.path.join(config['home_dir'], 'config_base', 'yml')))

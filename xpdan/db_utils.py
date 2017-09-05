@@ -147,8 +147,12 @@ def query_dark(db, docs, schema=1):
 def query_background(db, docs, schema=1):
     if schema == 1:
         doc = docs[0]
-        return db(sample_name=doc['bkgd_sample_name'],
-                  is_dark={'$exists': False})
+        sample_name = doc.get('bkgd_sample_name')
+        if sample_name:
+            return db(sample_name, bt_uid=doc['bt'],
+                      is_dark={'$exists': False})
+        else:
+            return []
 
 
 def temporal_prox(res, docs):

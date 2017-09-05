@@ -107,9 +107,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,
-                                   input_info=None,
+                                   input_info={0: ((), 0)},
                                    document_name='start',
-                                   stream_name='If not dark')
+                                   stream_name='If not dark',
+                                   full_event=True)
     eventify_raw_start = es.Eventify(if_not_dark_stream,
                                      stream_name='eventify raw start')
     # only the primary stream
@@ -147,7 +148,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # Decide if there is background data
     if_background_stream = es.filter(if_query_results, bg_query_stream,
-                                     full_event=True, input_info=None,
+                                     full_event=True,
+                                     input_info={'n_hdrs': (('n_hdrs',), 0)},
                                      document_name='start',
                                      stream_name='If background')
     # if has background do background subtraction
@@ -211,13 +213,14 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        )
 
     # else do nothing
+    eventify_nhdrs = es.Eventify(bg_query_stream, 'n_hdrs')
+    zldb = es.zip_latest(dark_sub_fg, eventify_nhdrs)
     if_not_background_stream = es.filter(
-        lambda x: not if_query_results(x, doc_to_inspect=1),
-        es.zip_latest(dark_sub_fg,
-                      bg_query_stream),
-        input_info=None,
-        document_name='start',
-        stream_name='If not background')
+        lambda x: not if_query_results(x),
+        zldb,
+        input_info={'x': (('data', 'n_hdrs',), 1)},
+        stream_name='If not background',
+        full_event=True)
     if_not_background_split_stream = es.split(if_not_background_stream, 2)
 
     # union of background and not background branch
@@ -226,13 +229,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     foreground_stream.stream_name = 'Pull from either bgsub or not sub'
     # CALIBRATION PROCESSING
 
-    # if calibration send to calibration maker
+    # if calibration send to calibration runner
+    zlfi = es.zip_latest(foreground_stream, if_not_dark_stream)
+    zlfi.sink(pprint)
     if_calibration_stream = es.filter(if_calibration,
-                                      es.zip_latest(
-                                          foreground_stream,
-                                          eventify_raw_start,
-                                      ),
-                                      input_info={0: ((), 2)},
+                                      zlfi,
+                                      input_info={0: ((), 1)},
+                                      full_event=True,
                                       document_name='start',
                                       stream_name='If calibration')
 
@@ -240,13 +243,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     calibration_stream = es.map(img_calibration, if_calibration_stream,
                                 input_info={
                                     'img': (('data', 'img'), 0),
-                                    'wavelength': (('bt_wavelength',), 2),
-                                    'calibrant': (('calibrant',), 2),
-                                    'detector': (('detector',), 2)},
+                                    'wavelength': (('bt_wavelength',), 1),
+                                    'calibrant': (('calibrant',), 1),
+                                    'detector': (('detector',), 1)},
                                 output_info=[('calibrant',
-                                              {'dtype': 'object'}),
-                                             'timestamp',
-                                             {'dtype': 'float'}],
+                                              {'dtype': 'object'})],
                                 stream_name='Run Calibration',
                                 md={'analysis_stage': 'calib'},
                                 full_event=True)
@@ -264,8 +265,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
                                           if_not_dark_stream,
-                                          input_info=None,
+                                          input_info={0: ((), 0)},
                                           document_name='start',
+                                          full_event=True,
                                           stream_name='If not calibration')
     cal_md_stream = es.Eventify(if_not_calibration_stream,
                                 'calibration_md',
@@ -366,6 +368,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
     # convert to tth
+    # TODO: decorate with radian->degree
     tth_stream = es.map(q_to_twotheta,
                         es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={'q': ('q', 0),
@@ -387,7 +390,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     fq_stream = es.map(fq_getter,
                        es.zip_latest(iq_stream, eventify_raw_start),
                        input_info={0: ('q', 0), 1: ('iq', 0),
-                                   'composition': ('sample_name', 1)},
+                                   'composition': ('composition_string', 1)},
                        output_info=[('q', {'dtype': 'array'}),
                                     ('fq', {'dtype': 'array'}),
                                     ('config', {'dtype': 'dict'})],
@@ -396,7 +399,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     pdf_stream = es.map(pdf_getter,
                         es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={0: ('q', 0), 1: ('iq', 0),
-                                    'composition': ('sample_name', 1)},
+                                    'composition': ('composition_string', 1)},
                         output_info=[('r', {'dtype': 'array'}),
                                      ('pdf', {'dtype': 'array'}),
                                      ('config', {'dtype': 'dict'})],
@@ -407,8 +410,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         mask_stream.sink(star(LiveImage('mask')))
         iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('Q (A^-1)',
                                                             'Arb'))))
-        tth_iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('tth',
-                                                                'Arb'))))
+        tth_iq_stream.sink(star(LiveWaterfall('tth', 'iq', units=('tth',
+                                                                  'Arb'))))
         fq_stream.sink(star(LiveWaterfall('q', 'fq', units=('Q (A^-1)',
                                                             'F(Q)'))))
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
@@ -518,20 +521,28 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            1: (('data',), 0)},
                full_event=True)
     if verbose:
-        source.sink(pprint)
-        if_not_dark_stream.sink(pprint)
-        zlid.sink(pprint)
-        if_not_calibration_stream.sink(pprint)
-        cal_md_stream.sink(pprint)
-        loaded_calibration_stream.sink(pprint)
-        foreground_stream.sink(pprint)
-        zlfl.sink(pprint)
-        p_corrected_stream.sink(pprint)
-        zlmc.sink(pprint)
-        binner_stream.sink(pprint)
-        zlpb.sink(pprint)
-        iq_stream.sink(pprint)
-        pdf_stream.sink(pprint)
+        # if_calibration_stream.sink(pprint)
+        # eventify_raw_start.sink(pprint)
+        # source.sink(pprint)
+        # if_not_dark_stream.sink(pprint)
+        # zlid.sink(pprint)
+        # dark_sub_fg.sink(pprint)
+        # bg_query_stream.sink(pprint)
+        # if_not_calibration_stream.sink(pprint)
+        # if_not_background_stream.sink(pprint)
+        # if_background_stream.sink(pprint)
+        # fg_sub_bg.sink(pprint)
+        # if_not_background_split_stream.split_streams[0].sink(pprint)
+        # cal_md_stream.sink(pprint)
+        # loaded_calibration_stream.sink(pprint)
+        # foreground_stream.sink(pprint)
+        # zlfl.sink(pprint)
+        # p_corrected_stream.sink(pprint)
+        # zlmc.sink(pprint)
+        # binner_stream.sink(pprint)
+        # zlpb.sink(pprint)
+        # iq_stream.sink(pprint)
+        # pdf_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
             [es.map(lambda **x: pprint(x['data']['filename']), cs,

@@ -231,9 +231,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # CALIBRATION PROCESSING
 
     # if calibration send to calibration runner
-    zlfi = es.zip_latest(foreground_stream, if_not_dark_stream,
-                         eventify_raw_start)
-    zlfi.sink(pprint)
+    zlfi = es.zip_latest(foreground_stream, es.zip(
+        if_not_dark_stream, eventify_raw_start), clear_on_lossless_stop=True)
     if_calibration_stream = es.filter(if_calibration,
                                       zlfi,
                                       input_info={0: ((), 1)},
@@ -434,7 +433,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         eventify_input_streams = [dark_sub_fg, mask_stream, iq_stream,
                                   tth_iq_stream, pdf_stream,
                                   calibration_stream]
-        iis = [
+        input_infos = [
             {'data': ('img', 0), 'file': ('filename', 1)},
             {'mask': ('mask', 0), 'filename': ('filename', 1)},
             {'tth': ('q', 0), 'intensity': ('iq', 0),
@@ -508,7 +507,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
               pdf_stream],
              mega_render,
              make_dirs,  # prevent run condition btwn dirs and files
-             iis,
+             input_infos,
              [tifffile.imsave, fit2d_save, save_output, save_output,
               pdf_saver, poni_saver],
              saver_kwargs
@@ -519,7 +518,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            1: (('data',), 0)},
                full_event=True)
     if verbose:
-        # if_calibration_stream.sink(pprint)
+        if_calibration_stream.sink(pprint)
+        # dark_sub_fg.sink(pprint)
         # eventify_raw_start.sink(pprint)
         # raw_source.sink(pprint)
         # if_not_dark_stream.sink(pprint)

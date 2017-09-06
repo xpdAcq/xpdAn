@@ -182,5 +182,8 @@ def img_calibration(img, wavelength, calibrant=None,
                     wavelength=wavelength)
     # pyFAI calibration
     calib_c, timestr = _calibration(img, c, calib_ref_fp, **kwargs)
+    # img2 = img.copy()
+    # img2 /= calib_c.ai.polarization(img2.shape, .99)
+    # calib_c, timestr = _calibration(img2, c, calib_ref_fp, **kwargs)
 
     return calib_c.ai

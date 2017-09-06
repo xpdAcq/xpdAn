@@ -149,7 +149,8 @@ def query_background(db, docs, schema=1):
         doc = docs[0]
         sample_name = doc.get('bkgd_sample_name')
         if sample_name:
-            return db(sample_name, bt_uid=doc['bt'],
+            return db(sample_name=sample_name,
+                      bt_uid=doc['bt'],
                       is_dark={'$exists': False})
         else:
             return []
@@ -158,10 +159,13 @@ def query_background(db, docs, schema=1):
 def temporal_prox(res, docs):
     # If there is only one result just use that one
     if isinstance(res, Header):
-        return res
+        return [res]
     doc = docs[0]
     t = doc['time']
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]
-    i = dt_sq.index(min(dt_sq))
-    min_r = next(islice(res, i, i + 1))
+    if dt_sq:
+        i = dt_sq.index(min(dt_sq))
+        min_r = next(islice(res, i, i + 1))
+    else:
+        min_r = []
     return min_r

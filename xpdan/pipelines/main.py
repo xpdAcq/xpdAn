@@ -213,7 +213,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        )
 
     # else do nothing
-    eventify_nhdrs = es.Eventify(bg_query_stream, 'n_hdrs')
+    eventify_nhdrs = es.Eventify(bg_query_stream, 'n_hdrs',
+                                 output_info=[('n_hdrs', {})])
     zldb = es.zip_latest(dark_sub_fg, eventify_nhdrs)
     if_not_background_stream = es.filter(
         lambda x: not if_query_results(x),
@@ -230,7 +231,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # CALIBRATION PROCESSING
 
     # if calibration send to calibration runner
-    zlfi = es.zip_latest(foreground_stream, if_not_dark_stream)
+    zlfi = es.zip_latest(foreground_stream, if_not_dark_stream,
+                         eventify_raw_start)
     zlfi.sink(pprint)
     if_calibration_stream = es.filter(if_calibration,
                                       zlfi,
@@ -243,24 +245,19 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     calibration_stream = es.map(img_calibration, if_calibration_stream,
                                 input_info={
                                     'img': (('data', 'img'), 0),
-                                    'wavelength': (('bt_wavelength',), 1),
-                                    'calibrant': (('calibrant',), 1),
-                                    'detector': (('detector',), 1)},
-                                output_info=[('calibrant',
-                                              {'dtype': 'object'})],
+                                    'wavelength': (
+                                        ('data', 'bt_wavelength',), 2),
+                                    'calibrant': (('data', 'dSpacing',), 2),
+                                    'detector': (('data', 'detector',), 2)},
+                                output_info=
+                                [('geo',
+                                  {'dtype': 'object',
+                                   'source': 'workflow',
+                                   'instance': 'pyFAI.azimuthalIntegrator'
+                                               '.AzimuthalIntegrator'})],
                                 stream_name='Run Calibration',
                                 md={'analysis_stage': 'calib'},
                                 full_event=True)
-
-    ai_stream = es.map(lambda x: x.ai,
-                       calibration_stream,
-                       input_info={'x': 'calibrant'},
-                       output_info=[('geo', {'dtype': 'object',
-                                             'source': 'workflow',
-                                             'instance':
-                                                 'pyFAI.azimuthalIntegrator'
-                                                 '.AzimuthalIntegrator'})]
-                       )
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
@@ -275,17 +272,18 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                               {'dtype': 'dict',
                                                'source': 'workflow'})],
                                 stream_name='Eventify Calibration')
-    cal_stream = es.map(load_geo, cal_md_stream,
-                        input_info={'cal_params': 'calibration_md'},
-                        output_info=[('geo',
-                                      {'dtype': 'object',
-                                       'source': 'workflow',
-                                       'instance': 'pyFAI.azimuthalIntegrator'
-                                                   '.AzimuthalIntegrator'})],
-                        stream_name='Load geometry')
+    loaded_cal_stream = es.map(load_geo, cal_md_stream,
+                               input_info={'cal_params': 'calibration_md'},
+                               output_info=[('geo',
+                                             {'dtype': 'object',
+                                              'source': 'workflow',
+                                              'instance':
+                                                  'pyFAI.azimuthalIntegrator'
+                                                  '.AzimuthalIntegrator'})],
+                               stream_name='Load geometry')
 
     # union the calibration branches
-    loaded_calibration_stream = cal_stream.union(ai_stream)
+    loaded_calibration_stream = loaded_cal_stream.union(calibration_stream)
     loaded_calibration_stream.stream_name = 'Pull from either md or ' \
                                             'run calibration'
 
@@ -523,7 +521,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if verbose:
         # if_calibration_stream.sink(pprint)
         # eventify_raw_start.sink(pprint)
-        # source.sink(pprint)
+        # raw_source.sink(pprint)
         # if_not_dark_stream.sink(pprint)
         # zlid.sink(pprint)
         # dark_sub_fg.sink(pprint)
@@ -535,6 +533,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # if_not_background_split_stream.split_streams[0].sink(pprint)
         # cal_md_stream.sink(pprint)
         # loaded_calibration_stream.sink(pprint)
+        # if_not_dark_stream.sink(pprint)
         # foreground_stream.sink(pprint)
         # zlfl.sink(pprint)
         # p_corrected_stream.sink(pprint)

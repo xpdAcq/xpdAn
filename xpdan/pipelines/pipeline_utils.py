@@ -9,17 +9,17 @@ def if_dark(doc):
 
 
 def if_query_results(n_hdrs):
-    return n_hdrs != 0
+    return n_hdrs > 0
 
 
 def if_calibration(start):
-    print(list(start.keys()))
     return 'is_calibration' in start
-    # return 'detector_calibration_server_uid' in start
+    # return 'calibration_server_uid' in start
 
 
 def if_not_calibration(doc):
     return 'calibration_md' in doc
+    # return 'calibration_client_uid' in doc
 
 
 def dark_template_func(timestamp, template):

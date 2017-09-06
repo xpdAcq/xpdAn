@@ -17,7 +17,7 @@ import os
 import time
 
 import yaml
-from pyFAI.calibration import Calibration, PeakPicker
+from pyFAI.calibration import Calibration, PeakPicker, Calibrant
 from pyFAI.gui.utils import update_fig
 
 from xpdan.dev_utils import _timestampstr
@@ -170,12 +170,16 @@ def img_calibration(img, wavelength, calibrant=None,
     pyFAI documentation:
     http://pyfai.readthedocs.io/en/latest/
     """
+    wavelength *= 10**-10
     if detector is None:
         detector = 'perkin_elmer'
     if calibrant is None:
         calibrant = 'Ni'
+    elif isinstance(calibrant, list):
+        calibrant = Calibrant(dSpacing=calibrant, wavelength=wavelength)
     # configure calibration instance
-    c = Calibration(calibrant, detector, wavelength)
+    c = Calibration(calibrant=calibrant, detector=detector,
+                    wavelength=wavelength)
     # pyFAI calibration
     calib_c, timestr = _calibration(img, c, calib_ref_fp, **kwargs)
 

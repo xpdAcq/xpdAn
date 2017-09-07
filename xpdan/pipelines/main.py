@@ -48,7 +48,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        mask_setting='default',
                        mask_kwargs=None,
                        pdf_config=None,
-                       verbose=False):
+                       verbose=False,
+                       calibration_md_path='../xpdConfig/'
+                                           'xpdAcq_calib_info.yml'):
     """Total data processing pipeline for XPD
 
     Parameters
@@ -257,6 +259,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                 stream_name='Run Calibration',
                                 md={'analysis_stage': 'calib'},
                                 full_event=True)
+    # write calibration info into xpdAcq sacred place
+    # TODO: use _save_calib_param
+    # TODO: have calibration return full Calibration not just Ai
+    xpdacq_calibration_writer_stream = es.map()
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
@@ -290,7 +296,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # polarization correction
     # SPLIT INTO TWO NODES
     zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
-                         stream_name='Combine FG and Calibration')
+                         stream_name='Combine FG and Calibration',
+                         clear_on_lossless_stop=True)
     p_corrected_stream = es.map(polarization_correction,
                                 zlfl,
                                 input_info={'img': ('img', 0),
@@ -353,7 +360,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream,
+                         clear_on_lossless_stop=True)
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),
@@ -366,11 +374,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        md=dict(analysis_stage='iq_q'))
     # convert to tth
     # TODO: decorate with radian->degree
-    tth_stream = es.map(q_to_twotheta,
+    tth_stream = es.map(lambda q, wavelength: np.rad2deg(
+        q_to_twotheta(q, wavelength)),
                         es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={'q': ('q', 0),
                                     'wavelength': ('bt_wavelength', 1)},
-                        output_info=[('tth', {'dtype': 'array'})])
+                        output_info=[('tth', {'dtype': 'array',
+                                              'units': 'degrees'})])
 
     tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
                            es.zip(tth_stream, iq_stream),

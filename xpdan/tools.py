@@ -20,10 +20,12 @@ except ImportError:
     from xpdan.tests.utils import PDFGetterShim as PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
+from scipy import stats
 from multiprocessing import Pool, cpu_count
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
+from skbeam.core.utils import bin_edges_to_centers
 
 
 # TODO: speed this up
@@ -367,9 +369,11 @@ def generate_binner(geo, img_shape, mask=None):
     pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
     rres = np.hypot(*pixel_size)
     rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres / 2.)
-    rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
+    # This is only called once, use the function version
+    # rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
 
-    qbin_sizes = rbinned(q_dq.ravel())
+    # qbin_sizes = rbinned(q_dq.ravel())
+    qbin_sizes, _, _ = stats.binned_statistic(r.ravel(), q_dq.ravel(), statistic=np.max, bins=rbins)
     qbin_sizes = np.nan_to_num(qbin_sizes)
     qbin = np.cumsum(qbin_sizes)
     if mask is not None:

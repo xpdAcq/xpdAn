@@ -150,7 +150,7 @@ def query_background(db, docs, schema=1):
         sample_name = doc.get('bkgd_sample_name')
         if sample_name:
             return db(sample_name=sample_name,
-                      bt_uid=doc['bt'],
+                      bt_uid=doc['bt_uid'],
                       is_dark={'$exists': False})
         else:
             return []

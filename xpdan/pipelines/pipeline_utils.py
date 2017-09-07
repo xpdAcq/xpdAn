@@ -15,9 +15,9 @@ def if_query_results(n_hdrs):
 
 
 def if_calibration(start):
-    print("detector cal tf ================================")
-    pprint(start)
-    print('detector_calibration_server_uid' in start)
+    # print("detector cal tf ================================")
+    # pprint(start)
+    # print('detector_calibration_server_uid' in start)
     # return 'is_calibration' in start
     return 'detector_calibration_server_uid' in start
 

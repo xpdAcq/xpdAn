@@ -362,7 +362,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            img_shape=(2048, 2048),
                            stream_name='Binners')
     zlpb = es.zip_latest(p_corrected_stream, binner_stream,
-                         clear_on_lossless_stop=True)
+                         #clear_on_lossless_stop=True
+                        )
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),
@@ -445,15 +446,15 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                   tth_iq_stream, pdf_stream,
                                   calibration_stream]
         input_infos = [
-            {'data': ('img', 0), 'file': ('filename', 1)},
-            {'mask': ('mask', 0), 'filename': ('filename', 1)},
-            {'tth': ('q', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'tth': ('tth', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
-             'config': ('config', 0)},
-            {'calibration': ('calibration', 0), 'filename': ('filename', 1)}
+            {'data': ('img', 1), 'file': ('filename', 0)},
+            {'mask': ('mask', 1), 'filename': ('filename', 0)},
+            {'tth': ('q', 1), 'intensity': ('iq', 1),
+             'output_name': ('filename', 0)},
+            {'tth': ('tth', 1), 'intensity': ('iq', 1),
+             'output_name': ('filename', 0)},
+            {'r': ('r', 1), 'pdf': ('pdf', 1), 'filename': ('filename', 0),
+             'config': ('config', 1)},
+            {'calibration': ('calibration', 1), 'filename': ('filename', 0)}
         ]
         saver_kwargs = [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
                         {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
@@ -468,7 +469,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                    es.zip_latest(
                        es.zip(h_timestamp_stream,
                               # human readable event timestamp
-                              if_not_dark_stream  # raw events
+                              if_not_dark_stream,  # raw events,
+                              stream_name='mega_render zip'
                               ),
                        eventify_raw_start,
                        eventify_raw_descriptor,
@@ -496,7 +498,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            input_info={'raw_start': (('data',), 0), },
                            output_info=[('filename', {'dtype': 'str'})],
                            ext='.yml',
-                           full_event=True)
+                           full_event=True,
+                           stream_name='MD render')
 
         make_dirs = [es.map(lambda x: os.makedirs(os.path.split(x)[0],
                                                   exist_ok=True),
@@ -507,7 +510,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             ) for cs in mega_render]
 
         [es.map(writer_templater,
-                es.zip_latest(s1, s2, made_dir),
+                es.zip_latest(es.zip(s2, s1, stream_name='zip render and data'), made_dir, 
+                              #clear_on_lossless_stop=True,
+                              stream_name='zl dirs and render and data'
+                             ),
                 input_info=ii,
                 output_info=[('final_filename', {'dtype': 'str'})],
                 stream_name='Write {}'.format(s1.stream_name),
@@ -527,9 +533,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         es.map(dump_yml, es.zip(eventify_raw_start, md_render),
                input_info={0: (('data', 'filename'), 1),
                            1: (('data',), 0)},
-               full_event=True)
+               full_event=True,
+               stream_name='dump yaml')
     if verbose:
-        if_calibration_stream.sink(pprint)
+        # if_calibration_stream.sink(pprint)
         # dark_sub_fg.sink(pprint)
         # eventify_raw_start.sink(pprint)
         # raw_source.sink(pprint)
@@ -552,10 +559,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # binner_stream.sink(pprint)
         # zlpb.sink(pprint)
         # iq_stream.sink(pprint)
-        # pdf_stream.sink(pprint)
+        pdf_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
-            [es.map(lambda **x: pprint(x['data']['filename']), cs,
-                    full_event=True) for cs in mega_render]
+            [cs.sink(pprint) for cs in mega_render]
 
     return raw_source

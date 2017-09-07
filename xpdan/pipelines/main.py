@@ -262,7 +262,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # write calibration info into xpdAcq sacred place
     # TODO: use _save_calib_param
     # TODO: have calibration return full Calibration not just Ai
-    xpdacq_calibration_writer_stream = es.map()
+    # xpdacq_calibration_writer_stream = es.map()
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
@@ -350,6 +350,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              md=dict(analysis_stage='mask'))
 
     # generate binner stream
+    L = loaded_calibration_stream.sink_to_list()
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 
     binner_stream = es.map(generate_binner,

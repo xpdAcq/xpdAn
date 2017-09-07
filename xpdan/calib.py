@@ -106,6 +106,9 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     c.peakPicker.gui(log=True, maximize=True, pick=True)
     update_fig(c.peakPicker.fig)
     c.gui_peakPicker()
+    # TODO: open issue at pyFAI on this crazyness
+    c.ai.setPyFAI(**c.geoRef.getPyFAI())
+    c.ai.wavelength = c.geoRef.wavelength
 
     return c, timestr
 

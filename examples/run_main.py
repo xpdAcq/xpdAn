@@ -24,13 +24,14 @@ db = Broker(mds=mds, reg=fs)
 td = TemporaryDirectory()
 
 vis = False
+# vis = True
 source = conf_main_pipeline(db, td.name,
                             vis=vis,
                             write_to_disk=False,
-                            verbose=True
+                            # verbose=True
                             )
-# source.visualize()
-# '''
+source.visualize()
+'''
 for hdr in list((db[-1], )):
     for e in hdr.documents():
         if e[0] == 'event' and vis:

@@ -48,7 +48,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        mask_setting='default',
                        mask_kwargs=None,
                        pdf_config=None,
-                       verbose=False):
+                       verbose=False,
+                       calibration_md_path='../xpdConfig/'
+                                           'xpdAcq_calib_info.yml'):
     """Total data processing pipeline for XPD
 
     Parameters
@@ -107,9 +109,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,
-                                   input_info=None,
+                                   input_info={0: ((), 0)},
                                    document_name='start',
-                                   stream_name='If not dark')
+                                   stream_name='If not dark',
+                                   full_event=True)
     eventify_raw_start = es.Eventify(if_not_dark_stream,
                                      stream_name='eventify raw start')
     # only the primary stream
@@ -147,7 +150,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # Decide if there is background data
     if_background_stream = es.filter(if_query_results, bg_query_stream,
-                                     full_event=True, input_info=None,
+                                     full_event=True,
+                                     input_info={'n_hdrs': (('n_hdrs',), 0)},
                                      document_name='start',
                                      stream_name='If background')
     # if has background do background subtraction
@@ -211,13 +215,15 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        )
 
     # else do nothing
+    eventify_nhdrs = es.Eventify(bg_query_stream, 'n_hdrs',
+                                 output_info=[('n_hdrs', {})])
+    zldb = es.zip_latest(dark_sub_fg, eventify_nhdrs)
     if_not_background_stream = es.filter(
-        lambda x: not if_query_results(x, doc_to_inspect=1),
-        es.zip_latest(dark_sub_fg,
-                      bg_query_stream),
-        input_info=None,
-        document_name='start',
-        stream_name='If not background')
+        lambda x: not if_query_results(x),
+        zldb,
+        input_info={'x': (('data', 'n_hdrs',), 1)},
+        stream_name='If not background',
+        full_event=True)
     if_not_background_split_stream = es.split(if_not_background_stream, 2)
 
     # union of background and not background branch
@@ -226,13 +232,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     foreground_stream.stream_name = 'Pull from either bgsub or not sub'
     # CALIBRATION PROCESSING
 
-    # if calibration send to calibration maker
+    # if calibration send to calibration runner
+    zlfi = es.zip_latest(foreground_stream, es.zip(
+        if_not_dark_stream, eventify_raw_start), clear_on_lossless_stop=True)
     if_calibration_stream = es.filter(if_calibration,
-                                      es.zip_latest(
-                                          foreground_stream,
-                                          eventify_raw_start,
-                                      ),
-                                      input_info={0: ((), 2)},
+                                      zlfi,
+                                      input_info={0: ((), 1)},
+                                      full_event=True,
                                       document_name='start',
                                       stream_name='If calibration')
 
@@ -240,32 +246,30 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     calibration_stream = es.map(img_calibration, if_calibration_stream,
                                 input_info={
                                     'img': (('data', 'img'), 0),
-                                    'wavelength': (('bt_wavelength',), 2),
-                                    'calibrant': (('calibrant',), 2),
-                                    'detector': (('detector',), 2)},
-                                output_info=[('calibrant',
-                                              {'dtype': 'object'}),
-                                             'timestamp',
-                                             {'dtype': 'float'}],
+                                    'wavelength': (
+                                        ('data', 'bt_wavelength',), 2),
+                                    'calibrant': (('data', 'dSpacing',), 2),
+                                    'detector': (('data', 'detector',), 2)},
+                                output_info=
+                                [('geo',
+                                  {'dtype': 'object',
+                                   'source': 'workflow',
+                                   'instance': 'pyFAI.azimuthalIntegrator'
+                                               '.AzimuthalIntegrator'})],
                                 stream_name='Run Calibration',
                                 md={'analysis_stage': 'calib'},
                                 full_event=True)
-
-    ai_stream = es.map(lambda x: x.ai,
-                       calibration_stream,
-                       input_info={'x': 'calibrant'},
-                       output_info=[('geo', {'dtype': 'object',
-                                             'source': 'workflow',
-                                             'instance':
-                                                 'pyFAI.azimuthalIntegrator'
-                                                 '.AzimuthalIntegrator'})]
-                       )
+    # write calibration info into xpdAcq sacred place
+    # TODO: use _save_calib_param
+    # TODO: have calibration return full Calibration not just Ai
+    # xpdacq_calibration_writer_stream = es.map()
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
                                           if_not_dark_stream,
-                                          input_info=None,
+                                          input_info={0: ((), 0)},
                                           document_name='start',
+                                          full_event=True,
                                           stream_name='If not calibration')
     cal_md_stream = es.Eventify(if_not_calibration_stream,
                                 'calibration_md',
@@ -273,17 +277,18 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                               {'dtype': 'dict',
                                                'source': 'workflow'})],
                                 stream_name='Eventify Calibration')
-    cal_stream = es.map(load_geo, cal_md_stream,
-                        input_info={'cal_params': 'calibration_md'},
-                        output_info=[('geo',
-                                      {'dtype': 'object',
-                                       'source': 'workflow',
-                                       'instance': 'pyFAI.azimuthalIntegrator'
-                                                   '.AzimuthalIntegrator'})],
-                        stream_name='Load geometry')
+    loaded_cal_stream = es.map(load_geo, cal_md_stream,
+                               input_info={'cal_params': 'calibration_md'},
+                               output_info=[('geo',
+                                             {'dtype': 'object',
+                                              'source': 'workflow',
+                                              'instance':
+                                                  'pyFAI.azimuthalIntegrator'
+                                                  '.AzimuthalIntegrator'})],
+                               stream_name='Load geometry')
 
     # union the calibration branches
-    loaded_calibration_stream = cal_stream.union(ai_stream)
+    loaded_calibration_stream = loaded_cal_stream.union(calibration_stream)
     loaded_calibration_stream.stream_name = 'Pull from either md or ' \
                                             'run calibration'
 
@@ -291,7 +296,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # polarization correction
     # SPLIT INTO TWO NODES
     zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
-                         stream_name='Combine FG and Calibration')
+                         stream_name='Combine FG and Calibration',
+                         clear_on_lossless_stop=True)
     p_corrected_stream = es.map(polarization_correction,
                                 zlfl,
                                 input_info={'img': ('img', 0),
@@ -306,7 +312,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        p_corrected_stream,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
-                             cal_stream)
+                             loaded_calibration_stream)
         mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
@@ -330,9 +336,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            p_corrected_stream,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
-                                 cal_stream)
+                                 loaded_calibration_stream)
         else:
-            zlfc = es.zip_latest(p_corrected_stream, cal_stream)
+            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
         mask_stream = es.map(mask_img,
                              zlfc,
                              input_info={'img': ('img', 0),
@@ -344,7 +350,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              md=dict(analysis_stage='mask'))
 
     # generate binner stream
-    zlmc = es.zip_latest(mask_stream, cal_stream)
+    L = loaded_calibration_stream.sink_to_list()
+    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 
     binner_stream = es.map(generate_binner,
                            zlmc,
@@ -354,7 +361,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream,
+                         clear_on_lossless_stop=True)
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),
@@ -365,11 +373,32 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                             'source': 'testing'})],
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
+    # convert to tth
+    # TODO: decorate with radian->degree
+    tth_stream = es.map(lambda q, wavelength: np.rad2deg(
+        q_to_twotheta(q, wavelength)),
+                        es.zip_latest(iq_stream, eventify_raw_start),
+                        input_info={'q': ('q', 0),
+                                    'wavelength': ('bt_wavelength', 1)},
+                        output_info=[('tth', {'dtype': 'array',
+                                              'units': 'degrees'})])
+
+    tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
+                           es.zip(tth_stream, iq_stream),
+                           input_info={'tth': ('tth', 0),
+                                       'iq': ('iq', 1)},
+                           output_info=[('tth', {'dtype': 'array',
+                                                 'source': 'testing'}),
+                                        ('iq', {'dtype': 'array',
+                                                'source': 'testing'})],
+                           stream_name='Combine tth and iq',
+                           md=dict(analysis_stage='iq_tth')
+                           )
 
     fq_stream = es.map(fq_getter,
                        es.zip_latest(iq_stream, eventify_raw_start),
                        input_info={0: ('q', 0), 1: ('iq', 0),
-                                   'composition': ('sample_name', 1)},
+                                   'composition': ('composition_string', 1)},
                        output_info=[('q', {'dtype': 'array'}),
                                     ('fq', {'dtype': 'array'}),
                                     ('config', {'dtype': 'dict'})],
@@ -378,7 +407,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     pdf_stream = es.map(pdf_getter,
                         es.zip_latest(iq_stream, eventify_raw_start),
                         input_info={0: ('q', 0), 1: ('iq', 0),
-                                    'composition': ('sample_name', 1)},
+                                    'composition': ('composition_string', 1)},
                         output_info=[('r', {'dtype': 'array'}),
                                      ('pdf', {'dtype': 'array'}),
                                      ('config', {'dtype': 'dict'})],
@@ -389,30 +418,14 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         mask_stream.sink(star(LiveImage('mask')))
         iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('Q (A^-1)',
                                                             'Arb'))))
+        tth_iq_stream.sink(star(LiveWaterfall('tth', 'iq', units=('tth',
+                                                                  'Arb'))))
         fq_stream.sink(star(LiveWaterfall('q', 'fq', units=('Q (A^-1)',
                                                             'F(Q)'))))
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
                                                               'G(r) A^-3'))))
 
     if write_to_disk:
-        # convert to tth
-        tth_stream = es.map(q_to_twotheta,
-                            es.zip_latest(iq_stream, eventify_raw_start),
-                            input_info={'q': ('q', 0),
-                                        'wavelength': ('bt_wavelength', 1)},
-                            output_info=[('tth', {'dtype': 'array'})])
-
-        tth_iq_stream = es.map(lambda **x: (x['tth'], x['iq']),
-                               es.zip(tth_stream, iq_stream),
-                               input_info={'tth': ('tth', 0),
-                                           'iq': ('iq', 1)},
-                               output_info=[('tth', {'dtype': 'array',
-                                                     'source': 'testing'}),
-                                            ('iq', {'dtype': 'array',
-                                                    'source': 'testing'})],
-                               stream_name='Combine tth and iq',
-                               md=dict(analysis_stage='iq_tth')
-                               )
         eventify_raw_descriptor = es.Eventify(
             if_not_dark_stream, stream_name='eventify raw descriptor',
             document='descriptor')
@@ -431,7 +444,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         eventify_input_streams = [dark_sub_fg, mask_stream, iq_stream,
                                   tth_iq_stream, pdf_stream,
                                   calibration_stream]
-        iis = [
+        input_infos = [
             {'data': ('img', 0), 'file': ('filename', 1)},
             {'mask': ('mask', 0), 'filename': ('filename', 1)},
             {'tth': ('q', 0), 'intensity': ('iq', 0),
@@ -505,7 +518,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
               pdf_stream],
              mega_render,
              make_dirs,  # prevent run condition btwn dirs and files
-             iis,
+             input_infos,
              [tifffile.imsave, fit2d_save, save_output, save_output,
               pdf_saver, poni_saver],
              saver_kwargs
@@ -516,20 +529,30 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            1: (('data',), 0)},
                full_event=True)
     if verbose:
-        source.sink(pprint)
-        if_not_dark_stream.sink(pprint)
-        zlid.sink(pprint)
-        if_not_calibration_stream.sink(pprint)
-        cal_md_stream.sink(pprint)
-        loaded_calibration_stream.sink(pprint)
-        foreground_stream.sink(pprint)
-        zlfl.sink(pprint)
-        p_corrected_stream.sink(pprint)
-        zlmc.sink(pprint)
-        binner_stream.sink(pprint)
-        zlpb.sink(pprint)
-        iq_stream.sink(pprint)
-        pdf_stream.sink(pprint)
+        if_calibration_stream.sink(pprint)
+        # dark_sub_fg.sink(pprint)
+        # eventify_raw_start.sink(pprint)
+        # raw_source.sink(pprint)
+        # if_not_dark_stream.sink(pprint)
+        # zlid.sink(pprint)
+        # dark_sub_fg.sink(pprint)
+        # bg_query_stream.sink(pprint)
+        # if_not_calibration_stream.sink(pprint)
+        # if_not_background_stream.sink(pprint)
+        # if_background_stream.sink(pprint)
+        # fg_sub_bg.sink(pprint)
+        # if_not_background_split_stream.split_streams[0].sink(pprint)
+        # cal_md_stream.sink(pprint)
+        # loaded_calibration_stream.sink(pprint)
+        # if_not_dark_stream.sink(pprint)
+        # foreground_stream.sink(pprint)
+        # zlfl.sink(pprint)
+        # p_corrected_stream.sink(pprint)
+        # zlmc.sink(pprint)
+        # binner_stream.sink(pprint)
+        # zlpb.sink(pprint)
+        # iq_stream.sink(pprint)
+        # pdf_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
             [es.map(lambda **x: pprint(x['data']['filename']), cs,

@@ -17,7 +17,7 @@ import os
 import time
 
 import yaml
-from pyFAI.calibration import Calibration, PeakPicker
+from pyFAI.calibration import Calibration, PeakPicker, Calibrant
 from pyFAI.gui.utils import update_fig
 
 from xpdan.dev_utils import _timestampstr
@@ -106,6 +106,9 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     c.peakPicker.gui(log=True, maximize=True, pick=True)
     update_fig(c.peakPicker.fig)
     c.gui_peakPicker()
+    # TODO: open issue at pyFAI on this crazyness
+    c.ai.setPyFAI(**c.geoRef.getPyFAI())
+    c.ai.wavelength = c.geoRef.wavelength
 
     return c, timestr
 
@@ -170,13 +173,20 @@ def img_calibration(img, wavelength, calibrant=None,
     pyFAI documentation:
     http://pyfai.readthedocs.io/en/latest/
     """
+    wavelength *= 10**-10
     if detector is None:
         detector = 'perkin_elmer'
     if calibrant is None:
         calibrant = 'Ni'
+    elif isinstance(calibrant, list):
+        calibrant = Calibrant(dSpacing=calibrant, wavelength=wavelength)
     # configure calibration instance
-    c = Calibration(calibrant, detector, wavelength)
+    c = Calibration(calibrant=calibrant, detector=detector,
+                    wavelength=wavelength)
     # pyFAI calibration
     calib_c, timestr = _calibration(img, c, calib_ref_fp, **kwargs)
+    # img2 = img.copy()
+    # img2 /= calib_c.ai.polarization(img2.shape, .99)
+    # calib_c, timestr = _calibration(img2, c, calib_ref_fp, **kwargs)
 
     return calib_c.ai

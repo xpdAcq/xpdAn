@@ -25,7 +25,6 @@ from multiprocessing import Pool, cpu_count
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
-from skbeam.core.utils import bin_edges_to_centers
 
 
 # TODO: speed this up
@@ -373,7 +372,8 @@ def generate_binner(geo, img_shape, mask=None):
     # rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
 
     # qbin_sizes = rbinned(q_dq.ravel())
-    qbin_sizes, _, _ = stats.binned_statistic(r.ravel(), q_dq.ravel(), statistic=np.max, bins=rbins)
+    qbin_sizes, _, _ = stats.binned_statistic(r.ravel(), q_dq.ravel(),
+                                              statistic=np.max, bins=rbins)
     qbin_sizes = np.nan_to_num(qbin_sizes)
     qbin = np.cumsum(qbin_sizes)
     if mask is not None:

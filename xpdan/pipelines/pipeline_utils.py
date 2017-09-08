@@ -3,8 +3,6 @@ from pathlib import Path
 
 from xpdan.dev_utils import _timestampstr
 
-from pprint import pprint
-
 
 def if_dark(doc):
     return doc.get('dark_frame', False)

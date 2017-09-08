@@ -24,7 +24,7 @@ from xpdan.tools import (pull_array, event_count,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter, decompress_mask)
 from xpdview.callbacks import LiveWaterfall
-from ..calib import img_calibration
+from ..calib import img_calibration, _save_calib_param
 
 base_template = (''
                  '{raw_start[sample_name]}/'
@@ -49,8 +49,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        mask_kwargs=None,
                        pdf_config=None,
                        verbose=False,
-                       calibration_md_path='../xpdConfig/'
-                                           'xpdAcq_calib_info.yml'):
+                       calibration_md_folder='../xpdConfig/'
+                       ):
     """Total data processing pipeline for XPD
 
     Parameters
@@ -115,6 +115,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    full_event=True)
     eventify_raw_start = es.Eventify(if_not_dark_stream,
                                      stream_name='eventify raw start')
+    h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
+                                input_info={0: 'time'},
+                                output_info=[('human_timestamp',
+                                              {'dtype': 'str'})],
+                                full_event=True,
+                                stream_name='human timestamp')
+
     # only the primary stream
     if_not_dark_stream_primary = es.filter(lambda x: x[0]['name'] == 'primary',
                                            if_not_dark_stream,
@@ -250,19 +257,29 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                         ('data', 'bt_wavelength',), 2),
                                     'calibrant': (('data', 'dSpacing',), 2),
                                     'detector': (('data', 'detector',), 2)},
-                                output_info=
-                                [('geo',
-                                  {'dtype': 'object',
-                                   'source': 'workflow',
-                                   'instance': 'pyFAI.azimuthalIntegrator'
-                                               '.AzimuthalIntegrator'})],
+                                output_info=[
+                                    ('calibration',
+                                     {'dtype': 'object',
+                                      'source': 'workflow',
+                                      'instance': 'pyFAI.calibration.'
+                                                  'Calibration'
+                                      }),
+                                    ('geo',
+                                     {'dtype': 'object',
+                                      'source': 'workflow',
+                                      'instance': 'pyFAI.azimuthalIntegrator'
+                                                  '.AzimuthalIntegrator'})],
                                 stream_name='Run Calibration',
                                 md={'analysis_stage': 'calib'},
                                 full_event=True)
     # write calibration info into xpdAcq sacred place
-    # TODO: use _save_calib_param
-    # TODO: have calibration return full Calibration not just Ai
-    # xpdacq_calibration_writer_stream = es.map()
+    es.map(_save_calib_param,
+           es.zip(calibration_stream, h_timestamp_stream),
+           calib_yml_fp=os.path.join(calibration_md_folder,
+                                     'xpdAcq_calib_info.yml'),
+           input_info={'calib_c': (('data', 'calibration'), 0),
+                       'timestr': (('data', 'human_timestamp'), 1)},
+           output_info=[('calib_config_dict', {'dtype': 'dict'})])
 
     # else get calibration from header
     if_not_calibration_stream = es.filter(if_not_calibration,
@@ -350,7 +367,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              md=dict(analysis_stage='mask'))
 
     # generate binner stream
-    L = loaded_calibration_stream.sink_to_list()
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 
     binner_stream = es.map(generate_binner,
@@ -362,8 +378,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            img_shape=(2048, 2048),
                            stream_name='Binners')
     zlpb = es.zip_latest(p_corrected_stream, binner_stream,
-                         #clear_on_lossless_stop=True
-                        )
+                         # clear_on_lossless_stop=True
+                         )
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),
@@ -375,7 +391,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
     # convert to tth
-    # TODO: decorate with radian->degree
     tth_stream = es.map(lambda q, wavelength: np.rad2deg(
         q_to_twotheta(q, wavelength)),
                         es.zip_latest(iq_stream, eventify_raw_start),
@@ -430,15 +445,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         eventify_raw_descriptor = es.Eventify(
             if_not_dark_stream, stream_name='eventify raw descriptor',
             document='descriptor')
-        # TODO: add calibration writer for xpdAcq
-        # TODO: add calibration writer for users
-        h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
-                                    input_info={0: 'time'},
-                                    output_info=[('human_timestamp',
-                                                  {'dtype': 'str'})],
-                                    full_event=True,
-                                    stream_name='human timestamp')
-
         exts = ['.tiff', '', '_Q.chi',
                 '_tth.chi', '.gr',
                 '.poni']
@@ -446,15 +452,15 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                   tth_iq_stream, pdf_stream,
                                   calibration_stream]
         input_infos = [
-            {'data': ('img', 1), 'file': ('filename', 0)},
-            {'mask': ('mask', 1), 'filename': ('filename', 0)},
-            {'tth': ('q', 1), 'intensity': ('iq', 1),
-             'output_name': ('filename', 0)},
-            {'tth': ('tth', 1), 'intensity': ('iq', 1),
-             'output_name': ('filename', 0)},
-            {'r': ('r', 1), 'pdf': ('pdf', 1), 'filename': ('filename', 0),
-             'config': ('config', 1)},
-            {'calibration': ('calibration', 1), 'filename': ('filename', 0)}
+            {'data': ('img', 0), 'file': ('filename', 1)},
+            {'mask': ('mask', 0), 'filename': ('filename', 1)},
+            {'tth': ('q', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
+            {'tth': ('tth', 0), 'intensity': ('iq', 0),
+             'output_name': ('filename', 1)},
+            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
+             'config': ('config', 0)},
+            {'calibration': ('calibration', 0), 'filename': ('filename', 1)}
         ]
         saver_kwargs = [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
                         {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
@@ -491,7 +497,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                '{}'.format(analysed_eventify.stream_name)
                    )
             for ext, analysed_eventify in zip(exts, eventifies)]
-
+        streams_to_be_saved = [dark_sub_fg, mask_stream, iq_stream,
+                               tth_iq_stream, pdf_stream, calibration_stream]
+        save_callables = [tifffile.imsave, fit2d_save, save_output,
+                          save_output, pdf_saver, poni_saver]
         md_render = es.map(render_and_clean,
                            eventify_raw_start,
                            string=light_template,
@@ -510,23 +519,21 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             ) for cs in mega_render]
 
         [es.map(writer_templater,
-                es.zip_latest(es.zip(s2, s1, stream_name='zip render and data'), made_dir, 
-                              #clear_on_lossless_stop=True,
+                es.zip_latest(es.zip(s1, s2, stream_name='zip render and data',
+                                     zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
-                             ),
+                              ),
                 input_info=ii,
                 output_info=[('final_filename', {'dtype': 'str'})],
                 stream_name='Write {}'.format(s1.stream_name),
                 **kwargs) for s1, s2, made_dir, ii, writer_templater, kwargs
          in
          zip(
-             [dark_sub_fg, mask_stream, iq_stream, tth_iq_stream,
-              pdf_stream],
+             streams_to_be_saved,
              mega_render,
              make_dirs,  # prevent run condition btwn dirs and files
              input_infos,
-             [tifffile.imsave, fit2d_save, save_output, save_output,
-              pdf_saver, poni_saver],
+             save_callables,
              saver_kwargs
          )]
 

@@ -18,28 +18,14 @@ from xpdan.dev_utils import _timestampstr
 from xpdan.formatters import render_and_clean
 from xpdan.io import pdf_saver, dump_yml, poni_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
-                                            if_calibration, if_not_calibration)
+                                            if_calibration, if_not_calibration,
+                                            base_template)
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter, decompress_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
-
-base_template = (''
-                 '{raw_start[sample_name]}/'
-                 '{raw_start[folder_tag]}/'
-                 '{analyzed_start[analysis_stage]}/'
-                 '{raw_start[sample_name]}_'
-                 '{human_timestamp}_'
-                 '[temp={raw_event[data][temperature]:1.2f}'
-                 '{raw_descriptor[data_keys][temperature][units]}]_'
-                 '[dx={raw_event[data][diff_x]:1.3f}'
-                 '{raw_descriptor[data_keys][diff_x][units]}]_'
-                 '[dy={raw_event[data][diff_y]:1.3f}'
-                 '{raw_descriptor[data_keys][diff_y][units]}]_'
-                 '{raw_start[uid]:.6}_'
-                 '{raw_event[seq_num]:03d}{ext}')
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -99,9 +85,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if mask_kwargs is None:
         mask_kwargs = {}
     print('start pipeline configuration')
-    light_template = os.path.join(
-        save_dir,
-        base_template)
+    light_template = os.path.join(save_dir, base_template)
     raw_source = Stream(stream_name='Raw Data')  # raw data
     source = es.fill_events(db, raw_source)  # filled raw data
 

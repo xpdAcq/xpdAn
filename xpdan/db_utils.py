@@ -141,7 +141,11 @@ def query_dark(db, docs, schema=1):
     """
     if schema == 1:
         doc = docs[0]
-        return db[doc['sc_dk_field_uid']]
+        dk_uid = doc.get('sc_dk_field_uid')
+        if dk_uid:
+            return db[dk_uid]
+        else:
+            return []
 
 
 def query_background(db, docs, schema=1):
@@ -162,10 +166,11 @@ def temporal_prox(res, docs):
         return [res]
     doc = docs[0]
     t = doc['time']
+    print(res)
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]
     if dt_sq:
         i = dt_sq.index(min(dt_sq))
-        min_r = next(islice(res, i, i + 1))
+        min_r = [next(islice(res, i, i + 1))]
     else:
         min_r = []
     return min_r

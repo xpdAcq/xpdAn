@@ -166,7 +166,6 @@ def temporal_prox(res, docs):
         return [res]
     doc = docs[0]
     t = doc['time']
-    print(res)
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]
     if dt_sq:
         i = dt_sq.index(min(dt_sq))

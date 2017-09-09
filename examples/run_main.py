@@ -32,16 +32,20 @@ source = conf_main_pipeline(db, td.name,
                             write_to_disk=False,
                             # verbose=True
                             )
-source.visualize()
+# source.visualize()
 # '''
+seen = False
 for hdr in list((db[-1], )):
     for e in hdr.documents():
         if e[0] == 'start':
             e[1].update(composition_string='EuTiO3')
         if e[0] == 'event' and vis:
             plt.pause(.1)
-        # input()
-        source.emit(e)
+        if e[0] == 'event' and not seen:
+            source.emit(e)
+            seen = True
+        elif e[0] != 'event':
+            source.emit(e)
 
 plt.show()
 plt.close("all")

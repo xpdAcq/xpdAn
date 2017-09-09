@@ -21,45 +21,12 @@ except ImportError:
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 from scipy import stats
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count
+# from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
-
-
-# TODO: speed this up
-def mask_ring(v_list, p_list, a_std=3.):
-    """Find outlier pixels in a single ring
-
-    Parameters
-    ----------
-    v_list: list
-        Values in ring
-    p_list: list
-        Positions in ring
-    a_std: float
-        Acceptable number of standard deviations
-
-    Returns
-    -------
-    list:
-        The positions to be masked
-    """
-    mask_list = []
-    while len(v_list) > 0:
-        norm_v_list = np.abs(v_list - np.mean(v_list)) / np.std(v_list)
-        if np.all(norm_v_list < a_std):
-            break
-        # get the index of the worst pixel
-        worst_idx = np.argmax(norm_v_list)
-        # get the position of the worst pixel
-        worst_p = p_list[worst_idx]
-        # add the worst position to the mask
-        # delete the worst position
-        v_list = np.delete(v_list, worst_idx)
-        p_list = np.delete(p_list, worst_idx)
-        mask_list.append(worst_p)
-    return mask_list
 
 
 # TODO: speed this up
@@ -82,41 +49,40 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     np.ndarray:
         The mask
     """
-    r = geo.rArray(img.shape)
-    q = geo.qArray(img.shape) / 10  # type: np.ndarray
-    delta_q = geo.deltaQ(img.shape) / 10  # type: np.ndarray
-
-    pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
-    rres = np.hypot(*pixel_size)
-    rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres / 2.)
-    rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins)
-
-    qbin_sizes = np.nan_to_num(rbinned(delta_q.ravel()))
-    qbin = np.cumsum(qbin_sizes)
-
-    ipos = np.arange(0, np.size(img)).reshape(img.shape)
-    qbinned = BinnedStatistic1D(q.ravel(), bins=qbin)
+    print('start mask')
+    qbinned = generate_binner(geo, img.shape)
     xy = qbinned.xy
+
+    ripos = np.arange(0, np.size(img))
+    rimg = img.flatten()
 
     if tmsk is None:
         tmsk = np.ones(img.shape)
 
-    ring_values = []
-    ring_positions = []
+    # TODO: speed this up
+    def mask_ring(i):
+        """Find outlier pixels in a single ring """
+        tv = (xy == i) & tmsk.flatten()
 
-    # TODO: include tmsk into this to speed things up?
-    for i in np.unique(xy):
-        ring_values.append(img.ravel()[xy == i])
-        ring_positions.append(ipos.ravel()[xy == i])
-    with Pool(cpu_count()) as p:
-        vp = [v + (alpha,) for v in zip(ring_values, ring_positions) if
-              len(v[0]) > 0]
-        print('start mask')
-        ss = p.starmap(mask_ring, vp)
-        print('finished mask')
-    mask_list = [i for s in ss for i in s]
-    tmsk[np.unravel_index(mask_list, img.shape)] = False
-    # mask = mask.astype(bool)
+        values_array = rimg[tv]
+        positions_array = ripos[tv]
+        while len(values_array) > 0:
+            norm_v_list = np.abs(values_array -
+                                 np.mean(values_array)) / np.std(values_array)
+            if np.all(norm_v_list < alpha):
+                break
+            # get the index of the worst pixel
+            worst_idx = np.argmax(norm_v_list)
+            # add the worst position to the mask
+            tmsk[np.unravel_index(positions_array[worst_idx],
+                                  img.shape)] = False
+            # delete the worst position
+            values_array = np.delete(values_array, worst_idx)
+            positions_array = np.delete(positions_array, worst_idx)
+
+    with Pool() as p:
+        [_ for _ in p.imap_unordered(mask_ring, np.unique(xy), 10)]
+    print('finished mask')
     return tmsk.astype(bool)
 
 
@@ -172,11 +138,8 @@ def old_mask_img(img, geo,
         are masked out.
 
     """
-
-    r = geo.rArray(img.shape)
-    pixel_size = [getattr(geo, a) for a in ['pixel1', 'pixel2']]
-    rres = np.hypot(*pixel_size)
-    rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres)
+    q = geo.qArray(img.shape)
+    qbinned = generate_binner(geo, img.shape)
     if tmsk is None:
         working_mask = np.ones(img.shape).astype(bool)
     else:
@@ -208,7 +171,8 @@ def old_mask_img(img, geo,
         working_mask *= ~grid.reshape((ny, nx))
 
     if alpha:
-        working_mask *= binned_outlier(img, r, alpha, rbins, mask=working_mask)
+        working_mask *= binned_outlier(img, q, alpha, qbinned.bin_edges,
+                                       mask=working_mask)
     return working_mask
 
 
@@ -369,34 +333,33 @@ def generate_binner(geo, img_shape, mask=None):
     rres = np.hypot(*pixel_size)
     rbins = np.arange(np.min(r) - rres / 2., np.max(r) + rres / 2., rres / 2.)
     # This is only called once, use the function version
-    # rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
+    rbinned = BinnedStatistic1D(r.ravel(), statistic=np.max, bins=rbins, )
 
-    # qbin_sizes = rbinned(q_dq.ravel())
-    qbin_sizes, _, _ = stats.binned_statistic(r.ravel(), q_dq.ravel(),
-                                              statistic=np.max, bins=rbins)
+    qbin_sizes = rbinned(q_dq.ravel())
     qbin_sizes = np.nan_to_num(qbin_sizes)
     qbin = np.cumsum(qbin_sizes)
     if mask is not None:
         mask = mask.flatten()
-    return BinnedStatistic1D(q.flatten(), bins=qbin,
-                             mask=mask
-                             )
+    return BinnedStatistic1D(q.flatten(), bins=qbin, mask=mask)
 
 
 def z_score_image(img, binner):
-    img_shape = img.shape
-    img = img.flatten()
+    img2 = img.flatten()
     xy = binner.xy
-    binner.statistic = 'mean'
-    means = binner(img)
-    binner.statistic = 'std'
-    stds = binner(img)
-    for i in np.unique(xy):
+
+    means = binner(img, 'mean')
+
+    stds = binner(img, 'std')
+
+    def f(i):
         tv = (xy == i)
-        img[tv] -= means[i]
-        img[tv] /= stds[i]
-    img = img.reshape(img_shape)
-    return img
+        img2[tv] -= means[i]
+        img2[tv] /= stds[i]
+
+    with Pool() as p:
+        p.map(f, np.unique(xy))
+
+    return img2.reshape(img.shape)
 
 
 def integrate(img, binner):

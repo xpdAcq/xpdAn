@@ -60,11 +60,11 @@ install:
   - pip install codecov pytest-env
 
 script:
+  - set -e
   - coverage run run_tests.py
   - coverage report -m
   - codecov
   - flake8 xpdan
-  - set -e
   - conda install --yes sphinx sphinx_rtd_theme
   - pip install git+git://github.com/drdoctr/doctr.git
   - cd docs

@@ -90,10 +90,12 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     """
     # Create detectors
     dark_det = ReaderWithRegistry('pe1_image',
-                                  {'pe1_image': lambda: np.random.random(shape)},
+                                  {'pe1_image': lambda: np.random.random(
+                                      shape)},
                                   reg=reg, save_path=save_dir)
     light_det = ReaderWithRegistry('pe1_image',
-                                   {'pe1_image': lambda: np.random.random(shape)},
+                                   {'pe1_image': lambda: np.random.random(
+                                       shape)},
                                    reg=reg, save_path=save_dir)
     beamtime_uid = str(uuid4())
     base_md = dict(beamtime_uid=beamtime_uid,

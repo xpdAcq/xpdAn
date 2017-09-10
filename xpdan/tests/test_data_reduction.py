@@ -18,7 +18,7 @@ from xpdan.data_reduction import (integrate_and_save, integrate_and_save_last,
                                   save_tiff, save_last_tiff)
 
 
-def test_integrate_core_smoke(exp_db, fast_tmp_dir):
+def test_integrate_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
@@ -30,7 +30,7 @@ def test_integrate_core_smoke(exp_db, fast_tmp_dir):
          os.listdir(fast_tmp_dir)]))
 
 
-def test_integrate_last_core_smoke(exp_db, fast_tmp_dir):
+def test_integrate_last_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
@@ -42,7 +42,7 @@ def test_integrate_last_core_smoke(exp_db, fast_tmp_dir):
          os.listdir(fast_tmp_dir)]))
 
 
-def test_save_tiff_core_smoke(exp_db, fast_tmp_dir):
+def test_save_tiff_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
@@ -55,7 +55,7 @@ def test_save_tiff_core_smoke(exp_db, fast_tmp_dir):
              os.listdir(fast_tmp_dir)]))
 
 
-def test_save_last_tiff_core_smoke(exp_db, fast_tmp_dir):
+def test_save_last_tiff_smoke(exp_db, fast_tmp_dir):
     old_files = os.listdir(fast_tmp_dir)
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]

@@ -1,13 +1,9 @@
-"""Decider between pipelines"""
+"""Save tiff pipeline"""
 import os
-import re
-from collections import defaultdict
 from operator import sub
-from pathlib import Path
 
 import shed.event_streams as es
 import tifffile
-import yaml
 from shed.event_streams import star
 
 from bluesky.callbacks.broker import LiveImage

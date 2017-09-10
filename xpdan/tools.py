@@ -20,9 +20,6 @@ except ImportError:
     from xpdan.tests.utils import PDFGetterShim as PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
-from scipy import stats
-from multiprocessing import cpu_count
-# from multiprocessing import Pool
 from multiprocessing.dummy import Pool
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D

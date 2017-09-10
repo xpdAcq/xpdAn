@@ -171,7 +171,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
     # sum the backgrounds
 
-    summed_bg = es.accumulate(add_img, bg_bundle,
+    summed_bg = es.accumulate(dstar(add_img), bg_bundle,
                               start=dstar(pull_array),
                               state_key='img1',
                               input_info={'img2': 'img'},

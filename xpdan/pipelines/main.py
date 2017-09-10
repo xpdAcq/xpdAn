@@ -361,9 +361,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    zlpb = es.zip_latest(p_corrected_stream, binner_stream,
-                         # clear_on_lossless_stop=True
-                         )
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+
     iq_stream = es.map(integrate,
                        zlpb,
                        input_info={'img': ('img', 0),

@@ -25,8 +25,8 @@ db = Broker(mds=mds, reg=fs)
 db.prepare_hook = lambda x, y: copy.deepcopy(y)
 td = TemporaryDirectory()
 
-vis = False
-# vis = True
+# vis = False
+vis = True
 source = conf_main_pipeline(db, td.name,
                             vis=vis,
                             write_to_disk=False,

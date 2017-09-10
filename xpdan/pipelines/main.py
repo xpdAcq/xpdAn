@@ -413,16 +413,21 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                         **pdf_config,
                         md=dict(analysis_stage='pdf'))
     if vis:
-        foreground_stream.sink(star(LiveImage('img')))
-        mask_stream.sink(star(LiveImage('mask')))
-        iq_stream.sink(star(LiveWaterfall('q', 'iq', units=('Q (A^-1)',
-                                                            'Arb'))))
-        tth_iq_stream.sink(star(LiveWaterfall('tth', 'iq', units=('tth',
-                                                                  'Arb'))))
-        fq_stream.sink(star(LiveWaterfall('q', 'fq', units=('Q (A^-1)',
-                                                            'F(Q)'))))
-        pdf_stream.sink(star(LiveWaterfall('r', 'pdf', units=('r (A)',
-                                                              'G(r) A^-3'))))
+        foreground_stream.sink(star(LiveImage(
+            'img', window_title='Dark Subtracted Image')))
+        mask_stream.sink(star(LiveImage('mask', window_title='Mask')))
+        iq_stream.sink(star(LiveWaterfall('q', 'iq',
+                                          units=('Q (A^-1)', 'Arb')
+                                          )))
+        tth_iq_stream.sink(star(LiveWaterfall('tth', 'iq',
+                                              units=('tth', 'Arb')
+                                              )))
+        fq_stream.sink(star(LiveWaterfall('q', 'fq',
+                                          units=('Q (A^-1)', 'F(Q)')
+                                          )))
+        pdf_stream.sink(star(LiveWaterfall('r', 'pdf',
+                                           units=('r (A)', 'G(r) A^-3')
+                                           )))
 
     if write_to_disk:
         eventify_raw_descriptor = es.Eventify(
@@ -480,10 +485,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                '{}'.format(analysed_eventify.stream_name)
                    )
             for ext, analysed_eventify in zip(exts, eventifies)]
+
         streams_to_be_saved = [dark_sub_fg, mask_stream, iq_stream,
                                tth_iq_stream, pdf_stream, calibration_stream]
+
         save_callables = [tifffile.imsave, fit2d_save, save_output,
                           save_output, pdf_saver, poni_saver]
+
         md_render = es.map(render_and_clean,
                            eventify_raw_start,
                            string=light_template,

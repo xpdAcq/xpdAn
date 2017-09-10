@@ -10,7 +10,6 @@ def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
     source = conf_main_pipeline(exp_db, fast_tmp_dir,
                                 vis=False,
                                 write_to_disk=True,
-                                mask_setting=None,
                                 verbose=True)
     # source.visualize('/home/christopher/dev/xpdAn/examples/mystream.png')
     t0 = time.time()

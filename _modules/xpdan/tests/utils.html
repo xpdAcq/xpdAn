@@ -244,10 +244,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Create detectors</span>
     <span class="n">dark_det</span> <span class="o">=</span> <span class="n">ReaderWithRegistry</span><span class="p">(</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                  <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)},</span>
+                                  <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
+                                      <span class="n">shape</span><span class="p">)},</span>
                                   <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">)</span>
     <span class="n">light_det</span> <span class="o">=</span> <span class="n">ReaderWithRegistry</span><span class="p">(</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                   <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="p">)},</span>
+                                   <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
+                                       <span class="n">shape</span><span class="p">)},</span>
                                    <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">)</span>
     <span class="n">beamtime_uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
     <span class="n">base_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">beamtime_uid</span><span class="o">=</span><span class="n">beamtime_uid</span><span class="p">,</span>
@@ -275,9 +277,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is a testing shim for PDFgetx if you see this message then&quot;</span>
-              <span class="s2">&quot;you don&#39;t have PDFgetx3 installed. &quot;</span>
-              <span class="s2">&quot;The data that comes from this is for testing purposes only&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is a testing shim for PDFgetx.</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;If you see this message then &quot;</span>
+              <span class="s2">&quot;you don&#39;t have PDFgetx3 installed.</span><span class="se">\n</span><span class="s2">&quot;</span>
+              <span class="s2">&quot;The data that comes from this is for testing purposes only &quot;</span>
               <span class="s2">&quot;and has no bearing on reality&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></div>
 
@@ -294,9 +297,10 @@
         <span class="c1"># &#39;auto&#39;,</span>
         <span class="kc">None</span><span class="p">,</span>
     <span class="p">),</span>
-    <span class="p">[</span><span class="kc">None</span><span class="p">,</span>
-     <span class="c1"># {&#39;alpha&#39;: 10}</span>
-     <span class="p">],</span>
+    <span class="p">[</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># {&#39;alpha&#39;: 10}</span>
+    <span class="p">],</span>
 <span class="p">]</span>
 
 <span class="n">bad_integrate_params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;polarization_factor&#39;</span><span class="p">,</span>

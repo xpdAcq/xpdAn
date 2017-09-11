@@ -157,8 +157,11 @@
 <span class="kn">import</span> <span class="nn">tempfile</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
-
-<span class="kn">from</span> <span class="nn">xpdsim</span> <span class="k">import</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">databroker</span> <span class="k">import</span> <span class="n">Broker</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">Broker</span><span class="o">.</span><span class="n">named</span><span class="p">(</span><span class="s1">&#39;xpd&#39;</span><span class="p">)</span>
+<span class="k">except</span> <span class="p">(</span><span class="ne">NameError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">xpdsim</span> <span class="k">import</span> <span class="n">db</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span> <span class="k">as</span> <span class="n">rs_fn</span>
 

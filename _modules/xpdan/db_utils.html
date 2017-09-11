@@ -295,25 +295,37 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">]]</span></div>
+        <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dk_uid</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">dk_uid</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
 
 
 <div class="viewcode-block" id="query_background"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_background">[docs]</a><span class="k">def</span> <span class="nf">query_background</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">schema</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">db</span><span class="p">(</span><span class="n">sample_name</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;bkgd_sample_name&#39;</span><span class="p">],</span>
-                  <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;$exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span></div>
+        <span class="n">sample_name</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bkgd_sample_name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sample_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="p">(</span><span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
+                      <span class="n">bt_uid</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;bt_uid&#39;</span><span class="p">],</span>
+                      <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;$exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
 
 
 <div class="viewcode-block" id="temporal_prox"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.temporal_prox">[docs]</a><span class="k">def</span> <span class="nf">temporal_prox</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
     <span class="c1"># If there is only one result just use that one</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">Header</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">res</span><span class="p">]</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
     <span class="n">dt_sq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">dt_sq</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_sq</span><span class="p">))</span>
-    <span class="n">min_r</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">dt_sq</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">dt_sq</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_sq</span><span class="p">))</span>
+        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="n">min_r</span></div>
 </pre></div>
 

@@ -27,6 +27,7 @@ from xpdan.tests.utils import insert_imgs
 from bluesky.examples import ReaderWithRegistryHandler
 from bluesky.tests.conftest import fresh_RE
 from bluesky.tests.conftest import db
+import uuid
 
 if sys.version_info >= (3, 0):
     pass
@@ -84,40 +85,26 @@ def tif_exporter_template():
 
 
 @pytest.fixture(scope='function')
-def exp_db(db, tmp_dir, img_size, fresh_RE):
+def exp_db(db, fast_tmp_dir, img_size, fresh_RE):
     db2 = db
     reg = db2.reg
     reg.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
     RE = fresh_RE
     RE.subscribe(db.insert)
+    bt_uid = str(uuid.uuid4)
 
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, bt_safN=0,
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, bt_safN=0,
                 pi_name='chris', sample_name='kapton', sample_composition='C',
-                start_uid1=True)
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='tim',
+                start_uid1=True, bt_uid=bt_uid, composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='tim',
                 bt_safN=1, sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au',
-                start_uid2=True)
-    insert_imgs(RE, reg, 5, img_size, tmp_dir, pi_name='chris', bt_safN=2,
+                start_uid2=True, bt_uid=bt_uid, composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='chris', bt_safN=2,
                 sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au',
-                start_uid3=True)
+                start_uid3=True, bt_uid=bt_uid, composition_string='Au')
     yield db2
-
-
-@pytest.fixture(scope='module')
-def disk_mask(tmp_dir, img_size):
-    mask = np.random.random_integers(0, 1, img_size).astype(bool)
-    dirn = tmp_dir
-    file_name_msk = os.path.join(dirn, 'mask_test' + '.msk')
-    assert ~os.path.exists(file_name_msk)
-    fit2d_save(mask, 'mask_test', dirn)
-    assert os.path.exists(file_name_msk)
-    file_name = os.path.join(dirn, 'mask_test' + '.npy')
-    assert ~os.path.exists(file_name)
-    np.save(file_name, mask)
-    assert os.path.exists(file_name)
-    yield (file_name_msk, file_name, mask)
 
 
 @pytest.fixture(scope='function')
@@ -127,19 +114,19 @@ def fuzzdb(exp_db):
 
 @pytest.fixture(scope='module')
 def tmp_dir():
-    td = tempfile.mkdtemp()
-    print('creating {}'.format(td))
-    yield td
-    if os.path.exists(td):
-        print('removing {}'.format(td))
-        shutil.rmtree(td)
+    td = tempfile.TemporaryDirectory()
+    print('creating {}'.format(td.name))
+    yield td.name
+    if os.path.exists(td.name):
+        print('removing {}'.format(td.name))
+        td.cleanup()
 
 
 @pytest.fixture(scope='function')
 def fast_tmp_dir():
-    td = tempfile.mkdtemp()
-    print('creating {}'.format(td))
-    yield td
-    if os.path.exists(td):
-        print('removing {}'.format(td))
-        shutil.rmtree(td)
+    td = tempfile.TemporaryDirectory()
+    print('creating {}'.format(td.name))
+    yield td.name
+    if os.path.exists(td.name):
+        print('removing {}'.format(td.name))
+        td.cleanup()

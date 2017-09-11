@@ -11,6 +11,7 @@ from databroker.assets.sqlite import RegistryRO
 from databroker.headersource.sqlite import MDSRO
 from xpdan.pipelines.main import conf_main_pipeline
 from tempfile import TemporaryDirectory
+import copy
 
 # from xpdan.tools import better_mask_img
 
@@ -21,23 +22,30 @@ mds = MDSRO(d)
 fs = RegistryRO(d)
 fs.register_handler('AD_TIFF', AreaDetectorTiffHandler)
 db = Broker(mds=mds, reg=fs)
+db.prepare_hook = lambda x, y: copy.deepcopy(y)
 td = TemporaryDirectory()
 
-vis = False
-# vis = True
+# vis = False
+vis = True
 source = conf_main_pipeline(db, td.name,
                             vis=vis,
                             write_to_disk=False,
                             # verbose=True
                             )
-source.visualize()
-'''
+# source.visualize()
+# '''
+seen = False
 for hdr in list((db[-1], )):
     for e in hdr.documents():
+        if e[0] == 'start':
+            e[1].update(composition_string='EuTiO3')
         if e[0] == 'event' and vis:
             plt.pause(.1)
-        # input()
-        source.emit(e)
+        if e[0] == 'event' and not seen:
+            source.emit(e)
+            seen = True
+        elif e[0] != 'event':
+            source.emit(e)
 
 plt.show()
 plt.close("all")

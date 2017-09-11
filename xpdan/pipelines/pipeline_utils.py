@@ -3,8 +3,6 @@ from pathlib import Path
 
 from xpdan.dev_utils import _timestampstr
 
-from pprint import pprint
-
 
 def if_dark(doc):
     return doc.get('dark_frame', False)
@@ -15,9 +13,9 @@ def if_query_results(n_hdrs):
 
 
 def if_calibration(start):
-    print("detector cal tf ================================")
-    pprint(start)
-    print('detector_calibration_server_uid' in start)
+    # print("detector cal tf ================================")
+    # pprint(start)
+    # print('detector_calibration_server_uid' in start)
     # return 'is_calibration' in start
     return 'detector_calibration_server_uid' in start
 
@@ -79,3 +77,19 @@ def templater2_func(doc, template, aux=None, short_aux=None):
 def templater3_func(template, analysis_stage='raw', ext='.tiff'):
     return Path(template.format(analysis_stage=analysis_stage,
                                 ext=ext)).as_posix()
+
+
+base_template = (''
+                 '{raw_start[sample_name]}/'
+                 '{raw_start[folder_tag]}/'
+                 '{analyzed_start[analysis_stage]}/'
+                 '{raw_start[sample_name]}_'
+                 '{human_timestamp}_'
+                 '[temp={raw_event[data][temperature]:1.2f}'
+                 '{raw_descriptor[data_keys][temperature][units]}]_'
+                 '[dx={raw_event[data][diff_x]:1.3f}'
+                 '{raw_descriptor[data_keys][diff_x][units]}]_'
+                 '[dy={raw_event[data][diff_y]:1.3f}'
+                 '{raw_descriptor[data_keys][diff_y][units]}]_'
+                 '{raw_start[uid]:.6}_'
+                 '{raw_event[seq_num]:03d}{ext}')

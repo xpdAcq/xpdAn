@@ -86,7 +86,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if pdf_config is None:
         pdf_config = _pdf_config.copy()
     else:
-        pdf_config= _pdf_config.copy().update(**pdf_config)
+        pdf_config = _pdf_config.copy().update(**pdf_config)
     if mask_kwargs is None:
         mask_kwargs = {}
     print('start pipeline configuration')

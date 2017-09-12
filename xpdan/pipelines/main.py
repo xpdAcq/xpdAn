@@ -70,7 +70,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     verbose: bool, optional
         If True print many outcomes from the pipeline, for debuging use
         only, defaults to False
-    calibration_md_path: str
+    calibration_md_folder: str
         Path to where the calibration is stored for xpdAcq
 
     Returns

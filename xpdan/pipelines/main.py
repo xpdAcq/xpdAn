@@ -44,11 +44,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     db: databroker.broker.Broker instance
         The databroker holding the data, this must be specified as a `db=` in
         the function call (keyword only argument)
-    write_to_disk: bool, optional
-        If True write files to disk, defaults to False
     save_dir: str
         The folder in which to save the data, this must be specified as a
         `save_dir=` in the function call (keyword only argument)
+    write_to_disk: bool, optional
+        If True write files to disk, defaults to False
     vis: bool, optional
         If True visualize the data. Defaults to False
     polarization_factor : float, optional
@@ -70,6 +70,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     verbose: bool, optional
         If True print many outcomes from the pipeline, for debuging use
         only, defaults to False
+    calibration_md_path: str
+        Path to where the calibration is stored for xpdAcq
 
     Returns
     -------
@@ -80,8 +82,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     --------
     xpdan.tools.mask_img
     """
+    _pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
     if pdf_config is None:
-        pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
+        pdf_config = _pdf_config.copy()
+    else:
+        pdf_config= _pdf_config.copy().update(**pdf_config)
     if mask_kwargs is None:
         mask_kwargs = {}
     print('start pipeline configuration')

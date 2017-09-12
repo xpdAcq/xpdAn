@@ -14,7 +14,7 @@ xpdan\.pipelines\.main module
 
 
 xpdan\.pipelines\.pipeline_utils module
------------------------------
+---------------------------------------
 
 .. automodule:: xpdan.pipelines.pipeline_utils
     :members:
@@ -22,7 +22,7 @@ xpdan\.pipelines\.pipeline_utils module
     :show-inheritance:
 
 xpdan\.pipelines\.save_tiff module
------------------------------
+----------------------------------
 
 .. automodule:: xpdan.pipelines.save_tiff
     :members:

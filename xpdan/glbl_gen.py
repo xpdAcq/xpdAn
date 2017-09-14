@@ -96,7 +96,7 @@ def make_glbl(config, env_code=0, db_xptal=None, db_an=None):
     else:
         # beamline
         base_dir = os.path.abspath('/direct/XF28ID1/pe2_data')
-        db_xptal = Broker.named('xpd') 
+        db_xptal = Broker.named('xpd')
 
     config['base_dir'] = base_dir
     config['exp_db'] = db_xptal

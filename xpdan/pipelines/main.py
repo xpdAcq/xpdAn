@@ -414,20 +414,20 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                         md=dict(analysis_stage='pdf'))
     if vis:
         foreground_stream.sink(star(LiveImage(
-            'img', window_title='Dark Subtracted Image')))
+            'img', window_title='Dark Subtracted Image', cmap='viridis')))
         mask_stream.sink(star(LiveImage('mask', window_title='Mask')))
         iq_stream.sink(star(LiveWaterfall('q', 'iq',
-                                          units=('Q (A^-1)', 'Arb')
-                                          )))
+                                          units=('Q (A^-1)', 'Arb'),
+                                          window_title='I(Q)')))
         tth_iq_stream.sink(star(LiveWaterfall('tth', 'iq',
-                                              units=('tth', 'Arb')
-                                              )))
+                                              units=('tth', 'Arb'),
+                                              window_title='I(tth)')))
         fq_stream.sink(star(LiveWaterfall('q', 'fq',
-                                          units=('Q (A^-1)', 'F(Q)')
-                                          )))
+                                          units=('Q (A^-1)', 'F(Q)'),
+                                          window_title='F(Q)')))
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf',
-                                           units=('r (A)', 'G(r) A^-3')
-                                           )))
+                                           units=('r (A)', 'G(r) A^-2'),
+                                           window_title='G(r)')))
 
     if write_to_disk:
         eventify_raw_descriptor = es.Eventify(
@@ -440,15 +440,15 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                   tth_iq_stream, pdf_stream,
                                   calibration_stream]
         input_infos = [
-            {'data': ('img', 0), 'file': ('filename', 1)},
-            {'mask': ('mask', 0), 'filename': ('filename', 1)},
-            {'tth': ('q', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'tth': ('tth', 0), 'intensity': ('iq', 0),
-             'output_name': ('filename', 1)},
-            {'r': ('r', 0), 'pdf': ('pdf', 0), 'filename': ('filename', 1),
-             'config': ('config', 0)},
-            {'calibration': ('calibration', 0), 'filename': ('filename', 1)}
+            {'data': ('img', 1), 'file': ('filename', 0)},
+            {'mask': ('mask', 1), 'filename': ('filename', 0)},
+            {'tth': ('q', 1), 'intensity': ('iq', 1),
+             'output_name': ('filename', 0)},
+            {'tth': ('tth', 1), 'intensity': ('iq', 1),
+             'output_name': ('filename', 0)},
+            {'r': ('r', 1), 'pdf': ('pdf', 1), 'filename': ('filename', 0),
+             'config': ('config', 1)},
+            {'calibration': ('calibration', 1), 'filename': ('filename', 0)}
         ]
         saver_kwargs = [{}, {}, {'q_or_2theta': 'Q', 'ext': ''},
                         {'q_or_2theta': '2theta', 'ext': ''}, {}, {}]
@@ -510,7 +510,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             ) for cs in mega_render]
 
         [es.map(writer_templater,
-                es.zip_latest(es.zip(s1, s2, stream_name='zip render and data',
+                es.zip_latest(es.zip(s2, s1, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
                               ),

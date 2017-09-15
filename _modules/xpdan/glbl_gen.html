@@ -250,7 +250,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># beamline</span>
         <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;/direct/XF28ID1/pe2_data&#39;</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">databroker.databroker</span> <span class="k">import</span> <span class="n">DataBroker</span> <span class="k">as</span> <span class="n">db_xptal</span>
+        <span class="n">db_xptal</span> <span class="o">=</span> <span class="n">Broker</span><span class="o">.</span><span class="n">named</span><span class="p">(</span><span class="s1">&#39;xpd&#39;</span><span class="p">)</span>
 
     <span class="n">config</span><span class="p">[</span><span class="s1">&#39;base_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_dir</span>
     <span class="n">config</span><span class="p">[</span><span class="s1">&#39;exp_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db_xptal</span>

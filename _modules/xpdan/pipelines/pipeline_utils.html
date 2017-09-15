@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.pipelines.pipeline_utils &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="xpdAn  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.pipelines.pipeline_utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.pipelines.pipeline_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">xpdan.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
+
+
+<div class="viewcode-block" id="if_dark"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_dark">[docs]</a><span class="k">def</span> <span class="nf">if_dark</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dark_frame&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="if_query_results"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_query_results">[docs]</a><span class="k">def</span> <span class="nf">if_query_results</span><span class="p">(</span><span class="n">n_hdrs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n_hdrs</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="if_calibration"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_calibration">[docs]</a><span class="k">def</span> <span class="nf">if_calibration</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+    <span class="c1"># print(&quot;detector cal tf ================================&quot;)</span>
+    <span class="c1"># pprint(start)</span>
+    <span class="c1"># print(&#39;detector_calibration_server_uid&#39; in start)</span>
+    <span class="c1"># return &#39;is_calibration&#39; in start</span>
+    <span class="k">return</span> <span class="s1">&#39;detector_calibration_server_uid&#39;</span> <span class="ow">in</span> <span class="n">start</span></div>
+
+
+<div class="viewcode-block" id="if_not_calibration"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_not_calibration">[docs]</a><span class="k">def</span> <span class="nf">if_not_calibration</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;is_calibration&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span> <span class="ow">and</span> <span class="s1">&#39;calibration_md&#39;</span> <span class="ow">in</span> <span class="n">doc</span></div>
+    <span class="c1"># return &#39;calibration_client_uid&#39; in doc</span>
+    <span class="c1"># return &#39;calibration_server_uid&#39; not in doc</span>
+
+
+<div class="viewcode-block" id="dark_template_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.dark_template_func">[docs]</a><span class="k">def</span> <span class="nf">dark_template_func</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format template for dark images</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    timestamp: float</span>
+<span class="sd">        The time in unix epoch</span>
+<span class="sd">    template: str</span>
+<span class="sd">        The string to be formatted</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;human_timestamp&#39;</span><span class="p">:</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">timestamp</span><span class="p">),</span> <span class="s1">&#39;ext&#39;</span><span class="p">:</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">}</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">t</span></div>
+
+
+<div class="viewcode-block" id="templater1_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater1_func">[docs]</a><span class="k">def</span> <span class="nf">templater1_func</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;format base string with data from experiment, sample_name,</span>
+<span class="sd">    folder_tag&quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sample_name&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+         <span class="s1">&#39;folder_tag&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;folder_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="templater2_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater2_func">[docs]</a><span class="k">def</span> <span class="nf">templater2_func</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">short_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;format with auxiliary and time&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">aux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">aux</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;diff_x&#39;</span><span class="p">,</span> <span class="s1">&#39;diff_y&#39;</span><span class="p">,</span> <span class="s1">&#39;eurotherm&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">short_aux</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">short_aux</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;euro&#39;</span><span class="p">]</span>
+    <span class="n">aux_res</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+               <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">aux</span><span class="p">,</span> <span class="n">short_aux</span><span class="p">)]</span>
+
+    <span class="n">aux_res_str</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">aux_res</span><span class="p">)</span>
+    <span class="c1"># Add a separator between timestamp and extras</span>
+    <span class="k">if</span> <span class="n">aux_res_str</span><span class="p">:</span>
+        <span class="n">aux_res_str</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">aux_res_str</span>
+    <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="c1"># Change to include name as well</span>
+        <span class="n">auxiliary</span><span class="o">=</span><span class="n">aux_res_str</span><span class="p">,</span>
+        <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="templater3_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater3_func">[docs]</a><span class="k">def</span> <span class="nf">templater3_func</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;.tiff&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="n">analysis_stage</span><span class="p">,</span>
+                                <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+
+<span class="n">base_template</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_start[sample_name]}</span><span class="s1">/&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_start[folder_tag]}</span><span class="s1">/&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{analyzed_start[analysis_stage]}</span><span class="s1">/&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_start[sample_name]}</span><span class="s1">_&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{human_timestamp}</span><span class="s1">_&#39;</span>
+                 <span class="s1">&#39;[temp=</span><span class="si">{raw_event[data][temperature]:1.2f}</span><span class="s1">&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_descriptor[data_keys][temperature][units]}</span><span class="s1">]_&#39;</span>
+                 <span class="s1">&#39;[dx=</span><span class="si">{raw_event[data][diff_x]:1.3f}</span><span class="s1">&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_descriptor[data_keys][diff_x][units]}</span><span class="s1">]_&#39;</span>
+                 <span class="s1">&#39;[dy=</span><span class="si">{raw_event[data][diff_y]:1.3f}</span><span class="s1">&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_descriptor[data_keys][diff_y][units]}</span><span class="s1">]_&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_start[uid]:.6}</span><span class="s1">_&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_event[seq_num]:03d}{ext}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.pipelines package &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="xpdAn  documentation" href="index.html"/>
+        <link rel="up" title="xpdan package" href="xpdan.html"/>
+        <link rel="prev" title="xpdan.tests package" href="xpdan.tests.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="xpdan.html">xpdan package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="xpdan.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="xpdan.tests.html">xpdan.tests package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">xpdan.pipelines package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.main">xpdan.pipelines.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.save_tiff">xpdan.pipelines.save_tiff module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-data-reduction-module">xpdan.data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-module">xpdan.glbl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl_gen">xpdan.glbl_gen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.tools">xpdan.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xpdAn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="xpdan.html">xpdan package</a> &raquo;</li>
+        
+      <li>xpdan.pipelines package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/xpdan.pipelines.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="xpdan-pipelines-package">
+<h1>xpdan.pipelines package<a class="headerlink" href="#xpdan-pipelines-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xpdan.pipelines.main">
+<span id="xpdan-pipelines-main-module"></span><h2>xpdan.pipelines.main module<a class="headerlink" href="#module-xpdan.pipelines.main" title="Permalink to this headline">¶</a></h2>
+<p>Main XPD analysis pipeline</p>
+<dl class="function">
+<dt id="xpdan.pipelines.main.conf_main_pipeline">
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">conf_main_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>polarization_factor=0.99</em>, <em>image_data_key='pe1_image'</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>pdf_config=None</em>, <em>verbose=False</em>, <em>calibration_md_folder='../xpdConfig/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#conf_main_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.conf_main_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total data processing pipeline for XPD</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>write_to_disk</strong> (<em>bool, optional</em>) – If True write files to disk, defaults to False</li>
+<li><strong>vis</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+(horizontal). default is 0.99. set to None for no
+correction.</li>
+<li><strong>mask_setting</strong> (<em>str, optional</em>) – If ‘default’ reuse mask created for first image, if ‘auto’ mask all
+images, if None use no mask. Defaults to ‘default’</li>
+<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+default is defined by an_glbl.auto_mask_dict.
+Please refer to documentation for more details</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+<li><strong>verbose</strong> (<em>bool, optional</em>) – If True print many outcomes from the pipeline, for debuging use
+only, defaults to False</li>
+<li><strong>calibration_md_folder</strong> (<em>str</em>) – Path to where the calibration is stored for xpdAcq</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>source</strong> – The source for the graph</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Stream</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="xpdan.html#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xpdan.pipelines.pipeline_utils">
+<span id="xpdan-pipelines-pipeline-utils-module"></span><h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#module-xpdan.pipelines.pipeline_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.dark_template_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">dark_template_func</code><span class="sig-paren">(</span><em>timestamp</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#dark_template_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.dark_template_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format template for dark images</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timestamp</strong> (<em>float</em>) – The time in unix epoch</li>
+<li><strong>template</strong> (<em>str</em>) – The string to be formatted</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_calibration">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_calibration</code><span class="sig-paren">(</span><em>start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_calibration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_dark">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_dark</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_dark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_not_calibration">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_not_calibration</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_not_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_not_calibration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_query_results">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_query_results</code><span class="sig-paren">(</span><em>n_hdrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_query_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_query_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater1_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater1_func</code><span class="sig-paren">(</span><em>doc</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater1_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater1_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>format base string with data from experiment, sample_name,
+folder_tag</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater2_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater2_func</code><span class="sig-paren">(</span><em>doc</em>, <em>template</em>, <em>aux=None</em>, <em>short_aux=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater2_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater2_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>format with auxiliary and time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater3_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater3_func</code><span class="sig-paren">(</span><em>template</em>, <em>analysis_stage='raw'</em>, <em>ext='.tiff'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater3_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater3_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-xpdan.pipelines.save_tiff">
+<span id="xpdan-pipelines-save-tiff-module"></span><h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#module-xpdan.pipelines.save_tiff" title="Permalink to this headline">¶</a></h2>
+<p>Save tiff pipeline</p>
+<dl class="function">
+<dt id="xpdan.pipelines.save_tiff.conf_save_tiff_pipeline">
+<code class="descclassname">xpdan.pipelines.save_tiff.</code><code class="descname">conf_save_tiff_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/save_tiff.html#conf_save_tiff_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.save_tiff.conf_save_tiff_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total data processing pipeline for XPD</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>write_to_disk</strong> (<em>bool, optional</em>) – If True write files to disk, defaults to False</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>vis</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>source</strong> – The source for the graph</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Stream</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="xpdan.html#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="xpdan.tests.html" class="btn btn-neutral" title="xpdan.tests package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

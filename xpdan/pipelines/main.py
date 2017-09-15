@@ -23,7 +23,7 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter, decompress_mask)
+                         pdf_getter, fq_getter, decompress_mask, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
 
@@ -420,7 +420,17 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if vis:
         foreground_stream.sink(star(LiveImage(
             'img', window_title='Dark Subtracted Image', cmap='viridis')))
-        mask_stream.sink(star(LiveImage('mask', window_title='Mask')))
+        masked_img = es.map(overlay_mask,
+                            es.zip_latest(p_corrected_stream, mask_stream),
+                            input_info={'img': (('data', 'img'), 0),
+                                        'mask': (('data', 'mask'), 1)},
+                            full_event=True,
+                            output_info=[('overlay_mask', {'dtype': 'array'})])
+        masked_img.sink(star(LiveImage('overlay_mask',
+                                       window_title='Dark/Background/'
+                                                    'Polarization Corrected '
+                                                    'Image with Mask',
+                                       cmap='viridis')))
         iq_stream.sink(star(LiveWaterfall('q', 'iq',
                                           units=('Q (A^-1)', 'Arb'),
                                           window_title='I(Q)')))

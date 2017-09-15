@@ -4,11 +4,11 @@ import time
 from xpdan.pipelines.main import conf_main_pipeline
 
 
-def test_master_pipeline(exp_db, fast_tmp_dir, start_uid3):
+def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     """Decider between pipelines"""
 
     source = conf_main_pipeline(exp_db, fast_tmp_dir,
-                                vis=True,
+                                vis=False,
                                 write_to_disk=True,
                                 mask_setting=None,
                                 verbose=True)

@@ -36,10 +36,10 @@ xpdan\.tests\.test\_db\_utils module
     :undoc-members:
     :show-inheritance:
 
-xpdan\.tests\.test\_fuzzy\_broker module
+xpdan\.tests\.test\_fuzzybroker module
 ----------------------------------------
 
-.. automodule:: xpdan.tests.test_fuzzy_broker
+.. automodule:: xpdan.tests.test_fuzzybroker
     :members:
     :undoc-members:
     :show-inheritance:

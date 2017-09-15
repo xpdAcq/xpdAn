@@ -21,6 +21,7 @@ from pyFAI.calibration import Calibration, PeakPicker, Calibrant
 from pyFAI.gui.utils import update_fig
 
 from xpdan.dev_utils import _timestampstr
+from tempfile import TemporaryDirectory
 
 
 def _save_calib_param(calib_c, timestr, calib_yml_fp):
@@ -62,7 +63,7 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
     return calib_config_dict
 
 
-def _calibration(img, calibration, calib_ref_fp, **kwargs):
+def _calibration(img, calibration, calib_ref_fp=None, **kwargs):
     """engine for performing calibration on a image with geometry
     correction software. current backend is ``pyFAI``.
 
@@ -91,9 +92,11 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     timestr = _timestampstr(time.time())
     c.gui = interactive
     # annoying pyFAI logic, you need valid fn to start calibration
-    # TODO: send to tmp folder then delete tmp folder
+    _is_tmp_dir = False
     if calib_ref_fp is None:
-        calib_ref_fp = os.path.join(os.getcwd(), 'from_calib_func')
+        _is_tmp_dir = True
+        td = TemporaryDirectory()
+        calib_ref_fp = os.path.join(td.name(), 'from_calib_func')
     basename, ext = os.path.splitext(calib_ref_fp)
     poni_fn = basename + ".npt"
     c.basename = basename
@@ -109,6 +112,8 @@ def _calibration(img, calibration, calib_ref_fp, **kwargs):
     # TODO: open issue at pyFAI on this crazyness
     c.ai.setPyFAI(**c.geoRef.getPyFAI())
     c.ai.wavelength = c.geoRef.wavelength
+    if _is_tmp_dir:
+        td.cleanup()
 
     return c, timestr
 

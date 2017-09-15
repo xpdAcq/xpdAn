@@ -8,6 +8,9 @@ Subpackages
 
     xpdan.tests
 
+.. toctree::
+    xpdan.pipelines
+
 Submodules
 ----------
 

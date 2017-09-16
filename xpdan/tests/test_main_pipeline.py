@@ -8,7 +8,7 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     """Decider between pipelines"""
 
     source = conf_main_pipeline(exp_db, fast_tmp_dir,
-                                vis=False,
+                                vis=True,
                                 write_to_disk=True,
                                 mask_setting=None,
                                 verbose=True)

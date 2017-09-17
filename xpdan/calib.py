@@ -50,7 +50,7 @@ def _save_calib_param(calib_c, timestr, calib_yml_fp):
                               calibrant_name})
 
     # save yaml dict used for xpdAcq
-    with open(calib_yml_fp, 'w') as f:
+    with open(os.path.expanduser(calib_yml_fp), 'w') as f:
         yaml.dump(calib_config_dict, f)
     stem, fn = os.path.split(calib_yml_fp)
     print("INFO: End of calibration process. This set of calibration "
@@ -96,7 +96,7 @@ def _calibration(img, calibration, calib_ref_fp=None, **kwargs):
     if calib_ref_fp is None:
         _is_tmp_dir = True
         td = TemporaryDirectory()
-        calib_ref_fp = os.path.join(td.name(), 'from_calib_func')
+        calib_ref_fp = os.path.join(td.name, 'from_calib_func')
     basename, ext = os.path.splitext(calib_ref_fp)
     poni_fn = basename + ".npt"
     c.basename = basename

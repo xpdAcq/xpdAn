@@ -13,6 +13,7 @@ from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from streamz import Stream
+from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_dark, temporal_prox, query_background
 from xpdan.dev_utils import _timestampstr
 from xpdan.formatters import render_and_clean
@@ -23,9 +24,8 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter, decompress_mask, overlay_mask)
+                         pdf_getter, fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
-from xpdan.callbacks import StartStopCallback
 from ..calib import img_calibration, _save_calib_param
 
 
@@ -95,9 +95,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     raw_source = Stream(stream_name='Raw Data')  # raw data
     source = es.fill_events(db, raw_source)  # filled raw data
 
-    # DARK PROCESSING
-
-    # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,
                                    input_info={0: ((), 0)},
                                    document_name='start',
@@ -329,13 +326,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              stream_name='dummy mask',
                              md=dict(analysis_stage='mask')
                              )
-    # If setting is cache pull from start
-    elif mask_setting == 'cache':
-        mask_stream = es.map(dstar(decompress_mask),
-                             eventify_raw_start,
-                             input_info={0: ('mask_dict', 0)},
-                             stream_name='decompress cached mask',
-                             md=dict(analysis_stage='mask'))
     else:
         if mask_setting == 'default':
             # note that this could become a much fancier filter
@@ -347,16 +337,48 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                  loaded_calibration_stream)
         else:
             zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
-        mask_stream = es.map(mask_img,
-                             zlfc,
-                             input_info={'img': ('img', 0),
-                                         'geo': ('geo', 1)},
-                             output_info=[('mask', {'dtype': 'array',
-                                                    'source': 'testing'})],
-                             **mask_kwargs,
-                             stream_name='Mask',
-                             md=dict(analysis_stage='mask'))
 
+        zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
+                                clear_on_lossless_stop=True)
+        if_setup_stream = es.filter(
+            lambda sn: sn == 'Setup',
+            zlfc_ds,
+            input_info={0: (('sample_name', ), 2)},
+            document_name='start',
+            full_event=True,
+            stream_name='Is Setup Mask'
+        )
+        blank_mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
+                                   if_setup_stream,
+                                   input_info={'x': ('img', 0)},
+                                   output_info=[('mask',
+                                                 {'dtype': 'array',
+                                                  'source': 'testing'})],
+                                   stream_name='dummy setup mask',
+                                   md=dict(analysis_stage='mask')
+                                   )
+        if_not_setup_steam = es.filter(
+            lambda doc: doc.get('sample_name') != 'Setup',
+            zlfc_ds,
+            input_info={0: ((), 2)},
+            document_name='start',
+            full_event=True,
+            stream_name='Is Not Setup Mask'
+        )
+
+        not_setup_mask_stream = es.map(mask_img,
+                                       if_not_setup_steam,
+                                       input_info={'img': ('img', 0),
+                                                   'geo': ('geo', 1)},
+                                       output_info=[('mask',
+                                                     {'dtype': 'array',
+                                                      'source': 'testing'})],
+                                       **mask_kwargs,
+                                       stream_name='Mask',
+                                       md=dict(analysis_stage='mask'))
+
+        mask_stream = not_setup_mask_stream.union(blank_mask_stream)
+        mask_stream.stream_name = 'If Setup pull Dummy Mask, else Mask'
     # generate binner stream
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 
@@ -422,8 +444,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if vis:
         foreground_stream.sink(star(LiveImage(
             'img', window_title='Dark Subtracted Image', cmap='viridis')))
+        zlpm = es.zip_latest(p_corrected_stream, mask_stream,
+                             clear_on_lossless_stop=True)
         masked_img = es.map(overlay_mask,
-                            es.zip_latest(p_corrected_stream, mask_stream),
+                            zlpm,
                             input_info={'img': (('data', 'img'), 0),
                                         'mask': (('data', 'mask'), 1)},
                             full_event=True,
@@ -579,7 +603,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # binner_stream.sink(pprint)
         # zlpb.sink(pprint)
         # iq_stream.sink(pprint)
-        pdf_stream.sink(pprint)
+        # pdf_stream.sink(pprint)
+        # mask_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
             [cs.sink(pprint) for cs in mega_render]

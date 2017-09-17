@@ -341,9 +341,9 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
                                 clear_on_lossless_stop=True)
         if_setup_stream = es.filter(
-            lambda doc: doc.get('sample_name') == 'Setup',
+            lambda sn: sn == 'Setup',
             zlfc_ds,
-            input_info={0: ((), 2)},
+            input_info={0: (('sample_name', ), 2)},
             document_name='start',
             full_event=True,
             stream_name='Is Setup Mask'
@@ -358,7 +358,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    md=dict(analysis_stage='mask')
                                    )
         if_not_setup_steam = es.filter(
-            lambda doc: not doc.get('sample_name') == 'Setup',
+            lambda doc: doc.get('sample_name') != 'Setup',
             zlfc_ds,
             input_info={0: ((), 2)},
             document_name='start',
@@ -444,8 +444,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     if vis:
         foreground_stream.sink(star(LiveImage(
             'img', window_title='Dark Subtracted Image', cmap='viridis')))
+        zlpm = es.zip_latest(p_corrected_stream, mask_stream,
+                             clear_on_lossless_stop=True)
         masked_img = es.map(overlay_mask,
-                            es.zip_latest(p_corrected_stream, mask_stream),
+                            zlpm,
                             input_info={'img': (('data', 'img'), 0),
                                         'mask': (('data', 'mask'), 1)},
                             full_event=True,
@@ -601,7 +603,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # binner_stream.sink(pprint)
         # zlpb.sink(pprint)
         # iq_stream.sink(pprint)
-        pdf_stream.sink(pprint)
+        # pdf_stream.sink(pprint)
+        # mask_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
             [cs.sink(pprint) for cs in mega_render]

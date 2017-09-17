@@ -95,9 +95,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     raw_source = Stream(stream_name='Raw Data')  # raw data
     source = es.fill_events(db, raw_source)  # filled raw data
 
-    # DARK PROCESSING
-
-    # if not dark do dark subtraction
     if_not_dark_stream = es.filter(lambda x: not if_dark(x), source,
                                    input_info={0: ((), 0)},
                                    document_name='start',
@@ -329,13 +326,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                              stream_name='dummy mask',
                              md=dict(analysis_stage='mask')
                              )
-    # If setting is cache pull from start
-    elif mask_setting == 'cache':
-        mask_stream = es.map(dstar(decompress_mask),
-                             eventify_raw_start,
-                             input_info={0: ('mask_dict', 0)},
-                             stream_name='decompress cached mask',
-                             md=dict(analysis_stage='mask'))
     else:
         if mask_setting == 'default':
             # note that this could become a much fancier filter
@@ -347,16 +337,47 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                  loaded_calibration_stream)
         else:
             zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
-        mask_stream = es.map(mask_img,
-                             zlfc,
-                             input_info={'img': ('img', 0),
-                                         'geo': ('geo', 1)},
-                             output_info=[('mask', {'dtype': 'array',
-                                                    'source': 'testing'})],
-                             **mask_kwargs,
-                             stream_name='Mask',
-                             md=dict(analysis_stage='mask'))
 
+        zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
+                                clear_on_lossless_stop=True)
+        if_setup_stream = es.filter(
+            lambda doc: doc.get('sample_name') == 'setup',
+            zlfc_ds,
+            input_info={0: ((), 2)},
+            document_name='start',
+            full_event=True,
+            stream_name='Is Setup Mask'
+        )
+        blank_mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
+                                   if_setup_stream,
+                                   input_info={'x': ('img', 0)},
+                                   output_info=[('mask',
+                                                 {'dtype': 'array',
+                                                  'source': 'testing'})],
+                                   stream_name='dummy setup mask',
+                                   md=dict(analysis_stage='mask')
+                                   )
+        if_not_setup_steam = es.filter(
+            lambda doc: not doc.get('sample_name') == 'setup',
+            zlfc_ds,
+            input_info={0: ((), 2)},
+            document_name='start',
+            full_event=True,
+            stream_name='Is Not Setup Mask'
+        )
+
+        not_setup_mask_stream = es.map(mask_img,
+                                       if_not_setup_steam,
+                                       input_info={'img': ('img', 0),
+                                                   'geo': ('geo', 1)},
+                                       output_info=[('mask',
+                                                     {'dtype': 'array',
+                                                      'source': 'testing'})],
+                                       **mask_kwargs,
+                                       stream_name='Mask',
+                                       md=dict(analysis_stage='mask'))
+
+        mask_stream = not_setup_mask_stream.union(blank_mask_stream)
     # generate binner stream
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 

@@ -167,6 +167,7 @@
 <span class="kn">from</span> <span class="nn">skbeam.io.fit2d</span> <span class="k">import</span> <span class="n">fit2d_save</span>
 <span class="kn">from</span> <span class="nn">skbeam.io.save_powder_output</span> <span class="k">import</span> <span class="n">save_output</span>
 <span class="kn">from</span> <span class="nn">streamz</span> <span class="k">import</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">xpdan.callbacks</span> <span class="k">import</span> <span class="n">StartStopCallback</span>
 <span class="kn">from</span> <span class="nn">xpdan.db_utils</span> <span class="k">import</span> <span class="n">query_dark</span><span class="p">,</span> <span class="n">temporal_prox</span><span class="p">,</span> <span class="n">query_background</span>
 <span class="kn">from</span> <span class="nn">xpdan.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
 <span class="kn">from</span> <span class="nn">xpdan.formatters</span> <span class="k">import</span> <span class="n">render_and_clean</span>
@@ -177,9 +178,8 @@
 <span class="kn">from</span> <span class="nn">xpdan.tools</span> <span class="k">import</span> <span class="p">(</span><span class="n">pull_array</span><span class="p">,</span> <span class="n">event_count</span><span class="p">,</span>
                          <span class="n">integrate</span><span class="p">,</span> <span class="n">generate_binner</span><span class="p">,</span> <span class="n">load_geo</span><span class="p">,</span>
                          <span class="n">polarization_correction</span><span class="p">,</span> <span class="n">mask_img</span><span class="p">,</span> <span class="n">add_img</span><span class="p">,</span>
-                         <span class="n">pdf_getter</span><span class="p">,</span> <span class="n">fq_getter</span><span class="p">,</span> <span class="n">decompress_mask</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="p">)</span>
+                         <span class="n">pdf_getter</span><span class="p">,</span> <span class="n">fq_getter</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xpdview.callbacks</span> <span class="k">import</span> <span class="n">LiveWaterfall</span>
-<span class="kn">from</span> <span class="nn">xpdan.callbacks</span> <span class="k">import</span> <span class="n">StartStopCallback</span>
 <span class="kn">from</span> <span class="nn">..calib</span> <span class="k">import</span> <span class="n">img_calibration</span><span class="p">,</span> <span class="n">_save_calib_param</span>
 
 
@@ -249,9 +249,6 @@
     <span class="n">raw_source</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Raw Data&#39;</span><span class="p">)</span>  <span class="c1"># raw data</span>
     <span class="n">source</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">fill_events</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">)</span>  <span class="c1"># filled raw data</span>
 
-    <span class="c1"># DARK PROCESSING</span>
-
-    <span class="c1"># if not dark do dark subtraction</span>
     <span class="n">if_not_dark_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">if_dark</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">source</span><span class="p">,</span>
                                    <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((),</span> <span class="mi">0</span><span class="p">)},</span>
                                    <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
@@ -483,13 +480,6 @@
                              <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dummy mask&#39;</span><span class="p">,</span>
                              <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">)</span>
                              <span class="p">)</span>
-    <span class="c1"># If setting is cache pull from start</span>
-    <span class="k">elif</span> <span class="n">mask_setting</span> <span class="o">==</span> <span class="s1">&#39;cache&#39;</span><span class="p">:</span>
-        <span class="n">mask_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dstar</span><span class="p">(</span><span class="n">decompress_mask</span><span class="p">),</span>
-                             <span class="n">eventify_raw_start</span><span class="p">,</span>
-                             <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;mask_dict&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)},</span>
-                             <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;decompress cached mask&#39;</span><span class="p">,</span>
-                             <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mask_setting</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
             <span class="c1"># note that this could become a much fancier filter</span>
@@ -501,16 +491,48 @@
                                  <span class="n">loaded_calibration_stream</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">zlfc</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">p_corrected_stream</span><span class="p">,</span> <span class="n">loaded_calibration_stream</span><span class="p">)</span>
-        <span class="n">mask_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mask_img</span><span class="p">,</span>
-                             <span class="n">zlfc</span><span class="p">,</span>
-                             <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                                         <span class="s1">&#39;geo&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
-                             <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-                                                    <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;testing&#39;</span><span class="p">})],</span>
-                             <span class="o">**</span><span class="n">mask_kwargs</span><span class="p">,</span>
-                             <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Mask&#39;</span><span class="p">,</span>
-                             <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">))</span>
 
+        <span class="n">zlfc_ds</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">zlfc</span><span class="p">,</span> <span class="n">if_not_dark_stream</span><span class="p">,</span>
+                                <span class="n">clear_on_lossless_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">if_setup_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">sn</span><span class="p">:</span> <span class="n">sn</span> <span class="o">==</span> <span class="s1">&#39;Setup&#39;</span><span class="p">,</span>
+            <span class="n">zlfc_ds</span><span class="p">,</span>
+            <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="mi">2</span><span class="p">)},</span>
+            <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
+            <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Is Setup Mask&#39;</span>
+        <span class="p">)</span>
+        <span class="n">blank_mask_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+                                   <span class="n">if_setup_stream</span><span class="p">,</span>
+                                   <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)},</span>
+                                   <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span>
+                                                 <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;testing&#39;</span><span class="p">})],</span>
+                                   <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dummy setup mask&#39;</span><span class="p">,</span>
+                                   <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">)</span>
+                                   <span class="p">)</span>
+        <span class="n">if_not_setup_steam</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">doc</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_name&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;Setup&#39;</span><span class="p">,</span>
+            <span class="n">zlfc_ds</span><span class="p">,</span>
+            <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((),</span> <span class="mi">2</span><span class="p">)},</span>
+            <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
+            <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Is Not Setup Mask&#39;</span>
+        <span class="p">)</span>
+
+        <span class="n">not_setup_mask_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mask_img</span><span class="p">,</span>
+                                       <span class="n">if_not_setup_steam</span><span class="p">,</span>
+                                       <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                                   <span class="s1">&#39;geo&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;geo&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+                                       <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;mask&#39;</span><span class="p">,</span>
+                                                     <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                                      <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;testing&#39;</span><span class="p">})],</span>
+                                       <span class="o">**</span><span class="n">mask_kwargs</span><span class="p">,</span>
+                                       <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Mask&#39;</span><span class="p">,</span>
+                                       <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;mask&#39;</span><span class="p">))</span>
+
+        <span class="n">mask_stream</span> <span class="o">=</span> <span class="n">not_setup_mask_stream</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">blank_mask_stream</span><span class="p">)</span>
+        <span class="n">mask_stream</span><span class="o">.</span><span class="n">stream_name</span> <span class="o">=</span> <span class="s1">&#39;If Setup pull Dummy Mask, else Mask&#39;</span>
     <span class="c1"># generate binner stream</span>
     <span class="n">zlmc</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">mask_stream</span><span class="p">,</span> <span class="n">loaded_calibration_stream</span><span class="p">)</span>
 
@@ -576,8 +598,10 @@
     <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
         <span class="n">foreground_stream</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">star</span><span class="p">(</span><span class="n">LiveImage</span><span class="p">(</span>
             <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="n">window_title</span><span class="o">=</span><span class="s1">&#39;Dark Subtracted Image&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)))</span>
+        <span class="n">zlpm</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">p_corrected_stream</span><span class="p">,</span> <span class="n">mask_stream</span><span class="p">,</span>
+                             <span class="n">clear_on_lossless_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">masked_img</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">overlay_mask</span><span class="p">,</span>
-                            <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">p_corrected_stream</span><span class="p">,</span> <span class="n">mask_stream</span><span class="p">),</span>
+                            <span class="n">zlpm</span><span class="p">,</span>
                             <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;img&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;img&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
                                         <span class="s1">&#39;mask&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">)},</span>
                             <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -733,7 +757,8 @@
         <span class="c1"># binner_stream.sink(pprint)</span>
         <span class="c1"># zlpb.sink(pprint)</span>
         <span class="c1"># iq_stream.sink(pprint)</span>
-        <span class="n">pdf_stream</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">pprint</span><span class="p">)</span>
+        <span class="c1"># pdf_stream.sink(pprint)</span>
+        <span class="c1"># mask_stream.sink(pprint)</span>
         <span class="k">if</span> <span class="n">write_to_disk</span><span class="p">:</span>
             <span class="n">md_render</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">pprint</span><span class="p">)</span>
             <span class="p">[</span><span class="n">cs</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">pprint</span><span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">mega_render</span><span class="p">]</span>

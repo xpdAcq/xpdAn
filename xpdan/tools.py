@@ -394,3 +394,9 @@ def fq_getter(*args, **kwargs):
     pg(*args, **kwargs)
     res = pg.fq
     return res[0], res[1], pg.config
+
+
+def overlay_mask(img, mask):
+    img2 = img.copy()
+    img2[~mask] = np.nan
+    return img2

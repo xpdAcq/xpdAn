@@ -341,7 +341,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
                                 clear_on_lossless_stop=True)
         if_setup_stream = es.filter(
-            lambda doc: doc.get('sample_name') == 'setup',
+            lambda doc: doc.get('sample_name') == 'Setup',
             zlfc_ds,
             input_info={0: ((), 2)},
             document_name='start',
@@ -358,7 +358,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    md=dict(analysis_stage='mask')
                                    )
         if_not_setup_steam = es.filter(
-            lambda doc: not doc.get('sample_name') == 'setup',
+            lambda doc: not doc.get('sample_name') == 'Setup',
             zlfc_ds,
             input_info={0: ((), 2)},
             document_name='start',

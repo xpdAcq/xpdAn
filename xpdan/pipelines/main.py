@@ -13,6 +13,7 @@ from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from streamz import Stream
+from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_dark, temporal_prox, query_background
 from xpdan.dev_utils import _timestampstr
 from xpdan.formatters import render_and_clean
@@ -23,9 +24,8 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter, decompress_mask, overlay_mask)
+                         pdf_getter, fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
-from xpdan.callbacks import StartStopCallback
 from ..calib import img_calibration, _save_calib_param
 
 

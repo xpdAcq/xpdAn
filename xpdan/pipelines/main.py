@@ -25,6 +25,7 @@ from xpdan.tools import (pull_array, event_count,
                          polarization_correction, mask_img, add_img,
                          pdf_getter, fq_getter, decompress_mask, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
+from xpdan.callbacks import StartStopCallback
 from ..calib import img_calibration, _save_calib_param
 
 
@@ -102,6 +103,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                    document_name='start',
                                    stream_name='If not dark',
                                    full_event=True)
+    if_not_dark_stream.sink(star(StartStopCallback()))
     eventify_raw_start = es.Eventify(if_not_dark_stream,
                                      stream_name='eventify raw start')
     h_timestamp_stream = es.map(_timestampstr, if_not_dark_stream,
@@ -430,7 +432,12 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        window_title='Dark/Background/'
                                                     'Polarization Corrected '
                                                     'Image with Mask',
-                                       cmap='viridis')))
+                                       cmap='viridis',
+                                       limit_func=lambda im: (
+                                           np.nanpercentile(im, 1),
+                                           np.nanpercentile(im, 99))
+                                       # norm=LogNorm()
+                                       )))
         iq_stream.sink(star(LiveWaterfall('q', 'iq',
                                           units=('Q (A^-1)', 'Arb'),
                                           window_title='I(Q)')))
@@ -576,5 +583,5 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         if write_to_disk:
             md_render.sink(pprint)
             [cs.sink(pprint) for cs in mega_render]
-
+    print('Finish pipeline configuration')
     return raw_source

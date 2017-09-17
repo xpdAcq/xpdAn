@@ -378,6 +378,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        md=dict(analysis_stage='mask'))
 
         mask_stream = not_setup_mask_stream.union(blank_mask_stream)
+        mask_stream.stream_name = 'If Setup pull Dummy Mask, else Mask'
     # generate binner stream
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
 

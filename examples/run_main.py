@@ -33,7 +33,7 @@ source = conf_main_pipeline(db, td.name,
                             # verbose=True
                             )
 source.visualize()
-# '''
+'''
 seen = False
 for hdr in list((db[-1], )):
     for e in hdr.documents():

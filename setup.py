@@ -11,7 +11,7 @@ def find_version(filename):
             vstr = line.strip().split()[-1]
             ver = ast.literal_eval(vstr)
             break
-
+    return ver
 
 setup(
     name='xpdan',

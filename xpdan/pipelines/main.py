@@ -407,10 +407,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                             'source': 'testing'})],
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
+
+    iq_rs_zl = es.zip_latest(iq_stream, eventify_raw_start)
+
     # convert to tth
     tth_stream = es.map(lambda q, wavelength: np.rad2deg(
         q_to_twotheta(q, wavelength)),
-                        es.zip_latest(iq_stream, eventify_raw_start),
+                        iq_rs_zl,
                         input_info={'q': ('q', 0),
                                     'wavelength': ('bt_wavelength', 1)},
                         output_info=[('tth', {'dtype': 'array',
@@ -429,7 +432,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            )
 
     fq_stream = es.map(fq_getter,
-                       es.zip_latest(iq_stream, eventify_raw_start),
+                       iq_rs_zl,
                        input_info={0: ('q', 0), 1: ('iq', 0),
                                    'composition': ('composition_string', 1)},
                        output_info=[('q', {'dtype': 'array'}),
@@ -438,7 +441,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        dataformat='QA', qmaxinst=28, qmax=22,
                        md=dict(analysis_stage='fq'))
     pdf_stream = es.map(pdf_getter,
-                        es.zip_latest(iq_stream, eventify_raw_start),
+                        iq_rs_zl,
                         input_info={0: ('q', 0), 1: ('iq', 0),
                                     'composition': ('composition_string', 1)},
                         output_info=[('r', {'dtype': 'array'}),

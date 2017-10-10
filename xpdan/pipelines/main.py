@@ -317,7 +317,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        p_corrected_stream,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
-                             loaded_calibration_stream)
+                             loaded_calibration_stream,
+                             clear_on_lossless_stop=True)
         mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
@@ -334,9 +335,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            p_corrected_stream,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
-                                 loaded_calibration_stream)
+                                 loaded_calibration_stream,
+                                 clear_on_lossless_stop=True)
         else:
-            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
+            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream,
+                                 clear_on_lossless_stop=True)
 
         zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
                                 clear_on_lossless_stop=True)
@@ -380,7 +383,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         mask_stream = not_setup_mask_stream.union(blank_mask_stream)
         mask_stream.stream_name = 'If Setup pull Dummy Mask, else Mask'
     # generate binner stream
-    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
+    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream,
+                         clear_on_lossless_stop=True)
 
     binner_stream = es.map(generate_binner,
                            zlmc,
@@ -390,7 +394,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream,
+                         clear_on_lossless_stop=True)
 
     iq_stream = es.map(integrate,
                        zlpb,

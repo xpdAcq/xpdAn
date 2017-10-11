@@ -27,6 +27,19 @@ from xpdan.tools import (pull_array, event_count,
                          pdf_getter, fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
+from bluesky.callbacks.core import CallbackBase
+
+
+class PrinterCallback(CallbackBase):
+    def __init__(self):
+        self.analysis_stage = None
+
+    def start(self, doc):
+        self.analysis_stage = doc[1]['analysis_stage']
+
+    def event(self, doc):
+        print('file saved 1at {}'.format(doc[0]['data']['filename']))
+        super().event(doc)
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -317,7 +330,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        p_corrected_stream,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
-                             loaded_calibration_stream)
+                             loaded_calibration_stream,
+                             clear_on_lossless_stop=True)
         mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
@@ -334,9 +348,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            p_corrected_stream,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
-                                 loaded_calibration_stream)
+                                 loaded_calibration_stream,
+                                 clear_on_lossless_stop=True)
         else:
-            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream)
+            zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream,
+                                 clear_on_lossless_stop=True)
 
         zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
                                 clear_on_lossless_stop=True)
@@ -380,7 +396,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         mask_stream = not_setup_mask_stream.union(blank_mask_stream)
         mask_stream.stream_name = 'If Setup pull Dummy Mask, else Mask'
     # generate binner stream
-    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream)
+    zlmc = es.zip_latest(mask_stream, loaded_calibration_stream,
+                         clear_on_lossless_stop=True)
 
     binner_stream = es.map(generate_binner,
                            zlmc,
@@ -390,7 +407,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                                     'source': 'testing'})],
                            img_shape=(2048, 2048),
                            stream_name='Binners')
-    zlpb = es.zip_latest(p_corrected_stream, binner_stream)
+    zlpb = es.zip_latest(p_corrected_stream, binner_stream,
+                         clear_on_lossless_stop=True)
 
     iq_stream = es.map(integrate,
                        zlpb,
@@ -402,10 +420,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                             'source': 'testing'})],
                        stream_name='I(Q)',
                        md=dict(analysis_stage='iq_q'))
+
+    iq_rs_zl = es.zip_latest(iq_stream, eventify_raw_start)
+
     # convert to tth
     tth_stream = es.map(lambda q, wavelength: np.rad2deg(
         q_to_twotheta(q, wavelength)),
-                        es.zip_latest(iq_stream, eventify_raw_start),
+                        iq_rs_zl,
                         input_info={'q': ('q', 0),
                                     'wavelength': ('bt_wavelength', 1)},
                         output_info=[('tth', {'dtype': 'array',
@@ -424,7 +445,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            )
 
     fq_stream = es.map(fq_getter,
-                       es.zip_latest(iq_stream, eventify_raw_start),
+                       iq_rs_zl,
                        input_info={0: ('q', 0), 1: ('iq', 0),
                                    'composition': ('composition_string', 1)},
                        output_info=[('q', {'dtype': 'array'}),
@@ -433,7 +454,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        dataformat='QA', qmaxinst=28, qmax=22,
                        md=dict(analysis_stage='fq'))
     pdf_stream = es.map(pdf_getter,
-                        es.zip_latest(iq_stream, eventify_raw_start),
+                        iq_rs_zl,
                         input_info={0: ('q', 0), 1: ('iq', 0),
                                     'composition': ('composition_string', 1)},
                         output_info=[('r', {'dtype': 'array'}),
@@ -607,6 +628,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # mask_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
-            [cs.sink(pprint) for cs in mega_render]
+            [es.zip(cs,
+                    streams_to_be_s, zip_type='truncate',
+                    stream_name='zip_print'
+                    ).sink(star(PrinterCallback())
+                           ) for cs, streams_to_be_s in zip(
+                mega_render, streams_to_be_saved)]
     print('Finish pipeline configuration')
     return raw_source

@@ -54,7 +54,7 @@ install:
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
 #  - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
 # Beamline current streamz
-  - pip install -e git+https://github.com/mrocklin/streamz.git@a9bdc6c509a6f77c6df7a6a59dbeaea22a79c8a4#egg=streamz
+  - pip install git+https://github.com/mrocklin/streamz.git@a9bdc6c509a6f77c6df7a6a59dbeaea22a79c8a4#egg=streamz
   - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed
   - pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview
   - pip install https://github.com/xpdAcq/xpdSim/zipball/master#egg=xpdsim

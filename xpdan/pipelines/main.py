@@ -27,6 +27,19 @@ from xpdan.tools import (pull_array, event_count,
                          pdf_getter, fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
+from bluesky.callbacks.core import CallbackBase
+
+
+class PrinterCallback(CallbackBase):
+    def __init__(self):
+        self.analysis_stage = None
+
+    def start(self, doc):
+        self.analysis_stage = doc[1]['analysis_stage']
+
+    def event(self, doc):
+        print('file saved 1at {}'.format(doc[0]['data']['filename']))
+        super().event(doc)
 
 
 def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -615,6 +628,11 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         # mask_stream.sink(pprint)
         if write_to_disk:
             md_render.sink(pprint)
-            [cs.sink(pprint) for cs in mega_render]
+            [es.zip(cs,
+                    streams_to_be_s, zip_type='truncate',
+                    stream_name='zip_print'
+                    ).sink(star(PrinterCallback())
+                           ) for cs, streams_to_be_s in zip(
+                mega_render, streams_to_be_saved)]
     print('Finish pipeline configuration')
     return raw_source

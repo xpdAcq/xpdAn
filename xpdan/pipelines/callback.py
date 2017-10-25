@@ -119,24 +119,18 @@ class MainCallback(CallbackBase):
         self.background_img = None
 
         self.descs = []
-        if self.write_to_disk:
-            yml_name = render_clean_makedir(self.light_template, ext='.yml',
-                                            raw_start=doc)
-            dump_yml(yml_name, doc)
         self.start_doc = doc
         self.wavelength = doc.get('bt_wavelength')
         self.composition = doc.get('composition_string')
         is_dark = if_dark(doc)
         # If the data is not a dark
         if not is_dark:
-            dark = None
-            for i in range(3):
-                try:
-                    dark = query_dark(self.db, [doc])
-                except ValueError:
-                        time.sleep(5)
-            if dark is None:
-                raise print("Can't Find Dark! Running without")
+            if self.write_to_disk:
+                yml_name = render_clean_makedir(self.light_template,
+                                                ext='.yml',
+                                                raw_start=doc)
+                dump_yml(yml_name, doc)
+            dark = query_dark(self.db, [doc])
 
             # If there is a dark associated
             if dark:

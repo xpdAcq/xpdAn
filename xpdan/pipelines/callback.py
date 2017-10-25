@@ -19,6 +19,7 @@ from xpdan.tools import (generate_binner, load_geo,
                          polarization_correction, mask_img, pdf_getter,
                          fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
+import time
 
 
 def format_event(**kwargs):
@@ -128,7 +129,14 @@ class MainCallback(CallbackBase):
         is_dark = if_dark(doc)
         # If the data is not a dark
         if not is_dark:
-            dark = query_dark(self.db, [doc])
+            dark = None
+            for i in range(3):
+                try:
+                    dark = query_dark(self.db, [doc])
+                except ValueError:
+                        time.sleep(5)
+            if dark is None:
+                raise print("Can't Find Dark! Running without")
 
             # If there is a dark associated
             if dark:

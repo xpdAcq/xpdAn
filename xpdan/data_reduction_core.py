@@ -14,10 +14,9 @@
 #
 ##############################################################################
 
-from xpdan.pipelines.main import conf_main_pipeline
-from xpdan.pipelines.save_tiff import conf_save_tiff_pipeline
-from xpdan.pipelines.callback import MainCallback
 import matplotlib.pyplot as plt
+
+from xpdan.pipelines.callback import MainCallback
 
 
 def _prepare_header_list(headers):

@@ -188,8 +188,7 @@ class MainCallback(CallbackBase):
                     raw_event=doc,
                     raw_start=self.start_doc,
                     raw_descriptor=self.descriptor_doc,
-                    analyzed_start={'analysis_stage':
-                                        'dark_sub'},
+                    analyzed_start={'analysis_stage': 'dark_sub'},
                     ext='.tiff')
                 tifffile.imsave(tiff_name, img)
 
@@ -213,8 +212,7 @@ class MainCallback(CallbackBase):
                             raw_event=doc,
                             raw_start=self.start_doc,
                             raw_descriptor=self.descriptor_doc,
-                            analyzed_start={'analysis_stage':
-                                                'calib'},
+                            analyzed_start={'analysis_stage': 'calib'},
                             ext='.poni')
                         poni_saver(poni_name, calibration)
 

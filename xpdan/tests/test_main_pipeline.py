@@ -1,7 +1,6 @@
 import os
 import time
 
-from xpdan.pipelines.main import conf_main_pipeline
 from xpdan.pipelines.callback import MainCallback
 
 

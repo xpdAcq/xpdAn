@@ -67,6 +67,7 @@ def clean_template(template, removals=None, cfmt=cfmt):
     e = e.replace(')', '')
     f = Path(e).as_posix()
     f = f.replace('/_', '/')
+    print('saving file at {}'.format(f))
     return f
 
 

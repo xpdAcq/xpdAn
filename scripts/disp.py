@@ -30,7 +30,6 @@ td = TemporaryDirectory()
 source = conf_main_pipeline(db, td.name,
                             # vis=False,
                             write_to_disk=False,
-                            verbose=True,
                             # mask_setting=None
                             )
 

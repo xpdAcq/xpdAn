@@ -1,7 +1,6 @@
 """Main XPD analysis pipeline"""
 import os
 from operator import sub, truediv
-from pprint import pprint
 
 import numpy as np
 import shed.event_streams as es
@@ -9,6 +8,7 @@ import tifffile
 from shed.event_streams import dstar, star
 
 from bluesky.callbacks.broker import LiveImage
+from bluesky.callbacks.core import CallbackBase
 from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
@@ -27,7 +27,8 @@ from xpdan.tools import (pull_array, event_count,
                          pdf_getter, fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
-from bluesky.callbacks.core import CallbackBase
+
+_s = set()
 
 
 class PrinterCallback(CallbackBase):
@@ -48,7 +49,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                        mask_setting='default',
                        mask_kwargs=None,
                        pdf_config=None,
-                       verbose=False,
                        calibration_md_folder='../xpdConfig/'
                        ):
     """Total data processing pipeline for XPD
@@ -81,9 +81,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     pdf_config: dict, optional
         Configuration for making PDFs, see pdfgetx3 docs. Defaults to
         ``dict(dataformat='QA', qmaxinst=28, qmax=22)``
-    verbose: bool, optional
-        If True print many outcomes from the pipeline, for debuging use
-        only, defaults to False
     calibration_md_folder: str
         Path to where the calibration is stored for xpdAcq
 
@@ -359,7 +356,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         if_setup_stream = es.filter(
             lambda sn: sn == 'Setup',
             zlfc_ds,
-            input_info={0: (('sample_name', ), 2)},
+            input_info={0: (('sample_name',), 2)},
             document_name='start',
             full_event=True,
             stream_name='Is Setup Mask'
@@ -576,63 +573,37 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
 
-        [es.map(writer_templater,
-                es.zip_latest(es.zip(s2, s1, stream_name='zip render and data',
+        _s.update([es.map(writer_templater,
+                          es.zip_latest(
+                              es.zip(s2, s1, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
                               ),
-                input_info=ii,
-                output_info=[('final_filename', {'dtype': 'str'})],
-                stream_name='Write {}'.format(s1.stream_name),
-                **kwargs) for s1, s2, made_dir, ii, writer_templater, kwargs
-         in
-         zip(
-             streams_to_be_saved,
-             mega_render,
-             make_dirs,  # prevent run condition btwn dirs and files
-             input_infos,
-             save_callables,
-             saver_kwargs
-         )]
+                          input_info=ii,
+                          output_info=[('final_filename', {'dtype': 'str'})],
+                          stream_name='Write {}'.format(s1.stream_name),
+                          **kwargs) for
+                   s1, s2, made_dir, ii, writer_templater, kwargs
+                   in
+                   zip(
+                       streams_to_be_saved,
+                       mega_render,
+                       make_dirs,  # prevent run condition btwn dirs and files
+                       input_infos,
+                       save_callables,
+                       saver_kwargs
+                   )])
 
-        es.map(dump_yml, es.zip(eventify_raw_start, md_render),
-               input_info={0: (('data', 'filename'), 1),
-                           1: (('data',), 0)},
-               full_event=True,
-               stream_name='dump yaml')
-    if verbose:
-        # if_calibration_stream.sink(pprint)
-        # dark_sub_fg.sink(pprint)
-        # eventify_raw_start.sink(pprint)
-        # raw_source.sink(pprint)
-        # if_not_dark_stream.sink(pprint)
-        # zlid.sink(pprint)
-        # dark_sub_fg.sink(pprint)
-        # bg_query_stream.sink(pprint)
-        # if_not_calibration_stream.sink(pprint)
-        # if_not_background_stream.sink(pprint)
-        # if_background_stream.sink(pprint)
-        # fg_sub_bg.sink(pprint)
-        # if_not_background_split_stream.split_streams[0].sink(pprint)
-        # cal_md_stream.sink(pprint)
-        # loaded_calibration_stream.sink(pprint)
-        # if_not_dark_stream.sink(pprint)
-        # foreground_stream.sink(pprint)
-        # zlfl.sink(pprint)
-        # p_corrected_stream.sink(pprint)
-        # zlmc.sink(pprint)
-        # binner_stream.sink(pprint)
-        # zlpb.sink(pprint)
-        # iq_stream.sink(pprint)
-        # pdf_stream.sink(pprint)
-        # mask_stream.sink(pprint)
-        if write_to_disk:
-            md_render.sink(pprint)
-            [es.zip(cs,
-                    streams_to_be_s, zip_type='truncate',
-                    stream_name='zip_print'
-                    ).sink(star(PrinterCallback())
-                           ) for cs, streams_to_be_s in zip(
-                mega_render, streams_to_be_saved)]
+        _s.add(es.map(dump_yml, es.zip(eventify_raw_start, md_render),
+                      input_info={0: (('data', 'filename'), 1),
+                                  1: (('data',), 0)},
+                      full_event=True,
+                      stream_name='dump yaml'))
+        [es.zip(cs,
+                streams_to_be_s, zip_type='truncate',
+                stream_name='zip_print'
+                ).sink(star(PrinterCallback())
+                       ) for cs, streams_to_be_s in zip(
+            mega_render, streams_to_be_saved)]
     print('Finish pipeline configuration')
     return raw_source

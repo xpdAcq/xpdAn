@@ -34,37 +34,43 @@ def render_clean_makedir(string, **kwargs):
 
 class MainCallback(CallbackBase):
     def __init__(self, db, save_dir, *,
+                 vis=True,
+                 write_to_disk=True,
                  polarization_factor=.99,
                  image_data_key='pe1_image',
                  mask_kwargs=None,
-                 fq_kwargs=None,
-                 pdf_kwargs=None,
+                 fq_config=None,
+                 pdf_config=None,
                  calibration_md_folder='../xpdConfig/',
-                 mask_setting='default'):
+                 mask_setting='default',
+                 analysis_setting='full'):
+        self.vis = vis
+        self.write_to_disk = write_to_disk
+        self.analysis_setting=analysis_setting
         self.mask_setting = mask_setting
         if mask_kwargs is None:
             mask_kwargs = {}
         _pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
-        _fq_config = dict(dataformat='QA', qmaxinst=30, qmax=30)
-        if pdf_kwargs is None:
-            pdf_kwargs = _pdf_config.copy()
-        else:
+        _fq_config = dict(dataformat='QA', qmaxinst=26, qmax=25)
+        if pdf_config is None:
             pdf_config = _pdf_config.copy()
-            pdf_config.update(pdf_kwargs)
-            pdf_kwargs = pdf_config
-
-        if fq_kwargs is None:
-            fq_kwargs = _fq_config.copy()
         else:
+            pdf_config2 = _pdf_config.copy()
+            pdf_config2.update(pdf_config)
+            pdf_config = pdf_config2
+
+        if fq_config is None:
             fq_config = _fq_config.copy()
-            fq_config.update(fq_kwargs)
-            fq_kwargs = fq_config
+        else:
+            fq_config2 = _fq_config.copy()
+            fq_config2.update(fq_config)
+            fq_config = fq_config2
 
         self.image_data_key = image_data_key
         self.mask_kwargs = mask_kwargs
         self.calibration_md_folder = calibration_md_folder
-        self.pdf_kwargs = pdf_kwargs
-        self.fq_kwargs = fq_kwargs
+        self.pdf_kwargs = pdf_config
+        self.fq_kwargs = fq_config
         self.polarization_factor = polarization_factor
         self.db = db
         self.save_dir = save_dir
@@ -112,9 +118,10 @@ class MainCallback(CallbackBase):
         self.background_img = None
 
         self.descs = []
-        yml_name = render_clean_makedir(self.light_template, ext='.yml',
-                                        raw_start=doc)
-        dump_yml(yml_name, doc)
+        if self.write_to_disk:
+            yml_name = render_clean_makedir(self.light_template, ext='.yml',
+                                            raw_start=doc)
+            dump_yml(yml_name, doc)
         self.start_doc = doc
         self.wavelength = doc.get('bt_wavelength')
         self.composition = doc.get('composition_string')
@@ -171,126 +178,141 @@ class MainCallback(CallbackBase):
             img = doc['data'][self.image_data_key]
             if self.dark_img is not None:
                 img -= self.dark_img
-            tiff_name = render_clean_makedir(
-                self.light_template,
-                human_timestamp=h_timestamp,
-                raw_event=doc,
-                raw_start=self.start_doc,
-                raw_descriptor=self.descriptor_doc,
-                analyzed_start={'analysis_stage':
-                                'dark_sub'},
-                ext='.tiff')
-            self.vis_callbacks['dark_sub_iq']('event', format_event(img=img))
-            tifffile.imsave(tiff_name, img)
-
-            # background correction
-            if self.background_img is not None:
-                img -= self.background_img
-
-            # get calibration
-            if self.is_calibration:
-                calibration, geo = img_calibration(img, self.wavelength,
-                                                   self.calibrant,
-                                                   self.detector)
-                poni_name = render_clean_makedir(
+            if self.vis:
+                self.vis_callbacks['dark_sub_iq']('event', format_event(img=img))
+            if self.write_to_disk:
+                tiff_name = render_clean_makedir(
                     self.light_template,
                     human_timestamp=h_timestamp,
                     raw_event=doc,
                     raw_start=self.start_doc,
                     raw_descriptor=self.descriptor_doc,
                     analyzed_start={'analysis_stage':
-                                        'calib'},
-                    ext='.poni')
-                poni_saver(poni_name, calibration)
-                _save_calib_param(calibration, h_timestamp,
-                                  os.path.join(self.calibration_md_folder,
-                                               'xpdAcq_calib_info.yml'))
-            elif self.calibrant:
-                geo = load_geo(self.calibrant)
-            else:
-                geo = None
+                                    'dark_sub'},
+                    ext='.tiff')
+                tifffile.imsave(tiff_name, img)
 
-            if geo:
-                img = polarization_correction(img, geo,
-                                              self.polarization_factor)
+            if self.analysis_setting == 'full':
+                # background correction
+                if self.background_img is not None:
+                    img -= self.background_img
 
-                # Masking
-                if doc['seq_num'] == 1:
-                    if (self.start_doc['sample_name'] == 'Setup' or
-                        self.mask_setting is None):
-                        self.mask = np.ones(img.shape, dtype=bool)
-                    else:
-                        self.mask = mask_img(img, geo, **self.mask_kwargs)
-                    mask_name = render_clean_makedir(
-                        self.light_template,
-                        human_timestamp=h_timestamp,
-                        raw_event=doc,
-                        raw_start=self.start_doc,
-                        raw_descriptor=self.descriptor_doc,
-                        analyzed_start={
-                            'analysis_stage': 'mask'},
-                        ext='')
-                    fit2d_save(self.mask, mask_name)
-                overlay = overlay_mask(img, self.mask)
-                self.vis_callbacks['masked_img']('event',
-                                                 format_event(
-                                                     overlay_mask=overlay)
-                                                 )
-                # binner
-                binner = generate_binner(geo, img.shape, self.mask)
+                # get calibration
+                if self.is_calibration:
+                    calibration, geo = img_calibration(img, self.wavelength,
+                                                       self.calibrant,
+                                                       self.detector)
+                    _save_calib_param(calibration, h_timestamp,
+                                      os.path.join(self.calibration_md_folder,
+                                                   'xpdAcq_calib_info.yml'))
+                    if self.write_to_disk:
+                        poni_name = render_clean_makedir(
+                            self.light_template,
+                            human_timestamp=h_timestamp,
+                            raw_event=doc,
+                            raw_start=self.start_doc,
+                            raw_descriptor=self.descriptor_doc,
+                            analyzed_start={'analysis_stage':
+                                                'calib'},
+                            ext='.poni')
+                        poni_saver(poni_name, calibration)
 
-                q, iq = binner.bin_centers, np.nan_to_num(
-                    binner(img.flatten()))
-                iq_name = render_clean_makedir(self.light_template,
-                                               human_timestamp=h_timestamp,
-                                               raw_event=doc,
-                                               raw_start=self.start_doc,
-                                               raw_descriptor=self.descriptor_doc,
-                                               analyzed_start={
-                                                   'analysis_stage': 'iq_q'},
-                                               ext='_Q.chi')
-                self.vis_callbacks['iq']('event', format_event(q=q, iq=iq)
-                                         )
-                save_output(q, iq, iq_name, 'Q')
-                tth = np.rad2deg(q_to_twotheta(q, self.wavelength))
-                itth_name = render_clean_makedir(
-                    self.light_template,
-                    human_timestamp=h_timestamp,
-                    raw_event=doc,
-                    raw_start=self.start_doc,
-                    raw_descriptor=self.descriptor_doc,
-                    analyzed_start={
-                        'analysis_stage': 'iq_tth'},
-                    ext='_tth.chi')
-                self.vis_callbacks['itth']('event',
-                                           format_event(tth=tth, iq=iq))
-                save_output(tth, iq, itth_name, '2theta')
+                elif self.calibrant:
+                    geo = load_geo(self.calibrant)
+                else:
+                    geo = None
 
-                if self.composition:
-                    fq_q, fq, fq_config = fq_getter(
-                        q, iq,
-                        composition=self.composition,
-                        **self.fq_kwargs)
-                    self.vis_callbacks['fq']('event',
-                                             format_event(q=fq_q, fq=fq))
+                if geo:
+                    img = polarization_correction(img, geo,
+                                                  self.polarization_factor)
 
-                    r, gr, pdf_config = pdf_getter(
-                        q, iq,
-                        composition=self.composition,
-                        **self.pdf_kwargs)
-                    self.vis_callbacks['pdf']('event',
-                                              format_event(r=r, pdf=gr)
-                                              )
-                    pdf_name = render_clean_makedir(
-                        self.light_template,
-                        human_timestamp=h_timestamp,
-                        raw_event=doc,
-                        raw_start=self.start_doc,
-                        raw_descriptor=self.descriptor_doc,
-                        analyzed_start={
-                            'analysis_stage': 'pdf'},
-                        ext='.gr')
-                    pdf_saver(r, gr, pdf_name, pdf_config)
+                    # Masking
+                    if doc['seq_num'] == 1:
+                        if (self.start_doc['sample_name'] == 'Setup' or
+                                self.mask_setting is None):
+                            self.mask = np.ones(img.shape, dtype=bool)
+                        else:
+                            self.mask = mask_img(img, geo, **self.mask_kwargs)
+                        if self.write_to_disk:
+                            mask_name = render_clean_makedir(
+                                self.light_template,
+                                human_timestamp=h_timestamp,
+                                raw_event=doc,
+                                raw_start=self.start_doc,
+                                raw_descriptor=self.descriptor_doc,
+                                analyzed_start={
+                                    'analysis_stage': 'mask'},
+                                ext='')
+                            fit2d_save(self.mask, mask_name)
+                    if self.vis:
+                        overlay = overlay_mask(img, self.mask)
+                        self.vis_callbacks['masked_img'](
+                            'event', format_event(overlay_mask=overlay))
+                    # binner
+                    binner = generate_binner(geo, img.shape, self.mask)
+
+                    q, iq = binner.bin_centers, np.nan_to_num(
+                        binner(img.flatten()))
+                    if self.vis:
+                        self.vis_callbacks['iq']('event', format_event(q=q,
+                                                                       iq=iq))
+                    if self.write_to_disk:
+                        iq_name = render_clean_makedir(self.light_template,
+                                                       human_timestamp=h_timestamp,
+                                                       raw_event=doc,
+                                                       raw_start=self.start_doc,
+                                                       raw_descriptor=self.descriptor_doc,
+                                                       analyzed_start={
+                                                           'analysis_stage': 'iq_q'},
+                                                       ext='_Q.chi')
+                        save_output(q, iq, iq_name, 'Q')
+                    tth = np.rad2deg(q_to_twotheta(q, self.wavelength))
+                    if self.vis:
+                        self.vis_callbacks['itth']('event',
+                                                   format_event(tth=tth,
+                                                                iq=iq))
+                    if self.write_to_disk:
+                        itth_name = render_clean_makedir(
+                            self.light_template,
+                            human_timestamp=h_timestamp,
+                            raw_event=doc,
+                            raw_start=self.start_doc,
+                            raw_descriptor=self.descriptor_doc,
+                            analyzed_start={
+                                'analysis_stage': 'iq_tth'},
+                            ext='_tth.chi')
+
+                        save_output(tth, iq, itth_name, '2theta')
+
+                    if self.composition:
+                        fq_q, fq, fq_config = fq_getter(
+                            q, iq,
+                            composition=self.composition,
+                            **self.fq_kwargs)
+                        if self.vis:
+                            self.vis_callbacks['fq']('event',
+                                                     format_event(q=fq_q,
+                                                                  fq=fq))
+
+                        r, gr, pdf_config = pdf_getter(
+                            q, iq,
+                            composition=self.composition,
+                            **self.pdf_kwargs)
+                        if self.vis:
+                            self.vis_callbacks['pdf']('event',
+                                                      format_event(r=r, pdf=gr)
+                                                      )
+                        if self.write_to_disk:
+                            pdf_name = render_clean_makedir(
+                                self.light_template,
+                                human_timestamp=h_timestamp,
+                                raw_event=doc,
+                                raw_start=self.start_doc,
+                                raw_descriptor=self.descriptor_doc,
+                                analyzed_start={
+                                    'analysis_stage': 'pdf'},
+                                ext='.gr')
+                            pdf_saver(r, gr, pdf_name, pdf_config)
 
     def stop(self, doc):
         for k, v in self.vis_callbacks.items():

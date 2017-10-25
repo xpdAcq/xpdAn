@@ -14,6 +14,8 @@ from xpdan.formatters import render_and_clean
 from xpdan.io import dump_yml
 from xpdan.pipelines.pipeline_utils import (if_dark, base_template)
 
+_s = set()
+
 
 # TODO: refactor templating
 def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
@@ -154,28 +156,30 @@ def conf_save_tiff_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
 
-        [es.map(writer_templater,
-                es.zip_latest(es.zip(s1, s2, stream_name='zip render and data',
+        _s.update([es.map(writer_templater,
+                          es.zip_latest(
+                              es.zip(s1, s2, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
                               ),
-                input_info=ii,
-                output_info=[('final_filename', {'dtype': 'str'})],
-                stream_name='Write {}'.format(s1.stream_name),
-                **kwargs) for s1, s2, made_dir, ii, writer_templater, kwargs
-         in
-         zip(
-             streams_to_be_saved,
-             mega_render,
-             make_dirs,  # prevent run condition btwn dirs and files
-             input_infos,
-             save_callables,
-             saver_kwargs
-         )]
+                          input_info=ii,
+                          output_info=[('final_filename', {'dtype': 'str'})],
+                          stream_name='Write {}'.format(s1.stream_name),
+                          **kwargs) for
+                   s1, s2, made_dir, ii, writer_templater, kwargs
+                   in
+                   zip(
+                       streams_to_be_saved,
+                       mega_render,
+                       make_dirs,  # prevent run condition btwn dirs and files
+                       input_infos,
+                       save_callables,
+                       saver_kwargs
+                   )])
 
-        es.map(dump_yml, es.zip(eventify_raw_start, md_render),
-               input_info={0: (('data', 'filename'), 1),
-                           1: (('data',), 0)},
-               full_event=True,
-               stream_name='dump yaml')
+        _s.add(es.map(dump_yml, es.zip(eventify_raw_start, md_render),
+                      input_info={0: (('data', 'filename'), 1),
+                                  1: (('data',), 0)},
+                      full_event=True,
+                      stream_name='dump yaml'))
     return raw_source

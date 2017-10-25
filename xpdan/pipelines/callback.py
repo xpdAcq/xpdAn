@@ -160,15 +160,17 @@ class MainCallback(CallbackBase):
             else:
                 self.calibrant = doc.get('calibration_md')
         # Run all the starts for the callbacks
-        for k, v in self.vis_callbacks.items():
-            v('start', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('start', doc)
 
     def descriptor(self, doc):
         self.descs.append(doc)
         self.descriptor_doc = doc
         # Run all the descriptor callbacks
-        for k, v in self.vis_callbacks.items():
-            v('descriptor', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('descriptor', doc)
 
     def event(self, doc):
         if self.dark_img is not None:
@@ -315,5 +317,6 @@ class MainCallback(CallbackBase):
                             pdf_saver(r, gr, pdf_name, pdf_config)
 
     def stop(self, doc):
-        for k, v in self.vis_callbacks.items():
-            v('stop', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('stop', doc)

@@ -84,7 +84,6 @@ def integrate_and_save(headers, *, db, save_dir, visualize=False,
     for hdr in hdrs:
         for nd in hdr.documents(fill=True):
             source(*nd)
-    plt.close('all')
 
 
 def integrate_and_save_last(**kwargs):
@@ -129,7 +128,6 @@ def integrate_and_save_last(**kwargs):
     xpdan.tools.mask_img
     """
     integrate_and_save(kwargs['db'][-1], **kwargs)
-    plt.close('all')
 
 
 def save_tiff(headers, *, db, save_dir,
@@ -162,7 +160,6 @@ def save_tiff(headers, *, db, save_dir,
     for hdr in hdrs:
         for nd in hdr.documents(fill=True):
             source(*nd)
-    plt.close('all')
 
 
 def save_last_tiff(**kwargs):
@@ -185,4 +182,3 @@ def save_last_tiff(**kwargs):
     """
 
     save_tiff(kwargs['db'][-1], **kwargs)
-    plt.close('all')

@@ -46,7 +46,7 @@ class MainCallback(CallbackBase):
                  analysis_setting='full'):
         self.vis = vis
         self.write_to_disk = write_to_disk
-        self.analysis_setting=analysis_setting
+        self.analysis_setting = analysis_setting
         self.mask_setting = mask_setting
         if mask_kwargs is None:
             mask_kwargs = {}
@@ -179,7 +179,8 @@ class MainCallback(CallbackBase):
             if self.dark_img is not None:
                 img -= self.dark_img
             if self.vis:
-                self.vis_callbacks['dark_sub_iq']('event', format_event(img=img))
+                self.vis_callbacks['dark_sub_iq']('event',
+                                                  format_event(img=img))
             if self.write_to_disk:
                 tiff_name = render_clean_makedir(
                     self.light_template,
@@ -188,7 +189,7 @@ class MainCallback(CallbackBase):
                     raw_start=self.start_doc,
                     raw_descriptor=self.descriptor_doc,
                     analyzed_start={'analysis_stage':
-                                    'dark_sub'},
+                                        'dark_sub'},
                     ext='.tiff')
                 tifffile.imsave(tiff_name, img)
 
@@ -257,14 +258,14 @@ class MainCallback(CallbackBase):
                         self.vis_callbacks['iq']('event', format_event(q=q,
                                                                        iq=iq))
                     if self.write_to_disk:
-                        iq_name = render_clean_makedir(self.light_template,
-                                                       human_timestamp=h_timestamp,
-                                                       raw_event=doc,
-                                                       raw_start=self.start_doc,
-                                                       raw_descriptor=self.descriptor_doc,
-                                                       analyzed_start={
-                                                           'analysis_stage': 'iq_q'},
-                                                       ext='_Q.chi')
+                        iq_name = render_clean_makedir(
+                            self.light_template,
+                            human_timestamp=h_timestamp,
+                            raw_event=doc,
+                            raw_start=self.start_doc,
+                            raw_descriptor=self.descriptor_doc,
+                            analyzed_start={'analysis_stage': 'iq_q'},
+                            ext='_Q.chi')
                         save_output(q, iq, iq_name, 'Q')
                     tth = np.rad2deg(q_to_twotheta(q, self.wavelength))
                     if self.vis:
@@ -290,9 +291,8 @@ class MainCallback(CallbackBase):
                             composition=self.composition,
                             **self.fq_kwargs)
                         if self.vis:
-                            self.vis_callbacks['fq']('event',
-                                                     format_event(q=fq_q,
-                                                                  fq=fq))
+                            self.vis_callbacks['fq'](
+                                'event', format_event(q=fq_q, fq=fq))
 
                         r, gr, pdf_config = pdf_getter(
                             q, iq,

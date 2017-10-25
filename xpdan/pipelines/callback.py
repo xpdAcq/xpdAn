@@ -26,6 +26,12 @@ def format_event(**kwargs):
             'filled': {k: True for k in kwargs}}
 
 
+def render_clean_makedir(string, **kwargs):
+    rendered_string = render_and_clean(string, **kwargs)
+    os.makedirs(os.path.split(rendered_string)[0], exist_ok=True)
+    return rendered_string
+
+
 class MainCallback(CallbackBase):
     def __init__(self, db, save_dir, *,
                  polarization_factor=.99,
@@ -33,7 +39,9 @@ class MainCallback(CallbackBase):
                  mask_kwargs=None,
                  fq_kwargs=None,
                  pdf_kwargs=None,
-                 calibration_md_folder='../xpdConfig/'):
+                 calibration_md_folder='../xpdConfig/',
+                 mask_setting='default'):
+        self.mask_setting = mask_setting
         if mask_kwargs is None:
             mask_kwargs = {}
         _pdf_config = dict(dataformat='QA', qmaxinst=28, qmax=22)
@@ -104,8 +112,8 @@ class MainCallback(CallbackBase):
         self.background_img = None
 
         self.descs = []
-        yml_name = render_and_clean(self.light_template, ext='.yml',
-                                    raw_start=doc)
+        yml_name = render_clean_makedir(self.light_template, ext='.yml',
+                                        raw_start=doc)
         dump_yml(yml_name, doc)
         self.start_doc = doc
         self.wavelength = doc.get('bt_wavelength')
@@ -126,10 +134,10 @@ class MainCallback(CallbackBase):
                 background = temporal_prox(background, [doc])[0]
                 self.background_img = next(
                     background.data(self.image_data_key))
-                bg_dark = query_dark(self.db, [background])
+                bg_dark = query_dark(self.db, [background['start']])
 
                 if bg_dark:
-                    bg_dark = temporal_prox(bg_dark, [doc])
+                    bg_dark = temporal_prox(bg_dark, [doc])[0]
                     bg_dark_img = next(bg_dark.data(self.image_data_key))
                 else:
                     bg_dark_img = np.zeros(self.background_img.shape)
@@ -163,19 +171,20 @@ class MainCallback(CallbackBase):
             img = doc['data'][self.image_data_key]
             if self.dark_img is not None:
                 img -= self.dark_img
-            tiff_name = render_and_clean(self.light_template,
-                                         human_timestamp=h_timestamp,
-                                         raw_event=doc,
-                                         raw_start=self.start_doc,
-                                         raw_descriptor=self.descriptor_doc,
-                                         analyzed_start={'analysis_stage':
-                                                             'dark_sub'},
-                                         ext='.tiff')
+            tiff_name = render_clean_makedir(
+                self.light_template,
+                human_timestamp=h_timestamp,
+                raw_event=doc,
+                raw_start=self.start_doc,
+                raw_descriptor=self.descriptor_doc,
+                analyzed_start={'analysis_stage':
+                                'dark_sub'},
+                ext='.tiff')
             self.vis_callbacks['dark_sub_iq']('event', format_event(img=img))
             tifffile.imsave(tiff_name, img)
 
             # background correction
-            if self.background_img:
+            if self.background_img is not None:
                 img -= self.background_img
 
             # get calibration
@@ -183,7 +192,7 @@ class MainCallback(CallbackBase):
                 calibration, geo = img_calibration(img, self.wavelength,
                                                    self.calibrant,
                                                    self.detector)
-                poni_name = render_and_clean(
+                poni_name = render_clean_makedir(
                     self.light_template,
                     human_timestamp=h_timestamp,
                     raw_event=doc,
@@ -207,20 +216,21 @@ class MainCallback(CallbackBase):
 
                 # Masking
                 if doc['seq_num'] == 1:
-                    if self.start_doc['sample_name'] == 'Setup':
+                    if (self.start_doc['sample_name'] == 'Setup' or
+                        self.mask_setting is None):
                         self.mask = np.ones(img.shape, dtype=bool)
                     else:
                         self.mask = mask_img(img, geo, **self.mask_kwargs)
-                        mask_name = render_and_clean(
-                            self.light_template,
-                            human_timestamp=h_timestamp,
-                            raw_event=doc,
-                            raw_start=self.start_doc,
-                            raw_descriptor=self.descriptor_doc,
-                            analyzed_start={
-                                'analysis_stage': 'mask'},
-                            ext='')
-                        fit2d_save(self.mask, mask_name)
+                    mask_name = render_clean_makedir(
+                        self.light_template,
+                        human_timestamp=h_timestamp,
+                        raw_event=doc,
+                        raw_start=self.start_doc,
+                        raw_descriptor=self.descriptor_doc,
+                        analyzed_start={
+                            'analysis_stage': 'mask'},
+                        ext='')
+                    fit2d_save(self.mask, mask_name)
                 overlay = overlay_mask(img, self.mask)
                 self.vis_callbacks['masked_img']('event',
                                                  format_event(
@@ -231,19 +241,19 @@ class MainCallback(CallbackBase):
 
                 q, iq = binner.bin_centers, np.nan_to_num(
                     binner(img.flatten()))
-                iq_name = render_and_clean(self.light_template,
-                                           human_timestamp=h_timestamp,
-                                           raw_event=doc,
-                                           raw_start=self.start_doc,
-                                           raw_descriptor=self.descriptor_doc,
-                                           analyzed_start={
-                                               'analysis_stage': 'iq_q'},
-                                           ext='_Q.chi')
+                iq_name = render_clean_makedir(self.light_template,
+                                               human_timestamp=h_timestamp,
+                                               raw_event=doc,
+                                               raw_start=self.start_doc,
+                                               raw_descriptor=self.descriptor_doc,
+                                               analyzed_start={
+                                                   'analysis_stage': 'iq_q'},
+                                               ext='_Q.chi')
                 self.vis_callbacks['iq']('event', format_event(q=q, iq=iq)
                                          )
                 save_output(q, iq, iq_name, 'Q')
                 tth = np.rad2deg(q_to_twotheta(q, self.wavelength))
-                itth_name = render_and_clean(
+                itth_name = render_clean_makedir(
                     self.light_template,
                     human_timestamp=h_timestamp,
                     raw_event=doc,
@@ -271,7 +281,7 @@ class MainCallback(CallbackBase):
                     self.vis_callbacks['pdf']('event',
                                               format_event(r=r, pdf=gr)
                                               )
-                    pdf_name = render_and_clean(
+                    pdf_name = render_clean_makedir(
                         self.light_template,
                         human_timestamp=h_timestamp,
                         raw_event=doc,

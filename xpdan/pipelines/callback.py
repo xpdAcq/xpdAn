@@ -19,7 +19,6 @@ from xpdan.tools import (generate_binner, load_geo,
                          polarization_correction, mask_img, pdf_getter,
                          fq_getter, overlay_mask)
 from xpdview.callbacks import LiveWaterfall
-import time
 
 
 def format_event(**kwargs):

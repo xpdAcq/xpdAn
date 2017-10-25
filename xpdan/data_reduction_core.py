@@ -14,8 +14,6 @@
 #
 ##############################################################################
 
-import matplotlib.pyplot as plt
-
 from xpdan.pipelines.callback import MainCallback
 
 

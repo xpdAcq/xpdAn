@@ -30,6 +30,8 @@ from ..calib import img_calibration, _save_calib_param
 from bluesky.callbacks.core import CallbackBase
 
 
+_s = set()
+
 class PrinterCallback(CallbackBase):
     def __init__(self):
         self.analysis_stage = None
@@ -576,7 +578,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                             stream_name='Make dirs {}'.format(cs.stream_name)
                             ) for cs in mega_render]
 
-        [es.map(writer_templater,
+        _s.update([es.map(writer_templater,
                 es.zip_latest(es.zip(s2, s1, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
@@ -593,46 +595,18 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
              input_infos,
              save_callables,
              saver_kwargs
-         )]
+         )])
 
-        es.map(dump_yml, es.zip(eventify_raw_start, md_render),
+        _s.add(es.map(dump_yml, es.zip(eventify_raw_start, md_render),
                input_info={0: (('data', 'filename'), 1),
                            1: (('data',), 0)},
                full_event=True,
-               stream_name='dump yaml')
-    if verbose:
-        # if_calibration_stream.sink(pprint)
-        # dark_sub_fg.sink(pprint)
-        # eventify_raw_start.sink(pprint)
-        # raw_source.sink(pprint)
-        # if_not_dark_stream.sink(pprint)
-        # zlid.sink(pprint)
-        # dark_sub_fg.sink(pprint)
-        # bg_query_stream.sink(pprint)
-        # if_not_calibration_stream.sink(pprint)
-        # if_not_background_stream.sink(pprint)
-        # if_background_stream.sink(pprint)
-        # fg_sub_bg.sink(pprint)
-        # if_not_background_split_stream.split_streams[0].sink(pprint)
-        # cal_md_stream.sink(pprint)
-        # loaded_calibration_stream.sink(pprint)
-        # if_not_dark_stream.sink(pprint)
-        # foreground_stream.sink(pprint)
-        # zlfl.sink(pprint)
-        # p_corrected_stream.sink(pprint)
-        # zlmc.sink(pprint)
-        # binner_stream.sink(pprint)
-        # zlpb.sink(pprint)
-        # iq_stream.sink(pprint)
-        # pdf_stream.sink(pprint)
-        # mask_stream.sink(pprint)
-        if write_to_disk:
-            md_render.sink(pprint)
-            [es.zip(cs,
-                    streams_to_be_s, zip_type='truncate',
-                    stream_name='zip_print'
-                    ).sink(star(PrinterCallback())
-                           ) for cs, streams_to_be_s in zip(
-                mega_render, streams_to_be_saved)]
+               stream_name='dump yaml'))
+        [es.zip(cs,
+                streams_to_be_s, zip_type='truncate',
+                stream_name='zip_print'
+                ).sink(star(PrinterCallback())
+                       ) for cs, streams_to_be_s in zip(
+            mega_render, streams_to_be_saved)]
     print('Finish pipeline configuration')
     return raw_source

@@ -75,31 +75,32 @@ class MainCallback(CallbackBase):
         self.db = db
         self.save_dir = save_dir
         self.light_template = os.path.join(self.save_dir, base_template)
-        self.vis_callbacks = {'dark_sub_iq': LiveImage(
-            'img', window_title='Dark Subtracted Image', cmap='viridis'),
-            'masked_img': LiveImage('overlay_mask',
-                                    window_title='Dark/Background/'
-                                                 'Polarization Corrected '
-                                                 'Image with Mask',
-                                    cmap='viridis',
-                                    limit_func=lambda im: (
-                                        np.nanpercentile(im, 1),
-                                        np.nanpercentile(im, 99))
-                                    # norm=LogNorm()
-                                    ),
-            'iq': LiveWaterfall('q', 'iq',
-                                units=('Q (A^-1)', 'Arb'),
-                                window_title='I(Q)'),
-            'itth': LiveWaterfall('tth', 'iq',
-                                  units=('tth', 'Arb'),
-                                  window_title='I(tth)'),
-            'fq': LiveWaterfall('q', 'fq',
-                                units=('Q (A^-1)', 'F(Q)'),
-                                window_title='F(Q)'),
-            'pdf': LiveWaterfall('r', 'pdf',
-                                 units=('r (A)', 'G(r) A^-2'),
-                                 window_title='G(r)')
-        }
+        if self.vis:
+            self.vis_callbacks = {'dark_sub_iq': LiveImage(
+                'img', window_title='Dark Subtracted Image', cmap='viridis'),
+                'masked_img': LiveImage('overlay_mask',
+                                        window_title='Dark/Background/'
+                                                     'Polarization Corrected '
+                                                     'Image with Mask',
+                                        cmap='viridis',
+                                        limit_func=lambda im: (
+                                            np.nanpercentile(im, 1),
+                                            np.nanpercentile(im, 99))
+                                        # norm=LogNorm()
+                                        ),
+                'iq': LiveWaterfall('q', 'iq',
+                                    units=('Q (A^-1)', 'Arb'),
+                                    window_title='I(Q)'),
+                'itth': LiveWaterfall('tth', 'iq',
+                                      units=('tth', 'Arb'),
+                                      window_title='I(tth)'),
+                'fq': LiveWaterfall('q', 'fq',
+                                    units=('Q (A^-1)', 'F(Q)'),
+                                    window_title='F(Q)'),
+                'pdf': LiveWaterfall('r', 'pdf',
+                                     units=('r (A)', 'G(r) A^-2'),
+                                     window_title='G(r)')
+            }
 
         self.start_doc = None
         self.descriptor_doc = None
@@ -159,15 +160,17 @@ class MainCallback(CallbackBase):
             else:
                 self.calibrant = doc.get('calibration_md')
         # Run all the starts for the callbacks
-        for k, v in self.vis_callbacks.items():
-            v('start', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('start', doc)
 
     def descriptor(self, doc):
         self.descs.append(doc)
         self.descriptor_doc = doc
         # Run all the descriptor callbacks
-        for k, v in self.vis_callbacks.items():
-            v('descriptor', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('descriptor', doc)
 
     def event(self, doc):
         if self.dark_img is not None:
@@ -314,5 +317,6 @@ class MainCallback(CallbackBase):
                             pdf_saver(r, gr, pdf_name, pdf_config)
 
     def stop(self, doc):
-        for k, v in self.vis_callbacks.items():
-            v('stop', doc)
+        if self.vis:
+            for k, v in self.vis_callbacks.items():
+                v('stop', doc)

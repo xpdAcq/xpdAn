@@ -165,6 +165,11 @@ class MainCallback(CallbackBase):
                 v('start', doc)
 
     def descriptor(self, doc):
+        if 'cryostat_T' in doc['data_keys']:
+            doc['data_keys']['cryostat_T']['units'] = 'K'
+            # rename to temperature
+            doc['data_keys']['temperature'] = doc['data_keys'].pop(
+                'cryostat_T')
         self.descs.append(doc)
         self.descriptor_doc = doc
         # Run all the descriptor callbacks
@@ -175,6 +180,8 @@ class MainCallback(CallbackBase):
     def event(self, doc):
         if self.dark_img is not None:
             doc = next(self.db.fill_events([doc], self.descs))
+            if 'cryostat_T' in doc['data']:
+                doc['data']['temperature'] = doc['data'].pop('cryostat_T')
             # human readable timestamp
             h_timestamp = _timestampstr(doc['time'])
 

@@ -205,7 +205,7 @@
 
 <dl class="function">
 <dt id="xpdan.pipelines.main.conf_main_pipeline">
-<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">conf_main_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>polarization_factor=0.99</em>, <em>image_data_key='pe1_image'</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>pdf_config=None</em>, <em>verbose=False</em>, <em>calibration_md_folder='../xpdConfig/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#conf_main_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.conf_main_pipeline" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">conf_main_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>polarization_factor=0.99</em>, <em>image_data_key='pe1_image'</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>pdf_config=None</em>, <em>calibration_md_folder='../xpdConfig/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#conf_main_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.conf_main_pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Total data processing pipeline for XPD</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -229,8 +229,6 @@ Please refer to documentation for more details</li>
 <li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
 <li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
 <code class="docutils literal"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
-<li><strong>verbose</strong> (<em>bool, optional</em>) – If True print many outcomes from the pipeline, for debuging use
-only, defaults to False</li>
 <li><strong>calibration_md_folder</strong> (<em>str</em>) – Path to where the calibration is stored for xpdAcq</li>
 </ul>
 </td>

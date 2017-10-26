@@ -168,8 +168,7 @@
 <span class="c1">#</span>
 <span class="c1">##############################################################################</span>
 
-<span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="n">conf_main_pipeline</span>
-<span class="kn">from</span> <span class="nn">xpdan.pipelines.save_tiff</span> <span class="k">import</span> <span class="n">conf_save_tiff_pipeline</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.callback</span> <span class="k">import</span> <span class="n">MainCallback</span>
 
 
 <span class="k">def</span> <span class="nf">_prepare_header_list</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
@@ -227,16 +226,16 @@
 <span class="sd">    xpdan.tools.mask_img</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_prepare_header_list</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">conf_main_pipeline</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="n">visualize</span><span class="p">,</span>
-                                <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                <span class="n">polarization_factor</span><span class="o">=</span><span class="n">polarization_factor</span><span class="p">,</span>
-                                <span class="n">image_data_key</span><span class="o">=</span><span class="n">image_data_key</span><span class="p">,</span>
-                                <span class="n">mask_setting</span><span class="o">=</span><span class="n">mask_setting</span><span class="p">,</span>
-                                <span class="n">mask_kwargs</span><span class="o">=</span><span class="n">mask_kwargs</span><span class="p">,</span>
-                                <span class="n">pdf_config</span><span class="o">=</span><span class="n">pdf_config</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">MainCallback</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="n">visualize</span><span class="p">,</span>
+                          <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">polarization_factor</span><span class="o">=</span><span class="n">polarization_factor</span><span class="p">,</span>
+                          <span class="n">image_data_key</span><span class="o">=</span><span class="n">image_data_key</span><span class="p">,</span>
+                          <span class="n">mask_setting</span><span class="o">=</span><span class="n">mask_setting</span><span class="p">,</span>
+                          <span class="n">mask_kwargs</span><span class="o">=</span><span class="n">mask_kwargs</span><span class="p">,</span>
+                          <span class="n">pdf_config</span><span class="o">=</span><span class="n">pdf_config</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">hdr</span><span class="o">.</span><span class="n">documents</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="n">source</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span></div>
+            <span class="n">source</span><span class="p">(</span><span class="o">*</span><span class="n">nd</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="integrate_and_save_last"><a class="viewcode-back" href="../../xpdan.html#xpdan.data_reduction_core.integrate_and_save_last">[docs]</a><span class="k">def</span> <span class="nf">integrate_and_save_last</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -305,13 +304,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># normalize list</span>
     <span class="n">hdrs</span> <span class="o">=</span> <span class="n">_prepare_header_list</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">conf_save_tiff_pipeline</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="n">visualize</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
-                                     <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                     <span class="n">image_data_key</span><span class="o">=</span><span class="n">image_data_key</span><span class="p">,</span>
-                                     <span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">MainCallback</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="n">visualize</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
+                          <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">image_data_key</span><span class="o">=</span><span class="n">image_data_key</span><span class="p">,</span>
+                          <span class="n">analysis_setting</span><span class="o">=</span><span class="s1">&#39;tiff only&#39;</span>
+                          <span class="p">)</span>
     <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">hdr</span><span class="o">.</span><span class="n">documents</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="n">source</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span></div>
+            <span class="n">source</span><span class="p">(</span><span class="o">*</span><span class="n">nd</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="save_last_tiff"><a class="viewcode-back" href="../../xpdan.html#xpdan.data_reduction_core.save_last_tiff">[docs]</a><span class="k">def</span> <span class="nf">save_last_tiff</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

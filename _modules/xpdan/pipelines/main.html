@@ -155,7 +155,6 @@
 <span></span><span class="sd">&quot;&quot;&quot;Main XPD analysis pipeline&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">sub</span><span class="p">,</span> <span class="n">truediv</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">shed.event_streams</span> <span class="k">as</span> <span class="nn">es</span>
@@ -163,6 +162,7 @@
 <span class="kn">from</span> <span class="nn">shed.event_streams</span> <span class="k">import</span> <span class="n">dstar</span><span class="p">,</span> <span class="n">star</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.callbacks.broker</span> <span class="k">import</span> <span class="n">LiveImage</span>
+<span class="kn">from</span> <span class="nn">bluesky.callbacks.core</span> <span class="k">import</span> <span class="n">CallbackBase</span>
 <span class="kn">from</span> <span class="nn">skbeam.core.utils</span> <span class="k">import</span> <span class="n">q_to_twotheta</span>
 <span class="kn">from</span> <span class="nn">skbeam.io.fit2d</span> <span class="k">import</span> <span class="n">fit2d_save</span>
 <span class="kn">from</span> <span class="nn">skbeam.io.save_powder_output</span> <span class="k">import</span> <span class="n">save_output</span>
@@ -181,7 +181,8 @@
                          <span class="n">pdf_getter</span><span class="p">,</span> <span class="n">fq_getter</span><span class="p">,</span> <span class="n">overlay_mask</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xpdview.callbacks</span> <span class="k">import</span> <span class="n">LiveWaterfall</span>
 <span class="kn">from</span> <span class="nn">..calib</span> <span class="k">import</span> <span class="n">img_calibration</span><span class="p">,</span> <span class="n">_save_calib_param</span>
-<span class="kn">from</span> <span class="nn">bluesky.callbacks.core</span> <span class="k">import</span> <span class="n">CallbackBase</span>
+
+<span class="n">_s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="PrinterCallback"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.PrinterCallback">[docs]</a><span class="k">class</span> <span class="nc">PrinterCallback</span><span class="p">(</span><span class="n">CallbackBase</span><span class="p">):</span>
@@ -202,7 +203,6 @@
                        <span class="n">mask_setting</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
                        <span class="n">mask_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">pdf_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                        <span class="n">calibration_md_folder</span><span class="o">=</span><span class="s1">&#39;../xpdConfig/&#39;</span>
                        <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Total data processing pipeline for XPD</span>
@@ -235,9 +235,6 @@
 <span class="sd">    pdf_config: dict, optional</span>
 <span class="sd">        Configuration for making PDFs, see pdfgetx3 docs. Defaults to</span>
 <span class="sd">        ``dict(dataformat=&#39;QA&#39;, qmaxinst=28, qmax=22)``</span>
-<span class="sd">    verbose: bool, optional</span>
-<span class="sd">        If True print many outcomes from the pipeline, for debuging use</span>
-<span class="sd">        only, defaults to False</span>
 <span class="sd">    calibration_md_folder: str</span>
 <span class="sd">        Path to where the calibration is stored for xpdAcq</span>
 
@@ -513,7 +510,7 @@
         <span class="n">if_setup_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">sn</span><span class="p">:</span> <span class="n">sn</span> <span class="o">==</span> <span class="s1">&#39;Setup&#39;</span><span class="p">,</span>
             <span class="n">zlfc_ds</span><span class="p">,</span>
-            <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="p">),</span> <span class="mi">2</span><span class="p">)},</span>
+            <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,),</span> <span class="mi">2</span><span class="p">)},</span>
             <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
             <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Is Setup Mask&#39;</span>
@@ -730,64 +727,38 @@
                             <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Make dirs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">stream_name</span><span class="p">)</span>
                             <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">mega_render</span><span class="p">]</span>
 
-        <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">writer_templater</span><span class="p">,</span>
-                <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip render and data&#39;</span><span class="p">,</span>
+        <span class="n">_s</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">writer_templater</span><span class="p">,</span>
+                          <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span>
+                              <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip render and data&#39;</span><span class="p">,</span>
                                      <span class="n">zip_type</span><span class="o">=</span><span class="s1">&#39;truncate&#39;</span><span class="p">),</span> <span class="n">made_dir</span><span class="p">,</span>
                               <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zl dirs and render and data&#39;</span>
                               <span class="p">),</span>
-                <span class="n">input_info</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span>
-                <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;final_filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
-                <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Write </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">stream_name</span><span class="p">),</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">made_dir</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">writer_templater</span><span class="p">,</span> <span class="n">kwargs</span>
-         <span class="ow">in</span>
-         <span class="nb">zip</span><span class="p">(</span>
-             <span class="n">streams_to_be_saved</span><span class="p">,</span>
-             <span class="n">mega_render</span><span class="p">,</span>
-             <span class="n">make_dirs</span><span class="p">,</span>  <span class="c1"># prevent run condition btwn dirs and files</span>
-             <span class="n">input_infos</span><span class="p">,</span>
-             <span class="n">save_callables</span><span class="p">,</span>
-             <span class="n">saver_kwargs</span>
-         <span class="p">)]</span>
+                          <span class="n">input_info</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span>
+                          <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;final_filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                          <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Write </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">stream_name</span><span class="p">),</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span>
+                   <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">made_dir</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">writer_templater</span><span class="p">,</span> <span class="n">kwargs</span>
+                   <span class="ow">in</span>
+                   <span class="nb">zip</span><span class="p">(</span>
+                       <span class="n">streams_to_be_saved</span><span class="p">,</span>
+                       <span class="n">mega_render</span><span class="p">,</span>
+                       <span class="n">make_dirs</span><span class="p">,</span>  <span class="c1"># prevent run condition btwn dirs and files</span>
+                       <span class="n">input_infos</span><span class="p">,</span>
+                       <span class="n">save_callables</span><span class="p">,</span>
+                       <span class="n">saver_kwargs</span>
+                   <span class="p">)])</span>
 
-        <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dump_yml</span><span class="p">,</span> <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">eventify_raw_start</span><span class="p">,</span> <span class="n">md_render</span><span class="p">),</span>
-               <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
-                           <span class="mi">1</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">)},</span>
-               <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dump yaml&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="c1"># if_calibration_stream.sink(pprint)</span>
-        <span class="c1"># dark_sub_fg.sink(pprint)</span>
-        <span class="c1"># eventify_raw_start.sink(pprint)</span>
-        <span class="c1"># raw_source.sink(pprint)</span>
-        <span class="c1"># if_not_dark_stream.sink(pprint)</span>
-        <span class="c1"># zlid.sink(pprint)</span>
-        <span class="c1"># dark_sub_fg.sink(pprint)</span>
-        <span class="c1"># bg_query_stream.sink(pprint)</span>
-        <span class="c1"># if_not_calibration_stream.sink(pprint)</span>
-        <span class="c1"># if_not_background_stream.sink(pprint)</span>
-        <span class="c1"># if_background_stream.sink(pprint)</span>
-        <span class="c1"># fg_sub_bg.sink(pprint)</span>
-        <span class="c1"># if_not_background_split_stream.split_streams[0].sink(pprint)</span>
-        <span class="c1"># cal_md_stream.sink(pprint)</span>
-        <span class="c1"># loaded_calibration_stream.sink(pprint)</span>
-        <span class="c1"># if_not_dark_stream.sink(pprint)</span>
-        <span class="c1"># foreground_stream.sink(pprint)</span>
-        <span class="c1"># zlfl.sink(pprint)</span>
-        <span class="c1"># p_corrected_stream.sink(pprint)</span>
-        <span class="c1"># zlmc.sink(pprint)</span>
-        <span class="c1"># binner_stream.sink(pprint)</span>
-        <span class="c1"># zlpb.sink(pprint)</span>
-        <span class="c1"># iq_stream.sink(pprint)</span>
-        <span class="c1"># pdf_stream.sink(pprint)</span>
-        <span class="c1"># mask_stream.sink(pprint)</span>
-        <span class="k">if</span> <span class="n">write_to_disk</span><span class="p">:</span>
-            <span class="n">md_render</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">pprint</span><span class="p">)</span>
-            <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span>
-                    <span class="n">streams_to_be_s</span><span class="p">,</span> <span class="n">zip_type</span><span class="o">=</span><span class="s1">&#39;truncate&#39;</span><span class="p">,</span>
-                    <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip_print&#39;</span>
-                    <span class="p">)</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">star</span><span class="p">(</span><span class="n">PrinterCallback</span><span class="p">())</span>
-                           <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span><span class="p">,</span> <span class="n">streams_to_be_s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="n">mega_render</span><span class="p">,</span> <span class="n">streams_to_be_saved</span><span class="p">)]</span>
+        <span class="n">_s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dump_yml</span><span class="p">,</span> <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">eventify_raw_start</span><span class="p">,</span> <span class="n">md_render</span><span class="p">),</span>
+                      <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">)},</span>
+                      <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dump yaml&#39;</span><span class="p">))</span>
+        <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span>
+                <span class="n">streams_to_be_s</span><span class="p">,</span> <span class="n">zip_type</span><span class="o">=</span><span class="s1">&#39;truncate&#39;</span><span class="p">,</span>
+                <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip_print&#39;</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">star</span><span class="p">(</span><span class="n">PrinterCallback</span><span class="p">())</span>
+                       <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span><span class="p">,</span> <span class="n">streams_to_be_s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">mega_render</span><span class="p">,</span> <span class="n">streams_to_be_saved</span><span class="p">)]</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finish pipeline configuration&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">raw_source</span></div>
 </pre></div>

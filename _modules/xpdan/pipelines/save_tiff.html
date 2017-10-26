@@ -168,6 +168,8 @@
 <span class="kn">from</span> <span class="nn">xpdan.io</span> <span class="k">import</span> <span class="n">dump_yml</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.pipeline_utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">if_dark</span><span class="p">,</span> <span class="n">base_template</span><span class="p">)</span>
 
+<span class="n">_s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
 
 <span class="c1"># TODO: refactor templating</span>
 <div class="viewcode-block" id="conf_save_tiff_pipeline"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.save_tiff.conf_save_tiff_pipeline">[docs]</a><span class="k">def</span> <span class="nf">conf_save_tiff_pipeline</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -308,30 +310,32 @@
                             <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Make dirs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">stream_name</span><span class="p">)</span>
                             <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">mega_render</span><span class="p">]</span>
 
-        <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">writer_templater</span><span class="p">,</span>
-                <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip render and data&#39;</span><span class="p">,</span>
+        <span class="n">_s</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">writer_templater</span><span class="p">,</span>
+                          <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span>
+                              <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip render and data&#39;</span><span class="p">,</span>
                                      <span class="n">zip_type</span><span class="o">=</span><span class="s1">&#39;truncate&#39;</span><span class="p">),</span> <span class="n">made_dir</span><span class="p">,</span>
                               <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zl dirs and render and data&#39;</span>
                               <span class="p">),</span>
-                <span class="n">input_info</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span>
-                <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;final_filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
-                <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Write </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">stream_name</span><span class="p">),</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">made_dir</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">writer_templater</span><span class="p">,</span> <span class="n">kwargs</span>
-         <span class="ow">in</span>
-         <span class="nb">zip</span><span class="p">(</span>
-             <span class="n">streams_to_be_saved</span><span class="p">,</span>
-             <span class="n">mega_render</span><span class="p">,</span>
-             <span class="n">make_dirs</span><span class="p">,</span>  <span class="c1"># prevent run condition btwn dirs and files</span>
-             <span class="n">input_infos</span><span class="p">,</span>
-             <span class="n">save_callables</span><span class="p">,</span>
-             <span class="n">saver_kwargs</span>
-         <span class="p">)]</span>
+                          <span class="n">input_info</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span>
+                          <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;final_filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                          <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Write </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">stream_name</span><span class="p">),</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span>
+                   <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">made_dir</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">writer_templater</span><span class="p">,</span> <span class="n">kwargs</span>
+                   <span class="ow">in</span>
+                   <span class="nb">zip</span><span class="p">(</span>
+                       <span class="n">streams_to_be_saved</span><span class="p">,</span>
+                       <span class="n">mega_render</span><span class="p">,</span>
+                       <span class="n">make_dirs</span><span class="p">,</span>  <span class="c1"># prevent run condition btwn dirs and files</span>
+                       <span class="n">input_infos</span><span class="p">,</span>
+                       <span class="n">save_callables</span><span class="p">,</span>
+                       <span class="n">saver_kwargs</span>
+                   <span class="p">)])</span>
 
-        <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dump_yml</span><span class="p">,</span> <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">eventify_raw_start</span><span class="p">,</span> <span class="n">md_render</span><span class="p">),</span>
-               <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
-                           <span class="mi">1</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">)},</span>
-               <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dump yaml&#39;</span><span class="p">)</span>
+        <span class="n">_s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dump_yml</span><span class="p">,</span> <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">eventify_raw_start</span><span class="p">,</span> <span class="n">md_render</span><span class="p">),</span>
+                      <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">)},</span>
+                      <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dump yaml&#39;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">raw_source</span></div>
 </pre></div>
 

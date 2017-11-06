@@ -3,21 +3,6 @@ import string
 from collections import defaultdict
 from pathlib import Path
 
-base_template = (''
-                 '{folder_tag_stuff}/'
-                 '{analyzed_start[analysis_stage]}/'
-                 '{raw_start[sample_name]}_'
-                 '{human_timestamp}_'
-                 '[temp={raw_event[data][temperature]:1.2f}'
-                 '{raw_descriptor[data_keys][temperature][units]}]_'
-                 '[dx={raw_event[data][diff_x]:1.3f}'
-                 '{raw_descriptor[data_keys][diff_x][units]}]_'
-                 '[dy={raw_event[data][diff_y]:1.3f}'
-                 '{raw_descriptor[data_keys][diff_y][units]}]_'
-                 '{raw_start[uid]:.6}_'
-                 '{raw_event[seq_num]:03d}{ext}')
-
-
 class PartialFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
         # Handle a key not found
@@ -81,23 +66,38 @@ def clean_template(template, removals=None, cfmt=cfmt):
     e = e.replace(']', '')
     e = e.replace('(', '')
     e = e.replace(')', '')
+    e = e.replace('\'','')
     f = Path(e).as_posix()
     f = f.replace('/_', '/')
     print('saving file at {}'.format(f))
     return f
 
 # Replaces each parameter name within folder_tag_list with the value of that parameter.
-# 
 def get_filename_prefix(folder_tag_list,md):
     result =''
     for tag in folder_tag_list:
         if isinstance(tag,str):
-            addition = str(md[tag])
+            try:
+                raw_addition = md[tag]
+            except(KeyError):
+                print("Error: " + str(tag) + " not valid folder tag. " + str(tag) + " was skipped in defining the file path.")
+                raw_addition = ''
         else:
             sub_md = md.copy()
             for item in tag:
-                sub_md = sub_md[item]
-            addition = str(sub_md) 
+                try:
+                    sub_md = sub_md[item]
+                    raw_addition = sub_md 
+                except(KeyError):
+                    print("Error: " + str(tag) + " not valid folder tag. " + str(tag) + " was skipped in defining the file path.")
+                    raw_addition = ''
+        if (type(raw_addition)!=float):
+            addition = str(raw_addition)
+        else:
+            if (raw_addition-int(raw_addition))==0:
+                addition = str(int(raw_addition))
+            else:
+                addition = str(raw_addition).replace('.','-')
         result += addition + '/'
     return result
 
@@ -106,6 +106,7 @@ def render_and_clean(string, formatter=pfmt, **kwargs):
     try:
         folder_tag_list = kwargs['folder_tag_list']
     except(KeyError):
+        #Current default behavior is no prefix. We could make a default, for example, sample name
         folder_tag_list = []
     filename_prefix = get_filename_prefix(folder_tag_list, kwargs)
     # format replaces curly braces with the value in kwargs associated with the key in curly braces

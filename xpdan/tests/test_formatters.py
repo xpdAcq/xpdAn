@@ -84,5 +84,5 @@ def test_get_filename_prefix(test_md, test_input, expected):
 	(["fake_tag", ("another_fake_tag", "fake_subtag")], "filename_details")])
 def test_render_and_clean(test_md, test_folder_list, expected):
     if test_folder_list!=[]:
-	    md['folder_tag_list'] = test_folder_list
+        md['folder_tag_list'] = test_folder_list
     assert render_and_clean("filename_details", md) == expected

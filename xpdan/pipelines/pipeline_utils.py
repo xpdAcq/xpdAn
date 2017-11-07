@@ -80,8 +80,6 @@ def templater3_func(template, analysis_stage='raw', ext='.tiff'):
 
 
 base_template = (''
-                 '{raw_start[sample_name]}/'
-                 '{raw_start[folder_tag]}/'
                  '{analyzed_start[analysis_stage]}/'
                  '{raw_start[sample_name]}_'
                  '{human_timestamp}_'

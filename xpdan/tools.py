@@ -335,6 +335,7 @@ def generate_binner(geo, img_shape, mask=None):
     qbin_sizes = rbinned(q_dq.ravel())
     qbin_sizes = np.nan_to_num(qbin_sizes)
     qbin = np.cumsum(qbin_sizes)
+    qbin[0] = np.min(q)
     if mask is not None:
         mask = mask.flatten()
     return BinnedStatistic1D(q.flatten(), bins=qbin, mask=mask)
@@ -344,9 +345,9 @@ def z_score_image(img, binner):
     img2 = img.flatten()
     xy = binner.xy
 
-    means = binner(img, 'mean')
+    means = binner(img2, 'mean')
 
-    stds = binner(img, 'std')
+    stds = binner(img2, 'std')
 
     def f(i):
         tv = (xy == i)

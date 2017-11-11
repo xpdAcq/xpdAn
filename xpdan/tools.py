@@ -24,9 +24,16 @@ from multiprocessing.dummy import Pool
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
+from numba import jit
 
 
-# TODO: speed this up
+@jit(cache=True, nopython=True, nogil=True)
+def zscore(a):
+    m = a.mean()
+    s = a.std()
+    return np.abs(a - m) / s
+
+
 def new_masking_method(img, geo, alpha=3, tmsk=None):
     """Sigma Clipping based masking
 
@@ -50,35 +57,39 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
     qbinned = generate_binner(geo, img.shape)
     xy = qbinned.xy
 
-    ripos = np.arange(0, np.size(img))
+    ripos = np.arange(np.size(img))
     rimg = img.flatten()
 
     if tmsk is None:
         tmsk = np.ones(img.shape)
+    tmsk.ravel()
 
     # TODO: speed this up
     def mask_ring(i):
         """Find outlier pixels in a single ring """
-        tv = (xy == i) & tmsk.flatten()
+        tv = (xy == i) & tmsk
 
         values_array = rimg[tv]
         positions_array = ripos[tv]
+        removals = []
         while len(values_array) > 0:
-            norm_v_list = np.abs(values_array -
-                                 np.mean(values_array)) / np.std(values_array)
+            norm_v_list = zscore(values_array)
             if np.all(norm_v_list < alpha):
                 break
             # get the index of the worst pixel
             worst_idx = np.argmax(norm_v_list)
             # add the worst position to the mask
-            tmsk[np.unravel_index(positions_array[worst_idx],
-                                  img.shape)] = False
+            removals.append(positions_array[worst_idx])
             # delete the worst position
             values_array = np.delete(values_array, worst_idx)
             positions_array = np.delete(positions_array, worst_idx)
+        return removals
 
     with Pool() as p:
-        [_ for _ in p.imap_unordered(mask_ring, np.unique(xy), 10)]
+        removals = [r for r in p.imap_unordered(mask_ring, np.unique(xy), 10)]
+    removals = [item for sublist in removals for item in sublist]
+    tmsk[removals] = False
+    tmsk.reshape(img.shape)
     print('finished mask')
     return tmsk.astype(bool)
 

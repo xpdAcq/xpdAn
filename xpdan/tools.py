@@ -338,8 +338,7 @@ def z_score_image(img, binner):
     xy = binner.xy
     idx = xy.argsort()
 
-    vfs = img.flatten()
-    vfs = vfs[idx]
+    vfs = img.flatten()[idx]
 
     i = 0
     for j, k in enumerate(np.bincount(xy)):

@@ -20,18 +20,17 @@ except ImportError:
     from xpdan.shim import PDFGetterShim as PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
-from multiprocessing.dummy import Pool
 
 from skbeam.core.accumulators.binned_statistic import BinnedStatistic1D
 from skbeam.core.mask import margin, binned_outlier
-from numba import jit
 
 
-@jit(cache=True, nopython=True, nogil=True)
-def zscore(a):
-    m = a.mean()
-    s = a.std()
-    return np.abs(a - m) / s
+def mask_ring(a):
+    """Find outlier pixels in a single ring """
+    values_array, positions_array, alpha = a
+    z = np.abs(values_array - np.median(values_array)) / np.std(values_array)
+    removals = positions_array[z > alpha]
+    return removals
 
 
 def new_masking_method(img, geo, alpha=3, tmsk=None):
@@ -54,42 +53,25 @@ def new_masking_method(img, geo, alpha=3, tmsk=None):
         The mask
     """
     print('start mask')
-    qbinned = generate_binner(geo, img.shape)
+
+    qbinned = generate_binner(geo, img.shape, mask=tmsk)
+
     xy = qbinned.xy
-
-    ripos = np.arange(np.size(img))
-    rimg = img.flatten()
-
-    if tmsk is None:
-        tmsk = np.ones(img.shape)
-    tmsk.ravel()
-
-    # TODO: speed this up
-    def mask_ring(i):
-        """Find outlier pixels in a single ring """
-        tv = (xy == i) & tmsk
-
-        values_array = rimg[tv]
-        positions_array = ripos[tv]
-        removals = []
-        while len(values_array) > 0:
-            norm_v_list = zscore(values_array)
-            if np.all(norm_v_list < alpha):
-                break
-            # get the index of the worst pixel
-            worst_idx = np.argmax(norm_v_list)
-            # add the worst position to the mask
-            removals.append(positions_array[worst_idx])
-            # delete the worst position
-            values_array = np.delete(values_array, worst_idx)
-            positions_array = np.delete(positions_array, worst_idx)
-        return removals
-
-    with Pool() as p:
-        removals = [r for r in p.imap_unordered(mask_ring, np.unique(xy), 10)]
+    idx = xy.argsort()
+    vfs = img.flatten()[idx]
+    pfs = np.arange(np.size(img))[idx]
+    h = np.bincount(xy)
+    t = []
+    i = 0
+    for j, k in enumerate(h):
+        if k > 0:
+            t.append((vfs[i: i + k], pfs[i: i + k], alpha))
+        i += k
+    removals = map(mask_ring, t)
     removals = [item for sublist in removals for item in sublist]
+    tmsk = tmsk.ravel()
     tmsk[removals] = False
-    tmsk.reshape(img.shape)
+    tmsk = tmsk.reshape(img.shape)
     print('finished mask')
     return tmsk.astype(bool)
 
@@ -353,20 +335,21 @@ def generate_binner(geo, img_shape, mask=None):
 
 
 def z_score_image(img, binner):
-    img2 = img.flatten()
     xy = binner.xy
+    idx = xy.argsort()
 
-    means = binner(img2, 'mean')
+    vfs = img.flatten()
+    vfs = vfs[idx]
 
-    stds = binner(img2, 'std')
+    i = 0
+    for j, k in enumerate(np.bincount(xy)):
+        if k > 0:
+            vfs[i: i + k] -= np.mean(vfs[i: i + k])
+            vfs[i: i + k] /= np.std(vfs[i: i + k])
+        i += k
 
-    def f(i):
-        tv = (xy == i)
-        img2[tv] -= means[i]
-        img2[tv] /= stds[i]
-
-    with Pool() as p:
-        p.map(f, np.unique(xy))
+    img2 = np.empty(vfs.shape)
+    img2[idx] = vfs
 
     return img2.reshape(img.shape)
 

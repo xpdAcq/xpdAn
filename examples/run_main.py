@@ -25,27 +25,28 @@ db = Broker(mds=mds, reg=fs)
 db.prepare_hook = lambda x, y: copy.deepcopy(y)
 td = TemporaryDirectory()
 
-vis = False
-# vis = True
+# vis = False
+vis = True
 source = conf_main_pipeline(db, td.name,
                             vis=vis,
                             write_to_disk=False,
+                            # mask_setting='auto'
                             # verbose=True
                             )
 source.visualize()
-'''
-seen = False
+# '''
 for hdr in list((db[-1], )):
     for e in hdr.documents():
         if e[0] == 'start':
             e[1].update(composition_string='EuTiO3')
         if e[0] == 'event' and vis:
             plt.pause(.1)
-        if e[0] == 'event' and not seen:
-            source.emit(e)
-            seen = True
-        elif e[0] != 'event':
-            source.emit(e)
+        if e[0] == 'event':
+            if e[1]['seq_num'] > 3:
+                # AAA
+                pass
+        source.emit(e)
+
 
 plt.show()
 plt.close("all")

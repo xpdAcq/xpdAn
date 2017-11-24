@@ -22,12 +22,14 @@ import pytest
 
 from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
+from xpdsim import xpd_pe1c as det
 from skbeam.io.fit2d import fit2d_save
 from .utils import insert_imgs
-from bluesky.examples import ReaderWithRegistryHandler
 from bluesky.tests.conftest import fresh_RE
 from bluesky.tests.conftest import db
 import uuid
+from ophyd.sim import (SynSignalWithRegistry, NumpySeqHandler,
+                       SynSignalRO)
 
 if sys.version_info >= (3, 0):
     pass
@@ -50,20 +52,20 @@ def img_size():
 def exp_db(db, fast_tmp_dir, img_size, fresh_RE):
     db2 = db
     reg = db2.reg
-    reg.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
+    db.reg.register_handler('NPY_SEQ', NumpySeqHandler)
     RE = fresh_RE
     RE.subscribe(db.insert)
     bt_uid = str(uuid.uuid4)
 
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, bt_safN=0,
+    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, bt_safN=0,
                 pi_name='chris', sample_name='kapton', sample_composition='C',
                 start_uid1=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='tim',
+    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, pi_name='tim',
                 bt_safN=1, sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au',
                 start_uid2=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='chris', bt_safN=2,
-                sample_name='Au', bkgd_sample_name='kapton',
+    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, pi_name='chris',
+                bt_safN=2, sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au',
                 start_uid3=True, bt_uid=bt_uid, composition_string='Au')
     yield db2

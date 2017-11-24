@@ -17,7 +17,7 @@ import numpy as np
 try:
     from diffpy.pdfgetx import PDFGetter
 except ImportError:
-    from xpdan.tests.utils import PDFGetterShim as PDFGetter
+    from xpdan.shim import PDFGetterShim as PDFGetter
 from matplotlib.path import Path
 from scipy.sparse import csr_matrix
 from multiprocessing.dummy import Pool

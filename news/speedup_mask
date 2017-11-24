@@ -1,0 +1,14 @@
+**Added:**
+
+* Add rever changelog activity
+* Speed up masking via median based sigma clipping
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

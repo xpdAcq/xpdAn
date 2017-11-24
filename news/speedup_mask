@@ -2,6 +2,8 @@
 
 * Add rever changelog activity
 * Speed up masking via median based sigma clipping
+* Z score visualization to callback pipeline
+
 
 **Changed:** None
 

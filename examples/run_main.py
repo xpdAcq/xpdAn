@@ -33,9 +33,9 @@ source = conf_main_pipeline(db, td.name,
                             # mask_setting='auto'
                             # verbose=True
                             )
-source.visualize(source_node=True)
+# source.visualize(source_node=True)
 # source.visualize(source_node=False)
-'''
+# '''
 for hdr in list((db[-1], )):
     for e in hdr.documents():
         if e[0] == 'start':

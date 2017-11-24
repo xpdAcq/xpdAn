@@ -466,7 +466,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            input_info={'img': ('img', 0),
                                        'binner': ('binner', 1)},
                            output_info=[('zimg', {'dtype': 'array',
-                                               'source': 'testing'}),],
+                                                  'source': 'testing'}), ],
                            stream_name='zscore',
                            md=dict(analysis_stage='zscore')
                            )
@@ -593,7 +593,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                               es.zip(s2, s1, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
-                              ),
+                          ),
                           input_info=ii,
                           output_info=[('final_filename', {'dtype': 'str'})],
                           stream_name='Write {}'.format(s1.stream_name),

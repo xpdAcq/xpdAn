@@ -17,7 +17,7 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_calibration,
                                             base_template)
 from xpdan.tools import (generate_binner, load_geo,
                          polarization_correction, mask_img, pdf_getter,
-                         fq_getter, overlay_mask)
+                         fq_getter, overlay_mask, z_score_image)
 from xpdview.callbacks import LiveWaterfall
 
 
@@ -76,8 +76,10 @@ class MainCallback(CallbackBase):
         self.save_dir = save_dir
         self.light_template = os.path.join(self.save_dir, base_template)
         if self.vis:
-            self.vis_callbacks = {'dark_sub_iq': LiveImage(
-                'img', window_title='Dark Subtracted Image', cmap='viridis'),
+            self.vis_callbacks = {
+                'dark_sub_iq': LiveImage('img',
+                                         window_title='Dark Subtracted Image',
+                                         cmap='viridis'),
                 'masked_img': LiveImage('overlay_mask',
                                         window_title='Dark/Background/'
                                                      'Polarization Corrected '
@@ -99,7 +101,10 @@ class MainCallback(CallbackBase):
                                     window_title='F(Q)'),
                 'pdf': LiveWaterfall('r', 'pdf',
                                      units=('r (A)', 'G(r) A^-2'),
-                                     window_title='G(r)')
+                                     window_title='G(r)'),
+                'zscore': LiveImage('img',
+                                    window_title='Z Score Image',
+                                    cmap='viridis')
             }
 
         self.start_doc = None
@@ -239,7 +244,7 @@ class MainCallback(CallbackBase):
                     # Masking
                     if doc['seq_num'] == 1:
                         if (self.start_doc['sample_name'] == 'Setup' or
-                                self.mask_setting is None):
+                                    self.mask_setting is None):
                             self.mask = np.ones(img.shape, dtype=bool)
                         else:
                             self.mask = mask_img(img, geo, **self.mask_kwargs)
@@ -264,8 +269,12 @@ class MainCallback(CallbackBase):
                     q, iq = binner.bin_centers, np.nan_to_num(
                         binner(img.flatten()))
                     if self.vis:
-                        self.vis_callbacks['iq']('event', format_event(q=q,
-                                                                       iq=iq))
+                        self.vis_callbacks['iq']('event',
+                                                 format_event(q=q, iq=iq))
+                        self.vis_callbacks['zscore']('event',
+                                                     format_event(
+                                                         img=z_score_image(
+                                                             img, binner)))
                     if self.write_to_disk:
                         iq_name = render_clean_makedir(
                             self.light_template,

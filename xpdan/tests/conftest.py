@@ -16,20 +16,18 @@ import os
 import shutil
 import sys
 import tempfile
-
-import numpy as np
+import uuid
 import pytest
+import numpy as np
+
+from xpdsim import xpd_pe1c as det
+from bluesky.tests.conftest import RE as fresh_RE, db, NumpySeqHandler
+from skbeam.io.fit2d import fit2d_save
 
 from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
-from xpdsim import xpd_pe1c as det
-from skbeam.io.fit2d import fit2d_save
 from .utils import insert_imgs
-from bluesky.tests.conftest import fresh_RE
-from bluesky.tests.conftest import db
-import uuid
-from ophyd.sim import (SynSignalWithRegistry, NumpySeqHandler,
-                       SynSignalRO)
+
 
 if sys.version_info >= (3, 0):
     pass

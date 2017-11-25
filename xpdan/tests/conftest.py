@@ -55,17 +55,17 @@ def exp_db(db, fast_tmp_dir, img_size, fresh_RE):
     RE.subscribe(db.insert)
     bt_uid = str(uuid.uuid4)
 
-    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, bt_safN=0,
-                pi_name='chris', sample_name='kapton', sample_composition='C',
-                start_uid1=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, pi_name='tim',
-                bt_safN=1, sample_name='Au', bkgd_sample_name='kapton',
-                sample_composition='Au',
-                start_uid2=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, det, reg, 2, img_size, fast_tmp_dir, pi_name='chris',
-                bt_safN=2, sample_name='Au', bkgd_sample_name='kapton',
-                sample_composition='Au',
-                start_uid3=True, bt_uid=bt_uid, composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, bt_safN=0, pi_name='chris',
+                sample_name='kapton', sample_composition='C', start_uid1=True,
+                bt_uid=bt_uid, composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='tim', bt_safN=1,
+                sample_name='Au', bkgd_sample_name='kapton',
+                sample_composition='Au', start_uid2=True, bt_uid=bt_uid,
+                composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='chris', bt_safN=2,
+                sample_name='Au', bkgd_sample_name='kapton',
+                sample_composition='Au', start_uid3=True, bt_uid=bt_uid,
+                composition_string='Au')
     yield db2
 
 

@@ -19,6 +19,7 @@ from uuid import uuid4
 import numpy as np
 
 from bluesky.plans import count
+from ophyd import sim
 
 pyFAI_calib = {'calibrant_name': 'Ni24',
                'centerX': 997.79605730878336,
@@ -69,15 +70,13 @@ pyFAI_calib = {'calibrant_name': 'Ni24',
                'wavelength': 1.832e-11}
 
 
-def insert_imgs(RE, det, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
+def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     """
     Insert images into mds and fs for testing
 
     Parameters
     ----------
     RE: bluesky.run_engine.RunEngine instance
-    det:
-        The detector
     reg: Registry instance
     n: int
         Number of images to take
@@ -90,14 +89,12 @@ def insert_imgs(RE, det, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
 
     """
     # Create detectors
-    dark_det = det('pe1_image',
-                   {'pe1_image': lambda: np.random.random(
-                       shape)},
-                   reg=reg, save_path=save_dir)
-    light_det = det('pe1_image',
-                    {'pe1_image': lambda: np.random.random(
-                        shape)},
-                    reg=reg, save_path=save_dir)
+    dark_det = sim.SynSignalWithRegistry(
+        'pe1_image', {'pe1_image': lambda: np.random.random(shape)},
+        reg=reg, save_path=save_dir)
+    light_det = sim.SynSignalWithRegistry(
+        'pe1_image', {'pe1_image': lambda: np.random.random(shape)},
+        reg=reg, save_path=save_dir)
     beamtime_uid = str(uuid4())
     base_md = dict(beamtime_uid=beamtime_uid,
                    calibration_md=pyFAI_calib,

@@ -52,12 +52,11 @@ install:
   - pip install https://github.com/NSLS-II/databroker/zipball/master#egg=databroker
   - pip install https://github.com/NSLS-II/bluesky/zipball/master#egg=bluesky
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
-#  - pip install https://github.com/mrocklin/streamz/zipball/master#egg=streamz
-# Beamline current streamz
   - pip install git+https://github.com/mrocklin/streamz.git#egg=streamz
   - pip install https://github.com/xpdAcq/SHED/zipball/master#egg=shed
   - pip install https://github.com/xpdAcq/xpdView/zipball/master#egg=xpdview
   - pip install https://github.com/xpdAcq/xpdSim/zipball/master#egg=xpdsim
+  - pip install https://github.com/xpdAcq/xpdAcq/zipball/master#egg=xpdacq
   - pip install .
   - pip install codecov pytest-env
 

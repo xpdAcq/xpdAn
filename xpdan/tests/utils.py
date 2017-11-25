@@ -18,8 +18,8 @@ from uuid import uuid4
 
 import numpy as np
 
-from bluesky.examples import ReaderWithRegistry
 from bluesky.plans import count
+from ophyd import sim
 
 pyFAI_calib = {'calibrant_name': 'Ni24',
                'centerX': 997.79605730878336,
@@ -89,14 +89,12 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
 
     """
     # Create detectors
-    dark_det = ReaderWithRegistry('pe1_image',
-                                  {'pe1_image': lambda: np.random.random(
-                                      shape)},
-                                  reg=reg, save_path=save_dir)
-    light_det = ReaderWithRegistry('pe1_image',
-                                   {'pe1_image': lambda: np.random.random(
-                                       shape)},
-                                   reg=reg, save_path=save_dir)
+    dark_det = sim.SynSignalWithRegistry(name='pe1_image',
+                                         func=lambda: np.random.random(shape),
+                                         reg=reg)
+    light_det = sim.SynSignalWithRegistry(name='pe1_image',
+                                          func=lambda: np.random.random(shape),
+                                          reg=reg)
     beamtime_uid = str(uuid4())
     base_md = dict(beamtime_uid=beamtime_uid,
                    calibration_md=pyFAI_calib,
@@ -115,20 +113,6 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     uid = RE(count([light_det], num=n), **light_md)
 
     return uid
-
-
-class PDFGetterShim:
-    def __init__(self):
-        self.config = {'qmax': 'testing'}
-        self.fq = np.ones(10), np.ones(10)
-
-    def __call__(self, *args, **kwargs):
-        print("This is a testing shim for PDFgetx.\n"
-              "If you see this message then "
-              "you don't have PDFgetx3 installed.\n"
-              "The data that comes from this is for testing purposes only "
-              "and has no bearing on reality")
-        return np.ones(10), np.ones(10)
 
 
 integrate_params = [

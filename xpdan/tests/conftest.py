@@ -16,21 +16,39 @@ import os
 import shutil
 import sys
 import tempfile
-
-import numpy as np
+import uuid
 import pytest
+import numpy as np
+
+from xpdsim import xpd_pe1c as det
+from bluesky.tests.conftest import db, NumpySeqHandler, RunEngine, asyncio
+from skbeam.io.fit2d import fit2d_save
 
 from xpdan.fuzzybroker import FuzzyBroker
 from xpdan.glbl_gen import make_glbl, load_configuration
-from skbeam.io.fit2d import fit2d_save
 from .utils import insert_imgs
-from bluesky.examples import ReaderWithRegistryHandler
-from bluesky.tests.conftest import fresh_RE
-from bluesky.tests.conftest import db
-import uuid
+
 
 if sys.version_info >= (3, 0):
     pass
+
+
+@pytest.fixture(scope='module')
+def fresh_RE(request):
+    loop = asyncio.new_event_loop()
+    loop.set_debug(True)
+    RE = RunEngine({}, loop=loop)
+    RE.ignore_callback_exceptions = False
+
+    def clean_event_loop():
+        if RE.state != 'idle':
+            RE.halt()
+        ev = asyncio.Event(loop=loop)
+        ev.set()
+        loop.run_until_complete(ev.wait())
+
+    request.addfinalizer(clean_event_loop)
+    return RE
 
 
 @pytest.fixture(scope='function')
@@ -46,26 +64,35 @@ def img_size():
     yield (a, a)
 
 
-@pytest.fixture(scope='function')
-def exp_db(db, fast_tmp_dir, img_size, fresh_RE):
-    db2 = db
+@pytest.fixture(scope='module')
+def ltdb(request):
+    """Return a data broker
+    """
+    from databroker.tests.utils import build_sqlite_backed_broker
+    db = build_sqlite_backed_broker(request)
+    return db
+
+
+@pytest.fixture(scope='module')
+def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
+    db2 = ltdb
     reg = db2.reg
-    reg.register_handler('RWFS_NPY', ReaderWithRegistryHandler)
+    reg.register_handler('NPY_SEQ', NumpySeqHandler)
     RE = fresh_RE
-    RE.subscribe(db.insert)
+    RE.subscribe(db2.insert)
     bt_uid = str(uuid.uuid4)
 
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, bt_safN=0,
-                pi_name='chris', sample_name='kapton', sample_composition='C',
-                start_uid1=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='tim',
-                bt_safN=1, sample_name='Au', bkgd_sample_name='kapton',
-                sample_composition='Au',
-                start_uid2=True, bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='chris', bt_safN=2,
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, bt_safN=0, pi_name='chris',
+                sample_name='kapton', sample_composition='C', start_uid1=True,
+                bt_uid=bt_uid, composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, pi_name='tim', bt_safN=1,
                 sample_name='Au', bkgd_sample_name='kapton',
-                sample_composition='Au',
-                start_uid3=True, bt_uid=bt_uid, composition_string='Au')
+                sample_composition='Au', start_uid2=True, bt_uid=bt_uid,
+                composition_string='Au')
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, pi_name='chris', bt_safN=2,
+                sample_name='Au', bkgd_sample_name='kapton',
+                sample_composition='Au', start_uid3=True, bt_uid=bt_uid,
+                composition_string='Au')
     yield db2
 
 
@@ -76,6 +103,16 @@ def fuzzdb(exp_db):
 
 @pytest.fixture(scope='function')
 def fast_tmp_dir():
+    td = tempfile.TemporaryDirectory()
+    print('creating {}'.format(td.name))
+    yield td.name
+    if os.path.exists(td.name):
+        print('removing {}'.format(td.name))
+        td.cleanup()
+
+
+@pytest.fixture(scope='module')
+def tmp_dir():
     td = tempfile.TemporaryDirectory()
     print('creating {}'.format(td.name))
     yield td.name

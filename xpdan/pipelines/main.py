@@ -25,7 +25,9 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter, overlay_mask, z_score_image)
+                         pdf_getter, fq_getter,
+                         overlay_mask,
+                         z_score_image)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
 
@@ -471,7 +473,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            md=dict(analysis_stage='zscore')
                            )
     if vis:
-        '''
         foreground_stream.sink(star(LiveImage(
             'img', window_title='Dark Subtracted Image', cmap='viridis')))
         zlpm = es.zip_latest(p_corrected_stream, mask_stream,
@@ -504,7 +505,6 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf',
                                            units=('r (A)', 'G(r) A^-2'),
                                            window_title='G(r)')))
-        '''
         zscore_stream.sink(star(LiveImage(
             'zimg', window_title='Zscore', cmap='viridis')))
 

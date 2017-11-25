@@ -244,7 +244,7 @@ class MainCallback(CallbackBase):
                     # Masking
                     if doc['seq_num'] == 1:
                         if (self.start_doc['sample_name'] == 'Setup' or
-                                    self.mask_setting is None):
+                            self.mask_setting is None):
                             self.mask = np.ones(img.shape, dtype=bool)
                         else:
                             self.mask = mask_img(img, geo, **self.mask_kwargs)

@@ -46,23 +46,32 @@ def img_size():
     yield (a, a)
 
 
-@pytest.fixture(scope='function')
-def exp_db(db, fast_tmp_dir, img_size, fresh_RE):
-    db2 = db
+@pytest.fixture(scope='module')
+def ltdb(request):
+    """Return a data broker
+    """
+    from databroker.tests.utils import build_sqlite_backed_broker
+    db = build_sqlite_backed_broker(request)
+    return db
+
+
+@pytest.fixture(scope='module')
+def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
+    db2 = ltdb
     reg = db2.reg
     db.reg.register_handler('NPY_SEQ', NumpySeqHandler)
     RE = fresh_RE
     RE.subscribe(db.insert)
     bt_uid = str(uuid.uuid4)
 
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, bt_safN=0, pi_name='chris',
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, bt_safN=0, pi_name='chris',
                 sample_name='kapton', sample_composition='C', start_uid1=True,
                 bt_uid=bt_uid, composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='tim', bt_safN=1,
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, pi_name='tim', bt_safN=1,
                 sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au', start_uid2=True, bt_uid=bt_uid,
                 composition_string='Au')
-    insert_imgs(RE, reg, 2, img_size, fast_tmp_dir, pi_name='chris', bt_safN=2,
+    insert_imgs(RE, reg, 2, img_size, tmp_dir, pi_name='chris', bt_safN=2,
                 sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au', start_uid3=True, bt_uid=bt_uid,
                 composition_string='Au')

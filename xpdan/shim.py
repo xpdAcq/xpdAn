@@ -1,7 +1,9 @@
+"""Shims"""
 import numpy as np
 
 
 class PDFGetterShim:
+    """Shim for PDFGetX3"""
     def __init__(self):
         self.config = {'qmax': 'testing'}
         self.fq = np.ones(10), np.ones(10)

@@ -172,8 +172,8 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.examples</span> <span class="k">import</span> <span class="n">ReaderWithRegistry</span>
 <span class="kn">from</span> <span class="nn">bluesky.plans</span> <span class="k">import</span> <span class="n">count</span>
+<span class="kn">from</span> <span class="nn">ophyd</span> <span class="k">import</span> <span class="n">sim</span>
 
 <span class="n">pyFAI_calib</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calibrant_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ni24&#39;</span><span class="p">,</span>
                <span class="s1">&#39;centerX&#39;</span><span class="p">:</span> <span class="mf">997.79605730878336</span><span class="p">,</span>
@@ -243,14 +243,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Create detectors</span>
-    <span class="n">dark_det</span> <span class="o">=</span> <span class="n">ReaderWithRegistry</span><span class="p">(</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                  <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                      <span class="n">shape</span><span class="p">)},</span>
-                                  <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">)</span>
-    <span class="n">light_det</span> <span class="o">=</span> <span class="n">ReaderWithRegistry</span><span class="p">(</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                   <span class="p">{</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                       <span class="n">shape</span><span class="p">)},</span>
-                                   <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">)</span>
+    <span class="n">dark_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
+                                         <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span>
+                                         <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
+    <span class="n">light_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
+                                          <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span>
+                                          <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
     <span class="n">beamtime_uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
     <span class="n">base_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">beamtime_uid</span><span class="o">=</span><span class="n">beamtime_uid</span><span class="p">,</span>
                    <span class="n">calibration_md</span><span class="o">=</span><span class="n">pyFAI_calib</span><span class="p">,</span>
@@ -269,20 +267,6 @@
     <span class="n">uid</span> <span class="o">=</span> <span class="n">RE</span><span class="p">(</span><span class="n">count</span><span class="p">([</span><span class="n">light_det</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">),</span> <span class="o">**</span><span class="n">light_md</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">uid</span></div>
-
-
-<div class="viewcode-block" id="PDFGetterShim"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.utils.PDFGetterShim">[docs]</a><span class="k">class</span> <span class="nc">PDFGetterShim</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;qmax&#39;</span><span class="p">:</span> <span class="s1">&#39;testing&#39;</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This is a testing shim for PDFgetx.</span><span class="se">\n</span><span class="s2">&quot;</span>
-              <span class="s2">&quot;If you see this message then &quot;</span>
-              <span class="s2">&quot;you don&#39;t have PDFgetx3 installed.</span><span class="se">\n</span><span class="s2">&quot;</span>
-              <span class="s2">&quot;The data that comes from this is for testing purposes only &quot;</span>
-              <span class="s2">&quot;and has no bearing on reality&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></div>
 
 
 <span class="n">integrate_params</span> <span class="o">=</span> <span class="p">[</span>

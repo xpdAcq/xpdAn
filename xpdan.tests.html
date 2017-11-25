@@ -194,12 +194,17 @@
 <span id="xpdan-tests-conftest-module"></span><h2>xpdan.tests.conftest module<a class="headerlink" href="#module-xpdan.tests.conftest" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="xpdan.tests.conftest.exp_db">
-<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">exp_db</code><span class="sig-paren">(</span><em>db</em>, <em>fast_tmp_dir</em>, <em>img_size</em>, <em>fresh_RE</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#exp_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.exp_db" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">exp_db</code><span class="sig-paren">(</span><em>ltdb</em>, <em>tmp_dir</em>, <em>img_size</em>, <em>fresh_RE</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#exp_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.exp_db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.tests.conftest.fast_tmp_dir">
 <code class="descclassname">xpdan.tests.conftest.</code><code class="descname">fast_tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#fast_tmp_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.fast_tmp_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.fresh_RE">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">fresh_RE</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#fresh_RE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.fresh_RE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -213,8 +218,19 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="xpdan.tests.conftest.ltdb">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">ltdb</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#ltdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.ltdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a data broker</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="xpdan.tests.conftest.start_uid3">
 <code class="descclassname">xpdan.tests.conftest.</code><code class="descname">start_uid3</code><span class="sig-paren">(</span><em>exp_db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#start_uid3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.start_uid3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.tests.conftest.tmp_dir">
+<code class="descclassname">xpdan.tests.conftest.</code><code class="descname">tmp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/conftest.html#tmp_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.conftest.tmp_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -330,15 +346,9 @@
 </div>
 <div class="section" id="module-xpdan.tests.utils">
 <span id="xpdan-tests-utils-module"></span><h2>xpdan.tests.utils module<a class="headerlink" href="#module-xpdan.tests.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="xpdan.tests.utils.PDFGetterShim">
-<em class="property">class </em><code class="descclassname">xpdan.tests.utils.</code><code class="descname">PDFGetterShim</code><a class="reference internal" href="_modules/xpdan/tests/utils.html#PDFGetterShim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.utils.PDFGetterShim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-</dd></dl>
-
 <dl class="function">
 <dt id="xpdan.tests.utils.insert_imgs">
-<code class="descclassname">xpdan.tests.utils.</code><code class="descname">insert_imgs</code><span class="sig-paren">(</span><em>RE</em>, <em>reg</em>, <em>n</em>, <em>shape</em>, <em>save_dir='/tmp/tmp9iq8cjau'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/utils.html#insert_imgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.utils.insert_imgs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.tests.utils.</code><code class="descname">insert_imgs</code><span class="sig-paren">(</span><em>RE</em>, <em>reg</em>, <em>n</em>, <em>shape</em>, <em>save_dir='/tmp/tmpvwkq5k33'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tests/utils.html#insert_imgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tests.utils.insert_imgs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert images into mds and fs for testing</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

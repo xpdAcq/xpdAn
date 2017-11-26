@@ -174,13 +174,19 @@
     <span class="kn">from</span> <span class="nn">xpdan.shim</span> <span class="k">import</span> <span class="n">PDFGetterShim</span> <span class="k">as</span> <span class="n">PDFGetter</span>
 <span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="k">import</span> <span class="n">csr_matrix</span>
-<span class="kn">from</span> <span class="nn">multiprocessing.dummy</span> <span class="k">import</span> <span class="n">Pool</span>
 
 <span class="kn">from</span> <span class="nn">skbeam.core.accumulators.binned_statistic</span> <span class="k">import</span> <span class="n">BinnedStatistic1D</span>
 <span class="kn">from</span> <span class="nn">skbeam.core.mask</span> <span class="k">import</span> <span class="n">margin</span><span class="p">,</span> <span class="n">binned_outlier</span>
 
 
-<span class="c1"># TODO: speed this up</span>
+<div class="viewcode-block" id="mask_ring"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.mask_ring">[docs]</a><span class="k">def</span> <span class="nf">mask_ring</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find outlier pixels in a single ring &quot;&quot;&quot;</span>
+    <span class="n">values_array</span><span class="p">,</span> <span class="n">positions_array</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values_array</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">values_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">values_array</span><span class="p">)</span>
+    <span class="n">removals</span> <span class="o">=</span> <span class="n">positions_array</span><span class="p">[</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">alpha</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">removals</span></div>
+
+
 <div class="viewcode-block" id="new_masking_method"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.new_masking_method">[docs]</a><span class="k">def</span> <span class="nf">new_masking_method</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tmsk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sigma Clipping based masking</span>
 
@@ -201,38 +207,25 @@
 <span class="sd">        The mask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start mask&#39;</span><span class="p">)</span>
-    <span class="n">qbinned</span> <span class="o">=</span> <span class="n">generate_binner</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">qbinned</span> <span class="o">=</span> <span class="n">generate_binner</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">tmsk</span><span class="p">)</span>
+
     <span class="n">xy</span> <span class="o">=</span> <span class="n">qbinned</span><span class="o">.</span><span class="n">xy</span>
-
-    <span class="n">ripos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
-    <span class="n">rimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">tmsk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">tmsk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-    <span class="c1"># TODO: speed this up</span>
-    <span class="k">def</span> <span class="nf">mask_ring</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Find outlier pixels in a single ring &quot;&quot;&quot;</span>
-        <span class="n">tv</span> <span class="o">=</span> <span class="p">(</span><span class="n">xy</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-
-        <span class="n">values_array</span> <span class="o">=</span> <span class="n">rimg</span><span class="p">[</span><span class="n">tv</span><span class="p">]</span>
-        <span class="n">positions_array</span> <span class="o">=</span> <span class="n">ripos</span><span class="p">[</span><span class="n">tv</span><span class="p">]</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">values_array</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">norm_v_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values_array</span> <span class="o">-</span>
-                                 <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">values_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">values_array</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">norm_v_list</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">):</span>
-                <span class="k">break</span>
-            <span class="c1"># get the index of the worst pixel</span>
-            <span class="n">worst_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">norm_v_list</span><span class="p">)</span>
-            <span class="c1"># add the worst position to the mask</span>
-            <span class="n">tmsk</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">positions_array</span><span class="p">[</span><span class="n">worst_idx</span><span class="p">],</span>
-                                  <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="c1"># delete the worst position</span>
-            <span class="n">values_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">values_array</span><span class="p">,</span> <span class="n">worst_idx</span><span class="p">)</span>
-            <span class="n">positions_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">positions_array</span><span class="p">,</span> <span class="n">worst_idx</span><span class="p">)</span>
-
-    <span class="k">with</span> <span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-        <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span><span class="n">mask_ring</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">xy</span><span class="p">),</span> <span class="mi">10</span><span class="p">)]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">xy</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">vfs</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">pfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">img</span><span class="p">))[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">vfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">],</span> <span class="n">pfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">],</span> <span class="n">alpha</span><span class="p">))</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="n">k</span>
+    <span class="n">removals</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">mask_ring</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">removals</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">removals</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+    <span class="n">tmsk</span> <span class="o">=</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">tmsk</span><span class="p">[</span><span class="n">removals</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">tmsk</span> <span class="o">=</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;finished mask&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span></div>
 
@@ -496,20 +489,21 @@
 
 
 <div class="viewcode-block" id="z_score_image"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.z_score_image">[docs]</a><span class="k">def</span> <span class="nf">z_score_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">binner</span><span class="p">):</span>
-    <span class="n">img2</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">xy</span> <span class="o">=</span> <span class="n">binner</span><span class="o">.</span><span class="n">xy</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">xy</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
 
-    <span class="n">means</span> <span class="o">=</span> <span class="n">binner</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+    <span class="n">vfs</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">idx</span><span class="p">]</span>
 
-    <span class="n">stds</span> <span class="o">=</span> <span class="n">binner</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">xy</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span>
+            <span class="n">vfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">vfs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">k</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="n">k</span>
 
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
-        <span class="n">tv</span> <span class="o">=</span> <span class="p">(</span><span class="n">xy</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">img2</span><span class="p">[</span><span class="n">tv</span><span class="p">]</span> <span class="o">-=</span> <span class="n">means</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">img2</span><span class="p">[</span><span class="n">tv</span><span class="p">]</span> <span class="o">/=</span> <span class="n">stds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-    <span class="k">with</span> <span class="n">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-        <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">xy</span><span class="p">))</span>
+    <span class="n">img2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">vfs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">img2</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">vfs</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">img2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
 

@@ -13,6 +13,7 @@ from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from streamz import Stream
+import streamz as sz
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_dark, temporal_prox, query_background
 from xpdan.dev_utils import _timestampstr
@@ -24,7 +25,9 @@ from xpdan.pipelines.pipeline_utils import (if_dark, if_query_results,
 from xpdan.tools import (pull_array, event_count,
                          integrate, generate_binner, load_geo,
                          polarization_correction, mask_img, add_img,
-                         pdf_getter, fq_getter, overlay_mask)
+                         pdf_getter, fq_getter,
+                         overlay_mask,
+                         z_score_image)
 from xpdview.callbacks import LiveWaterfall
 from ..calib import img_calibration, _save_calib_param
 
@@ -229,17 +232,18 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         input_info={'x': (('data', 'n_hdrs',), 1)},
         stream_name='If not background',
         full_event=True)
-    if_not_background_split_stream = es.split(if_not_background_stream, 2)
+    if_not_background_split_stream = sz.pluck(if_not_background_stream,
+                                              [0, 1])
 
     # union of background and not background branch
     foreground_stream = fg_sub_bg.union(
-        if_not_background_split_stream.split_streams[0])
+        if_not_background_split_stream)
     foreground_stream.stream_name = 'Pull from either bgsub or not sub'
     # CALIBRATION PROCESSING
 
     # if calibration send to calibration runner
     zlfi = es.zip_latest(foreground_stream, es.zip(
-        if_not_dark_stream, eventify_raw_start), clear_on_lossless_stop=True)
+        if_not_dark_stream, eventify_raw_start), )
     if_calibration_stream = es.filter(if_calibration,
                                       zlfi,
                                       input_info={0: ((), 1)},
@@ -312,7 +316,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
     # SPLIT INTO TWO NODES
     zlfl = es.zip_latest(foreground_stream, loaded_calibration_stream,
                          stream_name='Combine FG and Calibration',
-                         clear_on_lossless_stop=True)
+                         )
     p_corrected_stream = es.map(polarization_correction,
                                 zlfl,
                                 input_info={'img': ('img', 0),
@@ -328,7 +332,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        input_info={0: 'seq_num'},
                                        full_event=True),
                              loaded_calibration_stream,
-                             clear_on_lossless_stop=True)
+                             )
         mask_stream = es.map(lambda x: np.ones(x.shape, dtype=bool),
                              zlfc,
                              input_info={'x': ('img', 0)},
@@ -346,13 +350,13 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                            input_info={0: 'seq_num'},
                                            full_event=True),
                                  loaded_calibration_stream,
-                                 clear_on_lossless_stop=True)
+                                 )
         else:
             zlfc = es.zip_latest(p_corrected_stream, loaded_calibration_stream,
-                                 clear_on_lossless_stop=True)
+                                 )
 
         zlfc_ds = es.zip_latest(zlfc, if_not_dark_stream,
-                                clear_on_lossless_stop=True)
+                                )
         if_setup_stream = es.filter(
             lambda sn: sn == 'Setup',
             zlfc_ds,
@@ -392,9 +396,10 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
 
         mask_stream = not_setup_mask_stream.union(blank_mask_stream)
         mask_stream.stream_name = 'If Setup pull Dummy Mask, else Mask'
+    mask_stream.sink(print)
     # generate binner stream
     zlmc = es.zip_latest(mask_stream, loaded_calibration_stream,
-                         clear_on_lossless_stop=True)
+                         )
 
     binner_stream = es.map(generate_binner,
                            zlmc,
@@ -405,7 +410,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                            img_shape=(2048, 2048),
                            stream_name='Binners')
     zlpb = es.zip_latest(p_corrected_stream, binner_stream,
-                         clear_on_lossless_stop=True)
+                         )
 
     iq_stream = es.map(integrate,
                        zlpb,
@@ -459,6 +464,14 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                      ('config', {'dtype': 'dict'})],
                         **pdf_config,
                         md=dict(analysis_stage='pdf'))
+    zscore_stream = es.map(z_score_image, zlpb,
+                           input_info={'img': ('img', 0),
+                                       'binner': ('binner', 1)},
+                           output_info=[('zimg', {'dtype': 'array',
+                                                  'source': 'testing'}), ],
+                           stream_name='zscore',
+                           md=dict(analysis_stage='zscore')
+                           )
     if vis:
         foreground_stream.sink(star(LiveImage(
             'img', window_title='Dark Subtracted Image', cmap='viridis')))
@@ -477,7 +490,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                                        cmap='viridis',
                                        limit_func=lambda im: (
                                            np.nanpercentile(im, 1),
-                                           np.nanpercentile(im, 99))
+                                           np.nanpercentile(im, 99)),
                                        # norm=LogNorm()
                                        )))
         iq_stream.sink(star(LiveWaterfall('q', 'iq',
@@ -492,6 +505,8 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
         pdf_stream.sink(star(LiveWaterfall('r', 'pdf',
                                            units=('r (A)', 'G(r) A^-2'),
                                            window_title='G(r)')))
+        zscore_stream.sink(star(LiveImage(
+            'zimg', window_title='Zscore', cmap='viridis')))
 
     if write_to_disk:
         eventify_raw_descriptor = es.Eventify(
@@ -578,7 +593,7 @@ def conf_main_pipeline(db, save_dir, *, write_to_disk=False, vis=True,
                               es.zip(s2, s1, stream_name='zip render and data',
                                      zip_type='truncate'), made_dir,
                               stream_name='zl dirs and render and data'
-                              ),
+                          ),
                           input_info=ii,
                           output_info=[('final_filename', {'dtype': 'str'})],
                           stream_name='Write {}'.format(s1.stream_name),

@@ -349,7 +349,7 @@ def z_score_image(img, binner):
 
     img2 = np.empty(vfs.shape)
     img2[idx] = vfs
-    np.nan_to_num(img2, False)
+    img2 = np.nan_to_num(img2)
 
     return img2.reshape(img.shape)
 

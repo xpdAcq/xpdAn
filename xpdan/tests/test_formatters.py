@@ -63,7 +63,7 @@ test_md = {'analysis_stage': 'raw', \
 #case 4 - one tag doesn't actually exist in metadata
 #case 5 - one tag, inside tuple, doesn't exist in metadata
 #case 6 - no tags exist in metadata
-@pytest.mark.parameterize("test_input, expected" ,
+@pytest.mark.parametrize("test_input, expected" ,
 	[(["beamline_id"], "28-ID-2/"),
 	(["beamline_id", "sp_time_per_frame"], "28-ID-2/2-5/"),
 	(["lead_experimenter", "sample_name", ("sample_composition", "C")], "['Elizabeth']/undoped_ptp/18/"),
@@ -74,7 +74,7 @@ def test_get_filename_prefix(test_md, test_input, expected):
     assert get_filename_prefix(test_input, md) == expected 
 
 #Adds the case of no folder list provided
-@pytest.mark.parameterize("test_folder_list, expected" ,
+@pytest.mark.parametrize("test_folder_list, expected" ,
 	[([],"filename_details"),
 	(["beamline_id"], "28-ID-2/filename_details"),
 	(["beamline_id", "sp_time_per_frame"], "28-ID-2/2-5/filename_details"),

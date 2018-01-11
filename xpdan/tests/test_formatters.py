@@ -73,7 +73,7 @@ def test_md():
 	(["fake_tag", ("another_fake_tag", "fake_subtag")], "//")])
 def test_get_filename_prefix(test_md, test_input, expected):
 	md = test_md
-    assert get_filename_prefix(test_input, md) == expected 
+	assert get_filename_prefix(test_input, md) == expected
 
 #Adds the case of no folder list provided
 @pytest.mark.parametrize("test_folder_list, expected" ,
@@ -87,5 +87,5 @@ def test_get_filename_prefix(test_md, test_input, expected):
 def test_render_and_clean(test_md, test_folder_list, expected):
     md = test_md
     if test_folder_list!=[]:
-        md['folder_tag_list'] = test_folder_list
-    assert render_and_clean("filename_details", md) == expected
+    	md['folder_tag_list'] = test_folder_list
+	assert render_and_clean("filename_details", md) == expected

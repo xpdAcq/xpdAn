@@ -15,8 +15,7 @@
 
 import os
 import pytest
-from xpdan.formatters import (PartialFormatter, clean_template, 
-    get_filename_prefix, render_and_clean)
+from xpdan.formatters import (PartialFormatter, clean_template, get_filename_prefix, render_and_clean)
 import yaml
 
 @pytest.fixture(scope='module')
@@ -77,7 +76,7 @@ def test_md():
 	(["lead_experimenter", "sample_name", ("another_fake_tag", "C")], "['Elizabeth']/undoped_ptp//"),
 	(["fake_tag", ("another_fake_tag", "fake_subtag")], "//")])
 def test_get_filename_prefix(test_md, test_input, expected):
-    md = test_md()
+    md = test_md
     assert get_filename_prefix(test_input, md) == expected
 
 #Adds the case of no folder list provided
@@ -89,9 +88,9 @@ def test_get_filename_prefix(test_md, test_input, expected):
 	(["lead_experimenter", "fake_tag", ("sample_composition", "C")], "Elizabeth/18/filename_details"),
 	(["lead_experimenter", "sample_name", ("another_fake_tag", "C")], "Elizabeth/undoped_ptp/filename_details"),
 	(["fake_tag", ("another_fake_tag", "fake_subtag")], "undoped_ptp/filename_details")])
-def test_render_and_clean(test_md, test_folder_list, expected):
-    md = test_md()
+def test_render_and_clean(test_md, pfmt, test_folder_list, expected):
+    md = test_md
     if test_folder_list!=[]:
         md['folder_tag_list'] = test_folder_list
-    formatter = pfmt()
+    formatter = pfmt
     assert render_and_clean("filename_details", formatter=formatter, **md) == expected

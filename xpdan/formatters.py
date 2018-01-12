@@ -79,7 +79,9 @@ def get_filename_prefix(folder_tag_list, md):
         else:
             sub_md = md.copy()
             for item in tag:
-                raw_addition = md.get(tag, '')
+                if isinstance(sub_md,dict):
+                    sub_md = sub_md.get(item,'')
+            raw_addition = sub_md
         if (type(raw_addition)!=float):
             addition = str(raw_addition)
         else:
@@ -94,6 +96,8 @@ def get_filename_prefix(folder_tag_list, md):
 def render_and_clean(string, formatter=pfmt, **kwargs):
     folder_tag_list = kwargs.get('folder_tag_list', ['sample_name'])
     filename_prefix = get_filename_prefix(folder_tag_list, kwargs)
+    if re.fullmatch(r'/+',filename_prefix):
+        filename_prefix = kwargs.get('sample_name')
     # format replaces curly braces with the value in kwargs associated with the key in curly braces
     formatted_string = formatter.format(string, **kwargs)
     return clean_template(os.path.join(filename_prefix, formatted_string))

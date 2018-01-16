@@ -70,7 +70,8 @@ def clean_template(template, removals=None, cfmt=cfmt):
     return f
 
 
-# Replaces each parameter name within folder_tag_list with the value of that parameter.
+# Replaces each parameter name within folder_tag_list with the
+# value of that parameter.
 def get_filename_prefix(folder_tag_list, md):
     result = ''
     for tag in folder_tag_list:

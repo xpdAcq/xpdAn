@@ -31,6 +31,7 @@ before_install:
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -p ~/mc
   - export PATH=~/mc/bin:$PATH
+  - conda config --set always_yes yes --set changeps1 no --set quiet true
   - conda update conda --yes
   - conda config --add channels conda-forge
   - export CONDARC=ci/condarc
@@ -47,17 +48,17 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create --yes -n testenv python=$TRAVIS_PYTHON_VERSION
+  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
   - source activate testenv
-  - conda install --yes --file requirements/build.txt
+  - conda install --file requirements/build.txt
   - conda install pip
   - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
   - pip install .
 
 script:
   - set -e
-  - conda install --yes --file requirements/run.txt
-  - conda install --yes --file requirements/test.txt
+  - conda install --file requirements/run.txt
+  - conda install --file requirements/test.txt
   - coverage run run_tests.py
   - coverage report -m
   - codecov

@@ -1,0 +1,15 @@
+numpy
+scipy
+matplotlib
+pyyaml
+scikit-beam
+pyfai
+pyxdameraulevenshtein
+xray-vision
+databroker
+bluesky
+streamz_ext
+xpdsim
+shed
+xpdview
+ophyd

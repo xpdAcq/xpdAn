@@ -3,7 +3,9 @@
 ./_modules/xpdan/db_utils.html
 ./_modules/xpdan/fuzzybroker.html
 ./_modules/xpdan/glbl_gen.html
+./_modules/xpdan/pipelines/main.html
 ./_modules/xpdan/pipelines/pipeline_utils.html
+./_modules/xpdan/pipelines/save_tiff.html
 ./_modules/xpdan/tests/conftest.html
 ./_modules/xpdan/tests/test_data_reduction_core.html
 ./_modules/xpdan/tests/test_db_utils.html

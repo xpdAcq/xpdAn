@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.pipelines.save_tiff &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="xpdAn  documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.pipelines.save_tiff</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.pipelines.save_tiff</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Save tiff pipeline&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">sub</span>
+
+<span class="kn">import</span> <span class="nn">shed.event_streams</span> <span class="k">as</span> <span class="nn">es</span>
+<span class="kn">import</span> <span class="nn">tifffile</span>
+<span class="kn">from</span> <span class="nn">shed.event_streams</span> <span class="k">import</span> <span class="n">star</span>
+
+<span class="kn">from</span> <span class="nn">bluesky.callbacks.broker</span> <span class="k">import</span> <span class="n">LiveImage</span>
+<span class="kn">from</span> <span class="nn">streamz</span> <span class="k">import</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">xpdan.db_utils</span> <span class="k">import</span> <span class="n">query_dark</span><span class="p">,</span> <span class="n">temporal_prox</span>
+<span class="kn">from</span> <span class="nn">xpdan.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
+<span class="kn">from</span> <span class="nn">xpdan.formatters</span> <span class="k">import</span> <span class="n">render_and_clean</span>
+<span class="kn">from</span> <span class="nn">xpdan.io</span> <span class="k">import</span> <span class="n">dump_yml</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.pipeline_utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">if_dark</span><span class="p">,</span> <span class="n">base_template</span><span class="p">)</span>
+
+<span class="n">_s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+
+<span class="c1"># TODO: refactor templating</span>
+<div class="viewcode-block" id="conf_save_tiff_pipeline"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.save_tiff.conf_save_tiff_pipeline">[docs]</a><span class="k">def</span> <span class="nf">conf_save_tiff_pipeline</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">image_data_key</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Total data processing pipeline for XPD</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db: databroker.broker.Broker instance</span>
+<span class="sd">        The databroker holding the data, this must be specified as a `db=` in</span>
+<span class="sd">        the function call (keyword only argument)</span>
+<span class="sd">    write_to_disk: bool, optional</span>
+<span class="sd">        If True write files to disk, defaults to False</span>
+<span class="sd">    save_dir: str</span>
+<span class="sd">        The folder in which to save the data, this must be specified as a</span>
+<span class="sd">        `save_dir=` in the function call (keyword only argument)</span>
+<span class="sd">    vis: bool, optional</span>
+<span class="sd">        If True visualize the data. Defaults to False</span>
+<span class="sd">    image_data_key: str, optional</span>
+<span class="sd">        The key for the image data, defaults to `pe1_image`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    source: Stream</span>
+<span class="sd">        The source for the graph</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    xpdan.tools.mask_img</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;start pipeline configuration&#39;</span><span class="p">)</span>
+    <span class="n">light_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">base_template</span><span class="p">)</span>
+    <span class="n">raw_source</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Raw Data&#39;</span><span class="p">)</span>  <span class="c1"># raw data</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">fill_events</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">raw_source</span><span class="p">)</span>  <span class="c1"># filled raw data</span>
+
+    <span class="c1"># DARK PROCESSING</span>
+
+    <span class="c1"># if not dark do dark subtraction</span>
+    <span class="n">if_not_dark_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">if_dark</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">source</span><span class="p">,</span>
+                                   <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((),</span> <span class="mi">0</span><span class="p">)},</span>
+                                   <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">,</span>
+                                   <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;If not dark&#39;</span><span class="p">,</span>
+                                   <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">eventify_raw_start</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">Eventify</span><span class="p">(</span><span class="n">if_not_dark_stream</span><span class="p">,</span>
+                                     <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;eventify raw start&#39;</span><span class="p">)</span>
+    <span class="n">h_timestamp_stream</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">_timestampstr</span><span class="p">,</span> <span class="n">if_not_dark_stream</span><span class="p">,</span>
+                                <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;time&#39;</span><span class="p">},</span>
+                                <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;human_timestamp&#39;</span><span class="p">,</span>
+                                              <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                                <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;human timestamp&#39;</span><span class="p">)</span>
+
+    <span class="c1"># only the primary stream</span>
+    <span class="n">if_not_dark_stream_primary</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span>
+                                           <span class="n">if_not_dark_stream</span><span class="p">,</span>
+                                           <span class="n">document_name</span><span class="o">=</span><span class="s1">&#39;descriptor&#39;</span><span class="p">,</span>
+                                           <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Primary&#39;</span><span class="p">)</span>
+
+    <span class="n">dark_query</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">Query</span><span class="p">(</span><span class="n">db</span><span class="p">,</span>
+                          <span class="n">if_not_dark_stream</span><span class="p">,</span>
+                          <span class="n">query_function</span><span class="o">=</span><span class="n">query_dark</span><span class="p">,</span>
+                          <span class="n">query_decider</span><span class="o">=</span><span class="n">temporal_prox</span><span class="p">,</span>
+                          <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Query for FG Dark&#39;</span><span class="p">)</span>
+    <span class="n">dark_query_results</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">QueryUnpacker</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">dark_query</span><span class="p">,</span>
+                                          <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Unpack FG Dark&#39;</span><span class="p">)</span>
+    <span class="c1"># Do the dark subtraction</span>
+    <span class="n">zlid</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">if_not_dark_stream_primary</span><span class="p">,</span>
+                         <span class="n">dark_query_results</span><span class="p">,</span>
+                         <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Combine darks and lights&#39;</span><span class="p">)</span>
+    <span class="n">dark_sub_fg</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span>
+                         <span class="n">zlid</span><span class="p">,</span>
+                         <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="n">image_data_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                                     <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="n">image_data_key</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+                         <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;testing&#39;</span><span class="p">})],</span>
+                         <span class="n">md</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Dark Subtracted Foreground&#39;</span><span class="p">,</span>
+                                 <span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;dark_sub&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
+        <span class="n">dark_sub_fg</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">star</span><span class="p">(</span><span class="n">LiveImage</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">write_to_disk</span><span class="p">:</span>
+        <span class="n">eventify_raw_descriptor</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">Eventify</span><span class="p">(</span>
+            <span class="n">if_not_dark_stream</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;eventify raw descriptor&#39;</span><span class="p">,</span>
+            <span class="n">document</span><span class="o">=</span><span class="s1">&#39;descriptor&#39;</span><span class="p">)</span>
+        <span class="n">exts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.tiff&#39;</span><span class="p">]</span>
+        <span class="n">eventify_input_streams</span> <span class="o">=</span> <span class="p">[</span><span class="n">dark_sub_fg</span><span class="p">]</span>
+        <span class="n">input_infos</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+        <span class="p">]</span>
+        <span class="n">saver_kwargs</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="n">eventifies</span> <span class="o">=</span> <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">Eventify</span><span class="p">(</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;eventify </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">stream_name</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span>
+            <span class="n">eventify_input_streams</span><span class="p">]</span>
+
+        <span class="n">mega_render</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">render_and_clean</span><span class="p">,</span>
+                   <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span>
+                       <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">h_timestamp_stream</span><span class="p">,</span>
+                              <span class="c1"># human readable event timestamp</span>
+                              <span class="n">if_not_dark_stream</span><span class="p">,</span>  <span class="c1"># raw events,</span>
+                              <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;mega_render zip&#39;</span>
+                              <span class="p">),</span>
+                       <span class="n">eventify_raw_start</span><span class="p">,</span>
+                       <span class="n">eventify_raw_descriptor</span><span class="p">,</span>
+                       <span class="n">analysed_eventify</span>
+                   <span class="p">),</span>
+                   <span class="n">string</span><span class="o">=</span><span class="n">light_template</span><span class="p">,</span>
+                   <span class="n">input_info</span><span class="o">=</span><span class="p">{</span>
+                       <span class="s1">&#39;human_timestamp&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;human_timestamp&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
+                       <span class="s1">&#39;raw_event&#39;</span><span class="p">:</span> <span class="p">((),</span> <span class="mi">1</span><span class="p">),</span>
+                       <span class="s1">&#39;raw_start&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">2</span><span class="p">),</span>
+                       <span class="s1">&#39;raw_descriptor&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">3</span><span class="p">),</span>
+                       <span class="s1">&#39;analyzed_start&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">4</span><span class="p">)</span>
+                   <span class="p">},</span>
+                   <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span>
+                   <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                   <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;mega render &#39;</span>
+                               <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysed_eventify</span><span class="o">.</span><span class="n">stream_name</span><span class="p">)</span>
+                   <span class="p">)</span>
+            <span class="k">for</span> <span class="n">ext</span><span class="p">,</span> <span class="n">analysed_eventify</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exts</span><span class="p">,</span> <span class="n">eventifies</span><span class="p">)]</span>
+        <span class="n">streams_to_be_saved</span> <span class="o">=</span> <span class="p">[</span><span class="n">dark_sub_fg</span><span class="p">]</span>
+        <span class="n">save_callables</span> <span class="o">=</span> <span class="p">[</span><span class="n">tifffile</span><span class="o">.</span><span class="n">imsave</span><span class="p">]</span>
+        <span class="n">md_render</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">render_and_clean</span><span class="p">,</span>
+                           <span class="n">eventify_raw_start</span><span class="p">,</span>
+                           <span class="n">string</span><span class="o">=</span><span class="n">light_template</span><span class="p">,</span>
+                           <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;raw_start&#39;</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">),</span> <span class="p">},</span>
+                           <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                           <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;.yml&#39;</span><span class="p">,</span>
+                           <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;MD render&#39;</span><span class="p">)</span>
+
+        <span class="n">make_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                                  <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                            <span class="n">cs</span><span class="p">,</span>
+                            <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;filename&#39;</span><span class="p">},</span>
+                            <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                            <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Make dirs </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cs</span><span class="o">.</span><span class="n">stream_name</span><span class="p">)</span>
+                            <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">mega_render</span><span class="p">]</span>
+
+        <span class="n">_s</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">writer_templater</span><span class="p">,</span>
+                          <span class="n">es</span><span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span>
+                              <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zip render and data&#39;</span><span class="p">,</span>
+                                     <span class="n">zip_type</span><span class="o">=</span><span class="s1">&#39;truncate&#39;</span><span class="p">),</span> <span class="n">made_dir</span><span class="p">,</span>
+                              <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;zl dirs and render and data&#39;</span>
+                              <span class="p">),</span>
+                          <span class="n">input_info</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span>
+                          <span class="n">output_info</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;final_filename&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">})],</span>
+                          <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;Write </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s1</span><span class="o">.</span><span class="n">stream_name</span><span class="p">),</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span>
+                   <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">made_dir</span><span class="p">,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">writer_templater</span><span class="p">,</span> <span class="n">kwargs</span>
+                   <span class="ow">in</span>
+                   <span class="nb">zip</span><span class="p">(</span>
+                       <span class="n">streams_to_be_saved</span><span class="p">,</span>
+                       <span class="n">mega_render</span><span class="p">,</span>
+                       <span class="n">make_dirs</span><span class="p">,</span>  <span class="c1"># prevent run condition btwn dirs and files</span>
+                       <span class="n">input_infos</span><span class="p">,</span>
+                       <span class="n">save_callables</span><span class="p">,</span>
+                       <span class="n">saver_kwargs</span>
+                   <span class="p">)])</span>
+
+        <span class="n">_s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">es</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dump_yml</span><span class="p">,</span> <span class="n">es</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">eventify_raw_start</span><span class="p">,</span> <span class="n">md_render</span><span class="p">),</span>
+                      <span class="n">input_info</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                                  <span class="mi">1</span><span class="p">:</span> <span class="p">((</span><span class="s1">&#39;data&#39;</span><span class="p">,),</span> <span class="mi">0</span><span class="p">)},</span>
+                      <span class="n">full_event</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;dump yaml&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">raw_source</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

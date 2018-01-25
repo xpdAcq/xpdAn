@@ -141,6 +141,8 @@ class MainCallback(CallbackBase):
             if dark:
                 dark = temporal_prox(dark, [doc])[0]
                 self.dark_img = next(dark.data(self.image_data_key))
+                if str(self.dark_img.dtype) == 'uint16':
+                    self.dark_img = self.dark_img.astype('float32')
             background = query_background(self.db, [doc])
 
             # If there is a background associated
@@ -148,11 +150,15 @@ class MainCallback(CallbackBase):
                 background = temporal_prox(background, [doc])[0]
                 self.background_img = next(
                     background.data(self.image_data_key))
+                if str(self.background_img.dtype) == 'uint16':
+                    self.background_img = self.background_img.astype('float32')
                 bg_dark = query_dark(self.db, [background['start']])
 
                 if bg_dark:
                     bg_dark = temporal_prox(bg_dark, [doc])[0]
                     bg_dark_img = next(bg_dark.data(self.image_data_key))
+                    if str(bg_dark_img.dtype) == 'uint16':
+                        bg_dark_img = bg_dark_img.astype('float32')
                 else:
                     bg_dark_img = np.zeros(self.background_img.shape)
                 self.background_img = self.background_img - bg_dark_img
@@ -192,6 +198,8 @@ class MainCallback(CallbackBase):
 
             # dark subtraction
             img = doc['data'][self.image_data_key]
+            if str(img .dtype) == 'uint16':
+                img = img.astype('float32')
             if self.dark_img is not None:
                 img -= self.dark_img
             if self.vis:

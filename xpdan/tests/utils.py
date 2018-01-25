@@ -91,11 +91,11 @@ def insert_imgs(RE, reg, n, shape, save_dir=tempfile.mkdtemp(), **kwargs):
     # Create detectors
     dark_det = sim.SynSignalWithRegistry(name='pe1_image',
                                          func=lambda: np.random.random(
-                                             shape, dtype='uint16'),
+                                             shape).astype('uint16'),
                                          reg=reg)
     light_det = sim.SynSignalWithRegistry(name='pe1_image',
                                           func=lambda: np.random.random(
-                                              shape, dtype='uint16'),
+                                              shape).astype('uint16'),
                                           reg=reg)
     beamtime_uid = str(uuid4())
     base_md = dict(beamtime_uid=beamtime_uid,

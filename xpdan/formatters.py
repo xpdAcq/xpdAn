@@ -60,7 +60,7 @@ def clean_template(template, removals=None, cfmt=cfmt):
     d = cfmt.format(template, defaultdict(str))
 
     for r in removals:
-        d = d.replace('[{}=]'.format(r), '')
+        d = d.replace('[{}_]'.format(r), '')
     z = re.sub(r'_+', '_', d)
     z = z.replace('_.', '.')
     z = re.sub(r'[\[\]\(\)\']', '', z)

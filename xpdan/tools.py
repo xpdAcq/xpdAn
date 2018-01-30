@@ -170,7 +170,6 @@ def mask_img(img, geo,
              edge=30,
              lower_thresh=0.0,
              upper_thresh=None,
-             bs_width=13, tri_offset=13, v_asym=0,
              alpha=2.5,
              tmsk=None):
     """
@@ -193,15 +192,6 @@ def mask_img(img, geo,
         Pixels with values greater than or equal to this threshold will be
         masked.
         Defaults to None. If None, no upper threshold mask is applied.
-    bs_width: int, optional
-        The width of the beamstop in pixels. Defaults to 13.
-        If None, no beamstop polygon mask is applied.
-    tri_offset: int, optional
-        The triangular pixel offset to create a pointed beamstop polygon mask.
-        Defaults to 13. If None, no beamstop polygon mask is applied.
-    v_asym: int, optional
-        The vertical asymmetry of the polygon beamstop mask. Defaults to 0.
-        If None, no beamstop polygon mask is applied.
     alpha: float or tuple or, 1darray, optional
         Then number of acceptable standard deviations, if tuple then we use
         a linear distribution of alphas from alpha[0] to alpha[1], if array
@@ -229,26 +219,6 @@ def mask_img(img, geo,
         working_mask *= (img >= lower_thresh).astype(bool)
     if upper_thresh:
         working_mask *= (img <= upper_thresh).astype(bool)
-    if all([a is not None for a in [bs_width, tri_offset, v_asym]]):
-        center_x, center_y = [geo.getFit2D()[k] for k in
-                              ['centerX', 'centerY']]
-        nx, ny = img.shape
-        mask_verts = [(center_x - bs_width, center_y),
-                      (center_x, center_y - tri_offset),
-                      (center_x + bs_width, center_y),
-                      (center_x + bs_width + v_asym, ny),
-                      (center_x - bs_width - v_asym, ny)]
-
-        x, y = np.meshgrid(np.arange(nx), np.arange(ny))
-        x, y = x.flatten(), y.flatten()
-
-        points = np.vstack((x, y)).T
-
-        path = Path(mask_verts)
-        grid = path.contains_points(points)
-        # Plug msk_grid into into next (edge-mask) step in automask
-        working_mask *= ~grid.reshape((ny, nx))
-
     if alpha:
         working_mask *= new_masking_method(img, geo, alpha=alpha,
                                            tmsk=working_mask)

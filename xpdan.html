@@ -905,7 +905,7 @@ shorten the total search time.</p>
 
 <dl class="function">
 <dt id="xpdan.tools.mask_img">
-<code class="descclassname">xpdan.tools.</code><code class="descname">mask_img</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>edge=30</em>, <em>lower_thresh=0.0</em>, <em>upper_thresh=None</em>, <em>bs_width=13</em>, <em>tri_offset=13</em>, <em>v_asym=0</em>, <em>alpha=2.5</em>, <em>tmsk=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#mask_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.mask_img" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.tools.</code><code class="descname">mask_img</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>edge=30</em>, <em>lower_thresh=0.0</em>, <em>upper_thresh=None</em>, <em>alpha=2.5</em>, <em>tmsk=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#mask_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.mask_img" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mask an image based off of various methods</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -922,12 +922,6 @@ Defaults to 0.0. If None, no lower threshold mask is applied</li>
 <li><strong>upper_thresh</strong> (<em>float, optional</em>) – Pixels with values greater than or equal to this threshold will be
 masked.
 Defaults to None. If None, no upper threshold mask is applied.</li>
-<li><strong>bs_width</strong> (<em>int, optional</em>) – The width of the beamstop in pixels. Defaults to 13.
-If None, no beamstop polygon mask is applied.</li>
-<li><strong>tri_offset</strong> (<em>int, optional</em>) – The triangular pixel offset to create a pointed beamstop polygon mask.
-Defaults to 13. If None, no beamstop polygon mask is applied.</li>
-<li><strong>v_asym</strong> (<em>int, optional</em>) – The vertical asymmetry of the polygon beamstop mask. Defaults to 0.
-If None, no beamstop polygon mask is applied.</li>
 <li><strong>alpha</strong> (<em>float or tuple or, 1darray, optional</em>) – Then number of acceptable standard deviations, if tuple then we use
 a linear distribution of alphas from alpha[0] to alpha[1], if array
 then we just use that as the distribution of alphas. Defaults to 2.5.

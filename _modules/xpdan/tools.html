@@ -324,7 +324,6 @@
              <span class="n">edge</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
              <span class="n">lower_thresh</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
              <span class="n">upper_thresh</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">bs_width</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">tri_offset</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">v_asym</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
              <span class="n">alpha</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
              <span class="n">tmsk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -347,15 +346,6 @@
 <span class="sd">        Pixels with values greater than or equal to this threshold will be</span>
 <span class="sd">        masked.</span>
 <span class="sd">        Defaults to None. If None, no upper threshold mask is applied.</span>
-<span class="sd">    bs_width: int, optional</span>
-<span class="sd">        The width of the beamstop in pixels. Defaults to 13.</span>
-<span class="sd">        If None, no beamstop polygon mask is applied.</span>
-<span class="sd">    tri_offset: int, optional</span>
-<span class="sd">        The triangular pixel offset to create a pointed beamstop polygon mask.</span>
-<span class="sd">        Defaults to 13. If None, no beamstop polygon mask is applied.</span>
-<span class="sd">    v_asym: int, optional</span>
-<span class="sd">        The vertical asymmetry of the polygon beamstop mask. Defaults to 0.</span>
-<span class="sd">        If None, no beamstop polygon mask is applied.</span>
 <span class="sd">    alpha: float or tuple or, 1darray, optional</span>
 <span class="sd">        Then number of acceptable standard deviations, if tuple then we use</span>
 <span class="sd">        a linear distribution of alphas from alpha[0] to alpha[1], if array</span>
@@ -383,26 +373,6 @@
         <span class="n">working_mask</span> <span class="o">*=</span> <span class="p">(</span><span class="n">img</span> <span class="o">&gt;=</span> <span class="n">lower_thresh</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">upper_thresh</span><span class="p">:</span>
         <span class="n">working_mask</span> <span class="o">*=</span> <span class="p">(</span><span class="n">img</span> <span class="o">&lt;=</span> <span class="n">upper_thresh</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bs_width</span><span class="p">,</span> <span class="n">tri_offset</span><span class="p">,</span> <span class="n">v_asym</span><span class="p">]]):</span>
-        <span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span> <span class="o">=</span> <span class="p">[</span><span class="n">geo</span><span class="o">.</span><span class="n">getFit2D</span><span class="p">()[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
-                              <span class="p">[</span><span class="s1">&#39;centerX&#39;</span><span class="p">,</span> <span class="s1">&#39;centerY&#39;</span><span class="p">]]</span>
-        <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">mask_verts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">center_x</span> <span class="o">-</span> <span class="n">bs_width</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span>
-                      <span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span> <span class="o">-</span> <span class="n">tri_offset</span><span class="p">),</span>
-                      <span class="p">(</span><span class="n">center_x</span> <span class="o">+</span> <span class="n">bs_width</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span>
-                      <span class="p">(</span><span class="n">center_x</span> <span class="o">+</span> <span class="n">bs_width</span> <span class="o">+</span> <span class="n">v_asym</span><span class="p">,</span> <span class="n">ny</span><span class="p">),</span>
-                      <span class="p">(</span><span class="n">center_x</span> <span class="o">-</span> <span class="n">bs_width</span> <span class="o">-</span> <span class="n">v_asym</span><span class="p">,</span> <span class="n">ny</span><span class="p">)]</span>
-
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nx</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ny</span><span class="p">))</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-
-        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-
-        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">mask_verts</span><span class="p">)</span>
-        <span class="n">grid</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">contains_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-        <span class="c1"># Plug msk_grid into into next (edge-mask) step in automask</span>
-        <span class="n">working_mask</span> <span class="o">*=</span> <span class="o">~</span><span class="n">grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">ny</span><span class="p">,</span> <span class="n">nx</span><span class="p">))</span>
-
     <span class="k">if</span> <span class="n">alpha</span><span class="p">:</span>
         <span class="n">working_mask</span> <span class="o">*=</span> <span class="n">new_masking_method</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
                                            <span class="n">tmsk</span><span class="o">=</span><span class="n">working_mask</span><span class="p">)</span>

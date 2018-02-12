@@ -192,12 +192,12 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analysis_stage</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PrinterCallback.start"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.PrinterCallback.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_stage</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;analysis_stage&#39;</span><span class="p">]</span></div>
+<div class="viewcode-block" id="PrinterCallback.start"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.PrinterCallback.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_stage</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;analysis_stage&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="PrinterCallback.event"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.PrinterCallback.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file saved 1at </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]))</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;file saved 1at </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]))</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="conf_main_pipeline"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.conf_main_pipeline">[docs]</a><span class="k">def</span> <span class="nf">conf_main_pipeline</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -774,8 +774,8 @@
                 <span class="p">)</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="n">star</span><span class="p">(</span><span class="n">PrinterCallback</span><span class="p">())</span>
                        <span class="p">)</span> <span class="k">for</span> <span class="n">cs</span><span class="p">,</span> <span class="n">streams_to_be_s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
             <span class="n">mega_render</span><span class="p">,</span> <span class="n">streams_to_be_saved</span><span class="p">)]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finish pipeline configuration&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">raw_source</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Finish pipeline configuration&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">raw_source</span>
 </pre></div>
 
            </div>

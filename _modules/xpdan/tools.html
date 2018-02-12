@@ -183,8 +183,8 @@
     <span class="sd">&quot;&quot;&quot;Find outlier pixels in a single ring &quot;&quot;&quot;</span>
     <span class="n">values_array</span><span class="p">,</span> <span class="n">positions_array</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">a</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">values_array</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">values_array</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">values_array</span><span class="p">)</span>
-    <span class="n">removals</span> <span class="o">=</span> <span class="n">positions_array</span><span class="p">[</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">alpha</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">removals</span></div>
+    <span class="n">removals</span> <span class="o">=</span> <span class="n">positions_array</span><span class="p">[</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">alpha</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">removals</span>
 
 
 <div class="viewcode-block" id="new_masking_method"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.new_masking_method">[docs]</a><span class="k">def</span> <span class="nf">new_masking_method</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tmsk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -226,8 +226,8 @@
     <span class="n">tmsk</span> <span class="o">=</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
     <span class="n">tmsk</span><span class="p">[</span><span class="n">removals</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">tmsk</span> <span class="o">=</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;finished mask&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;finished mask&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">tmsk</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="old_mask_img"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.old_mask_img">[docs]</a><span class="k">def</span> <span class="nf">old_mask_img</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span>
@@ -316,8 +316,8 @@
 
     <span class="k">if</span> <span class="n">alpha</span><span class="p">:</span>
         <span class="n">working_mask</span> <span class="o">*=</span> <span class="n">binned_outlier</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">qbinned</span><span class="o">.</span><span class="n">bin_edges</span><span class="p">,</span>
-                                       <span class="n">mask</span><span class="o">=</span><span class="n">working_mask</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">working_mask</span></div>
+                                       <span class="n">mask</span><span class="o">=</span><span class="n">working_mask</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">working_mask</span>
 
 
 <div class="viewcode-block" id="mask_img"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.mask_img">[docs]</a><span class="k">def</span> <span class="nf">mask_img</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span>
@@ -376,8 +376,8 @@
     <span class="k">if</span> <span class="n">alpha</span><span class="p">:</span>
         <span class="n">working_mask</span> <span class="o">*=</span> <span class="n">new_masking_method</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
                                            <span class="n">tmsk</span><span class="o">=</span><span class="n">working_mask</span><span class="p">)</span>
-    <span class="n">working_mask</span> <span class="o">=</span> <span class="n">working_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">working_mask</span></div>
+    <span class="n">working_mask</span> <span class="o">=</span> <span class="n">working_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">working_mask</span>
 
 
 <div class="viewcode-block" id="compress_mask"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.compress_mask">[docs]</a><span class="k">def</span> <span class="nf">compress_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
@@ -402,8 +402,8 @@
 <span class="sd">    scipy.sparse.csr_matrix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cmask</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">)</span>
-    <span class="c1"># FIXME: we may need to also return the mask shape</span>
-    <span class="k">return</span> <span class="n">cmask</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">cmask</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">cmask</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+    <span class="c1"># FIXME: we may need to also return the mask shape</span></div>
+    <span class="k">return</span> <span class="n">cmask</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">cmask</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">cmask</span><span class="o">.</span><span class="n">indptr</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="decompress_mask"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.decompress_mask">[docs]</a><span class="k">def</span> <span class="nf">decompress_mask</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">indptr</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
@@ -430,12 +430,12 @@
 <span class="sd">    scipy.sparse.csr_matrix</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cmask</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="p">(</span>
-        <span class="nb">tuple</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">indptr</span><span class="p">]]),</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
-    <span class="k">return</span> <span class="o">~</span><span class="n">cmask</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span></div>
+        <span class="nb">tuple</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">indptr</span><span class="p">]]),</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="o">~</span><span class="n">cmask</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="pull_array"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.pull_array">[docs]</a><span class="k">def</span> <span class="nf">pull_array</span><span class="p">(</span><span class="n">img2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">img2</span></div>
+<div class="viewcode-block" id="pull_array"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.pull_array">[docs]</a><span class="k">def</span> <span class="nf">pull_array</span><span class="p">(</span><span class="n">img2</span><span class="p">):</span></div>
+    <span class="k">return</span> <span class="n">img2</span>
 
 
 <div class="viewcode-block" id="generate_binner"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.generate_binner">[docs]</a><span class="k">def</span> <span class="nf">generate_binner</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">img_shape</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -454,8 +454,8 @@
     <span class="n">qbin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">qbin_sizes</span><span class="p">)</span>
     <span class="n">qbin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">BinnedStatistic1D</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">qbin</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span></div>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">BinnedStatistic1D</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">qbin</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="z_score_image"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.z_score_image">[docs]</a><span class="k">def</span> <span class="nf">z_score_image</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">binner</span><span class="p">):</span>
@@ -474,51 +474,51 @@
     <span class="n">img2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">vfs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">img2</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">vfs</span>
     <span class="n">img2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">img2</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">img2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="integrate"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.integrate">[docs]</a><span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">binner</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">binner</span><span class="o">.</span><span class="n">bin_centers</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">binner</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span></div>
+</div>
+    <span class="k">return</span> <span class="n">img2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="polarization_correction"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.polarization_correction">[docs]</a><span class="k">def</span> <span class="nf">polarization_correction</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">polarization_factor</span><span class="o">=.</span><span class="mi">99</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">img</span> <span class="o">/</span> <span class="n">geo</span><span class="o">.</span><span class="n">polarization</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">polarization_factor</span><span class="p">)</span></div>
+<div class="viewcode-block" id="integrate"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.integrate">[docs]</a><span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">binner</span><span class="p">):</span></div>
+    <span class="k">return</span> <span class="n">binner</span><span class="o">.</span><span class="n">bin_centers</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">binner</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+
+
+<div class="viewcode-block" id="polarization_correction"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.polarization_correction">[docs]</a><span class="k">def</span> <span class="nf">polarization_correction</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">geo</span><span class="p">,</span> <span class="n">polarization_factor</span><span class="o">=.</span><span class="mi">99</span><span class="p">):</span></div>
+    <span class="k">return</span> <span class="n">img</span> <span class="o">/</span> <span class="n">geo</span><span class="o">.</span><span class="n">polarization</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">polarization_factor</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_geo"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.load_geo">[docs]</a><span class="k">def</span> <span class="nf">load_geo</span><span class="p">(</span><span class="n">cal_params</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pyFAI.azimuthalIntegrator</span> <span class="k">import</span> <span class="n">AzimuthalIntegrator</span>
     <span class="n">ai</span> <span class="o">=</span> <span class="n">AzimuthalIntegrator</span><span class="p">()</span>
-    <span class="n">ai</span><span class="o">.</span><span class="n">setPyFAI</span><span class="p">(</span><span class="o">**</span><span class="n">cal_params</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ai</span></div>
+    <span class="n">ai</span><span class="o">.</span><span class="n">setPyFAI</span><span class="p">(</span><span class="o">**</span><span class="n">cal_params</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">ai</span>
 
 
-<div class="viewcode-block" id="event_count"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.event_count">[docs]</a><span class="k">def</span> <span class="nf">event_count</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span></div>
+<div class="viewcode-block" id="event_count"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.event_count">[docs]</a><span class="k">def</span> <span class="nf">event_count</span><span class="p">(</span><span class="n">x</span><span class="p">):</span></div>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
 
 
 <div class="viewcode-block" id="add_img"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.add_img">[docs]</a><span class="k">def</span> <span class="nf">add_img</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">):</span>
-    <span class="c1"># Note that this exists because accumulate doesn&#39;t take args yet</span>
-    <span class="k">return</span> <span class="n">img1</span> <span class="o">+</span> <span class="n">img2</span></div>
+    <span class="c1"># Note that this exists because accumulate doesn&#39;t take args yet</span></div>
+    <span class="k">return</span> <span class="n">img1</span> <span class="o">+</span> <span class="n">img2</span>
 
 
 <div class="viewcode-block" id="pdf_getter"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.pdf_getter">[docs]</a><span class="k">def</span> <span class="nf">pdf_getter</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">pg</span> <span class="o">=</span> <span class="n">PDFGetter</span><span class="p">()</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">pg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pg</span><span class="o">.</span><span class="n">config</span></div>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pg</span><span class="o">.</span><span class="n">config</span>
 
 
 <div class="viewcode-block" id="fq_getter"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.fq_getter">[docs]</a><span class="k">def</span> <span class="nf">fq_getter</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">pg</span> <span class="o">=</span> <span class="n">PDFGetter</span><span class="p">()</span>
     <span class="n">pg</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">fq</span>
-    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pg</span><span class="o">.</span><span class="n">config</span></div>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">fq</span></div>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pg</span><span class="o">.</span><span class="n">config</span>
 
 
 <div class="viewcode-block" id="overlay_mask"><a class="viewcode-back" href="../../xpdan.html#xpdan.tools.overlay_mask">[docs]</a><span class="k">def</span> <span class="nf">overlay_mask</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
     <span class="n">img2</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">img2</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="k">return</span> <span class="n">img2</span></div>
+    <span class="n">img2</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+    <span class="k">return</span> <span class="n">img2</span>
 </pre></div>
 
            </div>

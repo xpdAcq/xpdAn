@@ -196,8 +196,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="n">pprint</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">d</span></div>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">d</span>
 
 
 <div class="viewcode-block" id="scan_diff"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.scan_diff">[docs]</a><span class="k">def</span> <span class="nf">scan_diff</span><span class="p">(</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blacklist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -231,8 +231,8 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">kv</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="n">pprint</span><span class="p">(</span><span class="n">kv</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">kv</span></div>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">kv</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">kv</span>
 
 
 <div class="viewcode-block" id="scan_summary"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.scan_summary">[docs]</a><span class="k">def</span> <span class="nf">scan_summary</span><span class="p">(</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -275,8 +275,8 @@
         <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">data2</span><span class="p">))</span>
-        <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">datas</span></div>
+        <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">datas</span>
 
 
 <div class="viewcode-block" id="query_dark"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_dark">[docs]</a><span class="k">def</span> <span class="nf">query_dark</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -298,8 +298,8 @@
         <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dk_uid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">db</span><span class="p">[</span><span class="n">dk_uid</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span></div>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="p">[]</span>
 
 
 <div class="viewcode-block" id="query_background"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_background">[docs]</a><span class="k">def</span> <span class="nf">query_background</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -310,8 +310,8 @@
             <span class="k">return</span> <span class="n">db</span><span class="p">(</span><span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
                       <span class="n">bt_uid</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;bt_uid&#39;</span><span class="p">],</span>
                       <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;$exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">[]</span></div>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="p">[]</span>
 
 
 <div class="viewcode-block" id="temporal_prox"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.temporal_prox">[docs]</a><span class="k">def</span> <span class="nf">temporal_prox</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
@@ -325,8 +325,8 @@
         <span class="n">i</span> <span class="o">=</span> <span class="n">dt_sq</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_sq</span><span class="p">))</span>
         <span class="n">min_r</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">return</span> <span class="n">min_r</span></div>
+        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[]</span></div>
+    <span class="k">return</span> <span class="n">min_r</span>
 </pre></div>
 
            </div>

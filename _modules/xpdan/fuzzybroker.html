@@ -202,8 +202,8 @@
 <span class="sd">        databroker searching for the ``search_string`` please make a point to</span>
 <span class="sd">        filter the databroker to shorten the total search time</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">fuzzy_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="n">fuzzy_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuzzyBroker.super_fuzzy_search"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search">[docs]</a>    <span class="k">def</span> <span class="nf">super_fuzzy_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fuzzy search a databroker</span>
@@ -228,8 +228,8 @@
 <span class="sd">        ``search_string`` please make a point to filter the databroker to</span>
 <span class="sd">        shorten the total search time.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">super_fuzzy_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="n">super_fuzzy_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuzzyBroker.beamtime_dates"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.FuzzyBroker.beamtime_dates">[docs]</a>    <span class="k">def</span> <span class="nf">beamtime_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get info for each beamtime</span>
@@ -247,8 +247,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        list of dicts:</span>
 <span class="sd">            The list of beamtimes and their associated information</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">beamtime_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="n">beamtime_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuzzyBroker.fuzzy_set_search"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search">[docs]</a>    <span class="k">def</span> <span class="nf">fuzzy_set_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the most similar set of values to the search string.</span>
@@ -275,8 +275,8 @@
 <span class="sd">        &gt;&gt;&gt; db = Broker(...) # Contains runs from Bob, Alice, Bob, and Eve</span>
 <span class="sd">        &gt;&gt;&gt; fuzzy_set_search(db, &#39;bt_piLast&#39;, &#39;Bob&#39;)</span>
 <span class="sd">        [&#39;Bob&#39;, &#39;Alice&#39;, &#39;Eve&#39;]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">fuzzy_set_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="k">return</span> <span class="n">fuzzy_set_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_from_dict</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">map_list</span><span class="p">):</span>
@@ -358,8 +358,8 @@
             <span class="n">heappushpop</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">ndld</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">keys</span><span class="p">],</span> <span class="n">search_string</span><span class="p">),</span>
                                <span class="n">h</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
     <span class="n">heap</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">]</span></div>
+    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="super_fuzzy_search"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.super_fuzzy_search">[docs]</a><span class="k">def</span> <span class="nf">super_fuzzy_search</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
@@ -388,8 +388,8 @@
                            <span class="n">_nested_dict_values</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">heappushpop</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">internal_scores</span><span class="p">),</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
     <span class="n">heap</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="beamtime_dates"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.beamtime_dates">[docs]</a><span class="k">def</span> <span class="nf">beamtime_dates</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;beamtime_uid&#39;</span><span class="p">,</span> <span class="s1">&#39;bt_safN&#39;</span><span class="p">,</span>
@@ -434,8 +434,8 @@
                      <span class="s1">&#39;stop_time&#39;</span><span class="p">:</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">stop_hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])})</span>
         <span class="n">returns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">print_results</span><span class="p">:</span>
-        <span class="n">pprint</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">returns</span></div>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">returns</span>
 
 
 <div class="viewcode-block" id="fuzzy_set_search"><a class="viewcode-back" href="../../xpdan.html#xpdan.fuzzybroker.fuzzy_set_search">[docs]</a><span class="k">def</span> <span class="nf">fuzzy_set_search</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">search_string</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
@@ -470,8 +470,8 @@
     <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
         <span class="n">heappushpop</span><span class="p">(</span><span class="n">heap</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">ndld</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">search_string</span><span class="p">),</span> <span class="n">v</span><span class="p">))</span>
     <span class="n">heap</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">]</span></div>
+    <span class="n">heap</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">heap</span> <span class="k">if</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">]</span>
 </pre></div>
 
            </div>

@@ -3,7 +3,9 @@ $ACTIVITIES = ['version_bump',
                'changelog',
                'tag',
                'push_tag',
-               'ghrelease']
+               'ghrelease',
+               'conda_forge'
+]
 
 $VERSION_BUMP_PATTERNS = [
     ('xpdan/__init__.py', '__version__\s*=.*', "__version__ = '$VERSION'"),

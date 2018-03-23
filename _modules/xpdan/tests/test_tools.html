@@ -181,8 +181,8 @@
     <span class="n">mask2</span><span class="p">[:,</span> <span class="o">-</span><span class="n">edge</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">mask2</span><span class="p">[:</span><span class="n">edge</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">mask2</span><span class="p">[</span><span class="o">-</span><span class="n">edge</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">mask2</span> <span class="o">=</span> <span class="n">mask2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span></div>
-    <span class="n">assert_array_equal</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="o">~</span><span class="n">mask2</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="n">mask2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">assert_array_equal</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="o">~</span><span class="n">mask2</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_ring_blur_mask"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.test_tools.test_ring_blur_mask">[docs]</a><span class="k">def</span> <span class="nf">test_ring_blur_mask</span><span class="p">():</span>
@@ -221,15 +221,15 @@
 
     <span class="c1"># We have not over masked 10% of the number of bad pixels</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">a_not_in_b</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">.</span><span class="mi">1</span>
-    <span class="c1"># Make certain that we have masked over 90% of the bad pixels</span></div>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_not_in_a</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">.</span><span class="mi">1</span>
+    <span class="c1"># Make certain that we have masked over 90% of the bad pixels</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_not_in_a</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">.</span><span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="test_compression_decompression"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.test_tools.test_compression_decompression">[docs]</a><span class="k">def</span> <span class="nf">test_compression_decompression</span><span class="p">():</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">compress_mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
-    <span class="n">mask2</span> <span class="o">=</span> <span class="n">decompress_mask</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
-    <span class="n">assert_array_equal</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="n">decompress_mask</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">assert_array_equal</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">mask2</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

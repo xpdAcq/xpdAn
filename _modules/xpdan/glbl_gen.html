@@ -212,8 +212,8 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using glbl specified in config file. </span><span class="se">\n</span><span class="si">%r</span><span class="s2">&quot;</span><span class="p">,</span>
-                         <span class="n">config</span><span class="p">)</span></div>
-    <span class="k">return</span> <span class="n">config</span>
+                         <span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
 
 
 <div class="viewcode-block" id="make_glbl"><a class="viewcode-back" href="../../xpdan.html#xpdan.glbl_gen.make_glbl">[docs]</a><span class="k">def</span> <span class="nf">make_glbl</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">env_code</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">db_xptal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">db_an</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -313,8 +313,8 @@
     <span class="n">config</span><span class="p">[</span><span class="s1">&#39;_exclude_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
                               <span class="p">[</span><span class="s1">&#39;home_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;blconfig_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;yaml_dir&#39;</span><span class="p">]]</span>
     <span class="n">config</span><span class="p">[</span><span class="s1">&#39;_export_tar_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
-                                 <span class="p">[</span><span class="s1">&#39;config_base&#39;</span><span class="p">,</span> <span class="s1">&#39;userscript_dir&#39;</span><span class="p">]]</span></div>
-    <span class="k">return</span> <span class="n">config</span>
+                                 <span class="p">[</span><span class="s1">&#39;config_base&#39;</span><span class="p">,</span> <span class="s1">&#39;userscript_dir&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">config</span></div>
 </pre></div>
 
            </div>

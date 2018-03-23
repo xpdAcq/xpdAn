@@ -158,24 +158,24 @@
 <span class="kn">from</span> <span class="nn">xpdan.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
 
 
-<div class="viewcode-block" id="if_dark"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_dark">[docs]</a><span class="k">def</span> <span class="nf">if_dark</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span></div>
-    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dark_frame&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<div class="viewcode-block" id="if_dark"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_dark">[docs]</a><span class="k">def</span> <span class="nf">if_dark</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dark_frame&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="if_query_results"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_query_results">[docs]</a><span class="k">def</span> <span class="nf">if_query_results</span><span class="p">(</span><span class="n">n_hdrs</span><span class="p">):</span></div>
-    <span class="k">return</span> <span class="n">n_hdrs</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<div class="viewcode-block" id="if_query_results"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_query_results">[docs]</a><span class="k">def</span> <span class="nf">if_query_results</span><span class="p">(</span><span class="n">n_hdrs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n_hdrs</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="if_calibration"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_calibration">[docs]</a><span class="k">def</span> <span class="nf">if_calibration</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
     <span class="c1"># print(&quot;detector cal tf ================================&quot;)</span>
     <span class="c1"># pprint(start)</span>
     <span class="c1"># print(&#39;detector_calibration_server_uid&#39; in start)</span>
-    <span class="c1"># return &#39;is_calibration&#39; in start</span></div>
-    <span class="k">return</span> <span class="s1">&#39;detector_calibration_server_uid&#39;</span> <span class="ow">in</span> <span class="n">start</span>
+    <span class="c1"># return &#39;is_calibration&#39; in start</span>
+    <span class="k">return</span> <span class="s1">&#39;detector_calibration_server_uid&#39;</span> <span class="ow">in</span> <span class="n">start</span></div>
 
 
-<div class="viewcode-block" id="if_not_calibration"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_not_calibration">[docs]</a><span class="k">def</span> <span class="nf">if_not_calibration</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span></div>
-    <span class="k">return</span> <span class="s1">&#39;is_calibration&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span> <span class="ow">and</span> <span class="s1">&#39;calibration_md&#39;</span> <span class="ow">in</span> <span class="n">doc</span>
+<div class="viewcode-block" id="if_not_calibration"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.if_not_calibration">[docs]</a><span class="k">def</span> <span class="nf">if_not_calibration</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;is_calibration&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span> <span class="ow">and</span> <span class="s1">&#39;calibration_md&#39;</span> <span class="ow">in</span> <span class="n">doc</span></div>
     <span class="c1"># return &#39;calibration_client_uid&#39; in doc</span>
     <span class="c1"># return &#39;calibration_server_uid&#39; not in doc</span>
 
@@ -197,16 +197,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;human_timestamp&#39;</span><span class="p">:</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">timestamp</span><span class="p">),</span> <span class="s1">&#39;ext&#39;</span><span class="p">:</span> <span class="s1">&#39;.tiff&#39;</span><span class="p">}</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
-    <span class="k">return</span> <span class="n">t</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">t</span></div>
 
 
 <div class="viewcode-block" id="templater1_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater1_func">[docs]</a><span class="k">def</span> <span class="nf">templater1_func</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">template</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;format base string with data from experiment, sample_name,</span>
 <span class="sd">    folder_tag&quot;&quot;&quot;</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sample_name&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-         <span class="s1">&#39;folder_tag&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;folder_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span></div>
-    <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
+         <span class="s1">&#39;folder_tag&#39;</span><span class="p">:</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;folder_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="templater2_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater2_func">[docs]</a><span class="k">def</span> <span class="nf">templater2_func</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">aux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">short_aux</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -224,13 +224,13 @@
         <span class="n">aux_res_str</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">aux_res_str</span>
     <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="c1"># Change to include name as well</span>
-        <span class="n">auxiliary</span><span class="o">=</span><span class="n">aux_res_str</span><span class="p">,</span></div>
-        <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]))</span>
+        <span class="n">auxiliary</span><span class="o">=</span><span class="n">aux_res_str</span><span class="p">,</span>
+        <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]))</span></div>
 
 
 <div class="viewcode-block" id="templater3_func"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.templater3_func">[docs]</a><span class="k">def</span> <span class="nf">templater3_func</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">analysis_stage</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;.tiff&#39;</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="n">analysis_stage</span><span class="p">,</span></div>
-                                <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysis_stage</span><span class="o">=</span><span class="n">analysis_stage</span><span class="p">,</span>
+                                <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
 
 <span class="n">base_template</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span>

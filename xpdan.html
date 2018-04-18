@@ -89,13 +89,13 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xpdan-999-load-module">xpdan.999-load module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#xpdan-data-reduction-module">xpdan.data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.db_utils">xpdan.db_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#xpdan-glbl-module">xpdan.glbl module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-xpdan.glbl_gen">xpdan.glbl_gen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-xpdan.glbl">xpdan.glbl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.tools">xpdan.tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xpdan-utils-module">xpdan.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan">Module contents</a></li>
@@ -174,7 +174,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xpdan.tests.html">xpdan.tests package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.conftest">xpdan.tests.conftest module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#xpdan-tests-test-data-reduction-module">xpdan.tests.test_data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_data_reduction">xpdan.tests.test_data_reduction module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_data_reduction_core">xpdan.tests.test_data_reduction_core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_db_utils">xpdan.tests.test_db_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_fuzzybroker">xpdan.tests.test_fuzzybroker module</a></li>
@@ -203,8 +203,8 @@
 <div class="section" id="xpdan-999-load-module">
 <h2>xpdan.999-load module<a class="headerlink" href="#xpdan-999-load-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="xpdan-data-reduction-module">
-<h2>xpdan.data_reduction module<a class="headerlink" href="#xpdan-data-reduction-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.data_reduction">
+<span id="xpdan-data-reduction-module"></span><h2>xpdan.data_reduction module<a class="headerlink" href="#module-xpdan.data_reduction" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-xpdan.data_reduction_core">
 <span id="xpdan-data-reduction-core-module"></span><h2>xpdan.data_reduction_core module<a class="headerlink" href="#module-xpdan.data_reduction_core" title="Permalink to this headline">¶</a></h2>
@@ -746,71 +746,12 @@ shorten the total search time.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="xpdan-glbl-module">
-<h2>xpdan.glbl module<a class="headerlink" href="#xpdan-glbl-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.glbl">
+<span id="xpdan-glbl-module"></span><h2>xpdan.glbl module<a class="headerlink" href="#module-xpdan.glbl" title="Permalink to this headline">¶</a></h2>
+<p>Shim for loading the glbl_dict from xpdconf</p>
 </div>
-<div class="section" id="module-xpdan.glbl_gen">
-<span id="xpdan-glbl-gen-module"></span><h2>xpdan.glbl_gen module<a class="headerlink" href="#module-xpdan.glbl_gen" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="xpdan.glbl_gen.load_configuration">
-<code class="descclassname">xpdan.glbl_gen.</code><code class="descname">load_configuration</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/glbl_gen.html#load_configuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.glbl_gen.load_configuration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load configuration data from a cascading series of locations.</p>
-<p>The precedence order is (highest priority last):</p>
-<ol class="arabic simple">
-<li>The conda environment
-- CONDA_ENV/etc/{name}.yaml (if <a href="#id1"><span class="problematic" id="id2">CONDA_ETC_</span></a> is defined for the env)</li>
-<li>The shipped version</li>
-<li>At the system level
-- /etc/{name}.yml</li>
-<li>In the user’s home directory
-- ~/.config/{name}.yml</li>
-</ol>
-<dl class="docutils">
-<dt>where</dt>
-<dd>{name} is xpdan</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) – The expected base-name of the configuration files</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>conf</strong> – Dictionary keyed on <code class="docutils literal notranslate"><span class="pre">fields</span></code> with the values extracted</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.glbl_gen.make_glbl">
-<code class="descclassname">xpdan.glbl_gen.</code><code class="descname">make_glbl</code><span class="sig-paren">(</span><em>config</em>, <em>env_code=0</em>, <em>db_xptal=None</em>, <em>db_an=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/glbl_gen.html#make_glbl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.glbl_gen.make_glbl" title="Permalink to this definition">¶</a></dt>
-<dd><p>make a glbl dict</p>
-<dl class="docutils">
-<dt>glbl dict is used to handle attributes and directories</dt>
-<dd>depends on environment variable</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>config</strong> (<em>dict</em>) – Configuration dictionary</li>
-<li><strong>env_code</strong> (<em>int, optional</em>) – environment variable to specify current situation</li>
-<li><strong>db_xptal</strong> (<em>databroker.broker instance</em>) – The experimental databroker</li>
-<li><strong>db_an</strong> (<em>databroker.broker instance</em>) – The anaysis databroker</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">by default: env_var 0 means beamline, 1 means test, 2 means simulation</p>
-</div>
-</dd></dl>
-
+<div class="section" id="xpdan-glbl-gen-module">
+<h2>xpdan.glbl_gen module<a class="headerlink" href="#xpdan-glbl-gen-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-xpdan.tools">
 <span id="xpdan-tools-module"></span><h2>xpdan.tools module<a class="headerlink" href="#module-xpdan.tools" title="Permalink to this headline">¶</a></h2>

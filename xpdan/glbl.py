@@ -1,3 +1,4 @@
+"""Shim for loading the glbl_dict from xpdconf"""
 ##############################################################################
 #
 # xpdan            by Billinge Group
@@ -12,15 +13,6 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
-import os
 
-from xpdan.glbl_gen import make_glbl, load_configuration
-
-try:
-    env_code = os.environ['XPDAN_SETUP']
-except KeyError:
-    env_code = 1
-print('ENV_CODE = {}'.format(env_code))
-an_glbl = make_glbl(
-    load_configuration('xpdan'),
-    env_code)
+from xpdconf.conf import glbl_dict
+an_glbl = glbl_dict

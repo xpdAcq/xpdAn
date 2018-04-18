@@ -52,7 +52,7 @@ install:
   - source activate testenv
   - conda install --file requirements/build.txt
   - conda install pip
-  - cp xpdan/config/xpdan.yml /home/travis/.config/xpdan.yml
+  - pip install -r requirements/pip.txt
   - pip install .
 
 script:

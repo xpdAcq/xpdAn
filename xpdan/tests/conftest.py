@@ -25,7 +25,6 @@ from bluesky.tests.conftest import db, NumpySeqHandler, RunEngine, asyncio
 from skbeam.io.fit2d import fit2d_save
 
 from xpdan.fuzzybroker import FuzzyBroker
-from xpdan.glbl_gen import make_glbl, load_configuration
 from .utils import insert_imgs
 
 

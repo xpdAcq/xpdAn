@@ -13,4 +13,4 @@ def test_no_equal(test_md):
                          )
     assert '=' not in a
     assert a == 'undoped_ptp/undoped_ptp_19920116-' \
-                '000000_temp_K_14c5fe_100.tif'
+                '000000_temp_K_14c5fe_0100.tif'

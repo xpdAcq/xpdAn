@@ -19,6 +19,7 @@ import tempfile
 import uuid
 import pytest
 import numpy as np
+import copy
 
 from xpdsim import xpd_pe1c as det
 from bluesky.tests.conftest import db, NumpySeqHandler, RunEngine, asyncio
@@ -69,6 +70,7 @@ def ltdb(request):
     """
     from databroker.tests.utils import build_sqlite_backed_broker
     db = build_sqlite_backed_broker(request)
+    db.prepare_hook = lambda name, doc: copy.deepcopy(doc)
     return db
 
 

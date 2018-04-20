@@ -15,9 +15,9 @@ from xpdan.formatters import render_and_clean
 from xpdan.io import pdf_saver, dump_yml, poni_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_calibration,
                                             base_template)
-from xpdan.tools import (generate_binner, load_geo,
-                         polarization_correction, mask_img, pdf_getter,
-                         fq_getter, overlay_mask, z_score_image)
+from xpdtools.tools import (generate_binner, load_geo,
+                            polarization_correction, mask_img, pdf_getter,
+                            fq_getter, overlay_mask, z_score_image)
 from xpdview.callbacks import LiveWaterfall
 
 
@@ -135,7 +135,7 @@ class MainCallback(CallbackBase):
                                                 ext='.yml',
                                                 raw_start=doc)
                 dump_yml(yml_name, doc)
-            dark = query_dark(self.db, [doc])
+            dark = query_dark([doc], self.db)
 
             # If there is a dark associated
             if dark:
@@ -143,7 +143,7 @@ class MainCallback(CallbackBase):
                 self.dark_img = next(dark.data(self.image_data_key))
                 if str(self.dark_img.dtype) == 'uint16':
                     self.dark_img = self.dark_img.astype('float32')
-            background = query_background(self.db, [doc])
+            background = query_background([doc], self.db)
 
             # If there is a background associated
             if background:
@@ -152,7 +152,7 @@ class MainCallback(CallbackBase):
                     background.data(self.image_data_key))
                 if str(self.background_img.dtype) == 'uint16':
                     self.background_img = self.background_img.astype('float32')
-                bg_dark = query_dark(self.db, [background['start']])
+                bg_dark = query_dark([background['start']], self.db)
 
                 if bg_dark:
                     bg_dark = temporal_prox(bg_dark, [doc])[0]
@@ -198,7 +198,7 @@ class MainCallback(CallbackBase):
 
             # dark subtraction
             img = doc['data'][self.image_data_key]
-            if str(img .dtype) == 'uint16':
+            if str(img.dtype) == 'uint16':
                 img = img.astype('float32')
             if self.dark_img is not None:
                 img -= self.dark_img
@@ -212,7 +212,7 @@ class MainCallback(CallbackBase):
                     raw_event=doc,
                     raw_start=self.start_doc,
                     raw_descriptor=self.descriptor_doc,
-                    analyzed_start={'analysis_stage': 'dark_sub'},
+                    analysis_stage ='dark_sub',
                     ext='.tiff')
                 tifffile.imsave(tiff_name, img)
 
@@ -236,7 +236,7 @@ class MainCallback(CallbackBase):
                             raw_event=doc,
                             raw_start=self.start_doc,
                             raw_descriptor=self.descriptor_doc,
-                            analyzed_start={'analysis_stage': 'calib'},
+                            analysis_stage='calib',
                             ext='.poni')
                         poni_saver(poni_name, calibration)
 
@@ -255,7 +255,9 @@ class MainCallback(CallbackBase):
                                 self.mask_setting is None):
                             self.mask = np.ones(img.shape, dtype=bool)
                         else:
-                            self.mask = mask_img(img, geo, **self.mask_kwargs)
+                            binner = generate_binner(geo, img.shape, self.mask)
+                            self.mask = mask_img(img, binner,
+                                                 **self.mask_kwargs)
                         if self.write_to_disk:
                             mask_name = render_clean_makedir(
                                 self.light_template,
@@ -263,8 +265,7 @@ class MainCallback(CallbackBase):
                                 raw_event=doc,
                                 raw_start=self.start_doc,
                                 raw_descriptor=self.descriptor_doc,
-                                analyzed_start={
-                                    'analysis_stage': 'mask'},
+                                analysis_stage='mask',
                                 ext='')
                             fit2d_save(self.mask, mask_name)
                     if self.vis:
@@ -290,7 +291,7 @@ class MainCallback(CallbackBase):
                             raw_event=doc,
                             raw_start=self.start_doc,
                             raw_descriptor=self.descriptor_doc,
-                            analyzed_start={'analysis_stage': 'iq_q'},
+                            analysis_stage='iq_q',
                             ext='_Q.chi')
                         save_output(q, iq, iq_name, 'Q')
                     tth = np.rad2deg(q_to_twotheta(q, self.wavelength))
@@ -305,8 +306,7 @@ class MainCallback(CallbackBase):
                             raw_event=doc,
                             raw_start=self.start_doc,
                             raw_descriptor=self.descriptor_doc,
-                            analyzed_start={
-                                'analysis_stage': 'iq_tth'},
+                            analysis_stage='iq_tth',
                             ext='_tth.chi')
 
                         save_output(tth, iq, itth_name, '2theta')
@@ -335,8 +335,7 @@ class MainCallback(CallbackBase):
                                 raw_event=doc,
                                 raw_start=self.start_doc,
                                 raw_descriptor=self.descriptor_doc,
-                                analyzed_start={
-                                    'analysis_stage': 'pdf'},
+                                analysis_stage='pdf',
                                 ext='.gr')
                             pdf_saver(r, gr, pdf_name, pdf_config)
 

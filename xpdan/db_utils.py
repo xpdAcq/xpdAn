@@ -125,7 +125,7 @@ def scan_summary(hdrs, fields=None, verbose=True):
     return datas
 
 
-def query_dark(db, docs, schema=1):
+def query_dark(docs, db, schema=1):
     """Get dark data from databroker
 
     Parameters
@@ -140,7 +140,10 @@ def query_dark(db, docs, schema=1):
 
     """
     if schema == 1:
-        doc = docs[0]
+        if isinstance(docs, (tuple, list)):
+            doc = docs[0]
+        else:
+            doc = docs
         dk_uid = doc.get('sc_dk_field_uid')
         if dk_uid:
             return db[dk_uid]
@@ -148,9 +151,12 @@ def query_dark(db, docs, schema=1):
             return []
 
 
-def query_background(db, docs, schema=1):
+def query_background(docs, db, schema=1):
     if schema == 1:
-        doc = docs[0]
+        if isinstance(docs, (tuple, list)):
+            doc = docs[0]
+        else:
+            doc = docs
         sample_name = doc.get('bkgd_sample_name')
         if sample_name:
             return db(sample_name=sample_name,
@@ -164,7 +170,10 @@ def temporal_prox(res, docs):
     # If there is only one result just use that one
     if isinstance(res, Header):
         return [res]
-    doc = docs[0]
+    if isinstance(docs, (tuple, list)):
+        doc = docs[0]
+    else:
+        doc = docs
     t = doc['time']
     dt_sq = [(t - r['start']['time']) ** 2 for r in res]
     if dt_sq:

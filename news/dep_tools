@@ -1,0 +1,30 @@
+**Added:**
+
+* ``Filler`` and ``clear_combine_latest`` to ``pipeline_utils``
+
+* Tests for main pipeline
+
+**Changed:**
+
+* ``db_utils`` query functions signatures are now reversed (docs first, db
+  second)
+
+* Simplified ``render_and_clean``
+
+* ``MainCallback`` ``analysis_stage`` syntax in line with pipeline
+
+* ``conftest`` databroker now reports raw dicts
+
+**Deprecated:** None
+
+**Removed:**
+
+* ``xpdan.tools`` is now in ``xpdtools.tools``
+
+* ``shim`` module is now in ``xpdtools``
+
+**Fixed:**
+
+* Analysis pipeline now runs on xpdtools pipeline
+
+**Security:** None

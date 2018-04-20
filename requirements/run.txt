@@ -13,4 +13,5 @@ xpdsim
 shed
 xpdview
 ophyd
+xpdtools
 xpdconf

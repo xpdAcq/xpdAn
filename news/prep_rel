@@ -1,0 +1,13 @@
+**Added:** None
+
+**Changed:** 
+
+* Use conda-forge ``xpdconf`` for CI builds
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

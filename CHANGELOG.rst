@@ -4,6 +4,22 @@
 
 .. current developments
 
+v0.2.3rc
+====================
+
+**Changed:**
+
+* xpdAcq now outsources ``glbl` configuration management to xpdConf
+* Use conda-forge ``xpdconf`` for CI builds
+
+
+**Removed:**
+
+* ``load_configuration`` (which is now in xpdConf)
+
+
+
+
 v0.2.2
 ====================
 

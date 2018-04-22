@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='xpdan',
-    version='0.2.2',
+    version='0.2.3rc',
     packages=find_packages(),
     description='data processing module',
     zip_safe=False,

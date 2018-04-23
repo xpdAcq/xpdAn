@@ -59,6 +59,7 @@ script:
   - set -e
   - conda install --file requirements/run.txt
   - conda install --file requirements/test.txt
+  - conda uninstall --force xpdtools
   - coverage run run_tests.py
   - coverage report -m
   - codecov

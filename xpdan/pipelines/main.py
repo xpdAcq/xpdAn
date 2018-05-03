@@ -250,4 +250,4 @@ ToEventStream(pdf, ('r', 'gr')).starsink(
                   window_title='PDF'), stream_name='G(r) vis')
 
 raw_source.starsink(StartStopCallback())
-raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)
+# raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)

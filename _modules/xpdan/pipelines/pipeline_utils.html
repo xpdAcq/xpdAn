@@ -144,7 +144,10 @@
             
   <h1>Source code for xpdan.pipelines.pipeline_utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">bluesky.callbacks</span> <span class="k">import</span> <span class="n">CallbackBase</span>
 
 <span class="kn">from</span> <span class="nn">xpdan.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
 
@@ -224,9 +227,42 @@
                                 <span class="n">ext</span><span class="o">=</span><span class="n">ext</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="clear_combine_latest"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.clear_combine_latest">[docs]</a><span class="k">def</span> <span class="nf">clear_combine_latest</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">last</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="n">position</span><span class="p">,)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">position</span><span class="p">:</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">last</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">missing</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">upstreams</span><span class="p">[</span><span class="n">p</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Filler"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.Filler">[docs]</a><span class="k">class</span> <span class="nc">Filler</span><span class="p">(</span><span class="n">CallbackBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill events without provenence&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descs</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Filler.start"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.Filler.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="n">docs</span></div>
+
+<div class="viewcode-block" id="Filler.descriptor"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.Filler.descriptor">[docs]</a>    <span class="k">def</span> <span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;descriptor&#39;</span><span class="p">,</span> <span class="n">docs</span></div>
+
+<div class="viewcode-block" id="Filler.event"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.Filler.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">fill_events</span><span class="p">([</span><span class="n">docs</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">descs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Filler.stop"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.pipeline_utils.Filler.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">docs</span></div></div>
+
+
 <span class="n">base_template</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span>
                  <span class="s1">&#39;</span><span class="si">{folder_prefix}</span><span class="s1">/&#39;</span>
-                 <span class="s1">&#39;</span><span class="si">{analyzed_start[analysis_stage]}</span><span class="s1">/&#39;</span>
+                 <span class="s1">&#39;</span><span class="si">{analysis_stage}</span><span class="s1">/&#39;</span>
                  <span class="s1">&#39;</span><span class="si">{raw_start[sample_name]}</span><span class="s1">_&#39;</span>
                  <span class="s1">&#39;</span><span class="si">{human_timestamp}</span><span class="s1">_&#39;</span>
                  <span class="s1">&#39;[temp_</span><span class="si">{raw_event[data][temperature]:1.2f}</span><span class="s1">&#39;</span>
@@ -236,7 +272,7 @@
                  <span class="s1">&#39;[dy_</span><span class="si">{raw_event[data][diff_y]:1.3f}</span><span class="s1">&#39;</span>
                  <span class="s1">&#39;</span><span class="si">{raw_descriptor[data_keys][diff_y][units]}</span><span class="s1">]_&#39;</span>
                  <span class="s1">&#39;</span><span class="si">{raw_start[uid]:.6}</span><span class="s1">_&#39;</span>
-                 <span class="s1">&#39;</span><span class="si">{raw_event[seq_num]:03d}{ext}</span><span class="s1">&#39;</span><span class="p">)</span>
+                 <span class="s1">&#39;</span><span class="si">{raw_event[seq_num]:04d}{ext}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 
            </div>

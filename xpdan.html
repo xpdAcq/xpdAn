@@ -96,7 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.glbl">xpdan.glbl module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-xpdan.tools">xpdan.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#xpdan-tools-module">xpdan.tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xpdan-utils-module">xpdan.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan">Module contents</a></li>
 </ul>
@@ -178,7 +178,7 @@
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_data_reduction_core">xpdan.tests.test_data_reduction_core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_db_utils">xpdan.tests.test_db_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_fuzzybroker">xpdan.tests.test_fuzzybroker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_tools">xpdan.tests.test_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#xpdan-tests-test-tools-module">xpdan.tests.test_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.utils">xpdan.tests.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests">Module contents</a></li>
 </ul>
@@ -246,7 +246,7 @@ Please refer to documentation for more details</li>
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -288,7 +288,7 @@ Please refer to documentation for more details</li>
 </div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -343,12 +343,12 @@ the function call (keyword only argument)</li>
 <span id="xpdan-db-utils-module"></span><h2>xpdan.db_utils module<a class="headerlink" href="#module-xpdan.db_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="xpdan.db_utils.query_background">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_background</code><span class="sig-paren">(</span><em>db</em>, <em>docs</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_background</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.db_utils.query_dark">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_dark</code><span class="sig-paren">(</span><em>db</em>, <em>docs</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_dark" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_dark</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_dark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get dark data from databroker</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -753,232 +753,8 @@ shorten the total search time.</p>
 <div class="section" id="xpdan-glbl-gen-module">
 <h2>xpdan.glbl_gen module<a class="headerlink" href="#xpdan-glbl-gen-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-xpdan.tools">
-<span id="xpdan-tools-module"></span><h2>xpdan.tools module<a class="headerlink" href="#module-xpdan.tools" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="xpdan.tools.add_img">
-<code class="descclassname">xpdan.tools.</code><code class="descname">add_img</code><span class="sig-paren">(</span><em>img1</em>, <em>img2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#add_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.add_img" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.compress_mask">
-<code class="descclassname">xpdan.tools.</code><code class="descname">compress_mask</code><span class="sig-paren">(</span><em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#compress_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.compress_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress a mask via a csr sparse matrix</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mask</strong> (<em>2d boolean array</em>) – The mask, True/1 are good pixels, False/0 are bad</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
-<li><em>list</em> – The csr_matrix data</li>
-<li><em>list</em> – The csr_matrix indices</li>
-<li><em>list</em> – The csr_matrix indptr</li>
-<li><em>See Also</em></li>
-<li><em>———</em></li>
-<li><em>scipy.sparse.csr_matrix</em></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.decompress_mask">
-<code class="descclassname">xpdan.tools.</code><code class="descname">decompress_mask</code><span class="sig-paren">(</span><em>data</em>, <em>indices</em>, <em>indptr</em>, <em>shape</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#decompress_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.decompress_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decompress a csr sparse matrix into a mask</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>list</em>) – The csr_matrix data</li>
-<li><strong>indices</strong> (<em>list</em>) – The csr_matrix indices</li>
-<li><strong>indptr</strong> (<em>list</em>) – The csr_matrix indptr</li>
-<li><strong>shape</strong> (<em>tuple</em>) – The shape of the array to be recreated</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>mask</strong> (<em>2d boolean array</em>) – The mask, True/1 are good pixels, False/0 are bad</li>
-<li><em>See Also</em></li>
-<li><em>———</em></li>
-<li><em>scipy.sparse.csr_matrix</em></li>
-</ul>
-</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.event_count">
-<code class="descclassname">xpdan.tools.</code><code class="descname">event_count</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#event_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.event_count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.fq_getter">
-<code class="descclassname">xpdan.tools.</code><code class="descname">fq_getter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#fq_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.fq_getter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.generate_binner">
-<code class="descclassname">xpdan.tools.</code><code class="descname">generate_binner</code><span class="sig-paren">(</span><em>geo</em>, <em>img_shape</em>, <em>mask=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#generate_binner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.generate_binner" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.integrate">
-<code class="descclassname">xpdan.tools.</code><code class="descname">integrate</code><span class="sig-paren">(</span><em>img</em>, <em>binner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#integrate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.integrate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.load_geo">
-<code class="descclassname">xpdan.tools.</code><code class="descname">load_geo</code><span class="sig-paren">(</span><em>cal_params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#load_geo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.load_geo" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.mask_img">
-<code class="descclassname">xpdan.tools.</code><code class="descname">mask_img</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>edge=30</em>, <em>lower_thresh=0.0</em>, <em>upper_thresh=None</em>, <em>alpha=2.5</em>, <em>tmsk=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#mask_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.mask_img" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mask an image based off of various methods</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>img</strong> (<em>np.ndarray</em>) – The image to be masked</li>
-<li><strong>geo</strong> (<em>pyFAI.geometry.Geometry</em>) – The pyFAI description of the detector orientation or any
-subclass of pyFAI.geometry.Geometry class</li>
-<li><strong>edge</strong> (<em>int, optional</em>) – The number of edge pixels to mask. Defaults to 30. If None, no edge
-mask is applied</li>
-<li><strong>lower_thresh</strong> (<em>float, optional</em>) – Pixels with values less than or equal to this threshold will be masked.
-Defaults to 0.0. If None, no lower threshold mask is applied</li>
-<li><strong>upper_thresh</strong> (<em>float, optional</em>) – Pixels with values greater than or equal to this threshold will be
-masked.
-Defaults to None. If None, no upper threshold mask is applied.</li>
-<li><strong>alpha</strong> (<em>float or tuple or, 1darray, optional</em>) – Then number of acceptable standard deviations, if tuple then we use
-a linear distribution of alphas from alpha[0] to alpha[1], if array
-then we just use that as the distribution of alphas. Defaults to 2.5.
-If None, no outlier masking applied.</li>
-<li><strong>tmsk</strong> (<em>np.ndarray, optional</em>) – The starting mask to be compounded on. Defaults to None. If None mask
-generated from scratch.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tmsk</strong> – The mask as a boolean array. True pixels are good pixels, False pixels
-are masked out.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.mask_ring">
-<code class="descclassname">xpdan.tools.</code><code class="descname">mask_ring</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#mask_ring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.mask_ring" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find outlier pixels in a single ring</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.new_masking_method">
-<code class="descclassname">xpdan.tools.</code><code class="descname">new_masking_method</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>alpha=3</em>, <em>tmsk=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#new_masking_method"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.new_masking_method" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sigma Clipping based masking</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>img</strong> (<em>np.ndarray</em>) – The image</li>
-<li><strong>geo</strong> (<em>pyFAI.geometry.Geometry instance</em>) – The detector geometry information</li>
-<li><strong>alpha</strong> (<em>float</em>) – The number of standard deviations to clip</li>
-<li><strong>tmsk</strong> (<em>np.ndarray, optional</em>) – Prior mask. If None don’t use a prior mask, defaults to None.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The mask</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.old_mask_img">
-<code class="descclassname">xpdan.tools.</code><code class="descname">old_mask_img</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>edge=30</em>, <em>lower_thresh=0.0</em>, <em>upper_thresh=None</em>, <em>bs_width=13</em>, <em>tri_offset=13</em>, <em>v_asym=0</em>, <em>alpha=2.5</em>, <em>tmsk=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#old_mask_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.old_mask_img" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mask an image based off of various methods</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>img</strong> (<em>np.ndarray</em>) – The image to be masked</li>
-<li><strong>geo</strong> (<em>pyFAI.geometry.Geometry</em>) – The pyFAI description of the detector orientation or any
-subclass of pyFAI.geometry.Geometry class</li>
-<li><strong>edge</strong> (<em>int, optional</em>) – The number of edge pixels to mask. Defaults to 30. If None, no edge
-mask is applied</li>
-<li><strong>lower_thresh</strong> (<em>float, optional</em>) – Pixels with values less than or equal to this threshold will be masked.
-Defaults to 0.0. If None, no lower threshold mask is applied</li>
-<li><strong>upper_thresh</strong> (<em>float, optional</em>) – Pixels with values greater than or equal to this threshold will be
-masked.
-Defaults to None. If None, no upper threshold mask is applied.</li>
-<li><strong>bs_width</strong> (<em>int, optional</em>) – The width of the beamstop in pixels. Defaults to 13.
-If None, no beamstop polygon mask is applied.</li>
-<li><strong>tri_offset</strong> (<em>int, optional</em>) – The triangular pixel offset to create a pointed beamstop polygon mask.
-Defaults to 13. If None, no beamstop polygon mask is applied.</li>
-<li><strong>v_asym</strong> (<em>int, optional</em>) – The vertical asymmetry of the polygon beamstop mask. Defaults to 0.
-If None, no beamstop polygon mask is applied.</li>
-<li><strong>alpha</strong> (<em>float or tuple or, 1darray, optional</em>) – Then number of acceptable standard deviations, if tuple then we use
-a linear distribution of alphas from alpha[0] to alpha[1], if array
-then we just use that as the distribution of alphas. Defaults to 2.5.
-If None, no outlier masking applied.</li>
-<li><strong>tmsk</strong> (<em>np.ndarray, optional</em>) – The starting mask to be compounded on. Defaults to None. If None mask
-generated from scratch.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>tmsk</strong> – The mask as a boolean array. True pixels are good pixels, False pixels
-are masked out.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.overlay_mask">
-<code class="descclassname">xpdan.tools.</code><code class="descname">overlay_mask</code><span class="sig-paren">(</span><em>img</em>, <em>mask</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#overlay_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.overlay_mask" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.pdf_getter">
-<code class="descclassname">xpdan.tools.</code><code class="descname">pdf_getter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#pdf_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.pdf_getter" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.polarization_correction">
-<code class="descclassname">xpdan.tools.</code><code class="descname">polarization_correction</code><span class="sig-paren">(</span><em>img</em>, <em>geo</em>, <em>polarization_factor=0.99</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#polarization_correction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.polarization_correction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.pull_array">
-<code class="descclassname">xpdan.tools.</code><code class="descname">pull_array</code><span class="sig-paren">(</span><em>img2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#pull_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.pull_array" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="xpdan.tools.z_score_image">
-<code class="descclassname">xpdan.tools.</code><code class="descname">z_score_image</code><span class="sig-paren">(</span><em>img</em>, <em>binner</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/tools.html#z_score_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.tools.z_score_image" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="xpdan-tools-module">
+<h2>xpdan.tools module<a class="headerlink" href="#xpdan-tools-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="xpdan-utils-module">
 <h2>xpdan.utils module<a class="headerlink" href="#xpdan-utils-module" title="Permalink to this headline">¶</a></h2>

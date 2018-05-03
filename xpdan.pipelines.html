@@ -101,7 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl">xpdan.glbl module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.tools">xpdan.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-tools-module">xpdan.tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
 </ul>
@@ -179,70 +179,41 @@
 </div>
 <div class="section" id="module-xpdan.pipelines.main">
 <span id="xpdan-pipelines-main-module"></span><h2>xpdan.pipelines.main module<a class="headerlink" href="#module-xpdan.pipelines.main" title="Permalink to this headline">¶</a></h2>
-<p>Main XPD analysis pipeline</p>
+</div>
+<div class="section" id="module-xpdan.pipelines.pipeline_utils">
+<span id="xpdan-pipelines-pipeline-utils-module"></span><h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#module-xpdan.pipelines.pipeline_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="xpdan.pipelines.main.PrinterCallback">
-<em class="property">class </em><code class="descclassname">xpdan.pipelines.main.</code><code class="descname">PrinterCallback</code><a class="reference internal" href="_modules/xpdan/pipelines/main.html#PrinterCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.PrinterCallback" title="Permalink to this definition">¶</a></dt>
+<dt id="xpdan.pipelines.pipeline_utils.Filler">
+<em class="property">class </em><code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">Filler</code><span class="sig-paren">(</span><em>db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluesky.callbacks.core.CallbackBase</span></code></p>
+<p>Fill events without provenence</p>
 <dl class="method">
-<dt id="xpdan.pipelines.main.PrinterCallback.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#PrinterCallback.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.PrinterCallback.event" title="Permalink to this definition">¶</a></dt>
+<dt id="xpdan.pipelines.pipeline_utils.Filler.descriptor">
+<code class="descname">descriptor</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.descriptor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="xpdan.pipelines.main.PrinterCallback.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#PrinterCallback.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.PrinterCallback.start" title="Permalink to this definition">¶</a></dt>
+<dt id="xpdan.pipelines.pipeline_utils.Filler.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.stop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
-<dt id="xpdan.pipelines.main.conf_main_pipeline">
-<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">conf_main_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>polarization_factor=0.99</em>, <em>image_data_key='pe1_image'</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>pdf_config=None</em>, <em>calibration_md_folder='../xpdConfig/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#conf_main_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.conf_main_pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Total data processing pipeline for XPD</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>write_to_disk</strong> (<em>bool, optional</em>) – If True write files to disk, defaults to False</li>
-<li><strong>vis</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
-(horizontal). default is 0.99. set to None for no
-correction.</li>
-<li><strong>mask_setting</strong> (<em>str, optional</em>) – If ‘default’ reuse mask created for first image, if ‘auto’ mask all
-images, if None use no mask. Defaults to ‘default’</li>
-<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
-default is defined by an_glbl.auto_mask_dict.
-Please refer to documentation for more details</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
-<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
-<li><strong>calibration_md_folder</strong> (<em>str</em>) – Path to where the calibration is stored for xpdAcq</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>source</strong> – The source for the graph</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Stream</p>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="xpdan.html#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
-</div>
-</dd></dl>
+<dt id="xpdan.pipelines.pipeline_utils.clear_combine_latest">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">clear_combine_latest</code><span class="sig-paren">(</span><em>node</em>, <em>position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#clear_combine_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.clear_combine_latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
-</div>
-<div class="section" id="module-xpdan.pipelines.pipeline_utils">
-<span id="xpdan-pipelines-pipeline-utils-module"></span><h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#module-xpdan.pipelines.pipeline_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="xpdan.pipelines.pipeline_utils.dark_template_func">
 <code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">dark_template_func</code><span class="sig-paren">(</span><em>timestamp</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#dark_template_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.dark_template_func" title="Permalink to this definition">¶</a></dt>
@@ -338,7 +309,7 @@ the function call (keyword only argument)</li>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="xpdan.html#xpdan.tools.mask_img" title="xpdan.tools.mask_img"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></a></p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 

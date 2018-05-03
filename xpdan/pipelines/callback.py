@@ -212,7 +212,7 @@ class MainCallback(CallbackBase):
                     raw_event=doc,
                     raw_start=self.start_doc,
                     raw_descriptor=self.descriptor_doc,
-                    analysis_stage ='dark_sub',
+                    analysis_stage='dark_sub',
                     ext='.tiff')
                 tifffile.imsave(tiff_name, img)
 

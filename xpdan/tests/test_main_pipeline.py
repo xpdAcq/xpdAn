@@ -2,8 +2,7 @@ import os
 import time
 
 from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
-                                  fg_dark_query, pdf)
-from xpdan.pipelines.main import *
+                                  fg_dark_query, mean, iq_comp)
 
 
 def test_main_callback(exp_db, fast_tmp_dir, start_uid3):

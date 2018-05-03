@@ -13,6 +13,7 @@ from xpdan.io import pdf_saver, dump_yml
 from xpdan.pipelines.pipeline_utils import (_timestampstr,
                                             clear_combine_latest, Filler,
                                             base_template)
+from xpdan.callbacks import StartStopCallback
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (mask_setting, geometry_img_shape,
@@ -52,6 +53,54 @@ source = (
     .pluck(0)
     .starmap(filler)
 )
+# Get all the documents
+start_docs = FromEventStream('start', (), source)
+descriptor_docs = FromEventStream('descriptor', (), source,
+                                  event_stream_name='primary')
+event_docs = FromEventStream('event', (), source, event_stream_name='primary')
+all_docs = (
+    event_docs
+    .combine_latest(start_docs, descriptor_docs, emit_on=0)
+    .starmap(lambda e, s, d: {'raw_event': e, 'raw_start': s,
+                              'raw_descriptor': d,
+                              'human_timestamp': _timestampstr(s['time'])})
+)
+start_yaml_string = (start_docs.map(lambda s: {'raw_start': s,
+                                               'ext': '.yaml',
+                                               # TODO: talk to BLS ask if
+                                               #  they like this
+                                               # 'analysis_stage': 'meta'
+                                               })
+                     .map(lambda kwargs, string: render(string, **kwargs),
+                          string=base_template)
+                     )
+start_yaml_string.map(clean_template).zip(start_docs).starsink(dump_yml)
+
+# create filename string
+filename_node = all_docs.map(lambda kwargs, string: render(string, **kwargs),
+                             string=base_template,
+                             stream_name='base path')
+
+# SAVING NAMES
+filename_name_nodes = {}
+for name, analysis_stage, ext in zip(
+        ['dark_corrected_image_name', 'iq_name', 'tth_name', 'mask_fit2d_name',
+         'mask_np_name', 'pdf_name', 'fq_name', 'sq_name'],
+        ['dark_sub', 'iq', 'itth', 'mask', 'mask', 'pdf', 'fq', 'sq'],
+        ['.tiff', '', '_tth', '', '_mask.npy', '.gr', '.fq', '.sq']
+):
+    if ext:
+        temp_name_node = filename_node.map(render,
+                                           analysis_stage=analysis_stage,
+                                           ext=ext)
+    else:
+        temp_name_node = filename_node.map(render,
+                                           analysis_stage=analysis_stage)
+
+    filename_name_nodes[name] = temp_name_node.map(clean_template)
+    (filename_name_nodes[name].map(os.path.dirname)
+     .sink(os.makedirs, exist_ok=True,))
+
 
 # If new calibration uid invalidate our current calibration cache
 (FromEventStream('start', ('detector_calibration_client_uid',), source)
@@ -84,7 +133,6 @@ FromEventStream('start', ('composition_string',), source).connect(composition)
 
 start_timestamp = FromEventStream('start', ('time',), source)
 
-start_docs = FromEventStream('start', (), source)
 bg_query = (start_docs.map(query_background, db=db))
 bg_docs = (bg_query
            .zip(start_docs)
@@ -126,51 +174,6 @@ h_timestamp = start_timestamp.map(_timestampstr)
  .zip_latest(h_timestamp)
  .sink(lambda x: _save_calib_param(*x, calibration_md_folder['file_path'])))
 
-# Write things to disk
-# create filename string
-descriptor_docs = FromEventStream('descriptor', (), source,
-                                  event_stream_name='primary')
-event_docs = FromEventStream('event', (), source, event_stream_name='primary')
-all_docs = (
-    event_docs
-    .combine_latest(start_docs, descriptor_docs, emit_on=0)
-    .starmap(lambda e, s, d: {'raw_event': e, 'raw_start': s,
-                              'raw_descriptor': d,
-                              'human_timestamp': _timestampstr(s['time'])})
-)
-start_yaml_string = (start_docs.map(lambda s: {'raw_start': s,
-                                               'ext': '.yaml',
-                                               # TODO: talk to BLS ask if
-                                               #  they like this
-                                               # 'analysis_stage': 'meta'
-                                               })
-                     .map(lambda kwargs, string: render(string, **kwargs),
-                          string=base_template)
-                     )
-start_yaml_string.map(clean_template).zip(start_docs).starsink(dump_yml)
-
-filename_node = all_docs.map(lambda kwargs, string: render(string, **kwargs),
-                             string=base_template)
-
-# SAVING NAMES
-filename_name_nodes = {}
-for name, analysis_stage, ext in zip(
-        ['dark_corrected_image_name', 'iq_name', 'tth_name', 'mask_fit2d_name',
-         'mask_np_name', 'pdf_name', 'fq_name', 'sq_name'],
-        ['dark_sub', 'iq', 'itth', 'mask', 'mask', 'pdf', 'fq', 'sq'],
-        ['.tiff', '', '_tth', '', '_mask.npy', '.gr', '.fq', '.sq']
-):
-    if ext:
-        temp_name_node = filename_node.map(render,
-                                           analysis_stage=analysis_stage,
-                                           ext=ext)
-    else:
-        temp_name_node = filename_node.map(render,
-                                           analysis_stage=analysis_stage)
-
-    filename_name_nodes[name] = temp_name_node.map(clean_template)
-    (filename_name_nodes[name]
-     .sink(lambda s: os.makedirs(os.path.split(s)[0], exist_ok=True)))
 # '''
 # SAVING
 # May rethink how we are doing the saving. If the saving was attached to the
@@ -181,18 +184,17 @@ for name, analysis_stage, ext in zip(
 # analyzed and raw documents, and creates the path from those two.
 
 # dark corrected img
-(dark_corrected_foreground
- .zip(filename_name_nodes['dark_corrected_image_name'])
- .starsink(lambda img, s: imsave(s, img),
-           stream_name='dark corrected foreground'))
+(filename_name_nodes['dark_corrected_image_name']
+ .zip(dark_corrected_foreground)
+ .starsink(imsave, stream_name='dark corrected foreground'))
 # integrated intensities
 (q.combine_latest(mean, emit_on=1).zip(filename_name_nodes['iq_name'])
  .map(lambda l: (*l[0], l[1]))
- .starsink(lambda x, y, n: save_output(x, y, n, 'Q'),
+ .starsink(save_output, 'Q',
            stream_name='save integration {}'.format('Q')))
 (tth.combine_latest(mean, emit_on=1).zip(filename_name_nodes['tth_name'])
  .map(lambda l: (*l[0], l[1]))
- .starsink(lambda x, y, n: save_output(x, y, n, '2theta'),
+ .starsink(save_output, '2theta',
            stream_name='save integration {}'.format('tth')))
 # Mask
 (mask.zip_latest(filename_name_nodes['mask_fit2d_name'])
@@ -201,16 +203,13 @@ for name, analysis_stage, ext in zip(
  .sink(lambda x: np.save(x[1], x[0])))
 # PDF
 (pdf.zip(filename_name_nodes['pdf_name']).map(lambda l: (*l[0], l[1]))
- .starsink(lambda r, gr, config, name: pdf_saver(r, gr, name, config),
-           stream_name='pdf saver'))
+ .starsink(pdf_saver, stream_name='pdf saver'))
 # F(Q)
 (fq.zip(filename_name_nodes['fq_name']).map(lambda l: (*l[0], l[1]))
- .starsink(lambda r, gr, config, name: pdf_saver(r, gr, name, config),
-           stream_name='fq saver'))
+ .starsink(pdf_saver, stream_name='fq saver'))
 # S(Q)
 (sq.zip(filename_name_nodes['sq_name']).map(lambda l: (*l[0], l[1]))
- .starsink(lambda r, gr, config, name: pdf_saver(r, gr, name, config),
-           stream_name='sq saver'))
+ .starsink(pdf_saver, stream_name='sq saver'))
 # '''
 # Visualization
 # background corrected img
@@ -229,13 +228,13 @@ ToEventStream(
                                    ), cmap='viridis'))
 
 # integrated intensities
-iq_em = (ToEventStream(mean.map(np.nan_to_num)
+iq_em = (ToEventStream(mean
          .combine_latest(q, emit_on=0), ('iq', 'q'))
          .starsink(LiveWaterfall('q', 'iq', units=('1/A', 'Intensity'),
                                  window_title='{} vs {}'.format('iq', 'q')),
                    stream_name='{} {} vis'.format('q', 'iq')))
 
-(ToEventStream(mean.map(np.nan_to_num)
+(ToEventStream(mean
                .combine_latest(tth, emit_on=0), ('iq', 'tth'))
  .starsink(LiveWaterfall('tth', 'iq', units=('Degree', 'Intensity'),
                          window_title='{} vs {}'.format('iq', 'tth')),
@@ -250,4 +249,5 @@ ToEventStream(pdf, ('r', 'gr')).starsink(
     LiveWaterfall('r', 'gr', units=('A', '1/A**2'),
                   window_title='PDF'), stream_name='G(r) vis')
 
-# raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)
+raw_source.starsink(StartStopCallback())
+raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)

@@ -38,7 +38,7 @@ ordereditems = '''args configfile configsection dataformat
             rmin rmax rstep plot interact verbose'''.split()
 
 
-def pdf_saver(r, pdf, filename, config):
+def pdf_saver(r, pdf, config, filename):
     config_dict = {k: getattr(config, k, '') for k in ordereditems}
     rpdf = np.vstack((r, pdf))
     rpdf = rpdf.T

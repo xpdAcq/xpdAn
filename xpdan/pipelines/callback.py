@@ -337,7 +337,7 @@ class MainCallback(CallbackBase):
                                 raw_descriptor=self.descriptor_doc,
                                 analysis_stage='pdf',
                                 ext='.gr')
-                            pdf_saver(r, gr, pdf_name, pdf_config)
+                            pdf_saver(r, gr, pdf_config, pdf_name)
 
     def stop(self, doc):
         if self.vis:

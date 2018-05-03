@@ -14,6 +14,7 @@ from xpdan.pipelines.pipeline_utils import (_timestampstr,
                                             base_template)
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import *
+from xpdtools.tools import overlay_mask
 from xpdview.callbacks import LiveWaterfall
 from xpdconf.conf import glbl_dict
 
@@ -163,6 +164,10 @@ for name, analysis_stage, ext in zip(
 # May rethink how we are doing the saving. If the saving was attached to the
 # translation nodes then it would be run before the rest of the graph was
 # processed.
+
+# This could be done by having each saver inside a callback which takes both
+# analyzed and raw documents, and creates the path from those two.
+
 # dark corrected img
 (dark_corrected_foreground
     .zip(filename_name_nodes['dark_corrected_image_name'])
@@ -232,10 +237,5 @@ ToEventStream(fq, ('q', 'fq')).starsink(
 ToEventStream(pdf, ('r', 'gr')).starsink(
     LiveWaterfall('r', 'gr', units=('A', '1/A**2'),
                   window_title='PDF'), stream_name='G(r) vis')
-
-# Zscore
-ToEventStream(z_score, ('z_score',)).starsink(
-    LiveImage('z_score', cmap='viridis', window_title='z score',
-              limit_func=lambda im: (-2, 2)), stream_name='z score vis')
 
 # raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)

@@ -83,7 +83,7 @@ def get_filename_prefix(folder_tag_list, md):
                 if isinstance(sub_md, dict):
                     sub_md = sub_md.get(item, '')
             raw_addition = sub_md
-        if (type(raw_addition) != float):
+        if type(raw_addition) != float:
             addition = str(raw_addition)
         else:
             if (raw_addition - int(raw_addition)) == 0:
@@ -94,7 +94,7 @@ def get_filename_prefix(folder_tag_list, md):
     return result
 
 
-def render_and_clean(string, formatter=pfmt, **kwargs):
+def render(string, formatter=pfmt, **kwargs):
     md = kwargs.get('raw_start', '')
     filename_prefix = ''
     if md != '':
@@ -104,4 +104,8 @@ def render_and_clean(string, formatter=pfmt, **kwargs):
             filename_prefix = md.get('sample_name')
     formatted_string = formatter.format(string, folder_prefix=filename_prefix,
                                         **kwargs)
-    return clean_template(formatted_string)
+    return formatted_string
+
+
+def render_and_clean(string, formatter=pfmt, **kwargs):
+    return clean_template(render(string, formatter=formatter, **kwargs))

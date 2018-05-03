@@ -26,8 +26,6 @@ coverage:
       tests:
         target: 97.9%
         paths: '*/tests/.*'
-        ignore:
-          - */tests/utils.py
 
 flags:
   tests:

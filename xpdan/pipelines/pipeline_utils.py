@@ -1,5 +1,8 @@
 import os
+from collections import Iterable
 from pathlib import Path
+
+from bluesky.callbacks import CallbackBase
 
 from xpdan.dev_utils import _timestampstr
 
@@ -79,9 +82,42 @@ def templater3_func(template, analysis_stage='raw', ext='.tiff'):
                                 ext=ext)).as_posix()
 
 
+def clear_combine_latest(node, position=None):
+    if position is None:
+        position = range(len(node.last))
+    elif not isinstance(position, Iterable):
+        position = (position,)
+    for p in position:
+        node.last[p] = None
+        node.missing.add(node.upstreams[p])
+
+
+class Filler(CallbackBase):
+    """Fill events without provenence"""
+
+    def __init__(self, db):
+        self.db = db
+        self.descs = None
+
+    def start(self, docs):
+        self.descs = []
+        return 'start', docs
+
+    def descriptor(self, docs):
+        self.descs.append(docs)
+        return 'descriptor', docs
+
+    def event(self, docs):
+        d = next(self.db.fill_events([docs], self.descs))
+        return 'event', d
+
+    def stop(self, docs):
+        return 'stop', docs
+
+
 base_template = (''
                  '{folder_prefix}/'
-                 '{analyzed_start[analysis_stage]}/'
+                 '{analysis_stage}/'
                  '{raw_start[sample_name]}_'
                  '{human_timestamp}_'
                  '[temp_{raw_event[data][temperature]:1.2f}'
@@ -91,4 +127,4 @@ base_template = (''
                  '[dy_{raw_event[data][diff_y]:1.3f}'
                  '{raw_descriptor[data_keys][diff_y][units]}]_'
                  '{raw_start[uid]:.6}_'
-                 '{raw_event[seq_num]:03d}{ext}')
+                 '{raw_event[seq_num]:04d}{ext}')

@@ -229,11 +229,11 @@ ToEventStream(
                                    ), cmap='viridis'))
 
 # integrated intensities
-(ToEventStream(mean.map(np.nan_to_num)
-               .combine_latest(q, emit_on=0), ('iq', 'q'))
- .starsink(LiveWaterfall('q', 'iq', units=('1/A', 'Intensity'),
-                         window_title='{} vs {}'.format('iq', 'q')),
-           stream_name='{} {} vis'.format('q', 'iq')))
+iq_em = (ToEventStream(mean.map(np.nan_to_num)
+         .combine_latest(q, emit_on=0), ('iq', 'q'))
+         .starsink(LiveWaterfall('q', 'iq', units=('1/A', 'Intensity'),
+                                 window_title='{} vs {}'.format('iq', 'q')),
+                   stream_name='{} {} vis'.format('q', 'iq')))
 
 (ToEventStream(mean.map(np.nan_to_num)
                .combine_latest(tth, emit_on=0), ('iq', 'tth'))

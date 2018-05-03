@@ -159,8 +159,6 @@ for name, analysis_stage, ext in zip(
         .sink(lambda s: os.makedirs(os.path.split(s)[0], exist_ok=True)))
 # '''
 # SAVING
-# TODO: NEED TO WRITE OUT YAML
-
 # May rethink how we are doing the saving. If the saving was attached to the
 # translation nodes then it would be run before the rest of the graph was
 # processed.

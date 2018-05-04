@@ -35,7 +35,7 @@ Carry out the steps in this order to ensure a successful analysis.
     * The pipeline will save:
 
         1. Dark corrected image (as ``.tiff``)
-        2. Mask (as ``.msk``)
+        2. Mask (as ``.msk`` and ``.npy``)
         3. I(Q) (as ``.chi``)
         4. I(tth) (as ``.chi``)
         5. G(r) (as ``.gr``)

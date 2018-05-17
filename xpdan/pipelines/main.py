@@ -136,7 +136,7 @@ start_timestamp = FromEventStream('start', ('time',), source)
 # Clean out the cached darks and backgrounds on start
 # so that this will run regardless of background/dark status
 # note that we get the proper data (if it exists downstream)
-for ds, dk in [raw_foreground_dark, raw_background, raw_background_dark]:
+for ds in [raw_foreground_dark, raw_background, raw_background_dark]:
     FromEventStream('start', source).map(ds.emit(0.0))
 
 bg_query = (start_docs.map(query_background, db=db))

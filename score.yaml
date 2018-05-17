@@ -37,7 +37,7 @@ run:
     default: {conda: shed}
   streamz_ext:
     default: {conda: streamz_ext}
-    bleeding: {orch: https://github.com/xpdAcq/streamz_ext.git}
+    bleeding: {orch: 'https://github.com/xpdAcq/streamz_ext.git'}
   xpdconf:
     default: {conda: xpdconf}
   xpdsim:

@@ -26,7 +26,8 @@ from xpdtools.pipelines.raw_pipeline import (mask_setting, geometry_img_shape,
                                              dark_corrected_foreground, q,
                                              mean, tth, mask, pdf, fq, sq,
                                              bg_corrected_img,
-                                             pol_corrected_img, raw_background)
+                                             pol_corrected_img, raw_background,
+                                             dark_corrected_background)
 from xpdtools.tools import overlay_mask
 from xpdview.callbacks import LiveWaterfall
 
@@ -136,14 +137,15 @@ start_timestamp = FromEventStream('start', ('time',), source)
 # Clean out the cached darks and backgrounds on start
 # so that this will run regardless of background/dark status
 # note that we get the proper data (if it exists downstream)
-for ds in [raw_foreground_dark, raw_background, raw_background_dark]:
-    FromEventStream('start', source).map(ds.emit(0.0))
+start_docs.sink(lambda x: raw_background_dark.emit(0.0))
+start_docs.sink(lambda x: raw_background.emit(0.0))
+start_docs.sink(lambda x: raw_foreground_dark.emit(0.0))
 
 bg_query = (start_docs.map(query_background, db=db))
 bg_docs = (bg_query
            .zip(start_docs)
            .starmap(temporal_prox)
-           .filter(lambda x: x is not None)
+           .filter(lambda x: x != [])
            .map(lambda x: x[0].documents(fill=True))
            .flatten())
 

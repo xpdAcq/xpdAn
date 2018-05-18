@@ -4,7 +4,8 @@ env:
   global:
     - secure: "3p23U7qqhUbE1EJ6yIDSa6cwOXslduQi6Y31QhQj6QsLc+b8oal8UjhLgPenIfWGT5pkJ15cppUU1OePVKx1lZr8rfFg+RLo6AYWUnoaYffYdwtK+4eaf0Xk25TSc/NyIA3n3rFoFS0wgQ5PWlA0W2RHtoPh0trkAD1+de2k6C6kBoWJUBCcQLNCVZSeqPe86apSLVuK9N/5E6gYaTbtyoejso2e6zjEviGGfJxwrBSVvTzgJulDiYqZ/7sP7oURBZOAfAZnGpxc+YRQv1tIK0M7SYFf0am3WlhzhJHwYcReRlwfdbeQ/VvZXR09AV2InIfelSo0OnQDosg+AQevrOcJvDWBRfzr470RORwPUTY9xu+OFFQOx90F49exzTFmGZGAUVIT515JsCUb8PKH4Nz1HRtopUwII65exSVlJTxP7TDu03XV/MyA5aDJfcWtOmPsME+nKpvNrd/TmrxquY8KvEH1hrEJBOg742dIIUTbObJkiCSDsLtQS9tg0vJA9H3uqjN8a6zm7Nt9VQ5Ji0GiHkM6RrBXrvC9+GbK1uCtrdmhCuKWVSe13AVoaD3qdYVFfT6y2xEy3CUiXZCNIfxIY1dNa+QLPwYWZvQheMo5JxzGkuD/Mak7CFY6Bqm9J2XR0d1wvYdrvf4njBlw/YHThR8lPD8cemY9mGGA27k="
   matrix:
-    - CUTTING_EDGE=true
+    - PRECEDENCE='default'
+    - PRECEDENCE='default bleeding'
 
 cache:
   directories:
@@ -32,8 +33,8 @@ before_install:
   - ./miniconda.sh -b -p ~/mc
   - export PATH=~/mc/bin:$PATH
   - conda config --set always_yes yes --set changeps1 no --set quiet true
-  - conda update conda --yes
   - conda config --add channels conda-forge
+  - conda update conda --yes
   - export CONDARC=ci/condarc
   - export MDS_HOST=localhost
   - export MDS_DATABASE=test
@@ -48,22 +49,16 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
+  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION orch
   - source activate testenv
-  - conda install --file requirements/build.txt
-  - conda install pip
-  - pip install -r requirements/pip.txt
-  - pip install .
+  - orch score.yaml
 
 script:
   - set -e
-  - conda install --file requirements/run.txt
-  - conda install --file requirements/test.txt
   - coverage run run_tests.py
   - coverage report -m
   - codecov
   - flake8 xpdan
-  - conda install --yes --file requirements/docs.txt
   - cd docs
   - make html
   - cd ..

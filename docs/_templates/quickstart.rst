@@ -77,7 +77,7 @@ Carry out the steps in this order to ensure a successful analysis.
      Then restart the analysis with ``{{ start_analysis }}``.
      Additionally ``{{ start_analysis }}`` accepts modification to these
      dictionaries when it is called. Please see the function signature via
-     ``{{ start_analysis_func }}?``.
+     ``{{ start_analysis_func }}?`` in the analysis ipython terminal.
 
 These and many more things are explained below and elsewhere in the
 documentation. `XPD-Users Google group

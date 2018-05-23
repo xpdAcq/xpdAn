@@ -26,8 +26,7 @@ from xpdtools.pipelines.raw_pipeline import (mask_setting, geometry_img_shape,
                                              dark_corrected_foreground, q,
                                              mean, tth, mask, pdf, fq, sq,
                                              bg_corrected_img,
-                                             pol_corrected_img, raw_background,
-                                             dark_corrected_background)
+                                             pol_corrected_img, raw_background)
 from xpdtools.tools import overlay_mask
 from xpdview.callbacks import LiveWaterfall
 

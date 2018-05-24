@@ -16,11 +16,7 @@ from xpdan.pipelines.pipeline_utils import (_timestampstr,
 from xpdan.callbacks import StartStopCallback
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
-from xpdtools.pipelines.raw_pipeline import (mask_setting,
-                                             fq_kwargs,  # noqa
-                                             pdf_kwargs,  # noqa
-                                             mask_kwargs,  # noqa
-                                             geometry_img_shape,
+from xpdtools.pipelines.raw_pipeline import (geometry_img_shape,
                                              iq_comp, composition, wavelength,
                                              calibrant, detector,
                                              is_calibration_img, geo_input,
@@ -31,6 +27,10 @@ from xpdtools.pipelines.raw_pipeline import (mask_setting,
                                              mean, tth, mask, pdf, fq, sq,
                                              bg_corrected_img,
                                              pol_corrected_img, raw_background)
+
+from xpdtools.pipelines.raw_pipeline import (mask_setting,  # noqa: F401
+                                             fq_kwargs, pdf_kwargs,
+                                             mask_kwargs,)
 from xpdtools.tools import overlay_mask
 from xpdview.callbacks import LiveWaterfall
 

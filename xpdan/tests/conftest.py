@@ -57,6 +57,13 @@ def start_uid3(exp_db):
     return str(exp_db[6]['start']['uid'])
 
 
+@pytest.fixture(scope='function')
+def start_uid1(exp_db):
+    assert 'start_uid1' in exp_db[2]['start']
+    assert exp_db[2]['start']['sample_name'] == 'kapton'
+    return str(exp_db[2]['start']['uid'])
+
+
 @pytest.fixture(scope='module')
 def img_size():
     # a = np.random.random_integers(100, 200)
@@ -85,7 +92,7 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
 
     insert_imgs(RE, reg, 2, img_size, tmp_dir, bt_safN=0, pi_name='chris',
                 sample_name='kapton', sample_composition='C', start_uid1=True,
-                bt_uid=bt_uid, composition_string='Au')
+                bt_uid=bt_uid, composition_string='C')
     insert_imgs(RE, reg, 2, img_size, tmp_dir, pi_name='tim', bt_safN=1,
                 sample_name='Au', bkgd_sample_name='kapton',
                 sample_composition='Au', start_uid2=True, bt_uid=bt_uid,

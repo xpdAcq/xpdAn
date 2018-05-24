@@ -133,11 +133,18 @@ FromEventStream('start', ('composition_string',), source).connect(composition)
 
 start_timestamp = FromEventStream('start', ('time',), source)
 
+# Clean out the cached darks and backgrounds on start
+# so that this will run regardless of background/dark status
+# note that we get the proper data (if it exists downstream)
+start_docs.sink(lambda x: raw_background_dark.emit(0.0))
+start_docs.sink(lambda x: raw_background.emit(0.0))
+start_docs.sink(lambda x: raw_foreground_dark.emit(0.0))
+
 bg_query = (start_docs.map(query_background, db=db))
 bg_docs = (bg_query
            .zip(start_docs)
            .starmap(temporal_prox)
-           .filter(lambda x: x is not None)
+           .filter(lambda x: x != [])
            .map(lambda x: x[0].documents(fill=True))
            .flatten())
 
@@ -156,6 +163,7 @@ FromEventStream('event', ('data', image_name), bg_docs).connect(raw_background)
 # Get foreground dark
 fg_dark_query = (start_docs
                  .map(query_dark, db=db))
+fg_dark_query.filter(lambda x: x == []).sink(lambda x: print('No dark found!'))
 (FromEventStream('event', ('data', image_name),
                  fg_dark_query
                  .map(lambda x: x[0].documents(fill=True)).flatten()

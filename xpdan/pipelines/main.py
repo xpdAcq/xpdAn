@@ -17,9 +17,9 @@ from xpdan.callbacks import StartStopCallback
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (mask_setting,
-                                             fq_kwargs,
-                                             pdf_kwargs,
-                                             mask_kwargs,
+                                             fq_kwargs,  # noqa
+                                             pdf_kwargs,  # noqa
+                                             mask_kwargs,  # noqa
                                              geometry_img_shape,
                                              iq_comp, composition, wavelength,
                                              calibrant, detector,

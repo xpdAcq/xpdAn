@@ -16,7 +16,11 @@ from xpdan.pipelines.pipeline_utils import (_timestampstr,
 from xpdan.callbacks import StartStopCallback
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
-from xpdtools.pipelines.raw_pipeline import (mask_setting, geometry_img_shape,
+from xpdtools.pipelines.raw_pipeline import (mask_setting,
+                                             fq_kwargs,
+                                             pdf_kwargs,
+                                             mask_kwargs,
+                                             geometry_img_shape,
                                              iq_comp, composition, wavelength,
                                              calibrant, detector,
                                              is_calibration_img, geo_input,

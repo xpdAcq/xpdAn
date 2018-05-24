@@ -1,0 +1,14 @@
+**Added:**
+
+* ``start_analysis`` function for starting the ``RemoteDispatcher`` and pushing
+  data through the pipeline live
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

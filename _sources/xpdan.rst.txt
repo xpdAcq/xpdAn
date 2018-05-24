@@ -11,6 +11,9 @@ Subpackages
 .. toctree::
     xpdan.pipelines
 
+.. toctree::
+    xpdan.startup
+
 Submodules
 ----------
 

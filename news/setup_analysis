@@ -1,0 +1,14 @@
+**Added:** None
+
+**Changed:**
+
+* Darks and Backgrounds are zeroed out at start of scan in case scan has no
+  dark or background.
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

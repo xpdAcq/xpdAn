@@ -44,7 +44,7 @@ run:
     default: {conda: xpdsim}
   xpdtools:
     default: {conda: xpdtools}
-    bleeding: {pip: 'git+https://github.com/xpdAcq/streamz_ext.git#egg=xpdtools'}
+    bleeding: {pip: 'git+https://github.com/xpdAcq/xpdtools.git#egg=xpdtools'}
   xpdview:
     default: {conda: xpdview}
   xray-vision:

@@ -37,14 +37,14 @@ run:
     default: {conda: shed}
   streamz_ext:
     default: {conda: streamz_ext}
-    bleeding2: {orch: 'https://github.com/xpdAcq/streamz_ext.git'}
+    bleeding: {orch: 'https://github.com/xpdAcq/streamz_ext.git'}
   xpdconf:
     default: {conda: xpdconf}
   xpdsim:
     default: {conda: xpdsim}
   xpdtools:
     default: {conda: xpdtools}
-    bleeding2: {orch: 'https://github.com/xpdAcq/xpdtools.git'}
+    bleeding: {orch: 'https://github.com/xpdAcq/xpdtools.git'}
   xpdview:
     default: {conda: xpdview}
   xray-vision:

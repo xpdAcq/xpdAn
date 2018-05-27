@@ -15,7 +15,7 @@ from xpdan.formatters import render_and_clean
 from xpdan.io import pdf_saver, dump_yml, poni_saver
 from xpdan.pipelines.pipeline_utils import (if_dark, if_calibration,
                                             base_template)
-from xpdtools.tools import (map_to_binner, load_geo,
+from xpdtools.tools import (gnerate_binner, load_geo,
                             polarization_correction, mask_img, pdf_getter,
                             fq_getter, overlay_mask, z_score_image)
 from xpdview.callbacks import LiveWaterfall
@@ -255,7 +255,7 @@ class MainCallback(CallbackBase):
                                 self.mask_setting is None):
                             self.mask = np.ones(img.shape, dtype=bool)
                         else:
-                            binner = map_to_binner(geo, img.shape, self.mask)
+                            binner = gnerate_binner(geo, img.shape, self.mask)
                             self.mask = mask_img(img, binner,
                                                  **self.mask_kwargs)
                         if self.write_to_disk:
@@ -273,7 +273,7 @@ class MainCallback(CallbackBase):
                         self.vis_callbacks['masked_img'](
                             'event', format_event(overlay_mask=overlay))
                     # binner
-                    binner = map_to_binner(geo, img.shape, self.mask)
+                    binner = gnerate_binner(geo, img.shape, self.mask)
 
                     q, iq = binner.bin_centers, np.nan_to_num(
                         binner(img.flatten()))

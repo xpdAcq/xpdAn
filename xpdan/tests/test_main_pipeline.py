@@ -2,7 +2,8 @@ import os
 import time
 
 from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
-                                  fg_dark_query, mean, iq_comp, iq_em)
+                                  fg_dark_query, mean, iq_comp)
+from xpdan.pipelines.vis import iq_em
 
 
 def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):

@@ -1,15 +1,11 @@
 from xpdan.pipelines.main import *  # noqa: F403, F401
 from shed.translation import ToEventStream
-from xpdtools.pipelines.qoi import q_peak_pos, r_peak_pos, pdf_intensity, mean_intensity
+from xpdtools.pipelines.qoi import *  # noqa: F403, F401
 
-from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.callbacks.mpl_plotting import LiveScatter
-from pprint import pprint
 
 from matplotlib.colors import LogNorm, SymLogNorm
 
-
-# bec = BestEffortCallback()
 
 class LiveMultiScatter(LiveScatter):
     """Plot scattered 2D data in a "heat map".
@@ -42,6 +38,12 @@ class LiveMultiScatter(LiveScatter):
     --------
     :class:`bluesky.callbacks.LiveGrid`.
     """
+
+    def descriptor(self, doc):
+        # everything has a sequence number even if it is lacking the true key
+        for n in ['x', 'y']:
+            if getattr(self, n) not in doc['data_keys']:
+                setattr(self, n, 'seq_num')
 
     def event(self, doc):
         x = doc.get(self.x, None) or doc.get('data').get(self.x)
@@ -97,9 +99,6 @@ z = ToEventStream(q_peak_pos, ('q_peaks',)).AlignEventStreams(
     ToEventStream(pdf_intensity, ('pdf_I', )),
     ToEventStream(r_peak_pos, ('r_peaks', ))
 )
-
-# z.sink(pprint)
-# z.starsink(bec)
 
 lms = LiveMultiScatter('q_peaks', 'temperature', 'mean_I')
 lms.ax.set_aspect('auto')

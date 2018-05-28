@@ -48,10 +48,7 @@ class LiveMultiScatter(LiveScatter):
     def event(self, doc):
         x = doc.get(self.x, None) or doc.get('data').get(self.x)
         y = doc.get(self.y, None) or doc.get('data').get(self.y)
-        if self.I is None:
-            I = 1
-        else:
-            I = doc['data'][self.I]
+        I = doc['data'][self.I]
         self.update(x, y, I)
         # super().event(doc)
 
@@ -103,10 +100,10 @@ z = ToEventStream(q_peak_pos, ('q_peaks',)).AlignEventStreams(
     ToEventStream(r_peak_pos, ('r_peaks', ))
 )
 
-lms = LiveMultiScatter('temperature', 'q_peaks', 'mean_I')
+lms = LiveMultiScatter('q_peaks', 'temperature', 'mean_I')
 lms.ax.set_aspect('auto')
 lms._norm = SymLogNorm(.001)
-lms2 = LiveMultiScatter('temperature', 'r_peaks', 'pdf_I')
+lms2 = LiveMultiScatter('r_peaks', 'temperature', 'pdf_I')
 lms2.ax.set_aspect('auto')
 
 # z.sink(pprint)

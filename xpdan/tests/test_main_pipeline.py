@@ -4,6 +4,7 @@ import time
 from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
                                   fg_dark_query, mean, iq_comp)
 from xpdan.pipelines.vis import iq_em
+from xpdan.pipelines.save import *
 
 
 def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
@@ -42,7 +43,12 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     for f in ['dark_sub', 'mask', 'iq', 'itth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))
-        assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) == n_events
+        if f == 'mask':
+            assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au',
+                                               f))) == n_events * 2
+        else:
+            assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au',
+                                               f))) == n_events
     assert 'Au_{:.6}.yaml'.format(start_uid3) in os.listdir(
         os.path.join(fast_tmp_dir, 'Au'))
 
@@ -83,7 +89,11 @@ def test_main_pipeline_no_background(exp_db, fast_tmp_dir, start_uid1):
     for f in ['dark_sub', 'mask', 'iq', 'itth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'kapton'))
-        assert len(os.listdir(os.path.join(fast_tmp_dir, 'kapton', f))
-                   ) == n_events
+        if f == 'mask':
+            assert len(os.listdir(os.path.join(fast_tmp_dir, 'kapton', f))
+                       ) == n_events * 2
+        else:
+            assert len(os.listdir(os.path.join(fast_tmp_dir, 'kapton', f))
+                       ) == n_events
     assert 'kapton_{:.6}.yaml'.format(start_uid1) in os.listdir(
         os.path.join(fast_tmp_dir, 'kapton'))

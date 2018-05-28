@@ -2,15 +2,21 @@ from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import install_qt_kicker
 
 from xpdconf.conf import glbl_dict
-from xpdan.pipelines.main import raw_source
+from xpdan.pipelines.main import *
+from xpdan.pipelines.save import *
+from xpdan.pipelines.vis import *
+from xpdan.pipelines.qoi import *
+
 from xpdan.pipelines.main import (mask_kwargs as _mask_kwargs,
                                   pdf_kwargs as _pdf_kwargs,
                                   fq_kwargs as _fq_kwargs,
                                   mask_setting as _mask_setting)
+from xpdan.pipelines.save import save_kwargs as _save_kwargs
 
 
 def start_analysis(mask_kwargs=None,
-                   pdf_kwargs=None, fq_kwargs=None, mask_setting=None):
+                   pdf_kwargs=None, fq_kwargs=None, mask_setting=None,
+                   save_kwargs=None):
     """Start analysis pipeline
 
     Parameters
@@ -35,8 +41,12 @@ def start_analysis(mask_kwargs=None,
         pdf_kwargs = {}
     if mask_kwargs is None:
         mask_kwargs = {}
-    for a, b in zip([mask_kwargs, pdf_kwargs, fq_kwargs, mask_setting],
-                    [_mask_kwargs, _pdf_kwargs, _fq_kwargs, _mask_setting]):
+    if save_kwargs is None:
+        save_kwargs = {}
+    for a, b in zip([mask_kwargs, pdf_kwargs, fq_kwargs, mask_setting,
+                     save_kwargs],
+                    [_mask_kwargs, _pdf_kwargs, _fq_kwargs, _mask_setting,
+                     _save_kwargs]):
         if a:
             b.update(a)
 

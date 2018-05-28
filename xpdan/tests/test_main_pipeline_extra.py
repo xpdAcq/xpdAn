@@ -43,6 +43,10 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     for f in ['dark_sub', 'mask', 'iq', 'itth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))
-        assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) == n_events
+        if f in 'mask':
+            assert (len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) ==
+                    n_events * 2)
+        else:
+            assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) == n_events
     assert 'Au_{:.6}.yaml'.format(start_uid3) in os.listdir(
         os.path.join(fast_tmp_dir, 'Au'))

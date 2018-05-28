@@ -72,3 +72,6 @@ for name, analysis_stage, ext in zip(
 (sq.zip(filename_name_nodes['sq_name']).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='sq saver'))
 # '''
+
+save_kwargs = start_yaml_string.kwargs
+filename_node.kwargs = save_kwargs

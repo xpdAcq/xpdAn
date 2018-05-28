@@ -6,22 +6,23 @@ from xpdconf.conf import glbl_dict
 from xpdan.pipelines.main import *  # noqa: F403, F401
 from xpdan.pipelines.save import *  # noqa: F403, F401
 from xpdan.pipelines.vis import *  # noqa: F403, F401
-from xpdan.pipelines.qoi import *  # noqa: F403, F401
+# from xpdan.pipelines.qoi import *  # noqa: F403, F401
 from xpdan.pipelines.main import (mask_kwargs as _mask_kwargs,
                                   pdf_kwargs as _pdf_kwargs,
                                   fq_kwargs as _fq_kwargs,
                                   mask_setting as _mask_setting)
 from xpdan.pipelines.save import save_kwargs as _save_kwargs
-from xpdan.pipelines.qoi import (
-    pdf_argrelmax_kwargs as _pdf_argrelmax_kwargs,
-    mean_argrelmax_kwargs as _mean_argrelmax_kwargs)
+# from xpdan.pipelines.qoi import (
+#     pdf_argrelmax_kwargs as _pdf_argrelmax_kwargs,
+#     mean_argrelmax_kwargs as _mean_argrelmax_kwargs)
 
 
 def start_analysis(mask_kwargs=None,
                    pdf_kwargs=None, fq_kwargs=None, mask_setting=None,
                    save_kwargs=None,
-                   pdf_argrelmax_kwargs=None,
-                   mean_argrelmax_kwargs=None):
+                   # pdf_argrelmax_kwargs=None,
+                   # mean_argrelmax_kwargs=None
+                   ):
     """Start analysis pipeline
 
     Parameters
@@ -37,15 +38,11 @@ def start_analysis(mask_kwargs=None,
     save_kwargs : dict
         The kwargs passed to the main formatting node (mostly the filename
         template)
-    pdf_argrelmax_kwargs : dict
-        The dict passed to ``argrelmax`` for extracting PDF peaks
-    mean_argrelmax_kwargs : dict
-        The dict passed to ``argrelmax`` for extracting I(Q) peaks
     """
-    if pdf_argrelmax_kwargs is None:
-        pdf_argrelmax_kwargs = {}
-    if mean_argrelmax_kwargs is None:
-        mean_argrelmax_kwargs = {}
+    # if pdf_argrelmax_kwargs is None:
+    #     pdf_argrelmax_kwargs = {}
+    # if mean_argrelmax_kwargs is None:
+    #     mean_argrelmax_kwargs = {}
     d = RemoteDispatcher(glbl_dict['proxy_address'])
     install_qt_kicker(
         loop=d.loop)  # This may need to be d._loop depending on tag
@@ -60,11 +57,15 @@ def start_analysis(mask_kwargs=None,
     if save_kwargs is None:
         save_kwargs = {}
     for a, b in zip([mask_kwargs, pdf_kwargs, fq_kwargs, mask_setting,
-                     save_kwargs, pdf_argrelmax_kwargs,
-                     mean_argrelmax_kwargs],
+                     save_kwargs,
+                     # pdf_argrelmax_kwargs,
+                     # mean_argrelmax_kwargs
+                     ],
                     [_mask_kwargs, _pdf_kwargs, _fq_kwargs, _mask_setting,
-                     _save_kwargs, _pdf_argrelmax_kwargs,
-                     _mean_argrelmax_kwargs]):
+                     _save_kwargs,
+                     # _pdf_argrelmax_kwargs,
+                     # _mean_argrelmax_kwargs
+                     ]):
         if a:
             b.update(a)
 

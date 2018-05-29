@@ -2,7 +2,7 @@ import os
 import time
 
 from xpdan.pipelines.extra import z_score_plot
-from xpdan.pipelines.qoi import *
+# from xpdan.pipelines.qoi import *
 from xpdan.pipelines.save import *
 from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
                                   fg_dark_query, mean, iq_comp)

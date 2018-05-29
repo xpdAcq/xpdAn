@@ -4,6 +4,16 @@
 
 .. current developments
 
+v0.3.2
+====================
+
+**Fixed:**
+
+* Cast to numpy float32 on way into pipeline
+
+
+
+
 v0.3.1
 ====================
 

@@ -9,8 +9,9 @@ def test_no_equal(test_md):
                                                        {'units': 'K'}}},
                          human_timestamp='19920116-000000',
                          raw_event={'seq_num': 100},
-                         ext='.tif'
+                         ext='.tif',
+                         base_folder='hi'
                          )
     assert '=' not in a
-    assert a == 'undoped_ptp/undoped_ptp_19920116-' \
+    assert a == 'hi/undoped_ptp/undoped_ptp_19920116-' \
                 '000000_temp_K_14c5fe_0100.tif'

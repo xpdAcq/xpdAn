@@ -1,4 +1,5 @@
 from xpdan.pipelines.main import *
+
 # '''
 # SAVING
 # May rethink how we are doing the saving. If the saving was attached to the
@@ -10,19 +11,22 @@ from xpdan.pipelines.main import *
 
 start_yaml_string = (start_docs.map(lambda s: {'raw_start': s,
                                                'ext': '.yaml',
-                                               # TODO: talk to BLS ask if
-                                               #  they like this
-                                               # 'analysis_stage': 'meta'
+                                               'analysis_stage': 'meta'
                                                })
-                     .map(lambda kwargs, string: render(string, **kwargs),
-                          string=base_template)
+                     .map(lambda kwargs, string, **kwargs2: render(string,
+                                                                   **kwargs,
+                                                                   **kwargs2),
+                          string=base_template,
+                          base_folder=glbl_dict['tiff_base'])
                      )
 start_yaml_string.map(clean_template).zip(start_docs).starsink(dump_yml)
 
 # create filename string
-filename_node = all_docs.map(lambda kwargs, string: render(string, **kwargs),
-                             string=base_template,
-                             stream_name='base path')
+filename_node = all_docs.map(
+    lambda kwargs, string, **kwargs2: render(string, **kwargs, **kwargs2),
+    string=base_template,
+    stream_name='base path',
+    base_folder=glbl_dict['tiff_base'])
 
 # SAVING NAMES
 filename_name_nodes = {}
@@ -42,7 +46,7 @@ for name, analysis_stage, ext in zip(
 
     filename_name_nodes[name] = temp_name_node.map(clean_template)
     (filename_name_nodes[name].map(os.path.dirname)
-     .sink(os.makedirs, exist_ok=True,))
+     .sink(os.makedirs, exist_ok=True, ))
 
 # dark corrected img
 (filename_name_nodes['dark_corrected_image_name']

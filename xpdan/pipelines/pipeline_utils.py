@@ -116,7 +116,7 @@ class Filler(CallbackBase):
 
 
 base_template = (''
-                 '{folder_prefix}/'
+                 '{base_folder}/{folder_prefix}/'
                  '{analysis_stage}/'
                  '{raw_start[sample_name]}_'
                  '{human_timestamp}_'

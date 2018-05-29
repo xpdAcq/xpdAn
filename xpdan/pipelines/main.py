@@ -51,7 +51,8 @@ source = (
     .combine_latest(dk_uid)
     .filter(lambda x: x[1])
     .pluck(0)
-    .starmap(filler)
+    # Filler returns None for resource/datum data
+    .starmap(filler).filter(lambda x: x is not None)
 )
 # Get all the documents
 start_docs = FromEventStream('start', (), source)

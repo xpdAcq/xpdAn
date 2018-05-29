@@ -9,6 +9,7 @@ from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
 
 
 def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
+    save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db
     for a in [bg_query, bg_dark_query, fg_dark_query]:
@@ -21,8 +22,6 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
         # Hack to change the output dir to the fast_tmp_dir
         name, doc = nd
         if name == 'start':
-            doc.update(save_dir=fast_tmp_dir,
-                       folder_tag_list=['save_dir'] + doc['folder_tag_list'])
             nd = (name, doc)
         raw_source.emit(nd)
     assert z_score_plot.upstreams[0].start_uid is None
@@ -52,4 +51,4 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
             assert (len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f)))
                     == n_events)
     assert 'Au_{:.6}.yaml'.format(start_uid3) in os.listdir(
-        os.path.join(fast_tmp_dir, 'Au'))
+        os.path.join(fast_tmp_dir, 'Au', 'meta'))

@@ -4,6 +4,28 @@
 
 .. current developments
 
+v0.3.1
+====================
+
+**Added:**
+
+* Add print statement for server startup
+
+
+**Changed:**
+
+* metadata now stored into its own folder
+
+
+**Fixed:**
+
+* Files saved in sub dir of ``tiff_base``
+
+* Filter out ``None`` produced by ``Filler`` on ``datum/resource`` docs
+
+
+
+
 v0.3.0
 ====================
 

@@ -1,0 +1,15 @@
+**Added:**
+
+* Support for QOI plotting
+
+**Changed:**
+
+* Separated saving, visualization, and QOI pipeline chunks
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

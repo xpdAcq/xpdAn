@@ -2,6 +2,8 @@ import os
 import time
 
 from xpdan.pipelines.extra import z_score_plot
+# from xpdan.pipelines.qoi import *
+from xpdan.pipelines.save import *
 from xpdan.pipelines.main import (raw_source, filler, bg_query, bg_dark_query,
                                   fg_dark_query, mean, iq_comp)
 
@@ -43,6 +45,11 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     for f in ['dark_sub', 'mask', 'iq', 'itth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))
-        assert len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) == n_events
+        if f in 'mask':
+            assert (len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f))) ==
+                    n_events * 2)
+        else:
+            assert (len(os.listdir(os.path.join(fast_tmp_dir, 'Au', f)))
+                    == n_events)
     assert 'Au_{:.6}.yaml'.format(start_uid3) in os.listdir(
         os.path.join(fast_tmp_dir, 'Au'))

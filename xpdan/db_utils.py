@@ -146,7 +146,12 @@ def query_dark(docs, db, schema=1):
             doc = docs
         dk_uid = doc.get('sc_dk_field_uid')
         if dk_uid:
-            return db[dk_uid]
+            try:
+                z = db[dk_uid]
+            except ValueError:
+                return []
+            else:
+                return z
         else:
             return []
 

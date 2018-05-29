@@ -69,6 +69,6 @@ def start_analysis(mask_kwargs=None,
         if a:
             b.update(a)
 
-    d.subscribe(raw_source.emit)
-
+    d.subscribe(lambda *x: raw_source.emit(x))
+    print('Starting Analysis Server')
     d.start()

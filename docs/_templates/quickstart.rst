@@ -77,8 +77,25 @@ Carry out the steps in this order to ensure a successful analysis.
 
      Then restart the analysis with ``{{ start_analysis }}``.
      Additionally ``{{ start_analysis }}`` accepts modification to these
-     dictionaries when it is called. 
+     dictionaries when it is called see: <REPLACE WITH LINK TO START ANALYSIS DOCS>. 
      FIXME.
+     
+     For example:
+     
+     .. code-block:: python
+        pdf_kwargs.update(qmax=30)
+        mask_setting.update({'setting': 'first'})
+        mask_kwargs['alpha'] = 2
+    
+     Would change the PDF calculation Q max to 30 inverse Angstrom, reuse the 
+     mask from the first image of the scan on the other images, and change
+     the auto masking tolarance to 2 standard deviations.
+
+     .. DANGER::
+        Never run ``pdf_kwargs = {'qmax': 30}`` or the like with any of the
+        configuration dictionaries, this will detach them from the pipeline
+        and you will need to reset the analysis completely (exit ipython 
+        and run ``setup_analysis`` again).
 
 These and many more things are explained below and elsewhere in the
 documentation. `XPD-Users Google group

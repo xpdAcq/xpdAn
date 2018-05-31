@@ -1,3 +1,5 @@
+.. _xpdan_startup:
+
 xpdan\.startup package
 ========================
 

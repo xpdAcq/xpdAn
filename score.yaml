@@ -44,6 +44,7 @@ run:
     default: {conda: xpdsim}
   xpdtools:
     default: {conda: xpdtools}
+    bleeding: {orch: 'https://github.com/xpdAcq/xpdtools.git'}
   xpdview:
     default: {conda: xpdview}
   xray-vision:

@@ -45,6 +45,9 @@ napoleon_use_ivar = True
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+from jinja2 import Template, Environment, FileSystemLoader
+import os
+
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
@@ -200,3 +203,24 @@ epub_copyright = copyright
 epub_exclude_files = ['search.html']
 
 
+print('rendering templates')
+templated_files = os.listdir(os.path.join(os.path.dirname(__file__),
+                                          '_templates'))
+ctx = {'collection_env': 'collection-17Q1.0',
+       'analysis_env': 'analysis-17Q1.1',
+       'bs_proxy_config': '5577 5578',
+       'analysis_session_cmd': 'setup_analysis',
+       'start_analysis': 'start_analysis()',
+       'start_analysis_func': 'start_analysis',
+       'setup_analysis': 'setup_analysis',
+       }
+env = Environment(loader=FileSystemLoader([
+            '_templates',
+            os.path.join(os.path.dirname(__file__), '_templates'),
+        ]))
+for tname in templated_files:
+    template = env.get_template(tname)
+    result = template.render(ctx)
+    with open(os.path.join(os.path.dirname(__file__), os.path.splitext(tname)[0] + '.rst'), 'wt') as f:
+        print(f.name)
+        f.write(result)

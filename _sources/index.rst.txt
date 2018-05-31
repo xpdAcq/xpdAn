@@ -6,6 +6,34 @@
 Welcome to xpdAn's documentation!
 =================================
 
+Introduction
+++++++++++++
+
+To post questions about anything XPD, including software, and to see archived answers, please join the `XPD-Users Google group
+<https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_
+
+``xpdAn`` is a Python package that aids data analysis at the XPD beamlime.
+
+The goal of the ``xpdAn`` package is to simplify your analysis workflow during beamtime,
+so that you can focus more on scientific aspects of your experiment.
+
+To get started, please go to :ref:`quick_start`
+
+If you have suggestions for new features in xpdAcq, or want to report a bug or simply ask a question about
+the software, please post it as a new thread at `XPD-Users
+<https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_
+
+
+.. include:: ../CHANGELOG.rst
+
+.. toctree::
+   :maxdepth: 3
+   :hidden:
+
+   quickstart
+
+
+
 .. toctree::
    :maxdepth: 4
    :caption: Contents:

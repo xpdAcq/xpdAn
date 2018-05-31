@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quick Start &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="xpdan package" href="xpdan.html" />
+    <link rel="prev" title="Welcome to xpdAn’s documentation!" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#xpd-data-analysis-workflow-summary">XPD Data Analysis Workflow Summary</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Quick Start</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quick-start">
+<span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<p>This quick-start contains an overview of how the <code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> software works.</p>
+<p>Please use this page as a reminder of the workflow and to copy &amp; paste code snippets into the
+ipython terminals that are controlling your experiment and analysis.  After
+pasting, hit enter.</p>
+<p>Remember, to post questions about anything XPD, including software, and to see archived answers, at the <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a>. If you are not already a member please request to join
+the community</p>
+<div class="section" id="xpd-data-analysis-workflow-summary">
+<h2>XPD Data Analysis Workflow Summary<a class="headerlink" href="#xpd-data-analysis-workflow-summary" title="Permalink to this headline">¶</a></h2>
+<p>This is a brief summary of the steps you have to take to enable real-time data analysis analysis at XPD.
+more information about these steps can be found later in the more detailed documentation. Treat this quickstart as a reference that you may return back to.
+Carry out the steps in this order to ensure a successful analysis.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>If you haven’t already, join <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a> . Look here for answers if you get stuck and if the answer to your question is not already there, please ask it!</li>
+<li>Setup the analysis by running <code class="docutils literal notranslate"><span class="pre">setup_analysis</span></code> in a terminal.</li>
+<li>To begin running the analysis pipeline run <code class="docutils literal notranslate"><span class="pre">start_analysis()</span></code>.</li>
+<li>Your data will be automatically saved and visualized via the analysis pipeline.</li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p class="first">The data will be saved in the directory
+<code class="docutils literal notranslate"><span class="pre">.../xpdUser/tiff_base/</span></code>.</p>
+</li>
+<li><p class="first">The pipeline will save:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Dark corrected image (as <code class="docutils literal notranslate"><span class="pre">.tiff</span></code>)</p>
+</li>
+<li><p class="first">Mask</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).</li>
+<li>alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis</li>
+<li>alternative ehavior available is to not mask any images.</li>
+<li>These settings can be changed by either updating the <code class="docutils literal notranslate"><span class="pre">mask_settings</span></code> dict loaded into the analysis terminal or by starting analysis with the <code class="docutils literal notranslate"><span class="pre">mask_setting`</span></code> kwarg set to the new dict. The three posibilities are denoted by “auto”, “first”, and “none” respectively. For example, to set the mask to only be created on the first image of the scan one would type <code class="docutils literal notranslate"><span class="pre">mask_setting.update({'setting':</span> <span class="pre">'first'})</span></code>, it is important to update the dict, not reassign it (so don’t use <code class="docutils literal notranslate"><span class="pre">mask_setting</span> <span class="pre">=</span> <span class="pre">{'setting':</span> <span class="pre">'first'}</span></code>).</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">Integrated scattered intensity, I(Q) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>)</p>
+</li>
+<li><p class="first">I(tth) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>), note that this is the same as I(Q) on the tth grid.</p>
+</li>
+<li><p class="first">The structure and reduced structure factor S(Q) and F(Q) (as <code class="docutils literal notranslate"><span class="pre">.sq</span></code> and <code class="docutils literal notranslate"><span class="pre">.fq</span></code> respecifvely)</p>
+</li>
+<li><p class="first">The PDF, G(r) (as <code class="docutils literal notranslate"><span class="pre">.gr</span></code>)</p>
+</li>
+<li><p class="first">Calibration parameters (as <code class="docutils literal notranslate"><span class="pre">.poni</span></code>, if the scan is an calibration scan)</p>
+</li>
+<li><p class="first">Scan metadata (as <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>)</p>
+</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p class="first">The pipeline will plot:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Dark corrected image</li>
+<li>Dark, Polarization, Background corrected Masked image</li>
+<li>I(Q)</li>
+<li>I(tth)</li>
+<li>F(Q)</li>
+<li>G(r)</li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic" start="5">
+<li><p class="first">To change the pipeline configuration stop the <code class="docutils literal notranslate"><span class="pre">start_analysis()</span></code> by
+typing <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> in the terminal where it is running. Then edit one of the configuration
+dictionaries which are loaded into ipython as variables.</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">mask_kwargs</span></code> which controls the mask creation (see the <a class="reference external" href="https://xpdacq.github.io/xpdtools/xpdtools.html#xpdtools.tools.mask_img">xpdtools docs</a>)</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span></code> which controls the PDF creation</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">fq_kwargs</span></code> which controls the FQ/SQ creation</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">mask_setting</span></code> which controls how often masks are created:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">auto</span></code>: a mask is autocalculated for, and applied to, each image,</li>
+<li><code class="docutils literal notranslate"><span class="pre">first</span></code>: a new mask is autocalculated for the first image in the scan,
+then this mask is applied to all images in the scan,</li>
+<li><code class="docutils literal notranslate"><span class="pre">none</span></code>: no mask is applied)</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>Note, the image that is saved is always the unmasked image, so the masking
+behavior affects only the real-time analysis. You can run masking in the
+analysis pipeline (recommended) and then apply different masking logic later
+in your final analysis, if you want to.</p>
+<p>Then restart the analysis with <code class="docutils literal notranslate"><span class="pre">start_analysis()</span></code>.
+Additionally <code class="docutils literal notranslate"><span class="pre">start_analysis()</span></code> accepts modification to these
+dictionaries when it is called see: <a class="reference internal" href="xpdan.startup.html#xpdan-startup"><span class="std std-ref">xpdan.startup package</span></a>.</p>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pdf_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">qmax</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">mask_setting</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;setting&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span><span class="p">})</span>
+<span class="n">mask_kwargs</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>Would change the PDF calculation Q max to 30 inverse Angstrom, reuse the
+mask from the first image of the scan on the other images, and change
+the auto masking tolarance to 2 standard deviations.</p>
+<div class="admonition danger">
+<p class="first admonition-title">Danger</p>
+<p class="last">Never run <code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span> <span class="pre">=</span> <span class="pre">{'qmax':</span> <span class="pre">30}</span></code> or the like with any of the
+configuration dictionaries, this will detach them from the pipeline
+and you will need to reset the analysis completely (exit ipython
+and run <code class="docutils literal notranslate"><span class="pre">setup_analysis</span></code> again).</p>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>Note that not all the pipeline functionality is loaded when <code class="docutils literal notranslate"><span class="pre">setup_analysis</span></code> is run.
+For instance the <code class="docutils literal notranslate"><span class="pre">z-score</span></code> pipeline chunk is not loaded automatically.
+It can be loaded with <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">xpdan.pipelines.extra</span> <span class="pre">import</span> <span class="pre">*</span></code>.</p>
+<p>These and many more things are explained below and elsewhere in the
+documentation. <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a> .</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="xpdan.html" class="btn btn-neutral float-right" title="xpdan package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to xpdAn’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

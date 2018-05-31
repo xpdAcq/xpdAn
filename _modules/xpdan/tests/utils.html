@@ -77,7 +77,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
 </ul>
@@ -233,12 +236,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Create detectors</span>
     <span class="n">dark_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                         <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                             <span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
+                                         <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
+                                             <span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
                                          <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
     <span class="n">light_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                          <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                              <span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
+                                          <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
+                                              <span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span> <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
                                           <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
     <span class="n">beamtime_uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
     <span class="n">base_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">beamtime_uid</span><span class="o">=</span><span class="n">beamtime_uid</span><span class="p">,</span>

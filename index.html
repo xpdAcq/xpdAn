@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="xpdan package" href="xpdan.html" /> 
+    <link rel="next" title="Quick Start" href="quickstart.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -78,7 +78,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="xpdan.html">xpdan package</a></li>
 </ul>
@@ -147,6 +150,102 @@
             
   <div class="section" id="welcome-to-xpdan-s-documentation">
 <h1>Welcome to xpdAn’s documentation!<a class="headerlink" href="#welcome-to-xpdan-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>To post questions about anything XPD, including software, and to see archived answers, please join the <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> is a Python package that aids data analysis at the XPD beamlime.</p>
+<p>The goal of the <code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> package is to simplify your analysis workflow during beamtime,
+so that you can focus more on scientific aspects of your experiment.</p>
+<p>To get started, please go to <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">Quick Start</span></a></p>
+<p>If you have suggestions for new features in xpdAcq, or want to report a bug or simply ask a question about
+the software, please post it as a new thread at <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users</a></p>
+<div class="section" id="change-log">
+<h3>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="section" id="v0-3-2">
+<h1>v0.3.2<a class="headerlink" href="#v0-3-2" title="Permalink to this headline">¶</a></h1>
+<p><strong>Fixed:</strong></p>
+<ul class="simple">
+<li>Cast to numpy float32 on way into pipeline</li>
+</ul>
+</div>
+<div class="section" id="v0-3-1">
+<h1>v0.3.1<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h1>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li>Add print statement for server startup</li>
+</ul>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li>metadata now stored into its own folder</li>
+</ul>
+<p><strong>Fixed:</strong></p>
+<ul class="simple">
+<li>Files saved in sub dir of <code class="docutils literal notranslate"><span class="pre">tiff_base</span></code></li>
+<li>Filter out <code class="docutils literal notranslate"><span class="pre">None</span></code> produced by <code class="docutils literal notranslate"><span class="pre">Filler</span></code> on <code class="docutils literal notranslate"><span class="pre">datum/resource</span></code> docs</li>
+</ul>
+</div>
+<div class="section" id="v0-3-0">
+<h1>v0.3.0<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h1>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">Filler</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_combine_latest</span></code> to <code class="docutils literal notranslate"><span class="pre">pipeline_utils</span></code></li>
+<li>Tests for main pipeline</li>
+<li>Support for QOI plotting</li>
+<li><code class="docutils literal notranslate"><span class="pre">start_analysis</span></code> function for starting the <code class="docutils literal notranslate"><span class="pre">RemoteDispatcher</span></code> and pushing
+data through the pipeline live</li>
+</ul>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">db_utils</span></code> query functions signatures are now reversed (docs first, db
+second)</li>
+<li>Simplified <code class="docutils literal notranslate"><span class="pre">render_and_clean</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">MainCallback</span></code> <code class="docutils literal notranslate"><span class="pre">analysis_stage</span></code> syntax in line with pipeline</li>
+<li><code class="docutils literal notranslate"><span class="pre">conftest</span></code> databroker now reports raw dicts</li>
+<li>Separated saving, visualization, and QOI pipeline chunks</li>
+<li>Darks and Backgrounds are zeroed out at start of scan in case scan has no
+dark or background.</li>
+</ul>
+<p><strong>Removed:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">xpdan.tools</span></code> is now in <code class="docutils literal notranslate"><span class="pre">xpdtools.tools</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">shim</span></code> module is now in <code class="docutils literal notranslate"><span class="pre">xpdtools</span></code></li>
+</ul>
+<p><strong>Fixed:</strong></p>
+<ul class="simple">
+<li>Analysis pipeline now runs on xpdtools pipeline</li>
+</ul>
+</div>
+<div class="section" id="v0-2-3rc">
+<h1>v0.2.3rc<a class="headerlink" href="#v0-2-3rc" title="Permalink to this headline">¶</a></h1>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li>xpdAcq now outsources <a href="#id1"><span class="problematic" id="id2">``</span></a>glbl` configuration management to xpdConf</li>
+<li>Use conda-forge <code class="docutils literal notranslate"><span class="pre">xpdconf</span></code> for CI builds</li>
+</ul>
+<p><strong>Removed:</strong></p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">load_configuration</span></code> (which is now in xpdConf)</li>
+</ul>
+</div>
+<div class="section" id="v0-2-2">
+<h1>v0.2.2<a class="headerlink" href="#v0-2-2" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="v0-2-1">
+<h1>v0.2.1<a class="headerlink" href="#v0-2-1" title="Permalink to this headline">¶</a></h1>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li>Requirements folder</li>
+<li><code class="docutils literal notranslate"><span class="pre">push_tag</span></code> to rever</li>
+<li>Flexible folder tag</li>
+<li>Add rever changelog activity</li>
+<li>Speed up masking via median based sigma clipping</li>
+<li>Z score visualization to callback pipeline</li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -212,7 +311,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="xpdan.html" class="btn btn-neutral float-right" title="xpdan package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quick Start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

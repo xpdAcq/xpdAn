@@ -12,6 +12,7 @@
 ./_modules/xpdan/tests/test_fuzzybroker.html
 ./_modules/xpdan/tests/utils.html
 ./_sources/index.rst.txt
+./_sources/quickstart.rst.txt
 ./_sources/xpdan.pipelines.rst.txt
 ./_sources/xpdan.rst.txt
 ./_sources/xpdan.startup.rst.txt
@@ -58,6 +59,7 @@
 ./index.html
 ./objects.inv
 ./py-modindex.html
+./quickstart.html
 ./search.html
 ./searchindex.js
 ./xpdan.html

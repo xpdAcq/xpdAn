@@ -77,7 +77,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
 </ul>
@@ -143,32 +146,51 @@
            <div itemprop="articleBody">
             
   <h1>Source code for xpdan.startup.analysis</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">bluesky.callbacks.zmq</span> <span class="k">import</span> <span class="n">RemoteDispatcher</span>
+<span></span><span class="sd">&quot;&quot;&quot;Tools for starting and managing the analysis server&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">bluesky.callbacks.zmq</span> <span class="k">import</span> <span class="n">RemoteDispatcher</span>
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="k">import</span> <span class="n">install_qt_kicker</span>
-
 <span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="k">import</span> <span class="n">glbl_dict</span>
-<span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="n">raw_source</span>
+
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403, F401</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.save</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403, F401</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.vis</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># noqa: F403, F401</span>
+<span class="c1"># from xpdan.pipelines.qoi import *  # noqa: F403, F401</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="p">(</span><span class="n">mask_kwargs</span> <span class="k">as</span> <span class="n">_mask_kwargs</span><span class="p">,</span>
                                   <span class="n">pdf_kwargs</span> <span class="k">as</span> <span class="n">_pdf_kwargs</span><span class="p">,</span>
                                   <span class="n">fq_kwargs</span> <span class="k">as</span> <span class="n">_fq_kwargs</span><span class="p">,</span>
                                   <span class="n">mask_setting</span> <span class="k">as</span> <span class="n">_mask_setting</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.save</span> <span class="k">import</span> <span class="n">save_kwargs</span> <span class="k">as</span> <span class="n">_save_kwargs</span>
+<span class="c1"># from xpdan.pipelines.qoi import (</span>
+<span class="c1">#     pdf_argrelmax_kwargs as _pdf_argrelmax_kwargs,</span>
+<span class="c1">#     mean_argrelmax_kwargs as _mean_argrelmax_kwargs)</span>
 
 
 <div class="viewcode-block" id="start_analysis"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis.start_analysis">[docs]</a><span class="k">def</span> <span class="nf">start_analysis</span><span class="p">(</span><span class="n">mask_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">pdf_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask_setting</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                   <span class="n">pdf_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask_setting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">save_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="c1"># pdf_argrelmax_kwargs=None,</span>
+                   <span class="c1"># mean_argrelmax_kwargs=None</span>
+                   <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Start analysis pipeline</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    mask_kwargs: dict</span>
+<span class="sd">    mask_kwargs : dict</span>
 <span class="sd">        The kwargs passed to the masking see xpdtools.tools.mask_img</span>
-<span class="sd">    pdf_kwargs: dict</span>
+<span class="sd">    pdf_kwargs : dict</span>
 <span class="sd">        The kwargs passed to the pdf generator, see xpdtools.tools.pdf_getter</span>
-<span class="sd">    fq_kwargs: dict</span>
+<span class="sd">    fq_kwargs : dict</span>
 <span class="sd">        The kwargs passed to the fq generator, see xpdtools.tools.fq_getter</span>
-<span class="sd">    mask_setting: dict</span>
+<span class="sd">    mask_setting : dict</span>
 <span class="sd">        The setting of the mask</span>
+<span class="sd">    save_kwargs : dict</span>
+<span class="sd">        The kwargs passed to the main formatting node (mostly the filename</span>
+<span class="sd">        template)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if pdf_argrelmax_kwargs is None:</span>
+    <span class="c1">#     pdf_argrelmax_kwargs = {}</span>
+    <span class="c1"># if mean_argrelmax_kwargs is None:</span>
+    <span class="c1">#     mean_argrelmax_kwargs = {}</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s1">&#39;proxy_address&#39;</span><span class="p">])</span>
     <span class="n">install_qt_kicker</span><span class="p">(</span>
         <span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>  <span class="c1"># This may need to be d._loop depending on tag</span>
@@ -180,13 +202,23 @@
         <span class="n">pdf_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">mask_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mask_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">mask_kwargs</span><span class="p">,</span> <span class="n">pdf_kwargs</span><span class="p">,</span> <span class="n">fq_kwargs</span><span class="p">,</span> <span class="n">mask_setting</span><span class="p">],</span>
-                    <span class="p">[</span><span class="n">_mask_kwargs</span><span class="p">,</span> <span class="n">_pdf_kwargs</span><span class="p">,</span> <span class="n">_fq_kwargs</span><span class="p">,</span> <span class="n">_mask_setting</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">save_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">save_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">mask_kwargs</span><span class="p">,</span> <span class="n">pdf_kwargs</span><span class="p">,</span> <span class="n">fq_kwargs</span><span class="p">,</span> <span class="n">mask_setting</span><span class="p">,</span>
+                     <span class="n">save_kwargs</span><span class="p">,</span>
+                     <span class="c1"># pdf_argrelmax_kwargs,</span>
+                     <span class="c1"># mean_argrelmax_kwargs</span>
+                     <span class="p">],</span>
+                    <span class="p">[</span><span class="n">_mask_kwargs</span><span class="p">,</span> <span class="n">_pdf_kwargs</span><span class="p">,</span> <span class="n">_fq_kwargs</span><span class="p">,</span> <span class="n">_mask_setting</span><span class="p">,</span>
+                     <span class="n">_save_kwargs</span><span class="p">,</span>
+                     <span class="c1"># _pdf_argrelmax_kwargs,</span>
+                     <span class="c1"># _mean_argrelmax_kwargs</span>
+                     <span class="p">]):</span>
         <span class="k">if</span> <span class="n">a</span><span class="p">:</span>
             <span class="n">b</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
-    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">raw_source</span><span class="o">.</span><span class="n">emit</span><span class="p">)</span>
-
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">raw_source</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting Analysis Server&#39;</span><span class="p">)</span>
     <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 </pre></div>
 

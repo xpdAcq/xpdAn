@@ -211,7 +211,8 @@ ctx = {'collection_env': 'collection-17Q1.0',
        'bs_proxy_config': '5577 5578',
        'analysis_session_cmd': 'setup_analysis',
        'start_analysis': 'start_analysis()',
-       'start_analysis_func': 'start_analysis'
+       'start_analysis_func': 'start_analysis',
+       'setup_analysis': 'setup_analysis',
        }
 env = Environment(loader=FileSystemLoader([
             '_templates',

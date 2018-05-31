@@ -4,14 +4,13 @@ Quick Start
 ===========
 
 This quick-start contains an overview of how the ``xpdAn`` software works.
-To understand more details about it, please refer to the detailed documentation in :ref:`xpdu`
 
 Please use this page as a reminder of the workflow and to copy & paste code snippets into the
 ipython terminals that are controlling your experiment and analysis.  After
 pasting, hit enter.
 
 Remember, to post questions about anything XPD, including software, and to see archived answers, at the `XPD-Users Google group
-<https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_ . If you are not already a member please request to join
+<https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_. If you are not already a member please request to join
 the community
 
 XPD Data Analysis Workflow Summary
@@ -23,28 +22,30 @@ Carry out the steps in this order to ensure a successful analysis.
 
   1. If you haven't already, join `XPD-Users Google group <https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_ . Look here for answers if you get stuck and if the answer to your question is not already there, please ask it!
 
-  2. Start the analysis by running ``{{ start_analysis }}`` in a terminal
+  2. Setup the analysis by running ``{{ setup_analysis }}`` in a terminal.
 
-  3. Your data will be automatically saved and visualized via the analysis pipeline.
+  3. To begin running the analysis pipeline run ``{{ start_analysis }}``.
+
+  4. Your data will be automatically saved and visualized via the analysis pipeline.
 
     * The data will be saved in the directory
-      ``.../xpdUser/tiff_base/<Sample_name_from_spreadsheet>``.
+      ``.../xpdUser/tiff_base/``.
 
     * The pipeline will save:
 
         1. Dark corrected image (as ``.tiff``)
         2. Mask 
-           1. by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).
-           2. alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis
-           3. alternative ehavior available is to not mask any images.
-           4. These settings can be changed by either updating the ``mask_settings`` dict loaded into the analysis terminal or by starting analysis with the ``mask_setting``` kwarg set to the new dict. The three posibilities are denoted by "auto", "first", and "none" respectively. For example, to set the mask to only be created on the first image of the scan one would type ``mask_setting.update({'setting': 'first'})``, it is important to update the dict, not reassign it (so don't use ``mask_setting = {'setting': 'first'}``).
+
+            1. by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).
+            2. alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis
+            3. alternative ehavior available is to not mask any images.
+            4. These settings can be changed by either updating the ``mask_settings`` dict loaded into the analysis terminal or by starting analysis with the ``mask_setting``` kwarg set to the new dict. The three posibilities are denoted by "auto", "first", and "none" respectively. For example, to set the mask to only be created on the first image of the scan one would type ``mask_setting.update({'setting': 'first'})``, it is important to update the dict, not reassign it (so don't use ``mask_setting = {'setting': 'first'}``).
         3. Integrated scattered intensity, I(Q) (as ``.chi``)
-        4. I(tth) (as ``.chi``), note that this is the same as I(Q) on the tth
-           grid.
+        4. I(tth) (as ``.chi``), note that this is the same as I(Q) on the tth grid.
         5. The structure and reduced structure factor S(Q) and F(Q) (as ``.sq`` and ``.fq`` respecifvely)
-        5. The PDF, G(r) (as ``.gr``)
-        6. Calibration parameters (as ``.poni``, if the scan is an calibration scan)
-        7. Scan metadata (as ``.yaml``)
+        6. The PDF, G(r) (as ``.gr``)
+        7. Calibration parameters (as ``.poni``, if the scan is an calibration scan)
+        8. Scan metadata (as ``.yaml``)
 
 
     * The pipeline will plot:
@@ -56,11 +57,11 @@ Carry out the steps in this order to ensure a successful analysis.
         5. F(Q)
         6. G(r)
 
-  4. To change the pipeline configuration stop the ``{{ start_analysis }}`` by
+  5. To change the pipeline configuration stop the ``{{ start_analysis }}`` by
      typing ``Ctrl+C`` in the terminal where it is running. Then edit one of the configuration
      dictionaries which are loaded into ipython as variables.
 
-     * ``mask_kwargs`` which controls the mask creation
+     * ``mask_kwargs`` which controls the mask creation (see the `xpdtools docs <https://xpdacq.github.io/xpdtools/xpdtools.html#xpdtools.tools.mask_img>`_)
      * ``pdf_kwargs`` which controls the PDF creation
      * ``fq_kwargs`` which controls the FQ/SQ creation
      * ``mask_setting`` which controls how often masks are created:
@@ -77,12 +78,12 @@ Carry out the steps in this order to ensure a successful analysis.
 
      Then restart the analysis with ``{{ start_analysis }}``.
      Additionally ``{{ start_analysis }}`` accepts modification to these
-     dictionaries when it is called see: <REPLACE WITH LINK TO START ANALYSIS DOCS>. 
-     FIXME.
+     dictionaries when it is called see: :ref:`xpdan_startup`. 
      
      For example:
      
      .. code-block:: python
+
         pdf_kwargs.update(qmax=30)
         mask_setting.update({'setting': 'first'})
         mask_kwargs['alpha'] = 2
@@ -96,6 +97,10 @@ Carry out the steps in this order to ensure a successful analysis.
         configuration dictionaries, this will detach them from the pipeline
         and you will need to reset the analysis completely (exit ipython 
         and run ``setup_analysis`` again).
+
+Note that not all the pipeline functionality is loaded when ``{{ setup_analysis }}`` is run.
+For instance the ``z-score`` pipeline chunk is not loaded automatically.
+It can be loaded with ``from xpdan.pipelines.extra import *``.
 
 These and many more things are explained below and elsewhere in the
 documentation. `XPD-Users Google group

@@ -58,7 +58,7 @@ script:
   - coverage run run_tests.py
   - coverage report -m
   - codecov
-  - flake8 xpdan
+  # - flake8 xpdan
   - cd docs
   - make html
   - cd ..

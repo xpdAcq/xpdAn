@@ -76,7 +76,7 @@ FromEventStream('start', ('composition_string',), source).connect(composition)
 (FromEventStream('start', ('bt_wavelength',), source)
  .unique(history=1)
  .connect(wavelength))
-(FromEventStream('start', ('calibrant',), source)
+(FromEventStream('start', ('dSpacing',), source)
  .unique(history=1)
  .connect(calibrant))
 (FromEventStream('start', ('detector',), source)
@@ -141,9 +141,10 @@ FromEventStream('event', ('seq_num',), source, stream_name='seq_num'
 
 # Save out calibration data to special place
 h_timestamp = start_timestamp.map(_timestampstr)
-(gen_geo_cal
+(gen_geo_cal.pluck(0)
  .zip_latest(h_timestamp)
- .sink(lambda x: _save_calib_param(*x, calibration_md_folder['file_path'])))
+ .starsink(lambda x, y: _save_calib_param(x, y, os.path.join(
+    glbl_dict['config_base'], glbl_dict['calib_config_name']))))
 
 raw_source.starsink(StartStopCallback())
 # raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)

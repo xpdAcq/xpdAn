@@ -4,6 +4,18 @@
 
 .. current developments
 
+v0.3.3
+====================
+
+**Fixed:**
+
+* Splay out args for calibration saving properly
+
+* Pull calibration information from ``dSpacings``
+
+
+
+
 v0.3.2
 ====================
 

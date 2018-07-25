@@ -76,7 +76,8 @@ for name, analysis_stage, ext in zip(
 (sq.zip(filename_name_nodes['sq_name']).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='sq saver'))
 # calibration
-gen_geo.zip(filename_name_nodes['calib_name'].starsink(lambda x, n: x.save(n)))
+(gen_geo.zip(filename_name_nodes['calib_name'])
+ .starsink(lambda x, n: x.save(n), stream_name='cal saver'))
 # '''
 
 save_kwargs = start_yaml_string.kwargs

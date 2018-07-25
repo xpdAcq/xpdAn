@@ -32,9 +32,9 @@ filename_node = all_docs.map(
 filename_name_nodes = {}
 for name, analysis_stage, ext in zip(
         ['dark_corrected_image_name', 'iq_name', 'tth_name', 'mask_fit2d_name',
-         'mask_np_name', 'pdf_name', 'fq_name', 'sq_name'],
-        ['dark_sub', 'iq', 'itth', 'mask', 'mask', 'pdf', 'fq', 'sq'],
-        ['.tiff', '', '_tth', '', '_mask.npy', '.gr', '.fq', '.sq']
+         'mask_np_name', 'pdf_name', 'fq_name', 'sq_name', 'calib_name'],
+        ['dark_sub', 'iq', 'itth', 'mask', 'mask', 'pdf', 'fq', 'sq', 'calib'],
+        ['.tiff', '', '_tth', '', '_mask.npy', '.gr', '.fq', '.sq', '.poni']
 ):
     if ext:
         temp_name_node = filename_node.map(render,
@@ -75,6 +75,8 @@ for name, analysis_stage, ext in zip(
 # S(Q)
 (sq.zip(filename_name_nodes['sq_name']).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='sq saver'))
+# calibration
+gen_geo.zip(filename_name_nodes['calib_name'].sink(lambda x, n: x.save(n)))
 # '''
 
 save_kwargs = start_yaml_string.kwargs

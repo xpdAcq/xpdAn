@@ -283,40 +283,6 @@ folder_tag</p>
 </div>
 <div class="section" id="module-xpdan.pipelines.save_tiff">
 <span id="xpdan-pipelines-save-tiff-module"></span><h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#module-xpdan.pipelines.save_tiff" title="Permalink to this headline">¶</a></h2>
-<p>Save tiff pipeline</p>
-<dl class="function">
-<dt id="xpdan.pipelines.save_tiff.conf_save_tiff_pipeline">
-<code class="descclassname">xpdan.pipelines.save_tiff.</code><code class="descname">conf_save_tiff_pipeline</code><span class="sig-paren">(</span><em>db</em>, <em>save_dir</em>, <em>*</em>, <em>write_to_disk=False</em>, <em>vis=True</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/save_tiff.html#conf_save_tiff_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.save_tiff.conf_save_tiff_pipeline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Total data processing pipeline for XPD</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>write_to_disk</strong> (<em>bool, optional</em>) – If True write files to disk, defaults to False</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>vis</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>source</strong> – The source for the graph</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Stream</p>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
-</div>
-</dd></dl>
-
 </div>
 </div>
 

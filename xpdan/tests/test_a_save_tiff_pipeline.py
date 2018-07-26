@@ -1,3 +1,7 @@
+# NOTE this is named ``test_a_save...`` so that it is run first by py.test
+# Since pytest doesn't import from scratch it stores the state of the pipeline
+# and rolls it over causing problems due to combine latest.
+# This will be fixed by having pipeline factories
 import os
 import time
 
@@ -6,7 +10,7 @@ from xpdan.pipelines.save_tiff import (raw_source,
                                        fg_dark_query, save_kwargs)
 
 
-def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
+def test_tiff_pipeline(exp_db, fast_tmp_dir, start_uid3):
     save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db
@@ -41,7 +45,7 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
         os.path.join(fast_tmp_dir, 'Au', 'meta'))
 
 
-def test_main_pipeline_no_background(exp_db, fast_tmp_dir, start_uid1):
+def test_tiff_pipeline_no_background(exp_db, fast_tmp_dir, start_uid1):
     save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db

@@ -3,8 +3,6 @@ import time
 
 from xpdan.pipelines.save_tiff import (raw_source,
                                        filler,
-                                       bg_query,
-                                       bg_dark_query,
                                        fg_dark_query, save_kwargs)
 
 
@@ -12,7 +10,7 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
     save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db
-    for a in [bg_query, bg_dark_query, fg_dark_query]:
+    for a in [fg_dark_query]:
         a.kwargs['db'] = exp_db
 
     t0 = time.time()
@@ -47,7 +45,7 @@ def test_main_pipeline_no_background(exp_db, fast_tmp_dir, start_uid1):
     save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db
-    for a in [bg_query, bg_dark_query, fg_dark_query]:
+    for a in [fg_dark_query]:
         a.kwargs['db'] = exp_db
 
     t0 = time.time()

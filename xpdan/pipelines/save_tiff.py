@@ -13,11 +13,9 @@ from xpdan.pipelines.pipeline_utils import (_timestampstr,
                                             base_template)
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.raw_pipeline import (
-    raw_background_dark,
-    raw_foreground_dark, img_counter,
+    raw_foreground_dark,
     raw_foreground,
-    dark_corrected_foreground,
-    raw_background)
+    dark_corrected_foreground)
 
 image_name = glbl_dict['image_field']
 db = glbl_dict['exp_db']
@@ -56,30 +54,7 @@ start_timestamp = FromEventStream('start', ('time',), source)
 # Clean out the cached darks and backgrounds on start
 # so that this will run regardless of background/dark status
 # note that we get the proper data (if it exists downstream)
-start_docs.sink(lambda x: raw_background_dark.emit(0.0))
-start_docs.sink(lambda x: raw_background.emit(0.0))
 start_docs.sink(lambda x: raw_foreground_dark.emit(0.0))
-
-bg_query = (start_docs.map(query_background, db=db))
-bg_docs = (bg_query
-           .zip(start_docs)
-           .starmap(temporal_prox)
-           .filter(lambda x: x != [])
-           .map(lambda x: x[0].documents(fill=True))
-           .flatten())
-
-# Get bg dark
-bg_dark_query = (FromEventStream('start', (), bg_docs)
-                 .map(query_dark, db=db)
-                 )
-(FromEventStream('event', ('data', image_name),
-                 bg_dark_query.map(lambda x: x[0].documents(fill=True))
-                 .flatten()).map(np.float32)
- .connect(raw_background_dark))
-
-# Get background
-(FromEventStream('event', ('data', image_name), bg_docs).map(np.float32)
- .connect(raw_background))
 
 # Get foreground dark
 fg_dark_query = (start_docs.map(query_dark, db=db))
@@ -93,8 +68,6 @@ fg_dark_query.filter(lambda x: x == []).sink(lambda x: print('No dark found!'))
  .connect(raw_foreground_dark))
 
 # Get foreground
-FromEventStream('event', ('seq_num',), source, stream_name='seq_num'
-                ).connect(img_counter)
 (FromEventStream('event', ('data', image_name), source, principle=True,
                  stream_name='raw_foreground').map(np.float32)
  .connect(raw_foreground))
@@ -103,7 +76,6 @@ FromEventStream('event', ('seq_num',), source, stream_name='seq_num'
 h_timestamp = start_timestamp.map(_timestampstr)
 
 raw_source.starsink(StartStopCallback())
-# raw_source.visualize(os.path.expanduser('~/mystream.png'), source_node=True)
 # '''
 # SAVING
 # May rethink how we are doing the saving. If the saving was attached to the

@@ -4,6 +4,16 @@
 
 .. current developments
 
+v0.3.4
+====================
+
+**Added:**
+
+* ``save_tiff`` pipeline for simple save tiff
+
+
+
+
 v0.3.3
 ====================
 

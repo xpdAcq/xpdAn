@@ -11,6 +11,7 @@
 * Make certain that files are saved before additional analysis is performed.
   This should make the pipeline more robust to analysis failures near the
   end of the pipeline.
-* Fix ``xpdan.callbacks.StopStartCallback`` to be no-stop doc tolerant
+* ``xpdan.callbacks.StopStartCallback`` to be no-stop doc tolerant
+* ``conftest.py`` now properly reports a ``bt_uid``
 
 **Security:** None

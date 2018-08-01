@@ -56,7 +56,8 @@ descriptor_docs = FromEventStream('descriptor', (), source,
                                   event_stream_name='primary')
 event_docs = FromEventStream('event', (), source, event_stream_name='primary')
 all_docs = (event_docs
-            .combine_latest(start_docs, descriptor_docs, emit_on=0)
+            .combine_latest(start_docs, descriptor_docs, emit_on=0,
+                            first=True)
             .starmap(lambda e, s, d: {'raw_event': e, 'raw_start': s,
                                       'raw_descriptor': d,
                                       'human_timestamp': _timestampstr(

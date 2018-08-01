@@ -2,12 +2,7 @@ from xpdan.pipelines.main import *
 
 # '''
 # SAVING
-# May rethink how we are doing the saving. If the saving was attached to the
-# translation nodes then it would be run before the rest of the graph was
-# processed.
-
-# This could be done by having each saver inside a callback which takes both
-# analyzed and raw documents, and creates the path from those two.
+# TODO: look at implementing hint/document based logic for saving
 
 start_yaml_string = (start_docs.map(lambda s: {'raw_start': s,
                                                'ext': '.yaml',
@@ -46,32 +41,28 @@ for name, analysis_stage, ext in zip(
 
     filename_name_nodes[name] = temp_name_node.map(clean_template,
                                                    stream_name=analysis_stage)
+    filename_name_nodes[name].map(os.path.dirname).sink(os.makedirs, exist_ok=True)
 
 # dark corrected img
-a = filename_name_nodes['dark_corrected_image_name'].zip(
-    dark_corrected_foreground, first=True)
-a.map(lambda l: l[0]).map(os.path.dirname).sink(os.makedirs, exist_ok=True)
-(a.starsink(imsave, stream_name='dark corrected foreground'))
+(filename_name_nodes['dark_corrected_image_name'].zip(
+    dark_corrected_foreground, first=dark_corrected_foreground).starsink(
+    imsave, stream_name='dark corrected foreground'))
 
 
-b = q.combine_latest(mean, emit_on=1, first=True).zip(
-    filename_name_nodes['iq_name'])
-b.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True)
 # integrated intensities
-(b
+(q.combine_latest(mean, emit_on=1, first=True).zip(
+    filename_name_nodes['iq_name'])
  .map(lambda l: (*l[0], l[1]))
  .starsink(save_output, 'Q',
            stream_name='save integration {}'.format('Q')))
 
-c = tth.combine_latest(mean, emit_on=1, first=True).zip(filename_name_nodes['tth_name'])
-c.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True, )
-(c
+(tth.combine_latest(mean, emit_on=1, first=True).zip(
+    filename_name_nodes['tth_name'])
  .map(lambda l: (*l[0], l[1]))
  .starsink(save_output, '2theta',
            stream_name='save integration {}'.format('tth')))
 # Mask
-d = mask.zip_latest(filename_name_nodes['mask_fit2d_name'], first=True)
-d.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True, )
+d = mask.combine_latest(filename_name_nodes['mask_fit2d_name'], first=mask, emit_on=0)
 (d.sink(lambda x: fit2d_save(np.flipud(x[0]), x[1])))
 (d.sink(lambda x: np.save(x[1], x[0])))
 
@@ -79,15 +70,11 @@ d.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True, )
 for k, name, source in zip(['pdf_name', 'fq_name', 'sq_name'],
                            ['pdf saver', 'fq saver', 'sq saver'],
                            [pdf, fq, sq]):
-    e = source.zip(filename_name_nodes[k], first=True)
-    (e.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs,
-                                                     exist_ok=True, ))
-    (e.map(lambda l: (*l[0], l[1]))
-     .starsink(pdf_saver, stream_name='name'))
+    (source.zip(filename_name_nodes[k], first=source).map(
+        lambda l: (*l[0], l[1])).starsink(pdf_saver, stream_name='name'))
 # calibration
-f = gen_geo.zip(filename_name_nodes['calib_name'], first=True)
-f.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True, )
-(f.starsink(lambda x, n: x.save(n), stream_name='cal saver'))
+(gen_geo.zip(filename_name_nodes['calib_name'], first=gen_geo).starsink(
+    lambda x, n: x.save(n), stream_name='cal saver'))
 # '''
 
 save_kwargs = start_yaml_string.kwargs

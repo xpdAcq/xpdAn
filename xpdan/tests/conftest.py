@@ -88,7 +88,7 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     reg.register_handler('NPY_SEQ', NumpySeqHandler)
     RE = fresh_RE
     RE.subscribe(db2.insert)
-    bt_uid = str(uuid.uuid4)
+    bt_uid = str(uuid.uuid4())
 
     insert_imgs(RE, reg, 2, img_size, tmp_dir, bt_safN=0, pi_name='chris',
                 sample_name='kapton', sample_composition='C', start_uid1=True,

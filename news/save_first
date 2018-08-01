@@ -1,0 +1,16 @@
+**Added:** None
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:**
+
+* Make certain that files are saved before additional analysis is performed.
+  This should make the pipeline more robust to analysis failures near the
+  end of the pipeline.
+* Fix ``xpdan.callbacks.StopStartCallback`` to be no-stop doc tolerant
+
+**Security:** None

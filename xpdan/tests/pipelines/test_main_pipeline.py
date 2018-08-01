@@ -8,6 +8,7 @@ from xpdan.pipelines.save import *
 
 
 def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3):
+    print('dir', fast_tmp_dir)
     save_kwargs.update({'base_folder': fast_tmp_dir})
     # reset the DBs so we can use the actual db
     filler.db = exp_db

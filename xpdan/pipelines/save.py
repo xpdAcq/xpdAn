@@ -19,7 +19,7 @@ start_yaml_string = (start_docs.map(lambda s: {'raw_start': s,
                           string=base_template,
                           base_folder=glbl_dict['tiff_base'])
                      )
-start_yaml_string.map(clean_template).zip(start_docs).starsink(dump_yml)
+start_yaml_string.map(clean_template).zip(start_docs, first=True).starsink(dump_yml)
 
 # create filename string
 filename_node = all_docs.map(
@@ -50,33 +50,33 @@ for name, analysis_stage, ext in zip(
 
 # dark corrected img
 (filename_name_nodes['dark_corrected_image_name']
- .zip(dark_corrected_foreground)
+ .zip(dark_corrected_foreground, first=True)
  .starsink(imsave, stream_name='dark corrected foreground'))
 # integrated intensities
-(q.combine_latest(mean, emit_on=1).zip(filename_name_nodes['iq_name'])
+(q.combine_latest(mean, emit_on=1, first=True).zip(filename_name_nodes['iq_name'])
  .map(lambda l: (*l[0], l[1]))
  .starsink(save_output, 'Q',
            stream_name='save integration {}'.format('Q')))
-(tth.combine_latest(mean, emit_on=1).zip(filename_name_nodes['tth_name'])
+(tth.combine_latest(mean, emit_on=1, first=True).zip(filename_name_nodes['tth_name'])
  .map(lambda l: (*l[0], l[1]))
  .starsink(save_output, '2theta',
            stream_name='save integration {}'.format('tth')))
 # Mask
-(mask.zip_latest(filename_name_nodes['mask_fit2d_name'])
+(mask.zip_latest(filename_name_nodes['mask_fit2d_name'], first=True)
  .sink(lambda x: fit2d_save(np.flipud(x[0]), x[1])))
-(mask.zip_latest(filename_name_nodes['mask_np_name'])
+(mask.zip_latest(filename_name_nodes['mask_np_name'], first=True)
  .sink(lambda x: np.save(x[1], x[0])))
 # PDF
-(pdf.zip(filename_name_nodes['pdf_name']).map(lambda l: (*l[0], l[1]))
+(pdf.zip(filename_name_nodes['pdf_name'], first=True).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='pdf saver'))
 # F(Q)
-(fq.zip(filename_name_nodes['fq_name']).map(lambda l: (*l[0], l[1]))
+(fq.zip(filename_name_nodes['fq_name'], first=True).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='fq saver'))
 # S(Q)
-(sq.zip(filename_name_nodes['sq_name']).map(lambda l: (*l[0], l[1]))
+(sq.zip(filename_name_nodes['sq_name'], first=True).map(lambda l: (*l[0], l[1]))
  .starsink(pdf_saver, stream_name='sq saver'))
 # calibration
-(gen_geo.zip(filename_name_nodes['calib_name'])
+(gen_geo.zip(filename_name_nodes['calib_name'], first=True)
  .starsink(lambda x, n: x.save(n), stream_name='cal saver'))
 # '''
 

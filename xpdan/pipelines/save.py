@@ -92,5 +92,3 @@ f.map(lambda l: l[-1]).map(os.path.dirname).sink(os.makedirs, exist_ok=True, )
 
 save_kwargs = start_yaml_string.kwargs
 filename_node.kwargs = save_kwargs
-
-raw_source.visualize(source_node=True)

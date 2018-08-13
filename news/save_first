@@ -13,5 +13,6 @@
   end of the pipeline.
 * ``xpdan.callbacks.StopStartCallback`` to be no-stop doc tolerant
 * ``conftest.py`` now properly reports a ``bt_uid``
+* ``xpdan.db_utils.query_dark`` now always returns a list
 
 **Security:** None

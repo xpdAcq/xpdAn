@@ -109,6 +109,16 @@ bg_docs = (bg_query
            .map(lambda x: x[0].documents(fill=True))
            .flatten())
 
+# Get foreground dark
+fg_dark_query = (start_docs.map(query_dark, db=db))
+fg_dark_query.filter(lambda x: x == []).sink(lambda x: print('No dark found!'))
+(FromEventStream('event', ('data', image_name),
+                 fg_dark_query
+                 .filter(lambda x: x != [])
+                 .map(lambda x: x[0].documents(fill=True)).flatten()
+                 ).map(np.float32)
+ .connect(raw_foreground_dark))
+
 # Get bg dark
 bg_dark_query = (FromEventStream('start', (), bg_docs)
                  .map(query_dark, db=db)
@@ -116,26 +126,14 @@ bg_dark_query = (FromEventStream('start', (), bg_docs)
 (FromEventStream('event', ('data', image_name),
                  bg_dark_query
                  .filter(lambda x: x != [])
-                 .map(lambda x: x if not isinstance(x, list) else x[0])
-                 .map(lambda x: x.documents(fill=True)).flatten()
+                 .map(lambda x: x[0].documents(fill=True))
+                 .flatten()
                  ).map(np.float32)
  .connect(raw_background_dark))
 
 # Get background
 (FromEventStream('event', ('data', image_name), bg_docs).map(np.float32)
  .connect(raw_background))
-
-# Get foreground dark
-fg_dark_query = (start_docs.map(query_dark, db=db))
-fg_dark_query.filter(lambda x: x != [] and isinstance(x, list)).sink(print)
-fg_dark_query.filter(lambda x: x == []).sink(lambda x: print('No dark found!'))
-(FromEventStream('event', ('data', image_name),
-                 fg_dark_query
-                 .filter(lambda x: x != [])
-                 .map(lambda x: x if not isinstance(x, list) else x[0])
-                 .map(lambda x: x.documents(fill=True)).flatten()
-                 ).map(np.float32)
- .connect(raw_foreground_dark))
 
 # Get foreground
 FromEventStream('event', ('seq_num',), source, stream_name='seq_num'

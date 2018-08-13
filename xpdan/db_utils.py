@@ -152,7 +152,7 @@ def query_dark(docs, db, schema=1):
             except ValueError:
                 return []
             else:
-                return [z]
+                return z
         else:
             return []
 

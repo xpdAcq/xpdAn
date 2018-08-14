@@ -356,7 +356,27 @@ the function call (keyword only argument)</li>
 <dl class="function">
 <dt id="xpdan.db_utils.query_background">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">query_background</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get background data from databroker</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>db</strong> (<em>Broker instance</em>)</li>
+<li><strong>docs</strong> (<em>tuple of dict</em>)</li>
+<li><strong>schema</strong> (<em>int</em>) – Schema version</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of headers which meet the criteria</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of Header</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="xpdan.db_utils.query_dark">
@@ -366,11 +386,17 @@ the function call (keyword only argument)</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>db</strong> (<em>Broker instance</em>)</li>
 <li><strong>docs</strong> (<em>tuple of dict</em>)</li>
 <li><strong>schema</strong> (<em>int</em>) – Schema version</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of headers which meet the criteria</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of Header</p>
 </td>
 </tr>
 </tbody>

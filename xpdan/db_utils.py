@@ -137,7 +137,8 @@ def query_dark(docs, db, schema=1):
 
     Returns
     -------
-
+    list of Header :
+        The list of headers which meet the criteria
     """
     if schema == 1:
         if isinstance(docs, (tuple, list)):
@@ -157,6 +158,20 @@ def query_dark(docs, db, schema=1):
 
 
 def query_background(docs, db, schema=1):
+    """Get background data from databroker
+
+    Parameters
+    ----------
+    db: Broker instance
+    docs: tuple of dict
+    schema: int
+        Schema version
+
+    Returns
+    -------
+    list of Header :
+        The list of headers which meet the criteria
+    """
     if schema == 1:
         if isinstance(docs, (tuple, list)):
             doc = docs[0]

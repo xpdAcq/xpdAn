@@ -4,6 +4,22 @@
 
 .. current developments
 
+v0.3.5
+====================
+
+**Fixed:**
+
+* Restore calib saving
+* Make certain that files are saved before additional analysis is performed.
+  This should make the pipeline more robust to analysis failures near the
+  end of the pipeline.
+* ``xpdan.callbacks.StopStartCallback`` to be no-stop doc tolerant
+* ``conftest.py`` now properly reports a ``bt_uid``
+* ``xpdan.db_utils.query_dark`` now always returns a list
+
+
+
+
 v0.3.4
 ====================
 

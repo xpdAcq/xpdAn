@@ -4,6 +4,17 @@
 
 .. current developments
 
+v0.3.6
+====================
+
+**Fixed:**
+
+* Both the foreground dark and foreground light are properly pulled based off
+  their stream names
+
+
+
+
 v0.3.5
 ====================
 

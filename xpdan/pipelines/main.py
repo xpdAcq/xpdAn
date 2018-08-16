@@ -131,7 +131,10 @@ bg_dark_query = (FromEventStream('start', (), bg_docs)
                  .map(lambda x: x.documents(fill=True)).flatten()
                  ).map(np.float32)
  .connect(raw_background_dark))
-
+(FromEventStream('event', ('data', image_name),
+                 source, event_stream_name='dark'
+                 ).map(np.float32)
+ .connect(raw_foreground_dark))
 # Get background
 (FromEventStream('event', ('data', image_name), bg_docs).map(np.float32)
  .connect(raw_background))
@@ -140,6 +143,7 @@ bg_dark_query = (FromEventStream('start', (), bg_docs)
 FromEventStream('event', ('seq_num',), source, stream_name='seq_num'
                 ).connect(img_counter)
 (FromEventStream('event', ('data', image_name), source, principle=True,
+                 event_stream_name='primary',
                  stream_name='raw_foreground').map(np.float32)
  .connect(raw_foreground))
 

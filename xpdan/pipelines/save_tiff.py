@@ -66,9 +66,14 @@ fg_dark_query.filter(lambda x: x == []).sink(lambda x: print('No dark found!'))
                  .map(lambda x: x.documents(fill=True)).flatten()
                  ).map(np.float32)
  .connect(raw_foreground_dark))
+(FromEventStream('event', ('data', image_name),
+                 source, event_stream_name='dark'
+                 ).map(np.float32)
+ .connect(raw_foreground_dark))
 
 # Get foreground
 (FromEventStream('event', ('data', image_name), source, principle=True,
+                 event_stream_name='primary',
                  stream_name='raw_foreground').map(np.float32)
  .connect(raw_foreground))
 

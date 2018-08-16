@@ -1,0 +1,14 @@
+**Added:** None
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:**
+
+* Both the foreground dark and foreground light are properly pulled based off
+  their stream names
+
+**Security:** None

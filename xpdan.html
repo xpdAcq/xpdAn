@@ -217,6 +217,136 @@
 </div>
 <div class="section" id="module-xpdan.data_reduction">
 <span id="xpdan-data-reduction-module"></span><h2>xpdan.data_reduction module<a class="headerlink" href="#module-xpdan.data_reduction" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.data_reduction.integrate_and_save">
+<code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>polarization_factor=0.99</em>, <em>mask_setting='default'</em>, <em>mask_kwargs={'alpha': 3.0</em>, <em>'bs_width': 13</em>, <em>'edge': 30</em>, <em>'lower_thresh': 0.0</em>, <em>'tri_offset': 13</em>, <em>'v_asym': 0}</em>, <em>image_data_key='pe1_image'</em>, <em>pdf_config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrate and save dark subtracted images for given list of headers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+(horizontal). default is 0.99. set to None for no
+correction.</li>
+<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</li>
+<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+default is defined by an_glbl.auto_mask_dict.
+Please refer to documentation for more details</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">complete docstring of masking functionality could be find in
+<code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.data_reduction.integrate_and_save_last">
+<code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save_last</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrate and save dark subtracted images for the latest header</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+(horizontal). default is 0.99. set to None for no
+correction.</li>
+<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</li>
+<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+default is defined by an_glbl.auto_mask_dict.
+Please refer to documentation for more details</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">complete docstring of masking functionality could be find in
+<code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.data_reduction.save_last_tiff">
+<code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_last_tiff</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_last_tiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save images obtained from dataBroker as tiff format files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.data_reduction.save_tiff">
+<code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_tiff</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_tiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save images obtained from dataBroker as tiff format files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
+<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</li>
+<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</li>
+<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
+<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-xpdan.data_reduction_core">
 <span id="xpdan-data-reduction-core-module"></span><h2>xpdan.data_reduction_core module<a class="headerlink" href="#module-xpdan.data_reduction_core" title="Permalink to this headline">¶</a></h2>

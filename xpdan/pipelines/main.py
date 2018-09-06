@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
 from shed.translation import FromEventStream
+from streamz_ext import move_to_first
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
 from xpdan.pipelines.pipeline_utils import (
@@ -8,9 +10,9 @@ from xpdan.pipelines.pipeline_utils import (
     clear_combine_latest,
     Filler,
 )
+from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (
-    explicit_link,
     image_process,
     calibration,
     scattering_correction,
@@ -18,37 +20,36 @@ from xpdtools.pipelines.raw_pipeline import (
     integration,
     pdf_gen,
 )
-from streamz_ext import Stream, first
-from xpdconf.conf import glbl_dict
 
 
+# TODO: use oracle to get rid of this
 def clear_geo_gen(source, geometry_img_shape, **kwargs):
     # If new calibration uid invalidate our current calibration cache
     a = FromEventStream("start", ("detector_calibration_client_uid",), source)
-    first(a)
+    move_to_first(a)
     (
-        a.unique(history=1).map(
+        a.unique(history=1).sink(
             lambda x: geometry_img_shape.lossless_buffer.clear()
         )
     )
 
 
+# TODO: use oracle to get rid of this
 def clear_comp(source, iq_comp, **kwargs):
     # Clear composition every start document
     # FIXME: Needs to go after the iq_comp is defined
     a = FromEventStream("start", (), source)
-    first(a)
+    move_to_first(a)
     (a.sink(lambda x: clear_combine_latest(iq_comp, 1)))
 
 
 def save_cal(start_timestamp, gen_geo_cal, **kwargs):
     # Save out calibration data to special place
-    # FIXME: needs to go after calibration
     h_timestamp = start_timestamp.map(_timestampstr)
     (
         gen_geo_cal.pluck(0)
-            .zip_latest(h_timestamp)
-            .starsink(
+        .zip_latest(h_timestamp)
+        .starsink(
             lambda x, y: _save_calib_param(
                 x,
                 y,
@@ -58,7 +59,7 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
             )
         )
     )
-    return h_timestamp
+    return locals()
 
 
 def start_gen(
@@ -196,30 +197,7 @@ def start_gen(
         stream_name="raw_foreground",
     ).map(np.float32)
     raw_source.starsink(StartStopCallback())
-    return dict(
-        filler=filler,
-        dk_uid=dk_uid,
-        source=source,
-        start_docs=start_docs,
-        descriptor_docs=descriptor_docs,
-        event_docs=event_docs,
-        all_docs=all_docs,
-        composition=composition,
-        calibrant=calibrant,
-        detector=detector,
-        is_calibration_img=is_calibration_img,
-        geo_input=geo_input,
-        start_timestamp=start_timestamp,
-        bg_query=bg_query,
-        bg_docs=bg_docs,
-        fg_dark_query=fg_dark_query,
-        raw_foreground_dark=raw_foreground_dark,
-        bg_dark_query=bg_dark_query,
-        raw_background_dark=raw_background_dark,
-        raw_background=raw_background,
-        img_counter=img_counter,
-        raw_foreground=raw_foreground,
-    )
+    return locals()
 
 
 pipeline_order = [
@@ -234,9 +212,3 @@ pipeline_order = [
     pdf_gen,
     clear_comp,
 ]
-
-
-def main_factory(start_doc):
-    po = [start_gen] + pipeline_order
-    raw_source = Stream(stream_name="raw source")
-    return explicit_link(*po, **dict(raw_source=raw_source))["raw_source"].emit

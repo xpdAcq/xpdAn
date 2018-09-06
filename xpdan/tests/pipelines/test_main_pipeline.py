@@ -7,12 +7,14 @@ from xpdan.pipelines.main import pipeline_order
 from xpdtools.pipelines.raw_pipeline import explicit_link
 
 
-@pytest.mark.parametrize('exception', [True, False])
-@pytest.mark.parametrize('background', [True, False])
-def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3, start_uid1,
-                       background, exception):
-    namespace = explicit_link(*pipeline_order,
-                              raw_source=Stream(stream_name="raw source"))
+@pytest.mark.parametrize("exception", [True, False])
+@pytest.mark.parametrize("background", [True, False])
+def test_main_pipeline(
+    exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
+):
+    namespace = explicit_link(
+        *pipeline_order, raw_source=Stream(stream_name="raw source")
+    )
     filler = namespace["filler"]
     bg_query = namespace["bg_query"]
     bg_dark_query = namespace["bg_dark_query"]
@@ -31,7 +33,7 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3, start_uid1,
         a.kwargs["db"] = exp_db
 
     limg = []
-    move_to_first(namespace['bg_corrected_img'].sink(lambda x: limg.append(x)))
+    move_to_first(namespace["bg_corrected_img"].sink(lambda x: limg.append(x)))
     lbgc = mean.sink_to_list()
     lpdf = iq_comp.sink_to_list()
     t0 = time.time()
@@ -43,7 +45,7 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3, start_uid1,
         name, doc = nd
         if name == "start":
             if exception:
-                doc['bt_wavelength'] = 'bla'
+                doc["bt_wavelength"] = "bla"
             nd = (name, doc)
         try:
             raw_source.emit(nd)
@@ -59,4 +61,4 @@ def test_main_pipeline(exp_db, fast_tmp_dir, start_uid3, start_uid1,
         assert_lbgc = n_events
     assert len(lbgc) == assert_lbgc
     assert len(lpdf) == assert_lbgc
-    assert iq_em.state == 'stopped'
+    assert iq_em.state == "stopped"

@@ -1,32 +1,32 @@
+# NOTE this is named ``test_a_save...`` so that it is run first by py.test
+# Since pytest doesn't import from scratch it stores the state of the pipeline
+# and rolls it over causing problems due to combine latest.
+# This will be fixed by having pipeline factories
 import os
 import time
 
 import pytest
-from streamz_ext import Stream
-from xpdan.pipelines.main import pipeline_order
-from xpdan.pipelines.save import pipeline_order as save_pipeline_order
+from xpdan.pipelines.save_tiff import pipeline_order
 from xpdtools.pipelines.raw_pipeline import explicit_link
+from streamz_ext import Stream
 
 
 @pytest.mark.parametrize("exception", [True, False])
 @pytest.mark.parametrize("background", [True, False])
-def test_main_pipeline(
+def test_tiff_pipeline(
     exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
 ):
     namespace = explicit_link(
-        *(pipeline_order + save_pipeline_order),
-        raw_source=Stream(stream_name="raw source")
+        *pipeline_order, raw_source=Stream(stream_name="raw source")
     )
     namespace["save_kwargs"].update({"base_folder": fast_tmp_dir})
     filler = namespace["filler"]
-    bg_query = namespace["bg_query"]
-    bg_dark_query = namespace["bg_dark_query"]
     fg_dark_query = namespace["fg_dark_query"]
     raw_source = namespace["raw_source"]
 
     # reset the DBs so we can use the actual db
     filler.db = exp_db
-    for a in [bg_query, bg_dark_query, fg_dark_query]:
+    for a in [fg_dark_query]:
         a.kwargs["db"] = exp_db
 
     t0 = time.time()
@@ -52,7 +52,6 @@ def test_main_pipeline(
     t1 = time.time()
     print(t1 - t0)
     n_events = len(list(exp_db[-1].events()))
-
     for root, dirs, files in os.walk(fast_tmp_dir):
         level = root.replace(fast_tmp_dir, "").count(os.sep)
         indent = " " * 4 * level
@@ -63,22 +62,9 @@ def test_main_pipeline(
     print(os.listdir(fast_tmp_dir))
     print(os.listdir(os.path.join(fast_tmp_dir, name)))
     assert name in os.listdir(fast_tmp_dir)
-    if exception:
-        output_list = ["dark_sub", "mask"]
-    else:
-        output_list = ["dark_sub", "mask", "iq", "itth", "pdf"]
-    for f in output_list:
+    for f in ["dark_sub"]:
         assert f in os.listdir(os.path.join(fast_tmp_dir, name))
-        if f == "mask":
-            assert (
-                len(os.listdir(os.path.join(fast_tmp_dir, name, f)))
-                == n_events * 2
-            )
-        else:
-            assert (
-                len(os.listdir(os.path.join(fast_tmp_dir, name, f)))
-                == n_events
-            )
+        assert len(os.listdir(os.path.join(fast_tmp_dir, name, f))) == n_events
     assert "{}_{:.6}.yaml".format(
         name, exp_db[uid].start["uid"][:6]
     ) in os.listdir(os.path.join(fast_tmp_dir, name, "meta"))

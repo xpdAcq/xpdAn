@@ -3,26 +3,14 @@ from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import install_qt_kicker
 from xpdconf.conf import glbl_dict
 
-from xpdan.pipelines.main import *  # noqa: F403, F401
-from xpdan.pipelines.save import *  # noqa: F403, F401
-from xpdan.pipelines.vis import *  # noqa: F403, F401
-# from xpdan.pipelines.qoi import *  # noqa: F403, F401
-from xpdan.pipelines.main import (mask_kwargs as _mask_kwargs,
-                                  pdf_kwargs as _pdf_kwargs,
-                                  fq_kwargs as _fq_kwargs,
-                                  mask_setting as _mask_setting)
-from xpdan.pipelines.save import save_kwargs as _save_kwargs
-# from xpdan.pipelines.qoi import (
-#     pdf_argrelmax_kwargs as _pdf_argrelmax_kwargs,
-#     mean_argrelmax_kwargs as _mean_argrelmax_kwargs)
+from xpdan.pipelines.main import pipeline_order
+from xpdan.pipelines.save import pipeline_order as save_pipeline_order
+from xpdan.pipelines.vis import vis_pipeline
+from xpdtools.pipelines.raw_pipeline import explicit_link
+from streamz_ext import Stream
 
 
-def start_analysis(mask_kwargs=None,
-                   pdf_kwargs=None, fq_kwargs=None, mask_setting=None,
-                   save_kwargs=None,
-                   # pdf_argrelmax_kwargs=None,
-                   # mean_argrelmax_kwargs=None
-                   ):
+def start_analysis(**kwargs):
     """Start analysis pipeline
 
     Parameters
@@ -35,40 +23,22 @@ def start_analysis(mask_kwargs=None,
         The kwargs passed to the fq generator, see xpdtools.tools.fq_getter
     mask_setting : dict
         The setting of the mask
-    save_kwargs : dict
-        The kwargs passed to the main formatting node (mostly the filename
-        template)
+    save_template : str
+        The template string for file saving
+    base_folder : str
+        The base folder for saving files
     """
-    # if pdf_argrelmax_kwargs is None:
-    #     pdf_argrelmax_kwargs = {}
-    # if mean_argrelmax_kwargs is None:
-    #     mean_argrelmax_kwargs = {}
-    d = RemoteDispatcher(glbl_dict['proxy_address'])
+    # TODO: also start up grave vis
+    d = RemoteDispatcher(glbl_dict["proxy_address"])
     install_qt_kicker(
-        loop=d.loop)  # This may need to be d._loop depending on tag
-    if mask_setting is None:
-        mask_setting = {}
-    if fq_kwargs is None:
-        fq_kwargs = {}
-    if pdf_kwargs is None:
-        pdf_kwargs = {}
-    if mask_kwargs is None:
-        mask_kwargs = {}
-    if save_kwargs is None:
-        save_kwargs = {}
-    for a, b in zip([mask_kwargs, pdf_kwargs, fq_kwargs, mask_setting,
-                     save_kwargs,
-                     # pdf_argrelmax_kwargs,
-                     # mean_argrelmax_kwargs
-                     ],
-                    [_mask_kwargs, _pdf_kwargs, _fq_kwargs, _mask_setting,
-                     _save_kwargs,
-                     # _pdf_argrelmax_kwargs,
-                     # _mean_argrelmax_kwargs
-                     ]):
-        if a:
-            b.update(a)
-
+        loop=d.loop
+    )  # This may need to be d._loop depending on tag
+    namespace = explicit_link(
+        *(pipeline_order + save_pipeline_order + [vis_pipeline]),
+        raw_source=Stream(stream_name="raw source"),
+        **kwargs
+    )
+    raw_source = namespace["raw_source"]
     d.subscribe(lambda *x: raw_source.emit(x))
-    print('Starting Analysis Server')
+    print("Starting Analysis Server")
     d.start()

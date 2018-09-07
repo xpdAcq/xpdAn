@@ -12,13 +12,19 @@ from xpdan.pipelines.pipeline_utils import base_template
 from xpdconf.conf import glbl_dict
 
 
-def save_pipeline(start_docs, all_docs, **kwargs):
+def save_pipeline(
+    start_docs,
+    all_docs,
+    save_template=base_template,
+    base_folder=glbl_dict["tiff_base"],
+    **kwargs
+):
     start_yaml_string = start_docs.map(
         lambda s: {"raw_start": s, "ext": ".yaml", "analysis_stage": "meta"}
     ).map(
         lambda kwargs, string, **kwargs2: render(string, **kwargs, **kwargs2),
-        string=base_template,
-        base_folder=glbl_dict["tiff_base"],
+        string=save_template,
+        base_folder=base_folder,
     )
     start_yaml_string.map(clean_template).zip(start_docs, first=True).starsink(
         dump_yml

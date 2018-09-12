@@ -1,7 +1,3 @@
-# NOTE this is named ``test_a_save...`` so that it is run first by py.test
-# Since pytest doesn't import from scratch it stores the state of the pipeline
-# and rolls it over causing problems due to combine latest.
-# This will be fixed by having pipeline factories
 import os
 import time
 

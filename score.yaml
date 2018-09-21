@@ -35,6 +35,7 @@ run:
     default: {conda: scipy}
   shed:
     default: {conda: shed}
+    bleeding: {orch: 'https://github.com/xpdAcq/SHED.git'}
   streamz_ext:
     default: {conda: streamz_ext}
     bleeding: {orch: 'https://github.com/xpdAcq/streamz_ext.git'}

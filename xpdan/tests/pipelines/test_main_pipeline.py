@@ -4,7 +4,7 @@ import pytest
 from shed.simple import SimpleToEventStream as ToEventStream
 from streamz_ext import Stream, move_to_first
 from xpdan.pipelines.main import pipeline_order
-from xpdtools.pipelines.raw_pipeline import explicit_link
+from streamz_ext.link import link
 
 
 @pytest.mark.parametrize("exception", [True, False])
@@ -12,7 +12,7 @@ from xpdtools.pipelines.raw_pipeline import explicit_link
 def test_main_pipeline(
     exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
 ):
-    namespace = explicit_link(
+    namespace = link(
         *pipeline_order, raw_source=Stream(stream_name="raw source")
     )
     filler = namespace["filler"]

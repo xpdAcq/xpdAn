@@ -3,7 +3,7 @@ import time
 
 import pytest
 from xpdan.pipelines.save_tiff import pipeline_order
-from xpdtools.pipelines.raw_pipeline import explicit_link
+from streamz_ext.link import link
 from streamz_ext import Stream
 
 
@@ -12,7 +12,7 @@ from streamz_ext import Stream
 def test_tiff_pipeline(
     exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
 ):
-    namespace = explicit_link(
+    namespace = link(
         *pipeline_order, raw_source=Stream(stream_name="raw source")
     )
     namespace["save_kwargs"].update({"base_folder": fast_tmp_dir})

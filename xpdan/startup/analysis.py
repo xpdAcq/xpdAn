@@ -6,7 +6,7 @@ from xpdconf.conf import glbl_dict
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
 from xpdan.pipelines.vis import vis_pipeline
-from xpdtools.pipelines.raw_pipeline import explicit_link
+from streamz_ext.link import link
 from streamz_ext import Stream
 
 
@@ -33,7 +33,7 @@ def start_analysis(**kwargs):
     install_qt_kicker(
         loop=d.loop
     )  # This may need to be d._loop depending on tag
-    namespace = explicit_link(
+    namespace = link(
         *(pipeline_order + save_pipeline_order + [vis_pipeline]),
         raw_source=Stream(stream_name="raw source"),
         **kwargs

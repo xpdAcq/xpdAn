@@ -2,7 +2,7 @@ import time
 
 import pytest
 from shed.simple import SimpleToEventStream as ToEventStream
-from streamz_ext import Stream, move_to_first
+from streamz_ext import Stream, move_to_first, destroy_pipeline
 from xpdan.pipelines.main import pipeline_order
 from streamz_ext.link import link
 
@@ -62,3 +62,7 @@ def test_main_pipeline(
     assert len(lbgc) == assert_lbgc
     assert len(lpdf) == assert_lbgc
     assert iq_em.state == "stopped"
+    destroy_pipeline(raw_source)
+    limg.clear()
+    lbgc.clear()
+    lpdf.clear()

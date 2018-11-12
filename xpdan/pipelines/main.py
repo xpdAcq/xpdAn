@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from shed.translation import FromEventStream
-from streamz_ext import move_to_first
+from rapidz import move_to_first
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
 from xpdan.pipelines.pipeline_utils import (

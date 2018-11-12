@@ -2,9 +2,9 @@ import time
 
 import pytest
 from shed.simple import SimpleToEventStream as ToEventStream
-from streamz_ext import Stream, move_to_first, destroy_pipeline
+from rapidz import Stream, move_to_first, destroy_pipeline
 from xpdan.pipelines.main import pipeline_order
-from streamz_ext.link import link
+from rapidz.link import link
 
 
 @pytest.mark.parametrize("exception", [True, False])

@@ -210,31 +210,33 @@ class Retrieve(ReturnCallback):
         for k in set(data) & fields:
             # Try to fill the data
             try:
+                print('hiw')
+                print(k, data[k])
                 v = self.retrieve_datum(data[k])
+                print(k, data[k], v)
                 data[k] = v
                 filled[k] = True
             # If retrieve fails keep going
-            except (ValueError, KeyError):
-                pass
+            except (ValueError, KeyError) as e:
+                raise e
         return event
 
     def event(self, doc):
-        super().event(doc)
-        ev = self.fill_event(doc)
+        ev = self.fill_event(doc, inplace=False)
         return ev
 
 
 class ExportCallback(Retrieve):
     """Callback to copy data to a new root"""
 
-    def __init__(self, new_root, root_map=None):
+    def __init__(self, new_root, handler_reg, root_map=None):
         # TODO: fix this, since it is a dirty hack which only works for ADTIFF
-        handler_reg = defaultdict(AreaDetectorTiffPathOnlyHandler)
         super().__init__(handler_reg, root_map)
         self.new_root = new_root
         self.old_root = None
 
     def resource(self, doc):
+        doc = copy.deepcopy(doc)
         super().resource(doc)
         self.old_root = doc['root']
         doc.update(root=self.new_root)
@@ -243,7 +245,10 @@ class ExportCallback(Retrieve):
     def datum(self, doc):
         super().datum(doc)
         # retrieve the datum using path only handler?
-        fin = self.retrieve_datum(doc['datum_id'])
+        resource = self.resources[doc['resource']]
+        handler_class = self.handler_reg[resource['spec']]
+        key = (str(resource['uid']), handler_class.__name__)
+        fin = self.handlers[key].get_file_list([doc['datum_kwargs']])[0]
 
         # replace the root with the new root
         fout = os.path.join(self.new_root, os.path.relpath(fin, self.old_root))
@@ -260,6 +265,7 @@ class ExportCallback(Retrieve):
 class RemoteExportCallback(ExportCallback):
     """Export callback which calls rsync to a remote needs to be sunk to a
     remote databroker"""
+
     def __init__(self, new_root, prefix, root_map=None):
         super().__init__(new_root, root_map)
         self.prefix = prefix

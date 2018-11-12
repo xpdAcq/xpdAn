@@ -6,8 +6,8 @@ from xpdconf.conf import glbl_dict
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
 from xpdan.pipelines.vis import vis_pipeline
-from streamz_ext.link import link
-from streamz_ext import Stream
+from rapidz.link import link
+from rapidz import Stream
 
 
 def start_analysis(**kwargs):

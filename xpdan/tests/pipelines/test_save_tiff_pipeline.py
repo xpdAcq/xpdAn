@@ -3,8 +3,8 @@ import time
 
 import pytest
 from xpdan.pipelines.save_tiff import pipeline_order
-from streamz_ext.link import link
-from streamz_ext import Stream
+from rapidz.link import link
+from rapidz import Stream
 
 
 @pytest.mark.parametrize("exception", [True, False])

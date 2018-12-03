@@ -149,7 +149,8 @@ class ReturnCallback(CallbackBase):
 
 
 class Retrieve(ReturnCallback):
-    def __init__(self, handler_reg, root_map=None):
+    def __init__(self, handler_reg, root_map=None, executor=None):
+        self.executor = executor
         if root_map is None:
             root_map = {}
         if handler_reg is None:
@@ -188,6 +189,10 @@ class Retrieve(ReturnCallback):
         resource = self.resources[doc['resource']]
         handler_class = self.handler_reg[resource['spec']]
         key = (str(resource['uid']), handler_class.__name__)
+        # If we hand in an executor use it, allowing us to load in parallel
+        if self.executor:
+            return self.executor.submit(self.handlers[key],
+                                        **doc['datum_kwargs'])
         return self.handlers[key](**doc['datum_kwargs'])
 
     def fill_event(self, event, fields=True, inplace=True):
@@ -271,6 +276,7 @@ class RemoteExportCallback(ExportCallback):
         self.prefix = prefix
 
     def datum(self, doc):
+        super().datum(doc)
         self.datums[doc['datum_id']] = doc
         # retrieve the datum using path only handler?
         fin = self.retrieve_datum(doc['datum_id'])

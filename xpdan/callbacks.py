@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from bluesky.callbacks.core import CallbackBase
 
 
@@ -7,6 +9,8 @@ class StartStopCallback(CallbackBase):
 
     def stop(self, doc):
         print('FINISH ANALYSIS ON {}'.format(doc.get('run_start', 'NA')))
+
+
 class RunRouter(CallbackBase):
     """
     Routes documents, by run, to callbacks it creates from factory functions.

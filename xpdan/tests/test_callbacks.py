@@ -7,14 +7,14 @@ def test_run_router(RE, hw):
     LL = []
 
     def appender(start_doc):
-        L.append(('start', start_doc))
+        L.append(("start", start_doc))
         return lambda n, d: L.append((n, d))
 
     def not_interested(start_doc):
         return
 
     # Run with not interesteds
-    rr = RunRouter([not_interested, ])
+    rr = RunRouter([not_interested])
     rr_token = RE.subscribe(rr)
 
     RE(bp.count([hw.img], 1))
@@ -25,6 +25,5 @@ def test_run_router(RE, hw):
     rr_token = RE.subscribe(rr)
     RE.subscribe(lambda n, d: LL.append((n, d)))
     RE(bp.count([hw.img], 1))
-
 
     assert L == LL

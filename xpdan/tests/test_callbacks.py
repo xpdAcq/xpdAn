@@ -14,6 +14,6 @@ def test_run_router(RE, hw):
     RE.subscribe(rr)
     RE.subscribe(lambda n, d: LL.append((n, d)))
 
-    RE(bp.count([hw.det1], 1))
+    RE(bp.count([hw.img], 1))
 
     assert L == LL

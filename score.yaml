@@ -46,7 +46,8 @@ run:
     default: {conda: xpdview}
   xray-vision:
     default: {conda: xray-vision}
-  rapidz: {conda: rapidz}
+  rapidz:
+    default: {conda: rapidz}
 test:
   pytest:
     default:

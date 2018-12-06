@@ -22,7 +22,7 @@ import numpy as np
 import copy
 
 from xpdsim import xpd_pe1c as det
-from bluesky.tests.conftest import db, NumpySeqHandler, RunEngine, asyncio
+from bluesky.tests.conftest import db, NumpySeqHandler, RunEngine, asyncio, RE, hw
 from skbeam.io.fit2d import fit2d_save
 
 from xpdan.fuzzybroker import FuzzyBroker

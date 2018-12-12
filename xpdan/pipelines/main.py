@@ -62,6 +62,7 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
     return locals()
 
 
+# TODO: chunk this up a bit more so we can separate XRD from PDF
 def start_gen(
     raw_source,
     image_name=glbl_dict["image_field"],

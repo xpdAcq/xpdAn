@@ -106,6 +106,7 @@ def start_gen(
         }
     )
 
+    # PDF specific
     composition = FromEventStream("start", ("composition_string",), source)
 
     # Calibration information

@@ -268,24 +268,3 @@ class ExportCallback(Retrieve):
     def event(self, doc):
         # don't fill
         return doc
-
-
-class RemoteExportCallback(ExportCallback):
-    """Export callback which calls rsync to a remote needs to be sunk to a
-    remote databroker"""
-
-    def __init__(self, new_root, prefix, root_map=None):
-        super().__init__(new_root, root_map)
-        self.prefix = prefix
-
-    def datum(self, doc):
-        super().datum(doc)
-        self.datums[doc['datum_id']] = doc
-        # retrieve the datum using path only handler?
-        fin = self.retrieve_datum(doc['datum_id'])
-
-        # replace the root with the new root
-        fout = os.path.join(self.new_root, os.path.relpath(fin,
-                                                           self.old_root))
-        fout = self.prefix + fout
-        subprocess.call(['rsync', '-auvv', fin, fout])

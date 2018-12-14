@@ -14,11 +14,17 @@ from databroker.utils import ensure_path_exists
 
 
 class StartStopCallback(CallbackBase):
+
+    def __init__(self):
+        self.t0 = 0
+
     def start(self, doc):
+        self.t0 = doc['time']
         print('START ANALYSIS ON {}'.format(doc['uid']))
 
     def stop(self, doc):
         print('FINISH ANALYSIS ON {}'.format(doc.get('run_start', 'NA')))
+        print('Analysis time {}'.format(doc['time'] - self.t0))
 
 
 class RunRouter(CallbackBase):
@@ -215,10 +221,7 @@ class Retrieve(ReturnCallback):
         for k in set(data) & fields:
             # Try to fill the data
             try:
-                print('hiw')
-                print(k, data[k])
                 v = self.retrieve_datum(data[k])
-                print(k, data[k], v)
                 data[k] = v
                 filled[k] = True
             # If retrieve fails keep going

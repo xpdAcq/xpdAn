@@ -13,12 +13,14 @@ plt.ion()
 d = RemoteDispatcher(glbl_dict['outbount_proxy_address'])
 install_qt_kicker(loop=d.loop)  # This may need to be d._loop depending on tag
 
+
+li = LiveImage()
 # TODO: add filler here
 # TODO: pull our vendorized version of BEC
 rr = RunRouter([lambda x: BestEffortCallback(
     # overplot=False
 ),
-                lambda x: LiveImage()
+                lambda x: li
                 # lambda x: lambda *y: pprint(y)
                 ])
 

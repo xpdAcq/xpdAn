@@ -90,8 +90,10 @@ class LiveImage(CallbackBase):
                        len(v['shape']) == 2]
         from xray_vision.backend.mpl.cross_section_2d import CrossSection
         import matplotlib.pyplot as plt
-        self.cs_dict = {}
+        # only make new figure for new data otherwise use old data
         for field in self.fields:
+            if field in self.cs_dict and plt.fignum_exists(self.cs_dict[field]._fig.number):
+                continue
             fig = plt.figure()
             cs = CrossSection(fig, self.cmap, self.norm,
                               self.limit_func, self.auto_redraw,
@@ -104,7 +106,10 @@ class LiveImage(CallbackBase):
         for field in self.fields:
             cs = self.cs_dict[field]
             # FIXME: DIRTY HACK
-            cs.update_image(np.asarray(doc['data'][field]))
+            data = doc['data'][field]
+            if isinstance(data, list):
+                data = np.asarray(doc['data'][field])
+            cs.update_image(data)
             cs._fig.canvas.draw_idle()
 
 

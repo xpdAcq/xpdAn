@@ -10,7 +10,7 @@ from rapidz.link import link
 from rapidz import Stream
 
 
-def start_analysis(**kwargs):
+def start_analysis(save=True, vis=True, **kwargs):
     """Start analysis pipeline
 
     Parameters
@@ -28,13 +28,18 @@ def start_analysis(**kwargs):
     base_folder : str
         The base folder for saving files
     """
-    # TODO: also start up grave vis
+    # TODO: also start up grave vis, maybe?
     d = RemoteDispatcher(glbl_dict["proxy_address"])
     install_qt_kicker(
         loop=d.loop
     )  # This may need to be d._loop depending on tag
+    order = pipeline_order
+    if save:
+        order += save_pipeline_order
+    if vis:
+        order += [vis_pipeline]
     namespace = link(
-        *(pipeline_order + save_pipeline_order + [vis_pipeline]),
+        *order,
         raw_source=Stream(stream_name="raw source"),
         **kwargs
     )

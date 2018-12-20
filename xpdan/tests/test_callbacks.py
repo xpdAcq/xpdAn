@@ -6,7 +6,7 @@ from bluesky.preprocessors import stage_decorator, run_decorator
 from bluesky.tests.conftest import NumpySeqHandler
 from xpdan.callbacks import Retrieve, ExportCallback
 import os
-from xpdan.callbacks import RunRouter
+from xpdan.vend.callbacks.core import RunRouter
 
 
 def test_retrieve(RE, hw):

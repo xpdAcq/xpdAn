@@ -319,6 +319,7 @@ def test_zmq_prefix(RE, hw):
     for i in range(len(local_accumulator)):
         remote_accumulator.append(queue.get(timeout=2))
     p.close()
+    p2.close()
     proxy_proc.terminate()
     dispatcher_proc.terminate()
     proxy_proc.join()
@@ -392,6 +393,7 @@ def test_zmq_multi_prefix(RE, hw):
     for i in range(len(local_accumulator)):
         remote_accumulator.append(queue.get(timeout=2))
     p.close()
+    p2.close()
     proxy_proc.terminate()
     dispatcher_proc.terminate()
     proxy_proc.join()

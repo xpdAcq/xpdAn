@@ -194,9 +194,11 @@ class RemoteDispatcher(Dispatcher):
     address : tuple
         Address of a running 0MQ proxy, given either as a string like
         ``'127.0.0.1:5567'`` or as a tuple like ``('127.0.0.1', 5567)``
-    prefix : bytes, optional
+    prefix : bytes or list of bytes, optional
         User-defined bytestring used to distinguish between multiple
         Publishers. If set, messages without this prefix will be ignored.
+        If a list of bytestrings then any messages with prefixes not in the
+        list will be ignored.
         If unset, no mesages will be ignored.
     loop : zmq.asyncio.ZMQEventLoop, optional
     zmq : object, optional
@@ -222,6 +224,8 @@ class RemoteDispatcher(Dispatcher):
                  deserializer=pickle.loads):
         if prefix and b' ' in prefix:
             raise ValueError("prefix {!r} may not contain b' '".format(prefix))
+        if isinstance(prefix, str):
+            prefix = [prefix]
         self._prefix = prefix
         if zmq is None:
             import zmq
@@ -252,7 +256,7 @@ class RemoteDispatcher(Dispatcher):
             message = yield from self._socket.recv()
             prefix, name, doc = message.split(b' ', 2)
             name = name.decode()
-            if (not our_prefix) or prefix == our_prefix:
+            if (not our_prefix) or prefix in our_prefix:
                 doc = self._deserializer(doc)
                 self.loop.call_soon(self.process, DocumentNames[name], doc)
 

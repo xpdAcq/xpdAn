@@ -7,7 +7,6 @@ def test_run_router(RE, hw):
     LL = []
 
     def appender(start_doc):
-        L.append(("start", start_doc))
         return lambda n, d: L.append((n, d))
 
     def not_interested(start_doc):

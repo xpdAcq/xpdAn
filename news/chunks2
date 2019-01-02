@@ -1,0 +1,13 @@
+**Added:** None
+
+**Changed:**
+
+* Chunk the analysis pipelines into pieces so they can be composed
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

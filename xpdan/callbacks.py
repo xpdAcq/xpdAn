@@ -128,6 +128,9 @@ class RunRouter(CallbackBase):
                 # The callback_factory is not interested in this run.
                 continue
             self.callbacks[doc['uid']].append(cb)
+        cbs = self.callbacks[doc['uid']]
+        for cb in cbs:
+            cb('start', doc)
 
     def stop(self, doc):
         start_uid = doc['run_start']

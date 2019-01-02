@@ -35,6 +35,7 @@ run:
     default: {conda: scipy}
   shed:
     default: {conda: shed}
+    bleeding: {orch: 'https://github.com/xpdAcq/SHED.git'}
   xpdconf:
     default: {conda: xpdconf}
   xpdsim:

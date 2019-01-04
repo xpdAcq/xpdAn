@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from bluesky.callbacks.zmq import RemoteDispatcher
+from xpdan.vend.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import install_qt_kicker
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
@@ -17,6 +17,19 @@ figure_pool = {}
 
 
 def fig_factory(x):
+    """Create figures as needed, reusing old figures when they are no longer
+    in use (eg the run has finished)
+
+    Parameters
+    ----------
+    x : str
+        The figure label name
+
+    Returns
+    -------
+    fig : Figure
+        The figure
+    """
     print(x)
     print(figure_pool)
     # if the figure is closed remove it from the pool
@@ -37,7 +50,18 @@ def fig_factory(x):
     return fig
 
 
-def taredown(fig):
+def teardown(fig):
+    """Slate the figure for reuse
+
+    Parameters
+    ----------
+    fig : Figure
+        The figure to be reused
+
+    Returns
+    -------
+
+    """
     figure_pool[fig] = False
 
 
@@ -45,7 +69,7 @@ def taredown(fig):
 rr = RunRouter(
     [
         lambda x: BestEffortCallback(
-            fig_factory=fig_factory, table_enabled=False, teardown=taredown
+            fig_factory=fig_factory, table_enabled=False, teardown=teardown
         ),
         lambda x: LiveImage(cmap="viridis"),
     ]

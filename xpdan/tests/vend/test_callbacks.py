@@ -20,8 +20,7 @@ from bluesky.preprocessors import stage_decorator, run_decorator
 from bluesky.run_engine import Msg, RunEngineInterrupted
 from bluesky.tests.conftest import NumpySeqHandler
 from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
-from xpdan.callbacks import Retrieve, ExportCallback
-from xpdan.vend.callbacks.core import RunRouter
+from xpdan.vend.callbacks.core import Retrieve, ExportCallback, RunRouter
 
 
 def test_retrieve(RE, hw):
@@ -38,23 +37,19 @@ def test_retrieve(RE, hw):
     RE(plan([hw.img]))
 
 
-# Databroker doesn't give back resource/datums
-
-'''
 def test_retrieve_db(RE, hw, db):
     rt = Retrieve(handler_reg={'NPY_SEQ': NumpySeqHandler})
     RE.subscribe(db.insert)
 
     RE(count([hw.img]))
 
-    docs = map(lambda x: rt(*x), db[-1].documents())
+    docs = list(map(lambda x: rt(*x), db[-1].documents()))
+    names = [n for n, d in docs]
+    assert 'datum' in names
     for n, d in docs:
         if n == 'event':
             data = d['data']['img']
-            break
-
-    np.testing.assert_allclose(data, np.ones((10, 10)))
-'''
+            np.testing.assert_allclose(data, np.ones((10, 10)))
 
 
 def test_export_file(RE, hw, tmpdir):

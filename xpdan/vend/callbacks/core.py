@@ -559,6 +559,19 @@ class RunRouter(CallbackBase):
 
 
 class Retrieve(CallbackBase):
+    """Callback for retrieving data from resource and datum documents. This
+    can also be used to access file bound data within a scan.
+
+    Parameters
+    ----------
+    handler_reg: dict
+        The handler registry used for looking up the data
+    root_map : dict, optional
+        Map to replace the root with a new root
+    executor : Executor, optional
+        If provided run the data loading via the executor, opening the files
+        as a future (potentially elsewhere).
+    """
     def __init__(self, handler_reg, root_map=None, executor=None):
         self.executor = executor
         if root_map is None:
@@ -632,7 +645,7 @@ class Retrieve(CallbackBase):
             # If retrieve fails keep going
             except (ValueError, KeyError) as e:
                 raise e
-        return event
+        return ev
 
     def event(self, doc):
         ev = self.fill_event(doc, inplace=False)
@@ -640,7 +653,19 @@ class Retrieve(CallbackBase):
 
 
 class ExportCallback(Retrieve):
-    """Callback to copy data to a new root"""
+    """Callback to copy file bound data to a new directory, modifying the
+    resource and datum documents to reflect the changes. This is used for the
+    copying of data to a portable databroker
+
+    Parameters
+    ----------
+    new_root: str
+        The filepath to the top folder where the data is to be stored
+    handler_reg: dict
+        The handler registry used for looking up the data
+    root_map : dict, optional
+        Map to replace the root with a new root
+    """
 
     def __init__(self, new_root, handler_reg, root_map=None):
         # TODO: fix this, since it is a dirty hack which only works for ADTIFF
@@ -676,6 +701,9 @@ class ExportCallback(Retrieve):
 
 
 class StripDepVar(CallbackBase):
+    """Strip the dependent variables from a data stream. This creates a
+    stream with only the independent variables, allowing the stream to be
+    merged with other dependent variables (including analyzed data)"""
     def __init__(self):
         self.independent_vars = set()
 

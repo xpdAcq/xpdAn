@@ -1,6 +1,8 @@
 import os
 import time
 
+import matplotlib.pyplot as plt
+
 from xpdan.pipelines.callback import MainCallback
 
 
@@ -30,6 +32,7 @@ def test_main_callback(exp_db, fast_tmp_dir, start_uid3):
     for f in ['dark_sub', 'mask', 'iq_q', 'iq_tth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))
+    plt.close('all')
 
 
 def test_main_callback2(exp_db, fast_tmp_dir, start_uid3):
@@ -56,3 +59,4 @@ def test_main_callback2(exp_db, fast_tmp_dir, start_uid3):
     for f in ['dark_sub', 'mask', 'iq_q', 'iq_tth', 'pdf']:
         assert f in os.listdir(
             os.path.join(fast_tmp_dir, 'Au'))
+    plt.close('all')

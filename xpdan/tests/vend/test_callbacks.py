@@ -6,10 +6,6 @@ import bluesky.plans as bp
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-from xpdan.vend.callbacks import CallbackCounter, LiveTable, LiveFit
-from xpdan.vend.callbacks.broker import BrokerCallbackBase
-from xpdan.vend.callbacks.mpl_plotting import (LiveScatter, LivePlot, LiveGrid,
-                                            LiveFitPlot, LiveRaster, LiveMesh)
 from bluesky.examples import stepscan
 from bluesky.object_plans import AbsScanPlan
 from bluesky.plan_stubs import pause
@@ -20,7 +16,13 @@ from bluesky.preprocessors import stage_decorator, run_decorator
 from bluesky.run_engine import Msg, RunEngineInterrupted
 from bluesky.tests.conftest import NumpySeqHandler
 from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
+
+from xpdan.vend.callbacks import CallbackCounter, LiveTable, LiveFit
+from xpdan.vend.callbacks.broker import BrokerCallbackBase
 from xpdan.vend.callbacks.core import Retrieve, ExportCallback, RunRouter
+from xpdan.vend.callbacks.mpl_plotting import (LiveScatter, LivePlot, LiveGrid,
+                                               LiveFitPlot, LiveRaster,
+                                               LiveMesh)
 
 
 def test_retrieve(RE, hw):

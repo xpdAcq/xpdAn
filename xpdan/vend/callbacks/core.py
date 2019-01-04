@@ -19,12 +19,14 @@ from collections import defaultdict
 
 from bluesky.callbacks.core import CallbackBase
 from databroker._core import _sanitize
-from databroker.assets.path_only_handlers import \
+from databroker.assets.path_only_handlers import (
     AreaDetectorTiffPathOnlyHandler
+)
 from databroker.utils import ensure_path_exists
 
 
 # deprecate callbacks moved to mpl_plotting ----------------------------------
+
 
 def _deprecate_import_name(name):
     wmsg = (
@@ -34,14 +36,18 @@ def _deprecate_import_name(name):
         "unrelated to matplotlib, to be imported and used without importing "
         "matplotlib.pyplot or configuring a DISPLAY."
     ).format(name)
+
     def f(*args, **kwargs):
         # per bluesky convention use UserWarning instead of DeprecationWarning
         warnings.warn(wmsg, UserWarning)
         from . import mpl_plotting
+
         cls = getattr(mpl_plotting, name)
         return cls(*args, **kwargs)
+
     f.__name__ = name
     return f
+
 
 LiveScatter = _deprecate_import_name("LiveScatter")
 LivePlot = _deprecate_import_name("LivePlot")
@@ -51,6 +57,7 @@ LiveRaster = _deprecate_import_name("LiveRaster")
 LiveMesh = _deprecate_import_name("LiveMesh")
 
 # ----------------------------------------------------------------------------
+
 
 class CallbackBase:
     def __call__(self, name, doc):
@@ -99,8 +106,8 @@ def print_metadata(name, doc):
     "Print all fields except uid and time."
     for field, value in sorted(doc.items()):
         # uid is returned by the RunEngine, and time is self-evident
-        if field not in ['time', 'uid']:
-            print('{0}: {1}'.format(field, value))
+        if field not in ["time", "uid"]:
+            print("{0}: {1}".format(field, value))
 
 
 def collector(field, output):
@@ -122,17 +129,18 @@ def collector(field, output):
     func : function
         expects one argument, an Event dictionary
     """
+
     def f(name, event):
-        output.append(event['data'][field])
+        output.append(event["data"][field])
 
     return f
 
 
 def format_num(x, max_len=11, pre=5, post=5):
-    if (abs(x) > 10**pre or abs(x) < 10**-post) and x != 0:
-        x = '%.{}e'.format(post) % x
+    if (abs(x) > 10 ** pre or abs(x) < 10 ** -post) and x != 0:
+        x = "%.{}e".format(post) % x
     else:
-        x = '%{}.{}f'.format(pre, post) % x
+        x = "%{}.{}f".format(pre, post) % x
 
     return x
 
@@ -151,14 +159,15 @@ def get_obj_fields(fields):
             try:
                 field_list = sorted(field.describe().keys())
             except AttributeError:
-                raise ValueError("Fields must be strings or objects with a "
-                                 "'describe' method that return a dict.")
+                raise ValueError(
+                    "Fields must be strings or objects with a "
+                    "'describe' method that return a dict."
+                )
             string_fields.extend(field_list)
     return string_fields
 
 
 class CollectThenCompute(CallbackBase):
-
     def __init__(self):
         self._start_doc = None
         self._stop_doc = None
@@ -193,7 +202,7 @@ class CollectThenCompute(CallbackBase):
 
 
 class LiveTable(CallbackBase):
-    '''Live updating table
+    """Live updating table
 
     Parameters
     ----------
@@ -223,24 +232,34 @@ class LiveTable(CallbackBase):
 
     out : callable, optional
         Function to call to 'print' a line.  Defaults to `print`
-    '''
-    _FMTLOOKUP = {'s': '{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}',
-                  'f': '{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}',
-                  'g': '{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}',
-                  'd': '{pad}{{{k}: >{width}{dtype}}}{pad}'}
-    _FMT_MAP = {'number': 'f',
-                'integer': 'd',
-                'string': 's',
-                }
-    _fm_sty = namedtuple('fm_sty', ['width', 'prec', 'dtype'])
-    water_mark = ("{st[plan_type]} {st[plan_name]} ['{st[uid]:.8s}'] "
-                  "(scan num: {st[scan_id]})")
-    ev_time_key = 'SUPERLONG_EV_TIMEKEY_THAT_I_REALLY_HOPE_NEVER_CLASHES'
+    """
 
-    def __init__(self, fields, *, stream_name='primary',
-                 print_header_interval=50,
-                 min_width=12, default_prec=3, extra_pad=1,
-                 logbook=None, out=print):
+    _FMTLOOKUP = {
+        "s": "{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}",
+        "f": "{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}",
+        "g": "{pad}{{{k}: >{width}.{prec}{dtype}}}{pad}",
+        "d": "{pad}{{{k}: >{width}{dtype}}}{pad}",
+    }
+    _FMT_MAP = {"number": "f", "integer": "d", "string": "s"}
+    _fm_sty = namedtuple("fm_sty", ["width", "prec", "dtype"])
+    water_mark = (
+        "{st[plan_type]} {st[plan_name]} ['{st[uid]:.8s}'] "
+        "(scan num: {st[scan_id]})"
+    )
+    ev_time_key = "SUPERLONG_EV_TIMEKEY_THAT_I_REALLY_HOPE_NEVER_CLASHES"
+
+    def __init__(
+        self,
+        fields,
+        *,
+        stream_name="primary",
+        print_header_interval=50,
+        min_width=12,
+        default_prec=3,
+        extra_pad=1,
+        logbook=None,
+        out=print
+    ):
         super().__init__()
         self._header_interval = print_header_interval
         # expand objects
@@ -250,13 +269,15 @@ class LiveTable(CallbackBase):
         self._stop = None
         self._descriptors = set()
         self._pad_len = extra_pad
-        self._extra_pad = ' ' * extra_pad
+        self._extra_pad = " " * extra_pad
         self._min_width = min_width
         self._default_prec = default_prec
-        self._format_info = OrderedDict([
-            ('seq_num', self._fm_sty(10 + self._pad_len, '', 'd')),
-            (self.ev_time_key, self._fm_sty(10 + 2 * extra_pad, 10, 's'))
-        ])
+        self._format_info = OrderedDict(
+            [
+                ("seq_num", self._fm_sty(10 + self._pad_len, "", "d")),
+                (self.ev_time_key, self._fm_sty(10 + 2 * extra_pad, 10, "s")),
+            ]
+        )
         self._rows = []
         self.logbook = logbook
         self._sep_format = None
@@ -269,56 +290,69 @@ class LiveTable(CallbackBase):
             except (TypeError, ValueError):
                 return self._default_prec
 
-        if doc['name'] != self._stream:
+        if doc["name"] != self._stream:
             return
 
-        self._descriptors.add(doc['uid'])
+        self._descriptors.add(doc["uid"])
 
-        dk = doc['data_keys']
+        dk = doc["data_keys"]
         for k in self._fields:
-            width = max(self._min_width,
-                        len(k) + 2,
-                        self._default_prec + 1 + 2 * self._pad_len)
+            width = max(
+                self._min_width,
+                len(k) + 2,
+                self._default_prec + 1 + 2 * self._pad_len,
+            )
             try:
                 dk_entry = dk[k]
             except KeyError:
                 # this descriptor does not know about this key
                 continue
 
-            if dk_entry['dtype'] not in self._FMT_MAP:
-                warnings.warn("The key {} will be skipped because LiveTable "
-                              "does not know how to display the dtype {}"
-                              "".format(k, dk_entry['dtype']))
+            if dk_entry["dtype"] not in self._FMT_MAP:
+                warnings.warn(
+                    "The key {} will be skipped because LiveTable "
+                    "does not know how to display the dtype {}"
+                    "".format(k, dk_entry["dtype"])
+                )
                 continue
 
-            prec = patch_up_precision(dk_entry.get('precision',
-                                                   self._default_prec))
-            fmt = self._fm_sty(width=width,
-                               prec=prec,
-                               dtype=self._FMT_MAP[dk_entry['dtype']])
+            prec = patch_up_precision(
+                dk_entry.get("precision", self._default_prec)
+            )
+            fmt = self._fm_sty(
+                width=width, prec=prec, dtype=self._FMT_MAP[dk_entry["dtype"]]
+            )
 
             self._format_info[k] = fmt
 
-        self._sep_format = ('+' +
-                            '+'.join('-' * f.width
-                                     for f in self._format_info.values()) +
-                            '+')
-        self._main_fmnt = '|'.join(
-            '{{: >{w}}}{pad}'.format(w=f.width - self._pad_len,
-                                     pad=' ' * self._pad_len)
-            for f in self._format_info.values())
-        headings = [k if k != self.ev_time_key else 'time'
-                    for k in self._format_info]
-        self._header = ('|' +
-                        self._main_fmnt.format(*headings) +
-                        '|'
-                        )
+        self._sep_format = (
+            "+"
+            + "+".join("-" * f.width for f in self._format_info.values())
+            + "+"
+        )
+        self._main_fmnt = "|".join(
+            "{{: >{w}}}{pad}".format(
+                w=f.width - self._pad_len, pad=" " * self._pad_len
+            )
+            for f in self._format_info.values()
+        )
+        headings = [
+            k if k != self.ev_time_key else "time" for k in self._format_info
+        ]
+        self._header = "|" + self._main_fmnt.format(*headings) + "|"
         self._data_formats = OrderedDict(
-            (k, self._FMTLOOKUP[f.dtype].format(k=k,
-                                                width=f.width-2*self._pad_len,
-                                                prec=f.prec, dtype=f.dtype,
-                                                pad=self._extra_pad))
-            for k, f in self._format_info.items())
+            (
+                k,
+                self._FMTLOOKUP[f.dtype].format(
+                    k=k,
+                    width=f.width - 2 * self._pad_len,
+                    prec=f.prec,
+                    dtype=f.dtype,
+                    pad=self._extra_pad,
+                ),
+            )
+            for k, f in self._format_info.items()
+        )
 
         self._count = 0
 
@@ -329,30 +363,32 @@ class LiveTable(CallbackBase):
 
     def event(self, doc):
         # shallow copy so we can mutate
-        if ensure_uid(doc['descriptor']) not in self._descriptors:
+        if ensure_uid(doc["descriptor"]) not in self._descriptors:
             return
-        data = dict(doc['data'])
+        data = dict(doc["data"])
         self._count += 1
         if not self._count % self._header_interval:
             self._print(self._sep_format)
             self._print(self._header)
             self._print(self._sep_format)
-        fmt_time = str(datetime.fromtimestamp(doc['time']).time())
+        fmt_time = str(datetime.fromtimestamp(doc["time"]).time())
         data[self.ev_time_key] = fmt_time
-        data['seq_num'] = doc['seq_num']
-        cols = [f.format(**{k: data[k]})
-                # Show data[k] if k exists in this Event and is 'filled'.
-                # (The latter is only applicable if the data is
-                # externally-stored -- hence the fallback to `True`.)
-                if ((k in data) and doc.get('filled', {}).get(k, True))
-                # Otherwise use a placeholder of whitespace.
-                else ' ' * self._format_info[k].width
-                for k, f in self._data_formats.items()]
-        self._print('|' + '|'.join(cols) + '|')
+        data["seq_num"] = doc["seq_num"]
+        cols = [
+            f.format(**{k: data[k]})
+            # Show data[k] if k exists in this Event and is 'filled'.
+            # (The latter is only applicable if the data is
+            # externally-stored -- hence the fallback to `True`.)
+            if ((k in data) and doc.get("filled", {}).get(k, True))
+            # Otherwise use a placeholder of whitespace.
+            else " " * self._format_info[k].width
+            for k, f in self._data_formats.items()
+        ]
+        self._print("|" + "|".join(cols) + "|")
         super().event(doc)
 
     def stop(self, doc):
-        if ensure_uid(doc['run_start']) != self._start['uid']:
+        if ensure_uid(doc["run_start"]) != self._start["uid"]:
             return
 
         # This sleep is just cosmetic. It improves the odds that the bottom
@@ -372,7 +408,7 @@ class LiveTable(CallbackBase):
         wm = self.water_mark.format(st=self._start)
         self._out(wm)
         if self.logbook:
-            self.logbook('\n'.join([wm] + self._rows))
+            self.logbook("\n".join([wm] + self._rows))
         super().stop(doc)
 
     def start(self, doc):
@@ -388,17 +424,16 @@ class LiveTable(CallbackBase):
 
 
 class StartStopCallback(CallbackBase):
-
     def __init__(self):
         self.t0 = 0
 
     def start(self, doc):
-        self.t0 = doc['time']
-        print('START ANALYSIS ON {}'.format(doc['uid']))
+        self.t0 = doc["time"]
+        print("START ANALYSIS ON {}".format(doc["uid"]))
 
     def stop(self, doc):
-        print('FINISH ANALYSIS ON {}'.format(doc.get('run_start', 'NA')))
-        print('Analysis time {}'.format(doc['time'] - self.t0))
+        print("FINISH ANALYSIS ON {}".format(doc.get("run_start", "NA")))
+        print("Analysis time {}".format(doc["time"] - self.t0))
 
 
 class RunRouter(CallbackBase):
@@ -435,6 +470,7 @@ class RunRouter(CallbackBase):
 
             callback(name, doc)
     """
+
     def __init__(self, callback_factories):
         self.callback_factories = callback_factories
         self.callbacks = defaultdict(list)  # start uid -> callbacks
@@ -442,7 +478,7 @@ class RunRouter(CallbackBase):
         self.resources = {}  # resource uid -> start uid
 
     def _event_or_bulk_event(self, doc):
-        descriptor_uid = doc['descriptor']
+        descriptor_uid = doc["descriptor"]
         try:
             start_uid = self.descriptors[descriptor_uid]
         except KeyError:
@@ -452,14 +488,14 @@ class RunRouter(CallbackBase):
 
     def event(self, doc):
         for cb in self._event_or_bulk_event(doc):
-            cb('event', doc)
+            cb("event", doc)
 
     def bulk_event(self, doc):
         for cb in self._event_or_bulk_event(doc):
-            cb('bulk_event', doc)
+            cb("bulk_event", doc)
 
     def _datum_or_bulk_datum(self, doc):
-        resource_uid = doc['resource']
+        resource_uid = doc["resource"]
         try:
             start_uid = self.resources[resource_uid]
         except KeyError:
@@ -469,31 +505,31 @@ class RunRouter(CallbackBase):
 
     def datum(self, doc):
         for cb in self._datum_or_bulk_datum(doc):
-            cb('datum', doc)
+            cb("datum", doc)
 
     def bulk_datum(self, doc):
         for cb in self._datum_or_bulk_datum(doc):
-            cb('bulk_datum', doc)
+            cb("bulk_datum", doc)
 
     def descriptor(self, doc):
-        start_uid = doc['run_start']
+        start_uid = doc["run_start"]
         cbs = self.callbacks[start_uid]
         if not cbs:
             # This belongs to a run we are not interested in.
             return
-        self.descriptors[doc['uid']] = start_uid
+        self.descriptors[doc["uid"]] = start_uid
         for cb in cbs:
-            cb('descriptor', doc)
+            cb("descriptor", doc)
 
     def resource(self, doc):
-        start_uid = doc['run_start']
+        start_uid = doc["run_start"]
         cbs = self.callbacks[start_uid]
         if not cbs:
             # This belongs to a run we are not interested in.
             return
-        self.resources[doc['uid']] = start_uid
+        self.resources[doc["uid"]] = start_uid
         for cb in cbs:
-            cb('resource', doc)
+            cb("resource", doc)
 
     def start(self, doc):
         for callback_factory in self.callback_factories:
@@ -501,13 +537,12 @@ class RunRouter(CallbackBase):
             if cb is None:
                 # The callback_factory is not interested in this run.
                 continue
-            self.callbacks[doc['uid']].append(cb)
-        for cb in self.callbacks[doc['uid']]:
-            print('hi')
-            cb('start', doc)
+            self.callbacks[doc["uid"]].append(cb)
+        for cb in self.callbacks[doc["uid"]]:
+            cb("start", doc)
 
     def stop(self, doc):
-        start_uid = doc['run_start']
+        start_uid = doc["run_start"]
         # Clean up references.
         cbs = self.callbacks.pop(start_uid)
         if not cbs:
@@ -520,7 +555,7 @@ class RunRouter(CallbackBase):
             if v == start_uid:
                 del self.resources[k]
         for cb in cbs:
-            cb('stop', doc)
+            cb("stop", doc)
 
 
 class Retrieve(CallbackBase):
@@ -542,14 +577,14 @@ class Retrieve(CallbackBase):
         self.datums = {}
 
     def resource(self, resource):
-        self.resources[resource['uid']] = resource
-        handler = self.handler_reg[resource['spec']]
+        self.resources[resource["uid"]] = resource
+        handler = self.handler_reg[resource["spec"]]
 
-        key = (str(resource['uid']), handler.__name__)
+        key = (str(resource["uid"]), handler.__name__)
 
-        kwargs = resource['resource_kwargs']
-        rpath = resource['resource_path']
-        root = resource.get('root', '')
+        kwargs = resource["resource_kwargs"]
+        rpath = resource["resource_path"]
+        root = resource.get("root", "")
         root = self.root_map.get(root, root)
         if root:
             rpath = os.path.join(root, rpath)
@@ -557,22 +592,23 @@ class Retrieve(CallbackBase):
         self.handlers[key] = ret
 
     def datum(self, doc):
-        self.datums[doc['datum_id']] = doc
+        self.datums[doc["datum_id"]] = doc
 
     def retrieve_datum(self, datum_id):
         doc = self.datums[datum_id]
-        resource = self.resources[doc['resource']]
-        handler_class = self.handler_reg[resource['spec']]
-        key = (str(resource['uid']), handler_class.__name__)
+        resource = self.resources[doc["resource"]]
+        handler_class = self.handler_reg[resource["spec"]]
+        key = (str(resource["uid"]), handler_class.__name__)
         # If we hand in an executor use it, allowing us to load in parallel
         if self.executor:
-            return self.executor.submit(self.handlers[key],
-                                        **doc['datum_kwargs'])
-        return self.handlers[key](**doc['datum_kwargs'])
+            return self.executor.submit(
+                self.handlers[key], **doc["datum_kwargs"]
+            )
+        return self.handlers[key](**doc["datum_kwargs"])
 
     def fill_event(self, event, fields=True, inplace=True):
         if fields is True:
-            fields = set(event['data'])
+            fields = set(event["data"])
         elif fields is False:
             # if no fields, we got nothing to do!
             # just return back as-is
@@ -585,8 +621,8 @@ class Retrieve(CallbackBase):
             ev = copy.deepcopy(ev)
         else:
             ev = event
-        data = ev['data']
-        filled = ev['filled']
+        data = ev["data"]
+        filled = ev["filled"]
         for k in set(data) & fields:
             # Try to fill the data
             try:
@@ -615,17 +651,17 @@ class ExportCallback(Retrieve):
     def resource(self, doc):
         doc = copy.deepcopy(doc)
         super().resource(doc)
-        self.old_root = doc['root']
+        self.old_root = doc["root"]
         doc.update(root=self.new_root)
         return doc
 
     def datum(self, doc):
         super().datum(doc)
         # retrieve the datum using path only handler?
-        resource = self.resources[doc['resource']]
-        handler_class = self.handler_reg[resource['spec']]
-        key = (str(resource['uid']), handler_class.__name__)
-        fin = self.handlers[key].get_file_list([doc['datum_kwargs']])[0]
+        resource = self.resources[doc["resource"]]
+        handler_class = self.handler_reg[resource["spec"]]
+        key = (str(resource["uid"]), handler_class.__name__)
+        fin = self.handlers[key].get_file_list([doc["datum_kwargs"]])[0]
 
         # replace the root with the new root
         fout = os.path.join(self.new_root, os.path.relpath(fin, self.old_root))
@@ -637,3 +673,34 @@ class ExportCallback(Retrieve):
     def event(self, doc):
         # don't fill
         return doc
+
+
+class StripDepVar(CallbackBase):
+    def __init__(self):
+        self.independent_vars = set()
+
+    def start(self, doc):
+        self.independent_vars = set(
+            [n[0] for n, s in doc.get("hints", {}).get("dimensions", [])]
+        )
+
+    def descriptor(self, doc):
+        new_doc = dict(doc)
+        data_keys = set(new_doc["object_keys"].keys())
+        for k in ["data_keys", "hints", "configuration", "object_keys"]:
+            new_doc[k] = dict(doc[k])
+            # all the things not in independent_vars
+            for key in self.independent_vars ^ data_keys:
+                new_doc[k].pop(key, None)
+        return new_doc
+
+    def event(self, doc):
+        # make copies
+        new_doc = dict(doc)
+        new_doc["data"] = dict(doc["data"])
+        data_keys = set(new_doc["data"].keys())
+        # all the things not in
+        for key in self.independent_vars ^ data_keys:
+            new_doc["data"].pop(key)
+            new_doc["timestamps"].pop(key)
+        return new_doc

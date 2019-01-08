@@ -49,6 +49,11 @@ class SaveBaseClass(Retrieve):
         self.descriptor_templates = {}
         self.dim_names = []
         self.kwargs = kwargs
+        self.in_dep_shapes = {}
+        self.dep_shapes = {}
+        # If you see this filename something bad happened (no metadata was
+        #  captured/formatted)
+        self.filename = 'something_horrible_happened.xxx'
 
         super().__init__(handler_reg, root_map)
 

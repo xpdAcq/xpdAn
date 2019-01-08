@@ -12,6 +12,7 @@ import os
 
 class StartStopCallback(CallbackBase):
     """Print the time for analysis"""
+
     def __init__(self):
         self.t0 = 0
 
@@ -40,9 +41,8 @@ class SaveBaseClass(Retrieve):
         All extra kwargs are passed to the filename formatter when the start
         document is received
     """
-    def __init__(
-        self, template, handler_reg, root_map=None, **kwargs
-    ):
+
+    def __init__(self, template, handler_reg, root_map=None, **kwargs):
         self._template = template
 
         self.start_template = ""
@@ -107,6 +107,7 @@ class SaveBaseClass(Retrieve):
 
 class SaveTiff(SaveBaseClass):
     """Callback for saving Tiff files"""
+
     def event(self, doc):
         # fill the document
         doc = super().event(doc)
@@ -124,6 +125,7 @@ class SaveTiff(SaveBaseClass):
 
 class SaveIntensity(SaveBaseClass):
     """Callback for saving Q and tth ``.chi`` files"""
+
     def event(self, doc):
         # fill the document
         doc = super().event(doc)
@@ -149,6 +151,7 @@ class SaveIntensity(SaveBaseClass):
 
 class SaveMask(SaveBaseClass):
     """Callback for saving masks as ``.msk`` and ``.npy`` files"""
+
     def event(self, doc):
         # fill the document
         doc = super().event(doc)
@@ -168,6 +171,7 @@ class SaveMask(SaveBaseClass):
 
 class SavePDFgetx3(SaveBaseClass):
     """Callback for saving PDF, F(Q), S(Q) files"""
+
     def event(self, doc):
         # fill the document
         doc = super().event(doc)
@@ -190,17 +194,24 @@ class SavePDFgetx3(SaveBaseClass):
 
 class SaveMeta(SaveBaseClass):
     """Callback for saving metadata files"""
+
     def start(self, doc):
         doc = dict(doc)
         doc["analysis_stage"] = "meta"
         super().start(doc)
-        os.makedirs(os.path.dirname(clean_template(pfmt.format(self.filename, ext=".yaml"))), exist_ok=True)
+        os.makedirs(
+            os.path.dirname(
+                clean_template(pfmt.format(self.filename, ext=".yaml"))
+            ),
+            exist_ok=True,
+        )
 
         dump_yml(clean_template(pfmt.format(self.filename, ext=".yaml")), doc)
 
 
 class SaveCalib(SaveBaseClass):
     """Callback for saving pyFAI calibrations as ``.poni`` files"""
+
     def event(self, doc):
         doc = super().event(doc)
 

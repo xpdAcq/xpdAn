@@ -45,7 +45,5 @@ def test_save_server(RE, hw, tmpdir):
     for n, d in L:
         if n == "event":
             start = L[0][1]
-            s = f"/a/b/c//{start['analysis_stage']}/" \
-                f"world_{_timestampstr(start['time'])}_motor_0,000_" \
-                f"{start['uid']:.6}_{d['seq_num']:04d}_img.tiff"
+            s = f"/a/b/c//{start['analysis_stage']}/" f"world_{_timestampstr(start['time'])}_motor_0,000_" f"{start['uid']:.6}_{d['seq_num']:04d}_img.tiff"
             assert os.path.exists(tmpdir.strpath + s)

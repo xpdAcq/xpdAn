@@ -53,16 +53,16 @@ class SaveBaseClass(Retrieve):
         super().__init__(handler_reg, root_map)
 
     def start(self, doc):
-        # Get the independant vars
+        # Get the independent vars
         self.dim_names = [
             d[0][0]
             for d in doc.get("hints", {}).get("dimensions")
             if d[0][0] != "time"
         ]
 
-        # Use independant vars to create the filename
+        # Use independent vars to create the filename
         independent_var_string = "_"
-        for dim in self.dim_names:
+        for dim in sorted(self.dim_names):
             independent_var_string += "{name}_{data}_{units}_".format(
                 name=dim,
                 data=f"{{event[data][{dim}]:1.{{descriptor[data_keys]"

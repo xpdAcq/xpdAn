@@ -70,6 +70,7 @@ def start_gen(
     calibration_md_folder={"folder": "xpdAcq_calib_info.yml"},
     **kwargs
 ):
+    raw_source.sink(lambda x: print(x[0]))
     filler = Filler(db=db)
     # Build the general pipeline from the raw_pipeline
 
@@ -113,7 +114,8 @@ def start_gen(
     wavelength = FromEventStream("start", ("bt_wavelength",), source).unique(
         history=1
     )
-    calibrant = FromEventStream("start", ("dSpacing",), source).unique(
+    calibrant = FromEventStream("start", ("dSpacing",), source, principle=True
+                                ).unique(
         history=1
     )
     detector = FromEventStream("start", ("detector",), source).unique(
@@ -124,7 +126,8 @@ def start_gen(
         lambda x: "detector_calibration_server_uid" in x
     )
     # Only pass through new calibrations (prevents us from recalculating cals)
-    geo_input = FromEventStream("start", ("calibration_md",), source).unique(
+    geo_input = FromEventStream("start", ("calibration_md",), source,
+                                principle=True).unique(
         history=1
     )
 
@@ -214,3 +217,12 @@ pipeline_order = [
     pdf_gen,
     clear_comp,
 ]
+
+# If main print visualize pipeline
+if __name__ == "__main__":
+    from rapidz import Stream
+    from rapidz.link import link
+
+    raw_source = Stream(stream_name="raw_source")
+    ns = link(*pipeline_order, raw_source=raw_source)
+    ns["raw_source"].visualize(source_node=True)

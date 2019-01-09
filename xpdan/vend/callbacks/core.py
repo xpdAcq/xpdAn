@@ -726,6 +726,7 @@ class StripDepVar(CallbackBase):
         # make copies
         new_doc = dict(doc)
         new_doc["data"] = dict(doc["data"])
+        new_doc["timestamps"] = dict(doc["timestamps"])
         data_keys = set(new_doc["data"].keys())
         # all the things not in
         for key in self.independent_vars ^ data_keys:

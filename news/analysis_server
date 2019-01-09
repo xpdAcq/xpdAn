@@ -1,0 +1,14 @@
+**Added:**
+
+* analysis server for running analysis in an external process
+  without saving or visualization
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

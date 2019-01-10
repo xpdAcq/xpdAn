@@ -1,0 +1,15 @@
+**Added:** None
+
+**Changed:**
+
+* Multiple detectors are supported for the main processing pipeline
+  note that this does not support multiple detectors at the same
+  time.
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

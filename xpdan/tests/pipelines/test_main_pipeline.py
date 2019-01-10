@@ -10,8 +10,16 @@ from xpdan.pipelines.main import pipeline_order
 
 @pytest.mark.parametrize("exception", [True, False])
 @pytest.mark.parametrize("background", [True, False])
+@pytest.mark.parametrize("pe2", [True, False])
 def test_main_pipeline(
-    exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
+    exp_db,
+    fast_tmp_dir,
+    start_uid3,
+    start_uid1,
+    start_uid2,
+    background,
+    exception,
+    pe2,
 ):
     namespace = link(
         *pipeline_order, raw_source=Stream(stream_name="raw source"),
@@ -29,6 +37,8 @@ def test_main_pipeline(
     t0 = time.time()
     if background:
         uid = start_uid1
+    elif pe2:
+        uid = start_uid2
     else:
         uid = -1
     for nd in exp_db[uid].documents():

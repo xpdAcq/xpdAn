@@ -219,7 +219,7 @@ pipeline_order = [
 ]
 
 # If main print visualize pipeline
-if __name__ == "__main__":  # no qa
+if __name__ == "__main__":  # pragma: no cover
     from rapidz import Stream
     from rapidz.link import link
 

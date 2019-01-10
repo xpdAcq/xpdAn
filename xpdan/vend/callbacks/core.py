@@ -714,6 +714,7 @@ class StripDepVar(CallbackBase):
 
     def descriptor(self, doc):
         new_doc = dict(doc)
+        # TODO: maybe use all the keys in the set? (hints, object_keys, etc.)
         data_keys = set(new_doc["object_keys"].keys())
         for k in ["data_keys", "hints", "configuration", "object_keys"]:
             new_doc[k] = dict(doc[k])

@@ -19,7 +19,8 @@ from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
 
 from xpdan.vend.callbacks import CallbackCounter, LiveTable, LiveFit
 from xpdan.vend.callbacks.broker import BrokerCallbackBase
-from xpdan.vend.callbacks.core import Retrieve, ExportCallback, RunRouter
+from xpdan.vend.callbacks.core import Retrieve, ExportCallback, RunRouter, \
+    StripDepVar
 from xpdan.vend.callbacks.mpl_plotting import (LiveScatter, LivePlot, LiveGrid,
                                                LiveFitPlot, LiveRaster,
                                                LiveMesh)
@@ -535,3 +536,29 @@ def test_plotting_hints(RE, hw, db):
     RE(grid_scan([hw.det], hw.motor1, -1, 1, 2, hw.motor2, -1, 1, 2,
                  True, hw.motor3, -2, 0, 2, True))
     assert dc.start[-1]['hints'] == hint
+
+
+def test_strip_dep_var(RE, hw):
+
+    L = []
+    LL = []
+    RE.subscribe(lambda *x: L.append(x))
+    sdv = StripDepVar()
+    RE.subscribe(lambda *x: LL.append(sdv(*x)))
+
+    RE(scan([hw.ab_det], hw.motor1, 0, 10, 10))
+
+    for (n1, d1), (n2, d2) in zip(L, LL):
+        assert n1 == n2
+        if n1 == 'descriptor':
+            assert d1 != d2
+            for k in ["data_keys", "hints", "configuration", "object_keys"]:
+                for kk in ['det']:
+                    assert kk not in d2[k]
+        elif n1 == 'event':
+            assert d1 != d2
+            for k in ["data", "timestamps"]:
+                for kk in ['det_a', 'det_b']:
+                    assert kk not in d2[k]
+        else:
+            assert d1 == d2

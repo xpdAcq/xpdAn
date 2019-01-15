@@ -33,9 +33,9 @@ for hdr in list((db[-1],)):
         if e[0] == 'resource':
             if 'run_start' not in e[1]:
                 e[1].update(run_start=start['uid'])
-        #pprint(e[1])
+        pprint(e[1])
         p(*e)
-        #input()
+        input()
         # time.sleep(1)
     #e = ("stop", stop)
     #p(*e)

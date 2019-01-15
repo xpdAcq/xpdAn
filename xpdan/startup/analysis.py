@@ -126,5 +126,5 @@ if __name__ == '__main__':  # pragma: no cover
         + [std_gen, z_score_gen, max_intensity_mean, max_gr_mean]
         + [to_em]
     )
-    namespace = create_analysis_pipeline(order, **kwargs)
+    namespace = create_analysis_pipeline(order)
     start_analysis_server(namespace['raw_source'])

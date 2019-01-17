@@ -2,9 +2,10 @@ import time
 
 import pytest
 from shed.simple import SimpleToEventStream as ToEventStream
+
 from rapidz import Stream, move_to_first, destroy_pipeline
-from xpdan.pipelines.main import pipeline_order
 from rapidz.link import link
+from xpdan.pipelines.main import pipeline_order
 
 
 @pytest.mark.parametrize("exception", [True, False])
@@ -16,18 +17,15 @@ def test_main_pipeline(
         *pipeline_order, raw_source=Stream(stream_name="raw source"),
         db=exp_db,
     )
-    mean = namespace["mean"]
-    iq_comp = namespace["iq_comp"]
-    q = namespace["q"]
-    raw_source = namespace["raw_source"]
-
-    iq_em = ToEventStream(mean.combine_latest(q, emit_on=0), ("iq", "q"))
+    iq_em = ToEventStream(
+        namespace["mean"].combine_latest(namespace["q"], emit_on=0),
+        ("iq", "q"))
     iq_em.sink(print)
 
     limg = []
     move_to_first(namespace["bg_corrected_img"].sink(lambda x: limg.append(x)))
-    lbgc = mean.sink_to_list()
-    lpdf = iq_comp.sink_to_list()
+    lbgc = namespace["mean"].sink_to_list()
+    lpdf = namespace["iq_comp"].sink_to_list()
     t0 = time.time()
     if background:
         uid = start_uid1
@@ -40,7 +38,7 @@ def test_main_pipeline(
                 doc["bt_wavelength"] = "bla"
             nd = (name, doc)
         try:
-            raw_source.emit(nd)
+            namespace["raw_source"].emit(nd)
         except ValueError:
             pass
     t1 = time.time()
@@ -54,7 +52,9 @@ def test_main_pipeline(
     assert len(lbgc) == assert_lbgc
     assert len(lpdf) == assert_lbgc
     assert iq_em.state == "stopped"
-    destroy_pipeline(raw_source)
+    destroy_pipeline(namespace["raw_source"])
+    del namespace
+    del iq_em
     limg.clear()
     lbgc.clear()
     lpdf.clear()

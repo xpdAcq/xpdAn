@@ -13,7 +13,7 @@ def test_save_server(RE, hw, tmpdir):
     RE.subscribe(
         RunRouter(
             [setup_saver],
-            base_folder=tmpdir.strpath,
+            base_folders=tmpdir.strpath,
             template="{base_folder}/{folder_prefix}/"
             "{start[analysis_stage]}/"
             "{start[sample_name]}_"

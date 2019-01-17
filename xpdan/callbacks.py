@@ -43,7 +43,8 @@ class SaveBaseClass(Retrieve):
         document is received
     """
 
-    def __init__(self, template, handler_reg, root_map=None, base_folders=None, **kwargs):
+    def __init__(self, template, handler_reg, root_map=None,
+                 base_folders=None, **kwargs):
         if base_folders is None:
             base_folders = []
         elif isinstance(base_folders, str):
@@ -113,7 +114,8 @@ class SaveBaseClass(Retrieve):
         ).replace(".", ",") for bf in self.base_folders]
         # Note that formally there are more steps to the formatting, but we
         #  should have the folder by now
-        os.makedirs(os.path.dirname(self.filenames), exist_ok=True)
+        for filename in self.filenames:
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
         return super().event(doc)
 
 

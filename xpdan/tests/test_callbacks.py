@@ -9,7 +9,7 @@ def test_SaveBaseClass(RE, hw, tmpdir):
         "{base_folder}/{folder_prefix}/{start[hello]}{"
         "__independent_vars__}",
         handler_reg={},
-        base_folder=tmpdir.strpath,
+        base_folders=tmpdir.strpath,
     )
     L = []
     RE.subscribe(lambda *x: L.append(x))
@@ -33,14 +33,13 @@ def test_SaveBaseClass(RE, hw, tmpdir):
     name_param = {
         "start": (
             "start_template",
-            "/a/b/c//world_motor_{event[data][motor]:1.{descriptor["
+            "{base_folder}/a/b/c//world_motor_{event[data][motor]:1.{descriptor["
             "data_keys][motor][precision]}f}_{descriptor[data_keys][motor]["
             "units]}_",
         ),
         "event": (
-            "filename",
-            "/a/b/c//world_motor_0,000_{descriptor[data_keys][motor]["
-            "units]}_",
+            "filenames",
+            [f"{tmpdir.strpath}/a/b/c//world_motor_0,000_{{descriptor[data_keys][motor][units]}}_"],
         ),
     }
 
@@ -49,7 +48,7 @@ def test_SaveBaseClass(RE, hw, tmpdir):
         key = name_param.get(n, "")
         if key:
             assert (
-                getattr(sbc, key[0], "") == tmpdir.strpath + name_param[n][1]
+                getattr(sbc, key[0], "") == name_param[n][1]
             )
 
 
@@ -58,7 +57,7 @@ def test_SaveTiff(RE, hw, tmpdir):
         handler_reg={"NPY_SEQ": NumpySeqHandler},
         template="{base_folder}/{folder_prefix}/{start[hello]}{"
         "__independent_vars__}{ext}",
-        base_folder=tmpdir.strpath,
+        base_folders=tmpdir.strpath,
     )
     L = []
     RE.subscribe(lambda *x: L.append(x))
@@ -82,7 +81,6 @@ def test_SaveTiff(RE, hw, tmpdir):
     for n, d in L:
         sbc(n, d)
         if n == "event":
-            print(sbc.filenames)
             assert os.path.exists(
                 tmpdir.strpath + "/a/b/c//world_motor_0,000_img.tiff"
             )

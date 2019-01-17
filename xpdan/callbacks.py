@@ -1,3 +1,4 @@
+import time
 from bluesky.callbacks.core import CallbackBase
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save

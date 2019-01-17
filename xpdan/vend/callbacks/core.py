@@ -638,7 +638,7 @@ class Retrieve(CallbackBase):
             ev = event
         data = ev["data"]
         filled = ev["filled"]
-        for k in set(data) & fields & set(k for k in data if not filled[k]):
+        for k in set(data) & fields & set(k for k in data if not filled.get(k, True)):
             # Try to fill the data
             try:
                 v = self.retrieve_datum(data[k])

@@ -24,7 +24,7 @@ from .utils import integrate_kwargs
 
 @pytest.mark.parametrize(("kwargs", 'known_fail_bool'), integrate_kwargs)
 def test_integrate_core_smoke(exp_db, fast_tmp_dir, kwargs,
-                              known_fail_bool):
+                              known_fail_bool, close_mpl_figs):
     print(kwargs)
     if known_fail_bool:
         pytest.xfail('Bad params')

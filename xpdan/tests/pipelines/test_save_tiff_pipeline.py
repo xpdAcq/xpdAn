@@ -13,17 +13,11 @@ def test_tiff_pipeline(
     exp_db, fast_tmp_dir, start_uid3, start_uid1, background, exception
 ):
     namespace = link(
-        *pipeline_order, raw_source=Stream(stream_name="raw source")
+        *pipeline_order, raw_source=Stream(stream_name="raw source"),
+        db=exp_db
     )
     namespace["save_kwargs"].update({"base_folder": fast_tmp_dir})
-    filler = namespace["filler"]
-    fg_dark_query = namespace["fg_dark_query"]
     raw_source = namespace["raw_source"]
-
-    # reset the DBs so we can use the actual db
-    filler.db = exp_db
-    for a in [fg_dark_query]:
-        a.kwargs["db"] = exp_db
 
     t0 = time.time()
     if background:
@@ -31,7 +25,7 @@ def test_tiff_pipeline(
     else:
         uid = -1
 
-    for nd in exp_db[uid].documents(fill=True):
+    for nd in exp_db[uid].documents():
         name, doc = nd
         if name == "start":
             if exception:

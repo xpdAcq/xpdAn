@@ -79,6 +79,8 @@ def ltdb(request):
     from databroker.tests.utils import build_sqlite_backed_broker
     db = build_sqlite_backed_broker(request)
     db.prepare_hook = lambda name, doc: copy.deepcopy(doc)
+    reg = db.reg
+    reg.register_handler('NPY_SEQ', NumpySeqHandler)
     return db
 
 
@@ -86,7 +88,6 @@ def ltdb(request):
 def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     db2 = ltdb
     reg = db2.reg
-    reg.register_handler('NPY_SEQ', NumpySeqHandler)
     RE = fresh_RE
     RE.subscribe(db2.insert)
     bt_uid = str(uuid.uuid4())

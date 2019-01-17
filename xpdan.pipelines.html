@@ -89,7 +89,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">xpdan.pipelines package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#xpdan-pipelines-main-module">xpdan.pipelines.main module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#xpdan-pipelines-pipeline-utils-module">xpdan.pipelines.pipeline_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#xpdan-pipelines-save-tiff-module">xpdan.pipelines.save_tiff module</a></li>
 </ul>
 </li>
@@ -98,16 +98,16 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-data-reduction-module">xpdan.data_reduction module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-data-reduction-core-module">xpdan.data_reduction_core module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-db-utils-module">xpdan.db_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-dev-utils-module">xpdan.dev_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-fuzzybroker-module">xpdan.fuzzybroker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-module">xpdan.glbl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl">xpdan.glbl module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-tools-module">xpdan.tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -184,8 +184,102 @@
 <div class="section" id="xpdan-pipelines-main-module">
 <h2>xpdan.pipelines.main module<a class="headerlink" href="#xpdan-pipelines-main-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="xpdan-pipelines-pipeline-utils-module">
-<h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#xpdan-pipelines-pipeline-utils-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.pipelines.pipeline_utils">
+<span id="xpdan-pipelines-pipeline-utils-module"></span><h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#module-xpdan.pipelines.pipeline_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xpdan.pipelines.pipeline_utils.Filler">
+<em class="property">class </em><code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">Filler</code><span class="sig-paren">(</span><em>db</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluesky.callbacks.core.CallbackBase</span></code></p>
+<p>Fill events without provenence</p>
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.descriptor">
+<code class="descname">descriptor</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.descriptor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.pipelines.pipeline_utils.Filler.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#Filler.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.Filler.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.clear_combine_latest">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">clear_combine_latest</code><span class="sig-paren">(</span><em>node</em>, <em>position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#clear_combine_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.clear_combine_latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.dark_template_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">dark_template_func</code><span class="sig-paren">(</span><em>timestamp</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#dark_template_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.dark_template_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format template for dark images</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timestamp</strong> (<em>float</em>) – The time in unix epoch</li>
+<li><strong>template</strong> (<em>str</em>) – The string to be formatted</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_calibration">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_calibration</code><span class="sig-paren">(</span><em>start</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_calibration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_dark">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_dark</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_dark" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_not_calibration">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_not_calibration</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_not_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_not_calibration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.if_query_results">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">if_query_results</code><span class="sig-paren">(</span><em>n_hdrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#if_query_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.if_query_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater1_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater1_func</code><span class="sig-paren">(</span><em>doc</em>, <em>template</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater1_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater1_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>format base string with data from experiment, sample_name,
+folder_tag</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater2_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater2_func</code><span class="sig-paren">(</span><em>doc</em>, <em>template</em>, <em>aux=None</em>, <em>short_aux=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater2_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater2_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>format with auxiliary and time</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.pipeline_utils.templater3_func">
+<code class="descclassname">xpdan.pipelines.pipeline_utils.</code><code class="descname">templater3_func</code><span class="sig-paren">(</span><em>template</em>, <em>analysis_stage='raw'</em>, <em>ext='.tiff'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/pipeline_utils.html#templater3_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.templater3_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="xpdan-pipelines-save-tiff-module">
 <h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#xpdan-pipelines-save-tiff-module" title="Permalink to this headline">¶</a></h2>

@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.db_utils &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.db_utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.db_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">islice</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">databroker._core</span> <span class="k">import</span> <span class="n">Header</span>
+
+
+<div class="viewcode-block" id="sort_scans_by_hdr_key"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.sort_scans_by_hdr_key">[docs]</a><span class="k">def</span> <span class="nf">sort_scans_by_hdr_key</span><span class="p">(</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;In a list of hdrs, group the scans by header-key.</span>
+
+<span class="sd">    Use this function to find all the scans in the list of headers that</span>
+<span class="sd">    have a particular key value, such as &#39;sample_name&#39;=&#39;Ni&#39;</span>
+
+<span class="sd">    Function returns a list of indices for the position in the list,</span>
+<span class="sd">    associated with the metadata key values.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hdrs: list of Header objects</span>
+<span class="sd">        The dictionary containing {&#39;key-value&#39;:[list of scan indices]}.</span>
+<span class="sd">        For example a search over &#39;sample_name&#39; might return</span>
+<span class="sd">        {&#39;Ni&#39;:[0,1,2,3,4,9,10],&#39;gold nanoparticles&#39;:[5,6,7,8]}</span>
+<span class="sd">    key: str</span>
+<span class="sd">        The scans will be sorted by the values of this metadata key,</span>
+<span class="sd">        e.g., &#39;sample_name&#39;</span>
+<span class="sd">    verbose: bool, optional</span>
+<span class="sd">        If true prints the results. Defaults to True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict:</span>
+<span class="sd">        The dictionary containing {&#39;key-value&#39;:[list of scan indices]}.</span>
+<span class="sd">        For example a search over &#39;sample_name&#39; might return</span>
+<span class="sd">        {&#39;Ni&#39;:[0,1,2,3,4,9,10],&#39;gold nanoparticles&#39;:[5,6,7,8]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hdrs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="scan_diff"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.scan_diff">[docs]</a><span class="k">def</span> <span class="nf">scan_diff</span><span class="p">(</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blacklist</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the metadata differences between scans in hdrs list</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hdrs: list of Header objects</span>
+<span class="sd">        The headers to be diffed</span>
+<span class="sd">    verbose: bool, optional</span>
+<span class="sd">        If true prints the results. Defaults to True</span>
+<span class="sd">    blacklist: list of str, optional</span>
+<span class="sd">        List of keys to not be included in diff. If None, defaults to `uid`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict:</span>
+<span class="sd">        The dictionary of keys with at least one different value across the</span>
+<span class="sd">        scans. The values are the results for each header.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">blacklist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">])</span>
+    <span class="n">kv</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="c1"># TODO: eventually support dict differences</span>
+        <span class="c1"># See http://stackoverflow.com/a/11092607/5100330</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span>
+             <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Hashable</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">kv</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="n">kv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kv</span></div>
+
+
+<div class="viewcode-block" id="scan_summary"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.scan_summary">[docs]</a><span class="k">def</span> <span class="nf">scan_summary</span><span class="p">(</span><span class="n">hdrs</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide one line summaries of headers</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hdrs: list of headers</span>
+<span class="sd">        The headers from the databroker</span>
+<span class="sd">    fields: list of str, optional</span>
+<span class="sd">        &#39;Specify a list of fields to summarize. If None, the following</span>
+<span class="sd">        will be returned</span>
+<span class="sd">        ``[&#39;sample_name&#39;, &#39;sp_type&#39;, &#39;sp_startingT&#39;, &#39;sp_endingT&#39;]``</span>
+<span class="sd">        defaults to None</span>
+<span class="sd">    verbose: bool, optional</span>
+<span class="sd">        If True print the summary</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        List of summary strings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_type&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_startingT&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_endingT&#39;</span><span class="p">]</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hdrs</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span>
+                <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span>
+                 <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+        <span class="n">data2</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])]</span> <span class="o">+</span> <span class="n">data</span>
+
+        <span class="n">data2</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]]</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">data2</span><span class="p">))</span>
+        <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">datas</span></div>
+
+
+<div class="viewcode-block" id="query_dark"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_dark">[docs]</a><span class="k">def</span> <span class="nf">query_dark</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get dark data from databroker</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db: Broker instance</span>
+<span class="sd">    docs: tuple of dict</span>
+<span class="sd">    schema: int</span>
+<span class="sd">        Schema version</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of Header :</span>
+<span class="sd">        The list of headers which meet the criteria</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
+        <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dk_uid</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">dk_uid</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">z</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="query_background"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_background">[docs]</a><span class="k">def</span> <span class="nf">query_background</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get background data from databroker</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db: Broker instance</span>
+<span class="sd">    docs: tuple of dict</span>
+<span class="sd">    schema: int</span>
+<span class="sd">        Schema version</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of Header :</span>
+<span class="sd">        The list of headers which meet the criteria</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
+        <span class="n">sample_name</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bkgd_sample_name&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sample_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">db</span><span class="p">(</span><span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
+                      <span class="n">bt_uid</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;bt_uid&#39;</span><span class="p">],</span>
+                      <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;$exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="temporal_prox"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.temporal_prox">[docs]</a><span class="k">def</span> <span class="nf">temporal_prox</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">docs</span><span class="p">):</span>
+    <span class="c1"># If there is only one result just use that one</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">Header</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">res</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+    <span class="n">dt_sq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dt_sq</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">dt_sq</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_sq</span><span class="p">))</span>
+        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">min_r</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">min_r</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,3 +1,14 @@
+./_modules/index.html
+./_modules/xpdan/data_reduction_core.html
+./_modules/xpdan/db_utils.html
+./_modules/xpdan/fuzzybroker.html
+./_modules/xpdan/pipelines/pipeline_utils.html
+./_modules/xpdan/tests/conftest.html
+./_modules/xpdan/tests/test_data_reduction.html
+./_modules/xpdan/tests/test_data_reduction_core.html
+./_modules/xpdan/tests/test_db_utils.html
+./_modules/xpdan/tests/test_fuzzybroker.html
+./_modules/xpdan/tests/utils.html
 ./_sources/index.rst.txt
 ./_sources/quickstart.rst.txt
 ./_sources/xpdan.pipelines.rst.txt
@@ -62,6 +73,7 @@
 ./genindex.html
 ./index.html
 ./objects.inv
+./py-modindex.html
 ./quickstart.html
 ./search.html
 ./searchindex.js

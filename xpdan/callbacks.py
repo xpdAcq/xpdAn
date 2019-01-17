@@ -43,7 +43,12 @@ class SaveBaseClass(Retrieve):
         document is received
     """
 
-    def __init__(self, template, handler_reg, root_map=None, **kwargs):
+    def __init__(self, template, handler_reg, root_map=None, base_folders=None, **kwargs):
+        if base_folders is None:
+            base_folders = []
+        elif isinstance(base_folders, str):
+            base_folders = [base_folders]
+        self.base_folders = base_folders
         self._template = template
 
         self.start_template = ""
@@ -54,7 +59,7 @@ class SaveBaseClass(Retrieve):
         self.dep_shapes = {}
         # If you see this filename something bad happened (no metadata was
         #  captured/formatted)
-        self.filename = 'something_horrible_happened.xxx'
+        self.filenames = 'something_horrible_happened.xxx'
 
         super().__init__(handler_reg, root_map)
 
@@ -102,12 +107,13 @@ class SaveBaseClass(Retrieve):
         return super().descriptor(doc)
 
     def event(self, doc):
-        self.filename = pfmt.format(
-            self.descriptor_templates[doc["descriptor"]], event=doc
-        ).replace(".", ",")
+        self.filenames = [pfmt.format(
+            self.descriptor_templates[doc["descriptor"]], event=doc,
+            base_folder=bf
+        ).replace(".", ",") for bf in self.base_folders]
         # Note that formally there are more steps to the formatting, but we
         #  should have the folder by now
-        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
+        os.makedirs(os.path.dirname(self.filenames), exist_ok=True)
         return super().event(doc)
 
 
@@ -121,12 +127,13 @@ class SaveTiff(SaveBaseClass):
         for two_d_var in [
             k for k, v in self.dep_shapes.items() if len(v) == 2
         ]:
-            imsave(
-                clean_template(
-                    pfmt.format(self.filename, ext=f"_{two_d_var}.tiff")
-                ),
-                doc["data"][two_d_var],
-            )
+            for filename in self.filenames:
+                imsave(
+                    clean_template(
+                        pfmt.format(filename, ext=f"_{two_d_var}.tiff")
+                    ),
+                    doc["data"][two_d_var],
+                )
 
 
 class SaveIntensity(SaveBaseClass):
@@ -142,17 +149,18 @@ class SaveIntensity(SaveBaseClass):
             for one_d_dep_var in [
                 k for k, v in self.dep_shapes.items() if len(v) == 1
             ]:
-                save_output(
-                    doc["data"][one_d_ind_var],
-                    doc["data"][one_d_dep_var],
-                    clean_template(
-                        pfmt.format(
-                            self.filename,
-                            ext=f"_{one_d_dep_var}_{one_d_ind_var}",
-                        )
-                    ),
-                    {"tth": "2theta", "q": "Q"}.get(one_d_ind_var),
-                )
+                for filename in self.filenames:
+                    save_output(
+                        doc["data"][one_d_ind_var],
+                        doc["data"][one_d_dep_var],
+                        clean_template(
+                            pfmt.format(
+                                filename,
+                                ext=f"_{one_d_dep_var}_{one_d_ind_var}",
+                            )
+                        ),
+                        {"tth": "2theta", "q": "Q"}.get(one_d_ind_var),
+                    )
 
 
 class SaveMask(SaveBaseClass):
@@ -165,14 +173,15 @@ class SaveMask(SaveBaseClass):
         for two_d_var in [
             k for k, v in self.dep_shapes.items() if len(v) == 2
         ]:
-            fit2d_save(
-                np.flipud(doc["data"][two_d_var]),
-                clean_template(pfmt.format(self.filename, ext="")),
-            )
-            np.save(
-                clean_template(pfmt.format(self.filename, ext="_mask.npy")),
-                doc["data"][two_d_var],
-            )
+            for filename in self.filenames:
+                fit2d_save(
+                    np.flipud(doc["data"][two_d_var]),
+                    clean_template(pfmt.format(filename, ext="")),
+                )
+                np.save(
+                    clean_template(pfmt.format(filename, ext="_mask.npy")),
+                    doc["data"][two_d_var],
+                )
 
 
 class SavePDFgetx3(SaveBaseClass):
@@ -188,14 +197,15 @@ class SavePDFgetx3(SaveBaseClass):
             for one_d_dep_var in [
                 k for k, v in self.dep_shapes.items() if len(v) == 1
             ]:
-                pdf_saver(
-                    doc["data"][one_d_ind_var],
-                    doc["data"][one_d_dep_var],
-                    doc["data"]["config"],
-                    clean_template(
-                        pfmt.format(self.filename, ext=f".{one_d_dep_var}")
-                    ),
-                )
+                for filename in self.filenames:
+                    pdf_saver(
+                        doc["data"][one_d_ind_var],
+                        doc["data"][one_d_dep_var],
+                        doc["data"]["config"],
+                        clean_template(
+                            pfmt.format(filename, ext=f".{one_d_dep_var}")
+                        ),
+                    )
 
 
 class SaveMeta(SaveBaseClass):
@@ -207,12 +217,13 @@ class SaveMeta(SaveBaseClass):
         super().start(doc)
         os.makedirs(
             os.path.dirname(
-                clean_template(pfmt.format(self.filename, ext=".yaml"))
+                clean_template(pfmt.format(self.filenames, ext=".yaml"))
             ),
             exist_ok=True,
         )
 
-        dump_yml(clean_template(pfmt.format(self.filename, ext=".yaml")), doc)
+        for filename in self.filenames:
+            dump_yml(clean_template(pfmt.format(filename, ext=".yaml")), doc)
 
 
 class SaveCalib(SaveBaseClass):
@@ -221,9 +232,10 @@ class SaveCalib(SaveBaseClass):
     def event(self, doc):
         doc = super().event(doc)
 
-        doc["calib"].save(
-            clean_template(pfmt.format(self.filename, ext=".poni"))
-        )
+        for filename in self.filenames:
+            doc["calib"].save(
+                clean_template(pfmt.format(filename, ext=".poni"))
+            )
 
 
 SAVER_MAP = {

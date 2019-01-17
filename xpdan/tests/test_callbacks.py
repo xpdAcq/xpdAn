@@ -82,7 +82,7 @@ def test_SaveTiff(RE, hw, tmpdir):
     for n, d in L:
         sbc(n, d)
         if n == "event":
-            print(sbc.filename)
+            print(sbc.filenames)
             assert os.path.exists(
                 tmpdir.strpath + "/a/b/c//world_motor_0,000_img.tiff"
             )

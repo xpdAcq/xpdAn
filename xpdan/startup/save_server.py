@@ -43,7 +43,7 @@ def setup_saver(doc, **kwargs):
 
 rr = RunRouter(
     [setup_saver],
-    base_folder=glbl_dict["tiff_base"],
+    base_folders=glbl_dict["tiff_base"],
     template=template,
     handler_reg=db.reg,
 )
@@ -53,4 +53,5 @@ d.subscribe(rr)
 print("Starting Save Server")
 
 if __name__ == "__main__":
+    # TODO: enable users to enter multiple base folders
     d.start()

@@ -236,5 +236,3 @@ SAVER_MAP = {
     "calib": SaveCalib,
     "raw": SaveMeta,
 }
-        print('FINISH ANALYSIS ON {}'.format(doc.get('run_start', 'NA')))
-        print('Analysis time {}'.format(time.time() - self.t0))

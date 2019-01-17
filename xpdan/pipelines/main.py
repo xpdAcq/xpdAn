@@ -5,11 +5,8 @@ from shed.translation import FromEventStream
 from rapidz import move_to_first
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
-from xpdan.pipelines.pipeline_utils import (
-    _timestampstr,
-    clear_combine_latest,
-    Filler,
-)
+from xpdan.pipelines.pipeline_utils import _timestampstr, clear_combine_latest
+from xpdan.vend.callbacks.core import Retrieve
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (
@@ -67,10 +64,27 @@ def start_gen(
     raw_source,
     image_name=glbl_dict["image_field"],
     db=glbl_dict["exp_db"],
-    calibration_md_folder={"folder": "xpdAcq_calib_info.yml"},
+    calibration_md_folder=None,
     **kwargs
 ):
-    filler = Filler(db=db)
+    """
+
+    Parameters
+    ----------
+    raw_source
+    image_name
+    db : databroker.Broker
+        The databroker to use
+    calibration_md_folder
+    kwargs
+
+    Returns
+    -------
+
+    """
+    if calibration_md_folder is None:
+        calibration_md_folder = {"folder": "xpdAcq_calib_info.yml"}
+    raw_source.sink(lambda x: print(x[0]))
     # Build the general pipeline from the raw_pipeline
 
     # TODO: change this when new dark logic comes
@@ -81,12 +95,13 @@ def start_gen(
     # Fill the raw event stream
     source = (
         raw_source.combine_latest(dk_uid)
-        .filter(lambda x: x[1])
-        .pluck(0)
-        # Filler returns None for resource/datum data
-        .starmap(filler)
-        .filter(lambda x: x is not None)
+            .filter(lambda x: x[1])
+            .pluck(0)
+            .starmap(
+            Retrieve(handler_reg=db.reg.handler_reg, root_map=db.reg.root_map))
+            .filter(lambda x: x[0] not in ['resource', 'datum'])
     )
+    source.sink(print)
     # Get all the documents
     start_docs = FromEventStream("start", (), source)
     descriptor_docs = FromEventStream(
@@ -113,9 +128,9 @@ def start_gen(
     wavelength = FromEventStream("start", ("bt_wavelength",), source).unique(
         history=1
     )
-    calibrant = FromEventStream("start", ("dSpacing",), source).unique(
-        history=1
-    )
+    calibrant = FromEventStream(
+        "start", ("dSpacing",), source, principle=True
+    ).unique(history=1)
     detector = FromEventStream("start", ("detector",), source).unique(
         history=1
     )
@@ -124,9 +139,9 @@ def start_gen(
         lambda x: "detector_calibration_server_uid" in x
     )
     # Only pass through new calibrations (prevents us from recalculating cals)
-    geo_input = FromEventStream("start", ("calibration_md",), source).unique(
-        history=1
-    )
+    geo_input = FromEventStream(
+        "start", ("calibration_md",), source, principle=True
+    ).unique(history=1)
 
     start_timestamp = FromEventStream("start", ("time",), source)
 
@@ -214,3 +229,12 @@ pipeline_order = [
     pdf_gen,
     clear_comp,
 ]
+
+# If main print visualize pipeline
+if __name__ == "__main__":  # pragma: no cover
+    from rapidz import Stream
+    from rapidz.link import link
+
+    raw_source = Stream(stream_name="raw_source")
+    ns = link(*pipeline_order, raw_source=raw_source)
+    ns["raw_source"].visualize(source_node=True)

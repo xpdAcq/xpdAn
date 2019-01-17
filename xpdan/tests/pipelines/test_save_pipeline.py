@@ -15,19 +15,11 @@ def test_main_pipeline(
 ):
     namespace = link(
         *(pipeline_order + save_pipeline_order),
-        raw_source=Stream(stream_name="raw source")
+        raw_source=Stream(stream_name="raw source"),
+        db=exp_db
     )
     namespace["save_kwargs"].update({"base_folder": fast_tmp_dir})
-    filler = namespace["filler"]
-    bg_query = namespace["bg_query"]
-    bg_dark_query = namespace["bg_dark_query"]
-    fg_dark_query = namespace["fg_dark_query"]
     raw_source = namespace["raw_source"]
-
-    # reset the DBs so we can use the actual db
-    filler.db = exp_db
-    for a in [bg_query, bg_dark_query, fg_dark_query]:
-        a.kwargs["db"] = exp_db
 
     t0 = time.time()
     if background:

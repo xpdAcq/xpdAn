@@ -572,6 +572,7 @@ class Retrieve(CallbackBase):
         If provided run the data loading via the executor, opening the files
         as a future (potentially elsewhere).
     """
+
     def __init__(self, handler_reg, root_map=None, executor=None):
         self.executor = executor
         if root_map is None:
@@ -636,15 +637,15 @@ class Retrieve(CallbackBase):
             ev = event
         data = ev["data"]
         filled = ev["filled"]
-        for k in set(data) & fields:
+        for k in set(data) & fields & set(k for k in data if not filled[k]):
             # Try to fill the data
             try:
                 v = self.retrieve_datum(data[k])
                 data[k] = v
                 filled[k] = True
             # If retrieve fails keep going
-            except (ValueError, KeyError) as e:
-                raise e
+            except (ValueError, KeyError):
+                pass
         return ev
 
     def event(self, doc):
@@ -704,6 +705,7 @@ class StripDepVar(CallbackBase):
     """Strip the dependent variables from a data stream. This creates a
     stream with only the independent variables, allowing the stream to be
     merged with other dependent variables (including analyzed data)"""
+
     def __init__(self):
         self.independent_vars = set()
 
@@ -714,6 +716,7 @@ class StripDepVar(CallbackBase):
 
     def descriptor(self, doc):
         new_doc = dict(doc)
+        # TODO: maybe use all the keys in the set? (hints, object_keys, etc.)
         data_keys = set(new_doc["object_keys"].keys())
         for k in ["data_keys", "hints", "configuration", "object_keys"]:
             new_doc[k] = dict(doc[k])
@@ -726,6 +729,7 @@ class StripDepVar(CallbackBase):
         # make copies
         new_doc = dict(doc)
         new_doc["data"] = dict(doc["data"])
+        new_doc["timestamps"] = dict(doc["timestamps"])
         data_keys = set(new_doc["data"].keys())
         # all the things not in
         for key in self.independent_vars ^ data_keys:

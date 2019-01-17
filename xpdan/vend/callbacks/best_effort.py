@@ -219,7 +219,7 @@ class BestEffortCallback(CallbackBase):
         if not columns:
             return
         if (
-            (self._start_doc.get("num_points") == 1)
+            (self._start_doc.get("num_points", '') == 1)
             and (stream_name == self.dim_stream)
             and self.omit_single_point_plot
         ):
@@ -255,7 +255,7 @@ class BestEffortCallback(CallbackBase):
                         fig_name = new_name
                         break
         ndims = len(dim_fields)
-        if not 1 < ndims < 3:
+        if not 0 < ndims < 3:
             # we need 1 or 2 dims to do anything, do not make empty figures
             return
 
@@ -300,6 +300,8 @@ class BestEffortCallback(CallbackBase):
                         "Omitting {} from plot because dtype is {}"
                         "".format(y_key, dtype)
                     )
+                    # close extra figure made for config
+                    plt.close(ax.figure)
                     continue
                 # Create an instance of LivePlot and an instance of PeakStats.
                 live_plot = LivePlotPlusPeaks(

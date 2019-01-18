@@ -171,7 +171,7 @@
 
 <div class="viewcode-block" id="test_integrate_core_smoke"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.test_data_reduction_core.test_integrate_core_smoke">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">((</span><span class="s2">&quot;kwargs&quot;</span><span class="p">,</span> <span class="s1">&#39;known_fail_bool&#39;</span><span class="p">),</span> <span class="n">integrate_kwargs</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_integrate_core_smoke</span><span class="p">(</span><span class="n">exp_db</span><span class="p">,</span> <span class="n">fast_tmp_dir</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span>
-                              <span class="n">known_fail_bool</span><span class="p">):</span>
+                              <span class="n">known_fail_bool</span><span class="p">,</span> <span class="n">close_mpl_figs</span><span class="p">):</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">known_fail_bool</span><span class="p">:</span>
         <span class="n">pytest</span><span class="o">.</span><span class="n">xfail</span><span class="p">(</span><span class="s1">&#39;Bad params&#39;</span><span class="p">)</span>

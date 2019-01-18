@@ -19,18 +19,13 @@ def test_main_pipeline(
     exception,
 ):
     namespace = link(
-        *pipeline_order, raw_source=Stream(stream_name="raw source")
+        *pipeline_order, raw_source=Stream(stream_name="raw source"),
+        db=exp_db,
     )
     iq_em = ToEventStream(
         namespace["mean"].combine_latest(namespace["q"], emit_on=0),
         ("iq", "q"))
     iq_em.sink(print)
-
-    # reset the DBs so we can use the actual db
-    (namespace["filler"]).db = exp_db
-    for a in [(namespace["bg_query"]), (namespace["bg_dark_query"]),
-              (namespace["fg_dark_query"])]:
-        a.kwargs["db"] = exp_db
 
     limg = []
     move_to_first(namespace["bg_corrected_img"].sink(lambda x: limg.append(x)))

@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from shed.translation import FromEventStream
-from rapidz import move_to_first
+from rapidz import move_to_first, union
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
 from xpdan.pipelines.pipeline_utils import _timestampstr, clear_combine_latest
@@ -62,7 +62,7 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
 # TODO: chunk this up a bit more so we can separate XRD from PDF
 def start_gen(
     raw_source,
-    image_name=glbl_dict["image_field"],
+    image_names=("pe1_image", "pe2_image", "pe3_image"),
     db=glbl_dict["exp_db"],
     calibration_md_folder=None,
     **kwargs
@@ -168,50 +168,80 @@ def start_gen(
     fg_dark_query.filter(lambda x: x == []).sink(
         lambda x: print("No dark found!")
     )
-    raw_foreground_dark = FromEventStream(
-        "event",
-        ("data", image_name),
-        fg_dark_query.filter(lambda x: x != [])
-        .map(lambda x: x if not isinstance(x, list) else x[0])
-        .map(lambda x: x.documents(fill=True))
-        .flatten(),
+
+    raw_foreground_dark = union(
+        *[
+            FromEventStream(
+                "event",
+                ("data", image_name),
+                fg_dark_query.filter(lambda x: x != [])
+                .map(lambda x: x if not isinstance(x, list) else x[0])
+                .map(lambda x: x.documents(fill=True))
+                .flatten(),
+            )
+            for image_name in image_names
+        ]
     ).map(np.float32)
 
     # Get bg dark
     bg_dark_query = FromEventStream("start", (), bg_docs).map(
         query_dark, db=db
     )
-    raw_background_dark = FromEventStream(
-        "event",
-        ("data", image_name),
-        bg_dark_query.filter(lambda x: x != [])
-        .map(lambda x: x if not isinstance(x, list) else x[0])
-        .map(lambda x: x.documents(fill=True))
-        .flatten(),
+
+    raw_background_dark = union(
+        *[
+            FromEventStream(
+                "event",
+                ("data", image_name),
+                bg_dark_query.filter(lambda x: x != [])
+                .map(lambda x: x if not isinstance(x, list) else x[0])
+                .map(lambda x: x.documents(fill=True))
+                .flatten(),
+            )
+            for image_name in image_names
+        ]
     ).map(np.float32)
-    (
-        FromEventStream(
-            "event", ("data", image_name), source, event_stream_name="dark"
+
+    # Pull darks from their stream if it exists
+    for image_name in image_names:
+        (
+            FromEventStream(
+                "event", ("data", image_name), source, event_stream_name="dark"
+            )
+            .map(np.float32)
+            .connect(raw_foreground_dark)
         )
-        .map(np.float32)
-        .connect(raw_foreground_dark)
-    )
+
     # Get background
-    raw_background = FromEventStream(
-        "event", ("data", image_name), bg_docs
+    raw_background = union(
+        *[
+            FromEventStream("event", ("data", image_name), bg_docs)
+            for image_name in image_names
+        ]
     ).map(np.float32)
 
     # Get foreground
     img_counter = FromEventStream(
-        "event", ("seq_num",), source, stream_name="seq_num"
-    )
-    raw_foreground = FromEventStream(
         "event",
-        ("data", image_name),
+        ("seq_num",),
         source,
-        principle=True,
+        stream_name="seq_num",
+        # This doesn't make sense in multi-stream settings
         event_stream_name="primary",
-        stream_name="raw_foreground",
+    )
+
+    raw_foreground = union(
+        *[
+            FromEventStream(
+                "event",
+                ("data", image_name),
+                source,
+                principle=True,
+                event_stream_name="primary",
+                stream_name="raw_foreground",
+            )
+            for image_name in image_names
+        ]
     ).map(np.float32)
     raw_source.starsink(StartStopCallback())
     return locals()

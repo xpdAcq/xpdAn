@@ -166,56 +166,62 @@
 <span class="kn">from</span> <span class="nn">bluesky.plans</span> <span class="k">import</span> <span class="n">count</span>
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="k">import</span> <span class="n">sim</span>
 
-<span class="n">pyFAI_calib</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;calibrant_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ni24&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;centerX&#39;</span><span class="p">:</span> <span class="mf">997.79605730878336</span><span class="p">,</span>
-               <span class="s1">&#39;centerY&#39;</span><span class="p">:</span> <span class="mf">1005.4468181991356</span><span class="p">,</span>
-               <span class="s1">&#39;dSpacing&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.0345823486199999</span><span class="p">,</span>
-                            <span class="mf">1.761935</span><span class="p">,</span>
-                            <span class="mf">1.24592214845</span><span class="p">,</span>
-                            <span class="mf">1.0625259782900001</span><span class="p">,</span>
-                            <span class="mf">1.0172911743099999</span><span class="p">,</span>
-                            <span class="mf">0.88100000000000001</span><span class="p">,</span>
-                            <span class="mf">0.80846104616000003</span><span class="p">,</span>
-                            <span class="mf">0.78799035527100003</span><span class="p">,</span>
-                            <span class="mf">0.71933348779700002</span><span class="p">,</span>
-                            <span class="mf">0.67819411620799996</span><span class="p">,</span>
-                            <span class="mf">0.62296107422500002</span><span class="p">,</span>
-                            <span class="mf">0.59566471873299998</span><span class="p">,</span>
-                            <span class="mf">0.58733333333299997</span><span class="p">,</span>
-                            <span class="mf">0.55719332372200003</span><span class="p">,</span>
-                            <span class="mf">0.53740496185200004</span><span class="p">,</span>
-                            <span class="mf">0.53126298914600001</span><span class="p">,</span>
-                            <span class="mf">0.50864558715599995</span><span class="p">,</span>
-                            <span class="mf">0.49345870161099997</span><span class="p">,</span>
-                            <span class="mf">0.48869087287399998</span><span class="p">,</span>
-                            <span class="mf">0.47091430825000002</span><span class="p">,</span>
-                            <span class="mf">0.45878572229600001</span><span class="p">,</span>
-                            <span class="mf">0.4405</span><span class="p">,</span>
-                            <span class="mf">0.43052512191199999</span><span class="p">,</span>
-                            <span class="mf">0.42734777131399998</span><span class="p">],</span>
-               <span class="s1">&#39;detector&#39;</span><span class="p">:</span> <span class="s1">&#39;Perkin detector&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;directDist&#39;</span><span class="p">:</span> <span class="mf">218.82105982728712</span><span class="p">,</span>
-               <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="mf">0.21881648512877194</span><span class="p">,</span>
-               <span class="s1">&#39;is_pytest&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-               <span class="s1">&#39;pixel1&#39;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
-               <span class="s1">&#39;pixel2&#39;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
-               <span class="s1">&#39;pixelX&#39;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
-               <span class="s1">&#39;pixelY&#39;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
-               <span class="s1">&#39;poni1&#39;</span><span class="p">:</span> <span class="mf">0.20146140778233776</span><span class="p">,</span>
-               <span class="s1">&#39;poni2&#39;</span><span class="p">:</span> <span class="mf">0.20092436456054058</span><span class="p">,</span>
-               <span class="s1">&#39;poni_file_name&#39;</span><span class="p">:</span> <span class="s1">&#39;/home/timothy/xpdUser/config_base</span><span class="se">\</span>
-<span class="s1">                                  /20170822-190241_pyFAI_calib_Ni24.poni&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;rot1&#39;</span><span class="p">:</span> <span class="mf">0.0062387227662129112</span><span class="p">,</span>
-               <span class="s1">&#39;rot2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0017002217339242484</span><span class="p">,</span>
-               <span class="s1">&#39;rot3&#39;</span><span class="p">:</span> <span class="mf">2.7628252550568797e-08</span><span class="p">,</span>
-               <span class="s1">&#39;splineFile&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-               <span class="s1">&#39;tilt&#39;</span><span class="p">:</span> <span class="mf">0.37048878612364949</span><span class="p">,</span>
-               <span class="s1">&#39;tiltPlanRotation&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">164.75544250965393</span><span class="p">,</span>
-               <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="s1">&#39;20170822-190241&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;wavelength&#39;</span><span class="p">:</span> <span class="mf">1.832e-11</span><span class="p">}</span>
+<span class="n">pyFAI_calib</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;calibrant_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ni24&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;centerX&quot;</span><span class="p">:</span> <span class="mf">997.79605730878336</span><span class="p">,</span>
+    <span class="s2">&quot;centerY&quot;</span><span class="p">:</span> <span class="mf">1005.4468181991356</span><span class="p">,</span>
+    <span class="s2">&quot;dSpacing&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">2.0345823486199999</span><span class="p">,</span>
+        <span class="mf">1.761935</span><span class="p">,</span>
+        <span class="mf">1.24592214845</span><span class="p">,</span>
+        <span class="mf">1.0625259782900001</span><span class="p">,</span>
+        <span class="mf">1.0172911743099999</span><span class="p">,</span>
+        <span class="mf">0.88100000000000001</span><span class="p">,</span>
+        <span class="mf">0.80846104616000003</span><span class="p">,</span>
+        <span class="mf">0.78799035527100003</span><span class="p">,</span>
+        <span class="mf">0.71933348779700002</span><span class="p">,</span>
+        <span class="mf">0.67819411620799996</span><span class="p">,</span>
+        <span class="mf">0.62296107422500002</span><span class="p">,</span>
+        <span class="mf">0.59566471873299998</span><span class="p">,</span>
+        <span class="mf">0.58733333333299997</span><span class="p">,</span>
+        <span class="mf">0.55719332372200003</span><span class="p">,</span>
+        <span class="mf">0.53740496185200004</span><span class="p">,</span>
+        <span class="mf">0.53126298914600001</span><span class="p">,</span>
+        <span class="mf">0.50864558715599995</span><span class="p">,</span>
+        <span class="mf">0.49345870161099997</span><span class="p">,</span>
+        <span class="mf">0.48869087287399998</span><span class="p">,</span>
+        <span class="mf">0.47091430825000002</span><span class="p">,</span>
+        <span class="mf">0.45878572229600001</span><span class="p">,</span>
+        <span class="mf">0.4405</span><span class="p">,</span>
+        <span class="mf">0.43052512191199999</span><span class="p">,</span>
+        <span class="mf">0.42734777131399998</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;detector&quot;</span><span class="p">:</span> <span class="s2">&quot;Perkin detector&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;directDist&quot;</span><span class="p">:</span> <span class="mf">218.82105982728712</span><span class="p">,</span>
+    <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="mf">0.21881648512877194</span><span class="p">,</span>
+    <span class="s2">&quot;is_pytest&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;pixel1&quot;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
+    <span class="s2">&quot;pixel2&quot;</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
+    <span class="s2">&quot;pixelX&quot;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="s2">&quot;pixelY&quot;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
+    <span class="s2">&quot;poni1&quot;</span><span class="p">:</span> <span class="mf">0.20146140778233776</span><span class="p">,</span>
+    <span class="s2">&quot;poni2&quot;</span><span class="p">:</span> <span class="mf">0.20092436456054058</span><span class="p">,</span>
+    <span class="s2">&quot;poni_file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;/home/timothy/xpdUser/config_base</span><span class="se">\</span>
+<span class="s2">                                  /20170822-190241_pyFAI_calib_Ni24.poni&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rot1&quot;</span><span class="p">:</span> <span class="mf">0.0062387227662129112</span><span class="p">,</span>
+    <span class="s2">&quot;rot2&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0017002217339242484</span><span class="p">,</span>
+    <span class="s2">&quot;rot3&quot;</span><span class="p">:</span> <span class="mf">2.7628252550568797e-08</span><span class="p">,</span>
+    <span class="s2">&quot;splineFile&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;tilt&quot;</span><span class="p">:</span> <span class="mf">0.37048878612364949</span><span class="p">,</span>
+    <span class="s2">&quot;tiltPlanRotation&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">164.75544250965393</span><span class="p">,</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;20170822-190241&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wavelength&quot;</span><span class="p">:</span> <span class="mf">1.832e-11</span><span class="p">,</span>
+<span class="p">}</span>
 
 
-<div class="viewcode-block" id="insert_imgs"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.utils.insert_imgs">[docs]</a><span class="k">def</span> <span class="nf">insert_imgs</span><span class="p">(</span><span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="insert_imgs"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.utils.insert_imgs">[docs]</a><span class="k">def</span> <span class="nf">insert_imgs</span><span class="p">(</span>
+    <span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">detector_name</span><span class="o">=</span><span class="s2">&quot;pe1_image&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Insert images into mds and fs for testing</span>
 
@@ -234,40 +240,42 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Create detectors</span>
-    <span class="n">dark_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                         <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                             <span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
-                                         <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
-    <span class="n">light_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;pe1_image&#39;</span><span class="p">,</span>
-                                          <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span>
-                                              <span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span> <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint16&#39;</span><span class="p">),</span>
-                                          <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">)</span>
+    <span class="n">dark_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">detector_name</span><span class="p">,</span>
+        <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
+        <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span>
+        <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">light_det</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">SynSignalWithRegistry</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">detector_name</span><span class="p">,</span>
+        <span class="n">func</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="mi">65535</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
+        <span class="n">reg</span><span class="o">=</span><span class="n">reg</span><span class="p">,</span>
+        <span class="n">save_path</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">beamtime_uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
-    <span class="n">base_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">beamtime_uid</span><span class="o">=</span><span class="n">beamtime_uid</span><span class="p">,</span>
-                   <span class="n">calibration_md</span><span class="o">=</span><span class="n">pyFAI_calib</span><span class="p">,</span>
-                   <span class="n">bt_wavelength</span><span class="o">=</span><span class="mf">0.1847</span><span class="p">,</span>
-                   <span class="n">folder_tag_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sample_name&#39;</span><span class="p">],</span>
-                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">base_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">beamtime_uid</span><span class="o">=</span><span class="n">beamtime_uid</span><span class="p">,</span>
+        <span class="n">calibration_md</span><span class="o">=</span><span class="n">pyFAI_calib</span><span class="p">,</span>
+        <span class="n">bt_wavelength</span><span class="o">=</span><span class="mf">0.1847</span><span class="p">,</span>
+        <span class="n">folder_tag_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sample_name&quot;</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
 
     <span class="c1"># Insert the dark images</span>
     <span class="n">dark_md</span> <span class="o">=</span> <span class="n">base_md</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">dark_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;test-dark&#39;</span><span class="p">,</span> <span class="n">is_dark</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dark_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test-dark&quot;</span><span class="p">,</span> <span class="n">is_dark</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">dark_uid</span> <span class="o">=</span> <span class="n">RE</span><span class="p">(</span><span class="n">count</span><span class="p">([</span><span class="n">dark_det</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="o">**</span><span class="n">dark_md</span><span class="p">)</span>
 
     <span class="c1"># Insert the light images</span>
     <span class="n">light_md</span> <span class="o">=</span> <span class="n">base_md</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">light_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">sc_dk_field_uid</span><span class="o">=</span><span class="n">dark_uid</span><span class="p">)</span>
+    <span class="n">light_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">sc_dk_field_uid</span><span class="o">=</span><span class="n">dark_uid</span><span class="p">)</span>
     <span class="n">uid</span> <span class="o">=</span> <span class="n">RE</span><span class="p">(</span><span class="n">count</span><span class="p">([</span><span class="n">light_det</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">),</span> <span class="o">**</span><span class="n">light_md</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">uid</span></div>
 
 
-<span class="n">integrate_params</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;polarization_factor&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;mask_setting&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;mask_kwargs&#39;</span><span class="p">,</span>
-<span class="p">]</span>
+<span class="n">integrate_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;polarization_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;mask_setting&quot;</span><span class="p">,</span> <span class="s2">&quot;mask_kwargs&quot;</span><span class="p">]</span>
 <span class="n">good_kwargs</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="o">.</span><span class="mi">99</span><span class="p">,),</span>
     <span class="p">(</span>
@@ -281,11 +289,9 @@
     <span class="p">],</span>
 <span class="p">]</span>
 
-<span class="n">bad_integrate_params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;polarization_factor&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;mask_setting&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;mask_kwargs&#39;</span><span class="p">]</span>
+<span class="n">bad_integrate_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;polarization_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;mask_setting&quot;</span><span class="p">,</span> <span class="s2">&quot;mask_kwargs&quot;</span><span class="p">]</span>
 
-<span class="n">bad_kwargs</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;str&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_integrate_params</span><span class="p">))]</span>
+<span class="n">bad_kwargs</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;str&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bad_integrate_params</span><span class="p">))]</span>
 
 <span class="n">integrate_kwarg_values</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">good_kwargs</span><span class="p">)</span>
 <span class="n">integrate_kwargs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -300,7 +306,7 @@
 <span class="n">save_tiff_kwargs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="n">save_tiff_kwargs</span><span class="p">,</span> <span class="n">integrate_kwargs</span><span class="p">]:</span>
     <span class="k">for</span> <span class="n">d2</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">d2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;image_data_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pe1_image&#39;</span>
+        <span class="n">d2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;image_data_key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;pe1_image&quot;</span>
 </pre></div>
 
            </div>

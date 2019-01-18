@@ -169,8 +169,14 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">from</span> <span class="nn">xpdsim</span> <span class="k">import</span> <span class="n">xpd_pe1c</span> <span class="k">as</span> <span class="n">det</span>
-<span class="kn">from</span> <span class="nn">bluesky.tests.conftest</span> <span class="k">import</span> <span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">NumpySeqHandler</span><span class="p">,</span> <span class="n">RunEngine</span><span class="p">,</span> <span class="n">asyncio</span><span class="p">,</span>
-                                    <span class="n">RE</span><span class="p">,</span> <span class="n">hw</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">bluesky.tests.conftest</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">db</span><span class="p">,</span>
+    <span class="n">NumpySeqHandler</span><span class="p">,</span>
+    <span class="n">RunEngine</span><span class="p">,</span>
+    <span class="n">asyncio</span><span class="p">,</span>
+    <span class="n">RE</span><span class="p">,</span>
+    <span class="n">hw</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">skbeam.io.fit2d</span> <span class="k">import</span> <span class="n">fit2d_save</span>
 
 <span class="kn">from</span> <span class="nn">xpdan.fuzzybroker</span> <span class="k">import</span> <span class="n">FuzzyBroker</span>
@@ -182,7 +188,7 @@
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="fresh_RE"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fresh_RE">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="fresh_RE"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fresh_RE">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">fresh_RE</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
     <span class="n">loop</span><span class="o">.</span><span class="n">set_debug</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -190,7 +196,7 @@
     <span class="n">RE</span><span class="o">.</span><span class="n">ignore_callback_exceptions</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">clean_event_loop</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">RE</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s1">&#39;idle&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">RE</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s2">&quot;idle&quot;</span><span class="p">:</span>
             <span class="n">RE</span><span class="o">.</span><span class="n">halt</span><span class="p">()</span>
         <span class="n">ev</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">)</span>
         <span class="n">ev</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
@@ -200,31 +206,39 @@
     <span class="k">return</span> <span class="n">RE</span></div>
 
 
-<div class="viewcode-block" id="start_uid3"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.start_uid3">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="start_uid3"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.start_uid3">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">start_uid3</span><span class="p">(</span><span class="n">exp_db</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="s1">&#39;start_uid3&#39;</span> <span class="ow">in</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exp_db</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">])</span></div>
+    <span class="k">assert</span> <span class="s2">&quot;start_uid3&quot;</span> <span class="ow">in</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exp_db</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;uid&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="start_uid1"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.start_uid1">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="start_uid1"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.start_uid1">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">start_uid1</span><span class="p">(</span><span class="n">exp_db</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="s1">&#39;start_uid1&#39;</span> <span class="ow">in</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">]</span>
-    <span class="k">assert</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;sample_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;kapton&#39;</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">])</span></div>
+    <span class="k">assert</span> <span class="s2">&quot;start_uid1&quot;</span> <span class="ow">in</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;sample_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kapton&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;uid&quot;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="img_size"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.img_size">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="start_uid2"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.start_uid2">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">start_uid2</span><span class="p">(</span><span class="n">exp_db</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="s2">&quot;start_uid1&quot;</span> <span class="ow">in</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">exp_db</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;sample_name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;kapton&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">exp_db</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;uid&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="img_size"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.img_size">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">img_size</span><span class="p">():</span>
     <span class="c1"># a = np.random.random_integers(100, 200)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="mi">2048</span>
     <span class="k">yield</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ltdb"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.ltdb">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="ltdb"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.ltdb">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">ltdb</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a data broker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">databroker.tests.utils</span> <span class="k">import</span> <span class="n">build_sqlite_backed_broker</span>
+
     <span class="n">db</span> <span class="o">=</span> <span class="n">build_sqlite_backed_broker</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
     <span class="n">db</span><span class="o">.</span><span class="n">prepare_hook</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
     <span class="n">reg</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">reg</span>
@@ -232,99 +246,138 @@
     <span class="k">return</span> <span class="n">db</span></div>
 
 
-<div class="viewcode-block" id="exp_db"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.exp_db">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="exp_db"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.exp_db">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">exp_db</span><span class="p">(</span><span class="n">ltdb</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">fresh_RE</span><span class="p">):</span>
     <span class="n">db2</span> <span class="o">=</span> <span class="n">ltdb</span>
     <span class="n">reg</span> <span class="o">=</span> <span class="n">db2</span><span class="o">.</span><span class="n">reg</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">register_handler</span><span class="p">(</span><span class="s2">&quot;NPY_SEQ&quot;</span><span class="p">,</span> <span class="n">NumpySeqHandler</span><span class="p">)</span>
     <span class="n">RE</span> <span class="o">=</span> <span class="n">fresh_RE</span>
     <span class="n">RE</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">db2</span><span class="o">.</span><span class="n">insert</span><span class="p">)</span>
     <span class="n">bt_uid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
 
-    <span class="n">insert_imgs</span><span class="p">(</span><span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">bt_safN</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">pi_name</span><span class="o">=</span><span class="s1">&#39;chris&#39;</span><span class="p">,</span>
-                <span class="n">sample_name</span><span class="o">=</span><span class="s1">&#39;kapton&#39;</span><span class="p">,</span> <span class="n">sample_composition</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">start_uid1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span> <span class="n">composition_string</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
-    <span class="n">insert_imgs</span><span class="p">(</span><span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">pi_name</span><span class="o">=</span><span class="s1">&#39;tim&#39;</span><span class="p">,</span> <span class="n">bt_safN</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">sample_name</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">,</span> <span class="n">bkgd_sample_name</span><span class="o">=</span><span class="s1">&#39;kapton&#39;</span><span class="p">,</span>
-                <span class="n">sample_composition</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">,</span> <span class="n">start_uid2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span>
-                <span class="n">composition_string</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">)</span>
-    <span class="n">insert_imgs</span><span class="p">(</span><span class="n">RE</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">img_size</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">pi_name</span><span class="o">=</span><span class="s1">&#39;chris&#39;</span><span class="p">,</span> <span class="n">bt_safN</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="n">sample_name</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">,</span> <span class="n">bkgd_sample_name</span><span class="o">=</span><span class="s1">&#39;kapton&#39;</span><span class="p">,</span>
-                <span class="n">sample_composition</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">,</span> <span class="n">start_uid3</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span>
-                <span class="n">composition_string</span><span class="o">=</span><span class="s1">&#39;Au&#39;</span><span class="p">)</span>
+    <span class="n">insert_imgs</span><span class="p">(</span>
+        <span class="n">RE</span><span class="p">,</span>
+        <span class="n">reg</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">img_size</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">bt_safN</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">pi_name</span><span class="o">=</span><span class="s2">&quot;chris&quot;</span><span class="p">,</span>
+        <span class="n">sample_name</span><span class="o">=</span><span class="s2">&quot;kapton&quot;</span><span class="p">,</span>
+        <span class="n">sample_composition</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+        <span class="n">start_uid1</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span>
+        <span class="n">composition_string</span><span class="o">=</span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">insert_imgs</span><span class="p">(</span>
+        <span class="n">RE</span><span class="p">,</span>
+        <span class="n">reg</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">img_size</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">pi_name</span><span class="o">=</span><span class="s2">&quot;tim&quot;</span><span class="p">,</span>
+        <span class="n">bt_safN</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">sample_name</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+        <span class="n">bkgd_sample_name</span><span class="o">=</span><span class="s2">&quot;kapton&quot;</span><span class="p">,</span>
+        <span class="n">sample_composition</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+        <span class="n">start_uid2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span>
+        <span class="n">composition_string</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+        <span class="n">detector_name</span><span class="o">=</span><span class="s2">&quot;pe2_image&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">insert_imgs</span><span class="p">(</span>
+        <span class="n">RE</span><span class="p">,</span>
+        <span class="n">reg</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">,</span>
+        <span class="n">img_size</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">pi_name</span><span class="o">=</span><span class="s2">&quot;chris&quot;</span><span class="p">,</span>
+        <span class="n">bt_safN</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">sample_name</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+        <span class="n">bkgd_sample_name</span><span class="o">=</span><span class="s2">&quot;kapton&quot;</span><span class="p">,</span>
+        <span class="n">sample_composition</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+        <span class="n">start_uid3</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">bt_uid</span><span class="o">=</span><span class="n">bt_uid</span><span class="p">,</span>
+        <span class="n">composition_string</span><span class="o">=</span><span class="s2">&quot;Au&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">yield</span> <span class="n">db2</span></div>
 
 
-<div class="viewcode-block" id="fuzzdb"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fuzzdb">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="fuzzdb"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fuzzdb">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">fuzzdb</span><span class="p">(</span><span class="n">exp_db</span><span class="p">):</span>
     <span class="k">yield</span> <span class="n">FuzzyBroker</span><span class="p">(</span><span class="n">exp_db</span><span class="o">.</span><span class="n">mds</span><span class="p">,</span> <span class="n">exp_db</span><span class="o">.</span><span class="n">reg</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="fast_tmp_dir"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fast_tmp_dir">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="fast_tmp_dir"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.fast_tmp_dir">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;function&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">fast_tmp_dir</span><span class="p">():</span>
     <span class="n">td</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;creating </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="k">yield</span> <span class="n">td</span><span class="o">.</span><span class="n">name</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;removing </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;removing </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
         <span class="n">td</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="tmp_dir"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.tmp_dir">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="tmp_dir"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.tmp_dir">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">tmp_dir</span><span class="p">():</span>
     <span class="n">td</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;creating </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
     <span class="k">yield</span> <span class="n">td</span><span class="o">.</span><span class="n">name</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;removing </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;removing </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">td</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
         <span class="n">td</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="test_md"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.test_md">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_md"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.test_md">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_md</span><span class="p">():</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;analysis_stage&#39;</span><span class="p">:</span> <span class="s1">&#39;raw&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;beamline_config&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s1">&#39;beamline_id&#39;</span><span class="p">:</span> <span class="s1">&#39;28-ID-2&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;bt_experimenters&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Long&#39;</span><span class="p">,</span> <span class="s1">&#39;Yang&#39;</span><span class="p">,</span> <span class="s1">&#39;Elizabeth&#39;</span><span class="p">,</span> <span class="s1">&#39;Culbertson&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;bt_piLast&#39;</span><span class="p">:</span> <span class="s1">&#39;Billinge&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;bt_safN&#39;</span><span class="p">:</span> <span class="s1">&#39;301750&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;bt_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;34f53730&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;bt_wavelength&#39;</span><span class="p">:</span> <span class="mf">0.1867</span><span class="p">,</span>
-            <span class="s1">&#39;composition_string&#39;</span><span class="p">:</span> <span class="s1">&#39;C18.0H14.0&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;detector_calibration_client_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;57d48021-d6a3-4b98-99ac&#39;</span>
-                                               <span class="s1">&#39;-dfc9ba4cdff2&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;detectors&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pe1&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;facility&#39;</span><span class="p">:</span> <span class="s1">&#39;NSLS-II&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;XPD&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;hints&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dimensions&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">]]},</span>
-            <span class="s1">&#39;lead_experimenter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Elizabeth&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;mask_client_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;57d48021-d6a3-4b98-99ac-dfc9ba4cdff2&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;num_intervals&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">&#39;num_points&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s1">&#39;plan_args&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;detectors&#39;</span><span class="p">:</span> <span class="p">[</span>
-                    <span class="s2">&quot;PerkinElmerContinuous(prefix=&#39;XF:28IDC-ES:1{Det:PE1}&#39;, &quot;</span>
-                    <span class="s2">&quot;name=&#39;pe1&#39;, read_attrs=[&#39;tiff&#39;, &#39;stats1.total&#39;], &quot;</span>
-                    <span class="s2">&quot;configuration_attrs=[&#39;cam&#39;, &#39;images_per_set&#39;, &quot;</span>
-                    <span class="s2">&quot;&#39;number_of_sets&#39;])&quot;</span><span class="p">],</span>
-                <span class="s1">&#39;num&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-            <span class="s1">&#39;plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;plan_type&#39;</span><span class="p">:</span> <span class="s1">&#39;generator&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;sa_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;67043ebb&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;sample_composition&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mf">18.0</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="mf">14.0</span><span class="p">},</span>
-            <span class="s1">&#39;sample_name&#39;</span><span class="p">:</span> <span class="s1">&#39;undoped_ptp&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;sample_phase&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C18H14&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
-            <span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;ad7be0bf-b52e-44f6-ad99-9fb330414df2&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;scan_id&#39;</span><span class="p">:</span> <span class="mi">980</span><span class="p">,</span>
-            <span class="s1">&#39;sp_computed_exposure&#39;</span><span class="p">:</span> <span class="mf">120.0</span><span class="p">,</span>
-            <span class="s1">&#39;sp_num_frames&#39;</span><span class="p">:</span> <span class="mf">60.0</span><span class="p">,</span>
-            <span class="s1">&#39;sp_plan_name&#39;</span><span class="p">:</span> <span class="s1">&#39;ct&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;sp_requested_exposure&#39;</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span>
-            <span class="s1">&#39;sp_time_per_frame&#39;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
-            <span class="s1">&#39;sp_type&#39;</span><span class="p">:</span> <span class="s1">&#39;ct&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;sp_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;6da5d267-257a-44e8-9b7c-068d08ab7f68&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="mf">1508919212.3547237</span><span class="p">,</span>
-            <span class="s1">&#39;uid&#39;</span><span class="p">:</span> <span class="s1">&#39;14c5fe8a-0462-4df4-8440-f738ccd83380&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;xpdacq_md_version&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span></div>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;analysis_stage&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;beamline_config&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="s2">&quot;beamline_id&quot;</span><span class="p">:</span> <span class="s2">&quot;28-ID-2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bt_experimenters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Long&quot;</span><span class="p">,</span> <span class="s2">&quot;Yang&quot;</span><span class="p">,</span> <span class="s2">&quot;Elizabeth&quot;</span><span class="p">,</span> <span class="s2">&quot;Culbertson&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;bt_piLast&quot;</span><span class="p">:</span> <span class="s2">&quot;Billinge&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bt_safN&quot;</span><span class="p">:</span> <span class="s2">&quot;301750&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bt_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;34f53730&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bt_wavelength&quot;</span><span class="p">:</span> <span class="mf">0.1867</span><span class="p">,</span>
+        <span class="s2">&quot;composition_string&quot;</span><span class="p">:</span> <span class="s2">&quot;C18.0H14.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;detector_calibration_client_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;57d48021-d6a3-4b98-99ac&quot;</span>
+        <span class="s2">&quot;-dfc9ba4cdff2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;detectors&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;pe1&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;facility&quot;</span><span class="p">:</span> <span class="s2">&quot;NSLS-II&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;group&quot;</span><span class="p">:</span> <span class="s2">&quot;XPD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hints&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dimensions&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;primary&quot;</span><span class="p">]]},</span>
+        <span class="s2">&quot;lead_experimenter&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Elizabeth&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;mask_client_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;57d48021-d6a3-4b98-99ac-dfc9ba4cdff2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;num_intervals&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;num_points&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;plan_args&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;detectors&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;PerkinElmerContinuous(prefix=&#39;XF:28IDC-ES:1{Det:PE1}&#39;, &quot;</span>
+                <span class="s2">&quot;name=&#39;pe1&#39;, read_attrs=[&#39;tiff&#39;, &#39;stats1.total&#39;], &quot;</span>
+                <span class="s2">&quot;configuration_attrs=[&#39;cam&#39;, &#39;images_per_set&#39;, &quot;</span>
+                <span class="s2">&quot;&#39;number_of_sets&#39;])&quot;</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;num&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;plan_name&quot;</span><span class="p">:</span> <span class="s2">&quot;count&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plan_type&quot;</span><span class="p">:</span> <span class="s2">&quot;generator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sa_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;67043ebb&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sample_composition&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="mf">18.0</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="mf">14.0</span><span class="p">},</span>
+        <span class="s2">&quot;sample_name&quot;</span><span class="p">:</span> <span class="s2">&quot;undoped_ptp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sample_phase&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;C18H14&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+        <span class="s2">&quot;sc_dk_field_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;ad7be0bf-b52e-44f6-ad99-9fb330414df2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scan_id&quot;</span><span class="p">:</span> <span class="mi">980</span><span class="p">,</span>
+        <span class="s2">&quot;sp_computed_exposure&quot;</span><span class="p">:</span> <span class="mf">120.0</span><span class="p">,</span>
+        <span class="s2">&quot;sp_num_frames&quot;</span><span class="p">:</span> <span class="mf">60.0</span><span class="p">,</span>
+        <span class="s2">&quot;sp_plan_name&quot;</span><span class="p">:</span> <span class="s2">&quot;ct&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sp_requested_exposure&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span>
+        <span class="s2">&quot;sp_time_per_frame&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+        <span class="s2">&quot;sp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ct&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sp_uid&quot;</span><span class="p">:</span> <span class="s2">&quot;6da5d267-257a-44e8-9b7c-068d08ab7f68&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="mf">1508919212.3547237</span><span class="p">,</span>
+        <span class="s2">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;14c5fe8a-0462-4df4-8440-f738ccd83380&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;xpdacq_md_version&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="close_mpl_figs"><a class="viewcode-back" href="../../../xpdan.tests.html#xpdan.tests.conftest.close_mpl_figs">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="n">autouse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

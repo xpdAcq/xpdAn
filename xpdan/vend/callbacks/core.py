@@ -471,11 +471,12 @@ class RunRouter(CallbackBase):
             callback(name, doc)
     """
 
-    def __init__(self, callback_factories):
+    def __init__(self, callback_factories, **kwargs):
         self.callback_factories = callback_factories
         self.callbacks = defaultdict(list)  # start uid -> callbacks
         self.descriptors = {}  # descriptor uid -> start uid
         self.resources = {}  # resource uid -> start uid
+        self.kwargs = kwargs
 
     def _event_or_bulk_event(self, doc):
         descriptor_uid = doc["descriptor"]
@@ -533,7 +534,7 @@ class RunRouter(CallbackBase):
 
     def start(self, doc):
         for callback_factory in self.callback_factories:
-            cb = callback_factory(doc)
+            cb = callback_factory(doc, **self.kwargs)
             if cb is None:
                 # The callback_factory is not interested in this run.
                 continue
@@ -637,7 +638,7 @@ class Retrieve(CallbackBase):
             ev = event
         data = ev["data"]
         filled = ev["filled"]
-        for k in set(data) & fields & set(k for k in data if not filled[k]):
+        for k in set(data) & fields & set(k for k in data if not filled.get(k, True)):
             # Try to fill the data
             try:
                 v = self.retrieve_datum(data[k])

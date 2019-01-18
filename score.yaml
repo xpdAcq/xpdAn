@@ -38,6 +38,7 @@ run:
     bleeding: {orch: 'https://github.com/xpdAcq/SHED.git'}
   xpdconf:
     default: {conda: xpdconf}
+    bleeding: {orch: 'https://github.com/xpdAcq/xpdConf.git'}
   xpdsim:
     default: {conda: xpdsim}
   xpdtools:

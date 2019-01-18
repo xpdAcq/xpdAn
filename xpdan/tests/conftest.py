@@ -29,6 +29,7 @@ from skbeam.io.fit2d import fit2d_save
 from xpdan.fuzzybroker import FuzzyBroker
 from .utils import insert_imgs
 
+import matplotlib.pyplot as plt
 
 if sys.version_info >= (3, 0):
     pass
@@ -177,3 +178,12 @@ def test_md():
             'time': 1508919212.3547237,
             'uid': '14c5fe8a-0462-4df4-8440-f738ccd83380',
             'xpdacq_md_version': 0.1}
+
+
+@pytest.fixture(scope='function', autouse=True)
+def close_mpl_figs():
+    existing = plt.get_fignums()
+    yield
+    new_and_existing = plt.get_fignums()
+    for fig in set(new_and_existing) ^ set(existing):
+        plt.close(fig)

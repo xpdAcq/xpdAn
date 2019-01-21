@@ -3,7 +3,7 @@ import copy
 from databroker.broker import Broker
 from xpdan.pipelines.to_event_model import pipeline_order as tem_pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
-from xpdan.startup.analysis import (
+from xpdan.startup.analysis_server import (
     create_analysis_pipeline,
     pipeline_order,
     start_server,

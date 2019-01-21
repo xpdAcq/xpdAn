@@ -1,10 +1,22 @@
-"""Tools for starting and managing the analysis server"""
+"""Server for analyzing data at XPD
+
+Notes
+-----
+This module can be called via a ``fire`` cli or used interactively.
+"""
+import copy
+from warnings import warn
+
+import fire
+
 from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import install_qt_kicker
 from rapidz import Stream
 from rapidz.link import link
 from xpdan.pipelines.main import pipeline_order
+from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
+from xpdan.pipelines.to_event_model import pipeline_order as tem_pipeline_order
 from xpdan.pipelines.to_event_model import (
     to_event_stream_with_ind,
     to_event_stream_no_ind,
@@ -13,6 +25,15 @@ from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar
 from xpdan.vend.callbacks.zmq import Publisher
 from xpdconf.conf import glbl_dict
+from xpdtools.pipelines.extra import std_gen, z_score_gen
+from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
+
+order = (
+    pipeline_order
+    + [std_gen, z_score_gen, max_intensity_mean, max_gr_mean]
+    + tem_pipeline_order
+    + qoi_pipeline_order
+)
 
 
 def start_analysis(save=True, vis=True, **kwargs):
@@ -33,6 +54,7 @@ def start_analysis(save=True, vis=True, **kwargs):
     base_folder : str
         The base folder for saving files
     """
+    warn(DeprecationWarning("Use the server instead"))
     # TODO: also start up grave vis, maybe?
     d = RemoteDispatcher(glbl_dict["outbound_proxy_address"])
     install_qt_kicker(
@@ -119,54 +141,35 @@ def create_analysis_pipeline(order, **kwargs):
     return namespace
 
 
-def start_server(source, inbound_prefix=b"raw"):
-    """Create and start the server passing documents with the prefix of
-    ``inbound_prefix`` to the ``source``
+def run_server(
+    order=order,
+    db=glbl_dict["exp_db"],
+    outbound_proxy_address=glbl_dict["outbound_proxy_address"],
+    prefix=b"raw",
+    **kwargs
+):
+    db.prepare_hook = lambda x, y: copy.deepcopy(y)
 
-    Parameters
-    ----------
-    source : Stream
-        The inbound node of the pipeline
-    inbound_prefix : str
-        The binary string representing the prefix to pull data from via ZMQ
+    if "db" not in kwargs:
+        kwargs.update(db=db)
 
-    Returns
-    -------
+    namespace = create_analysis_pipeline(order, **kwargs)
 
-    """
     d = RemoteDispatcher(
-        glbl_dict["outbound_proxy_address"],
+        outbound_proxy_address,
         # accept the raw data
-        prefix=inbound_prefix,
+        prefix=prefix,
     )
     install_qt_kicker(loop=d.loop)
 
-    d.subscribe(lambda *x: source.emit(x))
+    d.subscribe(lambda *x: namespace["raw_source"].emit(x))
     print("Starting Analysis Server")
     d.start()
 
 
+def run_main():
+    fire.Fire(run_server)
+
+
 if __name__ == "__main__":
-    import copy
-
-    from xpdan.pipelines.to_event_model import (
-        pipeline_order as tem_pipeline_order
-    )
-    from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
-    from xpdtools.pipelines.extra import std_gen, z_score_gen
-    from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
-    from xpdconf.conf import glbl_dict
-
-    db = glbl_dict["exp_db"]
-    db.prepare_hook = lambda x, y: copy.deepcopy(y)
-
-    order = (
-        pipeline_order
-        + [std_gen, z_score_gen, max_intensity_mean, max_gr_mean]
-        + tem_pipeline_order
-        + qoi_pipeline_order
-    )
-    namespace = create_analysis_pipeline(
-        order, db=db, image_name="pe1_image", mask_setting={"setting": "first"}
-    )
-    start_server(namespace["raw_source"])
+    run_main()

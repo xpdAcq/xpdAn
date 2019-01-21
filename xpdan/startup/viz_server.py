@@ -5,7 +5,6 @@ from matplotlib.colors import SymLogNorm
 from bluesky.utils import install_qt_kicker
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
-# pull from local data, not needed at beamline
 from xpdan.vend.callbacks.core import RunRouter
 from xpdan.vend.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
@@ -35,8 +34,6 @@ def fig_factory(x):
     fig : Figure
         The figure
     """
-    print(x)
-    print(figure_pool)
     # if the figure is closed remove it from the pool
     remove_figs = []
     for fig in figure_pool:
@@ -118,8 +115,7 @@ rr = RunRouter(
 )
 
 d.subscribe(rr)
-# d.subscribe(lambda *x: pprint(x[0]))
-print("Starting Viz Server")
 
 if __name__ == "__main__":
+    print("Starting Viz Server")
     d.start()

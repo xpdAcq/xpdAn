@@ -5,7 +5,10 @@ from rapidz import Stream
 from rapidz.link import link
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
-from xpdan.pipelines.to_event_model import to_event_stream_with_ind
+from xpdan.pipelines.to_event_model import (
+    to_event_stream_with_ind,
+    to_event_stream_no_ind,
+)
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar
 from xpdan.vend.callbacks.zmq import Publisher
@@ -84,6 +87,33 @@ def create_analysis_pipeline(order, **kwargs):
                 if k in namespace
             ],
             publisher=an_with_ind_pub
+        )
+    )
+
+    an_with_no_ind_pub = Publisher(
+        glbl_dict["inbound_proxy_address"], prefix=b"clean_an"
+    )
+    namespace.update(
+        to_event_stream_no_ind(
+            *[
+                namespace[k]
+                for k in [
+                    "dark_corrected_tes",
+                    "bg_corrected_tes",
+                    # XXX: reinstate this when pyfai calibrations are pickle
+                    # friendly ( > 0.16)
+                    # "geometry_tes",
+                    "mask_tes",
+                    "integration_tes",
+                    "fq_tes",
+                    "mask_overlay_tes",
+                    "pdf_tes",
+                    "max_tes",
+                    "max_pdf_tes",
+                ]
+                if k in namespace
+            ],
+            publisher=an_with_no_ind_pub
         )
     )
     return namespace

@@ -670,7 +670,6 @@ class ExportCallback(Retrieve):
     """
 
     def __init__(self, new_root, handler_reg, root_map=None):
-        # TODO: fix this, since it is a dirty hack which only works for ADTIFF
         super().__init__(handler_reg, root_map)
         self.new_root = new_root
         self.old_root = None
@@ -684,10 +683,12 @@ class ExportCallback(Retrieve):
 
     def datum(self, doc):
         super().datum(doc)
-        # retrieve the datum using path only handler?
+
         resource = self.resources[doc["resource"]]
         handler_class = self.handler_reg[resource["spec"]]
         key = (str(resource["uid"]), handler_class.__name__)
+
+        # this comes back as a single element list for one datum
         fin = self.handlers[key].get_file_list([doc["datum_kwargs"]])[0]
 
         # replace the root with the new root
@@ -695,6 +696,7 @@ class ExportCallback(Retrieve):
 
         ensure_path_exists(os.path.dirname(fout))
         # cp fin, new_path
+        print(fin, fout)
         shutil.copy2(fin, fout)
 
     def event(self, doc):

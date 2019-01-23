@@ -67,7 +67,8 @@ class Publisher:
 
     def __call__(self, name, doc):
         doc = copy.deepcopy(doc)
-        apply_to_dict_recursively(doc, sanitize_np)
+        # This is not needed here
+        # apply_to_dict_recursively(doc, sanitize_np)
         message = b' '.join([self._prefix,
                              name.encode(),
                              self._serializer(doc)])

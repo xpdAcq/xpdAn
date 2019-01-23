@@ -423,19 +423,6 @@ class LiveTable(CallbackBase):
         self._out(out_str)
 
 
-class StartStopCallback(CallbackBase):
-    def __init__(self):
-        self.t0 = 0
-
-    def start(self, doc):
-        self.t0 = doc["time"]
-        print("START ANALYSIS ON {}".format(doc["uid"]))
-
-    def stop(self, doc):
-        print("FINISH ANALYSIS ON {}".format(doc.get("run_start", "NA")))
-        print("Analysis time {}".format(doc["time"] - self.t0))
-
-
 class RunRouter(CallbackBase):
     """
     Routes documents, by run, to callbacks it creates from factory functions.
@@ -545,7 +532,7 @@ class RunRouter(CallbackBase):
     def stop(self, doc):
         start_uid = doc["run_start"]
         # Clean up references.
-        cbs = self.callbacks.pop(start_uid)
+        cbs = self.callbacks.pop(start_uid, [])
         if not cbs:
             return
         to_remove = []
@@ -638,7 +625,11 @@ class Retrieve(CallbackBase):
             ev = event
         data = ev["data"]
         filled = ev["filled"]
-        for k in set(data) & fields & set(k for k in data if not filled.get(k, True)):
+        for k in (
+            set(data)
+            & fields
+            & set(k for k in data if not filled.get(k, True))
+        ):
             # Try to fill the data
             try:
                 v = self.retrieve_datum(data[k])

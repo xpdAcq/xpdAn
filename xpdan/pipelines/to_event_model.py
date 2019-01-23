@@ -1,7 +1,7 @@
 """Event Model mirror of xpdtools.pipelines.raw_pipeline meant to accept nodes
 from the raw pipeline and convert them to Event Model"""
 from shed.simple import SimpleToEventStream, AlignEventStreams
-from xpdtools.tools import overlay_mask
+from xpdtools.tools import overlay_mask, splay_tuple
 
 
 def to_event_stream_with_ind(raw_stripped, *nodes, publisher, **kwargs):
@@ -47,15 +47,26 @@ def gen_mask(mask, pol_corrected_img, **kwargs):
     return locals()
 
 
-def integration(mean, q, tth, std=None, **kwargs):
+def integration(mean, q, tth, std=None, median=None, **kwargs):
+    merge_names = ["mean"]
+    merge_streams = []
     if std:
-        merge_names = ("mean", "std", "q", "tth")
-        integration_merge = mean.combine_latest(*(std, q, tth), emit_on=1)
-
+        merge_names += ["std"]
+        merge_streams += [std]
+    if median:
+        merge_names += ["median"]
+        merge_streams += [median]
+    if merge_streams:
+        merge = mean.zip(*merge_streams)
+        # need to splay so we have everything at the same level
+        integration_merge = merge.combine_latest(q, tth, emit_on=0).map(
+            splay_tuple
+        )
     else:
-        integration_merge = mean.combine_latest(*(q, tth), emit_on=0)
-        merge_names = ("mean", "q", "tth")
+        merge = mean
+        integration_merge = merge.combine_latest(q, tth, emit_on=0)
 
+    merge_names += ["q", "tth"]
     # TODO: stuff q/tth hints into start doc
     integration_tes = SimpleToEventStream(
         integration_merge, merge_names, analysis_stage="integration"
@@ -71,7 +82,9 @@ def pdf_gen(fq, pdf, **kwargs):
     )
 
     pdf_tes = SimpleToEventStream(
-        pdf, ("r", "gr", "config"), analysis_stage="pdf"
+        pdf, ("r", "gr",
+              # "config"
+              ), analysis_stage="pdf"
     )
     return locals()
 

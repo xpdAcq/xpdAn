@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-from shed.translation import FromEventStream
+from shed.simple import SimpleFromEventStream as FromEventStream
 from rapidz import move_to_first, union
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
@@ -84,7 +84,7 @@ def start_gen(
     """
     if calibration_md_folder is None:
         calibration_md_folder = {"folder": "xpdAcq_calib_info.yml"}
-    raw_source.sink(lambda x: print(x[0]))
+    # raw_source.sink(lambda x: print(x[0]))
     # Build the general pipeline from the raw_pipeline
 
     # TODO: change this when new dark logic comes
@@ -95,13 +95,14 @@ def start_gen(
     # Fill the raw event stream
     source = (
         raw_source.combine_latest(dk_uid)
-            .filter(lambda x: x[1])
-            .pluck(0)
-            .starmap(
-            Retrieve(handler_reg=db.reg.handler_reg, root_map=db.reg.root_map))
-            .filter(lambda x: x[0] not in ['resource', 'datum'])
+        .filter(lambda x: x[1])
+        .pluck(0)
+        .starmap(
+            Retrieve(handler_reg=db.reg.handler_reg, root_map=db.reg.root_map)
+        )
+        .filter(lambda x: x[0] not in ["resource", "datum"])
     )
-    source.sink(print)
+    # source.sink(print)
     # Get all the documents
     start_docs = FromEventStream("start", (), source)
     descriptor_docs = FromEventStream(
@@ -197,6 +198,7 @@ def start_gen(
                 .map(lambda x: x if not isinstance(x, list) else x[0])
                 .map(lambda x: x.documents(fill=True))
                 .flatten(),
+                stream_name="raw_background_dark",
             )
             for image_name in image_names
         ]
@@ -215,7 +217,12 @@ def start_gen(
     # Get background
     raw_background = union(
         *[
-            FromEventStream("event", ("data", image_name), bg_docs)
+            FromEventStream(
+                "event",
+                ("data", image_name),
+                bg_docs,
+                stream_name="raw_background",
+            )
             for image_name in image_names
         ]
     ).map(np.float32)
@@ -229,7 +236,6 @@ def start_gen(
         # This doesn't make sense in multi-stream settings
         event_stream_name="primary",
     )
-
     raw_foreground = union(
         *[
             FromEventStream(

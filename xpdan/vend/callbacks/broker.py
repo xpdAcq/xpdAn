@@ -114,7 +114,7 @@ class LiveImage(Retrieve):
                 self.cs_dict[field]._fig.number
             ):
                 continue
-            fig = plt.figure()
+            fig = plt.figure(field)
             cs = CrossSection(
                 fig,
                 self.cmap,

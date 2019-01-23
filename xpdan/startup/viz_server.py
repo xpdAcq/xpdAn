@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib.colors import SymLogNorm
 
 from bluesky.utils import install_qt_kicker
+from xpdan.startup.pack_unpack import deserializer
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
 from xpdan.vend.callbacks.core import RunRouter
@@ -28,61 +29,15 @@ def run_server(
 ):
 
     if handlers is None:
-        for db in ['exp_db', 'an_db']:
+        for db in ["exp_db", "an_db"]:
             if db in glbl_dict:
                 handlers = glbl_dict[db].reg.handler_reg
                 break
     if prefix is None:
         prefix = [b"an", b"raw"]
-    figure_pool = {}
 
-    # TODO: maybe remove this?
-    def fig_factory(x):
-        """Create figures as needed, reusing old figures when they are no longer
-        in use (eg the run has finished)
-
-        Parameters
-        ----------
-        x : str
-            The figure label name
-
-        Returns
-        -------
-        fig : Figure
-            The figure
-        """
-        # if the figure is closed remove it from the pool
-        remove_figs = []
-        for fig in figure_pool:
-            if not plt.fignum_exists(fig.number):
-                remove_figs.append(fig)
-        for fig in remove_figs:
-            figure_pool.pop(fig)
-
-        for fig, in_use in figure_pool.items():
-            if not in_use:
-                fig.clear()
-                figure_pool[fig] = True
-                return fig
-        fig = plt.figure(x)
-        figure_pool[fig] = True
-        return fig
-
-    def teardown(fig):
-        """Slate the figure for reuse
-
-        Parameters
-        ----------
-        fig : Figure
-            The figure to be reused
-
-        Returns
-        -------
-
-        """
-        figure_pool[fig] = False
-
-    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
+    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix,
+                         deserializer=deserializer)
     install_qt_kicker(loop=d.loop)
 
     rr = RunRouter(

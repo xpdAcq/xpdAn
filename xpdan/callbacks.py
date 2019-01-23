@@ -16,14 +16,31 @@ class StartStopCallback(CallbackBase):
 
     def __init__(self):
         self.t0 = 0
+        self.event_t0 = None
 
     def start(self, doc):
         self.t0 = time.time()
-        print('START ANALYSIS ON {}'.format(doc['uid']))
+        self.total_analysis_time = 0
+        self.n_events = 0
+        print("START ANALYSIS ON {}".format(doc["uid"]))
+
+    def event(self, doc):
+        self.n_events = doc["seq_num"]
+        if not self.event_t0:
+            self.event_t0 = time.time()
+        else:
+            self.total_analysis_time += time.time() - self.event_t0
+            print("Simgle Event Analysis time {}".format(time.time() - self.event_t0))
+            self.event_t0 = time.time()
 
     def stop(self, doc):
         print("FINISH ANALYSIS ON {}".format(doc.get("run_start", "NA")))
-        print('Analysis time {}'.format(time.time() - self.t0))
+        print(
+            "Average Event analysis time {}".format(
+                self.total_analysis_time / self.n_events
+            )
+        )
+        print("Analysis time {}".format(time.time() - self.t0))
 
 
 class SaveBaseClass(Retrieve):
@@ -43,8 +60,9 @@ class SaveBaseClass(Retrieve):
         document is received
     """
 
-    def __init__(self, template, handler_reg, root_map=None,
-                 base_folders=None, **kwargs):
+    def __init__(
+        self, template, handler_reg, root_map=None, base_folders=None, **kwargs
+    ):
         if base_folders is None:
             base_folders = []
         elif isinstance(base_folders, str):
@@ -60,7 +78,7 @@ class SaveBaseClass(Retrieve):
         self.dep_shapes = {}
         # If you see this filename something bad happened (no metadata was
         #  captured/formatted)
-        self.filenames = 'something_horrible_happened.xxx'
+        self.filenames = "something_horrible_happened.xxx"
 
         super().__init__(handler_reg, root_map)
 
@@ -108,10 +126,14 @@ class SaveBaseClass(Retrieve):
         return super().descriptor(doc)
 
     def event(self, doc):
-        self.filenames = [pfmt.format(
-            self.descriptor_templates[doc["descriptor"]], event=doc,
-            base_folder=bf
-        ).replace(".", ",") for bf in self.base_folders]
+        self.filenames = [
+            pfmt.format(
+                self.descriptor_templates[doc["descriptor"]],
+                event=doc,
+                base_folder=bf,
+            ).replace(".", ",")
+            for bf in self.base_folders
+        ]
         # Note that formally there are more steps to the formatting, but we
         #  should have the folder by now
         for filename in self.filenames:

@@ -13,24 +13,32 @@ from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import install_qt_kicker
 from rapidz import Stream
 from rapidz.link import link
+from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
 from xpdan.pipelines.to_event_model import pipeline_order as tem_pipeline_order
-from xpdan.pipelines.to_event_model import (
-    to_event_stream_with_ind,
-    to_event_stream_no_ind,
-)
+from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar
 from xpdan.vend.callbacks.zmq import Publisher
 from xpdconf.conf import glbl_dict
-from xpdtools.pipelines.extra import std_gen, z_score_gen
+from xpdtools.pipelines.extra import std_gen, median_gen, z_score_gen
 from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
+
+from xpdan.startup.pack_unpack import serializer, deserializer
+
 
 order = (
     pipeline_order
-    + [std_gen, z_score_gen, max_intensity_mean, max_gr_mean]
+    + [
+        # std_gen,
+        # median_gen,
+        # z_score_gen,
+        # z_score_tem,
+        max_intensity_mean,
+        max_gr_mean,
+    ]
     + tem_pipeline_order
     + qoi_pipeline_order
 )
@@ -83,7 +91,8 @@ def create_analysis_pipeline(order, **kwargs):
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"an"
+        glbl_dict["inbound_proxy_address"], prefix=b"an",
+        serializer=serializer
     )
     # strip the dependant vars form the raw data
     raw_stripped = raw_source.starmap(StripDepVar())
@@ -95,9 +104,7 @@ def create_analysis_pipeline(order, **kwargs):
                 for k in [
                     "dark_corrected_tes",
                     "bg_corrected_tes",
-                    # XXX: reinstate this when pyfai calibrations are pickle
-                    # friendly ( > 0.16)
-                    # "geometry_tes",
+                    "geometry_tes",
                     "mask_tes",
                     "integration_tes",
                     "fq_tes",
@@ -105,6 +112,7 @@ def create_analysis_pipeline(order, **kwargs):
                     "pdf_tes",
                     "max_tes",
                     "max_pdf_tes",
+                    "z_score_tes",
                 ]
                 if k in namespace
             ],
@@ -112,6 +120,7 @@ def create_analysis_pipeline(order, **kwargs):
         )
     )
 
+    """
     an_with_no_ind_pub = Publisher(
         glbl_dict["inbound_proxy_address"], prefix=b"clean_an"
     )
@@ -124,7 +133,7 @@ def create_analysis_pipeline(order, **kwargs):
                     "bg_corrected_tes",
                     # XXX: reinstate this when pyfai calibrations are pickle
                     # friendly ( > 0.16)
-                    # "geometry_tes",
+                    "geometry_tes",
                     "mask_tes",
                     "integration_tes",
                     "fq_tes",
@@ -138,6 +147,7 @@ def create_analysis_pipeline(order, **kwargs):
             publisher=an_with_no_ind_pub
         )
     )
+    """
     return namespace
 
 
@@ -159,6 +169,7 @@ def run_server(
         outbound_proxy_address,
         # accept the raw data
         prefix=prefix,
+        deserializer=deserializer
     )
     install_qt_kicker(loop=d.loop)
 

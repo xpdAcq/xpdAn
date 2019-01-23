@@ -10,7 +10,9 @@ from shed.simple import SimpleFromEventStream
 import bluesky.plans as bp
 from ophyd.sim import NumpySeqHandler
 from rapidz import Stream
-from xpdan.startup.portable_db_server import run_server as save_run_server
+from xpdan.startup.portable_db_server import (
+    run_server as portable_db_run_sever
+)
 from xpdan.startup.viz_server import run_server as viz_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
@@ -38,10 +40,12 @@ def test_save_run_server(tmpdir, proxy, RE, hw):
             "event",
             ("data", "img"),
             raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
-            principle=True
-        ).map(lambda x: x * 2).SimpleToEventStream(("img2", ),
-                                                   analysis_stage='pdf'
-                                                   ).starsink(pp)
+            principle=True,
+        ).map(lambda x: x * 2).SimpleToEventStream(
+            ("img2",), analysis_stage="pdf"
+        ).starsink(
+            pp
+        )
         RE.subscribe(lambda *x: raw_source.emit(x))
 
         RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
@@ -56,7 +60,7 @@ def test_save_run_server(tmpdir, proxy, RE, hw):
     threading.Thread(target=delayed_sigint, args=(10,)).start()
     try:
         print("running server")
-        save_run_server(fn, handlers={"NPY_SEQ": NumpySeqHandler})
+        portable_db_run_sever(fn, handlers={"NPY_SEQ": NumpySeqHandler})
 
     except KeyboardInterrupt:
         print("finished server")
@@ -89,10 +93,12 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
             "event",
             ("data", "img"),
             raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
-            principle=True
-        ).map(lambda x: x * 2).SimpleToEventStream(("img2", ),
-                                                   analysis_stage='pdf'
-                                                   ).starsink(pp)
+            principle=True,
+        ).map(lambda x: x * 2).SimpleToEventStream(
+            ("img2",), analysis_stage="pdf"
+        ).starsink(
+            pp
+        )
         RE.subscribe(lambda *x: raw_source.emit(x))
 
         RE(bp.count([hw.img], md=dict(analysis_stage="raw")))

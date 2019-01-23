@@ -67,24 +67,35 @@ def integration(mean, q, tth, std=None, median=None, **kwargs):
         integration_merge = merge.combine_latest(q, tth, emit_on=0)
 
     merge_names += ["q", "tth"]
-    # TODO: stuff q/tth hints into start doc
     integration_tes = SimpleToEventStream(
-        integration_merge, merge_names, analysis_stage="integration"
+        integration_merge,
+        merge_names,
+        analysis_stage="integration",
+        # TODO: might push q/tth into the same list
+        hints=dict(dimensions=[(["q"], "primary"), (["tth"], "primary")]),
     )
     return locals()
 
 
-def pdf_gen(fq, pdf, **kwargs):
-    # TODO: sq TES
-    # TODO: stuff q/r hints into start doc
+def pdf_gen(fq, sq, pdf, **kwargs):
     fq_tes = SimpleToEventStream(
-        fq, ("q", "fq", "config"), analysis_stage="fq"
+        fq,
+        ("q", "fq", "config"),
+        analysis_stage="fq",
+        hints=dict(dimensions=[(["q"], "primary")]),
+    )
+    sq_tes = SimpleToEventStream(
+        fq,
+        ("q", "sq", "config"),
+        analysis_stage="sq",
+        hints=dict(dimensions=[(["q"], "primary")]),
     )
 
     pdf_tes = SimpleToEventStream(
-        pdf, ("r", "gr",
-              # "config"
-              ), analysis_stage="pdf"
+        pdf,
+        ("r", "gr", "config"),
+        analysis_stage="pdf",
+        hints=dict(dimensions=[(["r"], "primary")]),
     )
     return locals()
 

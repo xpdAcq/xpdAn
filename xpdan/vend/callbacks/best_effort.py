@@ -16,6 +16,7 @@ import time
 from warnings import warn
 import weakref
 
+from xpdan.vend.callbacks.core import hinted_fields
 from .core import CallbackBase, LiveTable
 from .mpl_plotting import LivePlot, LiveGrid, LiveScatter
 from .fitting import PeakStats
@@ -211,7 +212,13 @@ class BestEffortCallback(CallbackBase):
                 self._table("descriptor", doc)
 
         # ## DECIDE WHICH KIND OF PLOT CAN BE USED ## #
-
+        # only use columns we can plot!
+        columns = [
+            c
+            for c in columns
+            if doc["data_keys"][c]["dtype"]
+            in ("number", "integer", "float64", "float32")
+        ]
         if not self._plots_enabled:
             return
         if stream_name in self.noplot_streams:
@@ -219,7 +226,7 @@ class BestEffortCallback(CallbackBase):
         if not columns:
             return
         if (
-            (self._start_doc.get("num_points", '') == 1)
+            (self._start_doc.get("num_points", "") == 1)
             and (stream_name == self.dim_stream)
             and self.omit_single_point_plot
         ):
@@ -300,8 +307,6 @@ class BestEffortCallback(CallbackBase):
                         "Omitting {} from plot because dtype is {}"
                         "".format(y_key, dtype)
                     )
-                    # close extra figure made for config
-                    plt.close(ax.figure)
                     continue
                 # Create an instance of LivePlot and an instance of PeakStats.
                 live_plot = LivePlotPlusPeaks(
@@ -589,21 +594,3 @@ class LivePlotPlusPeaks(LivePlot):
     def stop(self, doc):
         self.check_visibility()
         super().stop(doc)
-
-
-def hinted_fields(descriptor):
-    # Figure out which columns to put in the table.
-    obj_names = list(descriptor["object_keys"])
-    # We will see if these objects hint at whether
-    # a subset of their data keys ('fields') are interesting. If they
-    # did, we'll use those. If these didn't, we know that the RunEngine
-    # *always* records their complete list of fields, so we can use
-    # them all unselectively.
-    columns = []
-    for obj_name in obj_names:
-        try:
-            fields = descriptor.get("hints", {}).get(obj_name, {})["fields"]
-        except KeyError:
-            fields = descriptor["object_keys"][obj_name]
-        columns.extend(fields)
-    return columns

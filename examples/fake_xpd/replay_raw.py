@@ -14,9 +14,9 @@ db.prepare_hook = lambda x, y: copy.deepcopy(y)
 
 from xpdconf.conf import glbl_dict
 
-p = Publisher(glbl_dict["inbound_proxy_address"], prefix=b"raw",
-              serializer=serializer
-              )
+p = Publisher(
+    glbl_dict["inbound_proxy_address"], prefix=b"raw", serializer=serializer
+)
 
 stopped = False
 t0 = time.time()
@@ -28,11 +28,24 @@ try:
             if e[0] == "start":
                 e[1].update(composition_string="EuTiO3")
                 e[1].update(
-                    hints={"dimensions": [(["temperature"], "primary")]}
+                    hints={
+                        "dimensions": [
+                            (
+                                ["temperature", "temperature_setpoint"],
+                                "primary",
+                            )
+                        ]
+                    }
                 )
                 e[1].update(analysis_stage="raw")
             if e[0] == "descriptor":
-                e[1].update(hints={"cs700": {"fields": ["temperature"]}})
+                e[1].update(
+                    hints={
+                        "cs700": {
+                            "fields": ["temperature", "temperature_setpoint"]
+                        }
+                    }
+                )
             # if e[0] == "event":
             # if e[1]["seq_num"] > 3:
             #     break
@@ -41,9 +54,10 @@ try:
                     e[1].update(run_start=start["uid"])
             if e[0] == "stop":
                 stopped = True
-            #pprint(e[1])
+            print(e[0])
+            # pprint(e[1])
             p(*e)
-            # input()
+            input()
             # time.sleep(1)
         # e = ("stop", stop)
         # p(*e)

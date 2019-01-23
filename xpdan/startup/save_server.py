@@ -33,6 +33,7 @@ base_template = (
     "{base_folder}/{folder_prefix}/"
     "{start[analysis_stage]}/"
     "{start[sample_name]}_"
+    # The writers handle the trailing ``_``
     "{human_timestamp}_"
     "{__independent_vars__}"
     "{start[uid]:.6}_"
@@ -41,7 +42,7 @@ base_template = (
 
 
 def run_server(
-    base_folders=glbl_dict["tiff_base"],
+    base_folders=None,
     template=base_template,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     db_names=("exp_db", "an_db"),
@@ -63,12 +64,24 @@ def run_server(
         The names of the databases in the ``glbl_dict`` which to use for data
         loading handlers
     """
+    if base_folders is None:
+        base_folders = []
+
+    if isinstance(base_folders, str):
+        base_folders = [base_folders]
+    if isinstance(base_folders, tuple):
+        base_folders = list(base_folders)
+    if isinstance(glbl_dict["tiff_base"], str):
+        glbl_dict["tiff_base"] = [glbl_dict["tiff_base"]]
+
+    base_folders += glbl_dict["tiff_base"]
     # TODO: support other protocols? (REST, maybe)
     d = RemoteDispatcher(outbound_proxy_address)
-    dbs = [glbl_dict[k] for k in db_names]
+    dbs = [glbl_dict[k] for k in db_names if k in glbl_dict]
     handlers = {}
     for db in dbs:
-        handlers.update(db.reg.handler_registry)
+        handlers.update(db.reg.handler_reg)
+    print(base_folders)
 
     rr = RunRouter(
         [setup_saver],

@@ -46,7 +46,7 @@ def run_server(
     template=base_template,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     db_names=("exp_db", "an_db"),
-    prefix=[b'an', 'raw']
+    prefix=None
 ):
     """Run analysis server
 
@@ -64,7 +64,11 @@ def run_server(
     db_names : iterable of str
         The names of the databases in the ``glbl_dict`` which to use for data
         loading handlers
+    prefix : binary strings
+        Which topics to listen on for zmq
     """
+    if prefix is None:
+        prefix = [b'an', b'raw']
     if base_folders is None:
         base_folders = []
 

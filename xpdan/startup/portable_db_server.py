@@ -1,15 +1,17 @@
 import io
+from pprint import pprint
 
 import fire
 
+from bluesky.utils import apply_to_dict_recursively, sanitize_np
 from databroker import Broker
 from rapidz import Stream
+from shed.writers import NpyWriter
 from xpdan.vend.callbacks.core import RunRouter, ExportCallback
 from xpdan.vend.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
 import os
 import yaml
-
 
 portable_template = """description: '{0} database'
 metadatastore:
@@ -27,10 +29,10 @@ assets:
 
 
 def run_server(
-    folder,
-    outbound_proxy_address=glbl_dict["outbound_proxy_address"],
-    prefix=None,
-    handlers=None,
+        folder,
+        outbound_proxy_address=glbl_dict["outbound_proxy_address"],
+        prefix=None,
+        handlers=None,
 ):
     """Start up the portable databroker server
 
@@ -54,36 +56,33 @@ def run_server(
     portable_configs = {}
     for folder_name in ["an", "raw"]:
         fn = os.path.join(portable_folder, folder_name)
+        os.makedirs(fn, exist_ok=True)
         # if the path doesn't exist then make the databrokers
         with open(
-            os.path.join(portable_folder, f"{folder_name}.yml"), "w"
+                os.path.join(portable_folder, f"{folder_name}.yml"), "w"
         ) as f:
             f.write(portable_template.format(folder_name))
         print(portable_template.format(folder_name))
 
-        if not os.path.exists(fn):
-            print(fn)
-            os.makedirs(fn)
+        print(fn)
             # TODO: add more files here, eg. a databroker readme/tutorial
-            portable_configs[folder_name] = yaml.load(
-                io.StringIO(portable_template.format(fn))
-            )
-            os.makedirs(os.path.join(fn, "data"), exist_ok=True)
+        portable_configs[folder_name] = yaml.load(
+            io.StringIO(portable_template.format(fn))
+        )
+        os.makedirs(os.path.join(fn, "data"), exist_ok=True)
 
     an_broker = Broker.from_config(portable_configs["an"])
     if handlers is None:
         handlers = an_broker.reg.handler_reg
 
     an_source = Stream()
-    an_source.starmap(
-        ExportCallback(
-            os.path.join(
-                portable_configs["an"]["metadatastore"]["config"]["directory"],
-                "data",
-            ),
-            handler_reg=handlers,
-        )
-    ).starsink(an_broker.insert)
+    zed = an_source.Store(os.path.join(
+        portable_configs["an"]["metadatastore"]["config"][
+            "directory"
+        ],
+        "data",
+    ), NpyWriter)
+    zed.starsink(an_broker.insert)
 
     raw_broker = Broker.from_config(portable_configs["raw"])
 
@@ -108,7 +107,7 @@ def run_server(
         ]
         + [
             lambda x: lambda *nd: an_source.emit(nd)
-            if x.get("analysis_stage", "") == k
+            if x.get("analysis_stage", None) == k
             else None
             for k in [
                 # TODO: put this in when we have the writers hooked up

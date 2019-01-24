@@ -46,6 +46,7 @@ def run_server(
     template=base_template,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     db_names=("exp_db", "an_db"),
+    prefix=b'an'
 ):
     """Run analysis server
 
@@ -76,7 +77,7 @@ def run_server(
 
     base_folders += glbl_dict["tiff_base"]
     # TODO: support other protocols? (REST, maybe)
-    d = RemoteDispatcher(outbound_proxy_address)
+    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     dbs = [glbl_dict[k] for k in db_names if k in glbl_dict]
     handlers = {}
     for db in dbs:

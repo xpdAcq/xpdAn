@@ -17,7 +17,8 @@ from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
-from xpdan.pipelines.to_event_model import pipeline_order as tem_pipeline_order
+from xpdan.pipelines.to_event_model import \
+    pipeline_order as tem_pipeline_order, to_event_stream_no_ind
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar
@@ -108,6 +109,7 @@ def create_analysis_pipeline(order, **kwargs):
                     "mask_tes",
                     "integration_tes",
                     "fq_tes",
+                    "sq_test",
                     "mask_overlay_tes",
                     "pdf_tes",
                     "max_tes",
@@ -119,25 +121,27 @@ def create_analysis_pipeline(order, **kwargs):
             publisher=an_with_ind_pub
         )
     )
+    # '''
 
-    """
+    # """
     an_with_no_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"clean_an"
+        glbl_dict["inbound_proxy_address"], prefix=b"clean_an",
+        serializer=serializer
     )
     namespace.update(
         to_event_stream_no_ind(
             *[
                 namespace[k]
                 for k in [
-                    "dark_corrected_tes",
-                    "bg_corrected_tes",
-                    # XXX: reinstate this when pyfai calibrations are pickle
-                    # friendly ( > 0.16)
-                    "geometry_tes",
-                    "mask_tes",
+                    # "dark_corrected_tes",
+                    # "bg_corrected_tes",
+                    # XXX: reinstate this when pyfai has a saver
+                    # "geometry_tes",
+                    # "mask_tes",
                     "integration_tes",
                     "fq_tes",
-                    "mask_overlay_tes",
+                    "sq_test",
+                    # "mask_overlay_tes",
                     "pdf_tes",
                     "max_tes",
                     "max_pdf_tes",
@@ -147,7 +151,7 @@ def create_analysis_pipeline(order, **kwargs):
             publisher=an_with_no_ind_pub
         )
     )
-    """
+    # """
     return namespace
 
 

@@ -33,13 +33,11 @@ def test_SaveBaseClass(RE, hw, tmpdir):
     name_param = {
         "start": (
             "start_template",
-            "{base_folder}/a/b/c//world_motor_{event[data][motor]:1.{descriptor["
-            "data_keys][motor][precision]}f}_{descriptor[data_keys][motor]["
-            "units]}_",
+            "{base_folder}/a/b/c//world{__independent_vars__}",
         ),
         "event": (
             "filenames",
-            [f"{tmpdir.strpath}/a/b/c//world_motor_0,000_{{descriptor[data_keys][motor][units]}}_"],
+            [f"{tmpdir.strpath}/a/b/c//world_motor_0,000_arb_"],
         ),
     }
 
@@ -47,9 +45,7 @@ def test_SaveBaseClass(RE, hw, tmpdir):
         sbc(n, d)
         key = name_param.get(n, "")
         if key:
-            assert (
-                getattr(sbc, key[0], "") == name_param[n][1]
-            )
+            assert getattr(sbc, key[0], "") == name_param[n][1]
 
 
 def test_SaveTiff(RE, hw, tmpdir):
@@ -82,5 +78,5 @@ def test_SaveTiff(RE, hw, tmpdir):
         sbc(n, d)
         if n == "event":
             assert os.path.exists(
-                tmpdir.strpath + "/a/b/c//world_motor_0,000_img.tiff"
+                tmpdir.strpath + "/a/b/c//world_motor_0,000_arb_img.tiff"
             )

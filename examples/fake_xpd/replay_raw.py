@@ -46,7 +46,6 @@ try:
                         }
                     }
                 )
-            # if e[0] == "event":
             # if e[1]["seq_num"] > 3:
             #     break
             if e[0] == "resource":
@@ -57,7 +56,9 @@ try:
             print(e[0])
             # pprint(e[1])
             p(*e)
-            input()
+            if e[0] == "event":
+                input()
+            # input()
             # time.sleep(1)
         # e = ("stop", stop)
         # p(*e)

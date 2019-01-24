@@ -743,6 +743,7 @@ class StripDepVar(CallbackBase):
         for key in self.independent_vars ^ data_keys:
             new_doc["data"].pop(key)
             new_doc["timestamps"].pop(key)
+            new_doc.get("filled", {}).pop(key, None)
         return new_doc
 
 

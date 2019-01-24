@@ -69,8 +69,7 @@ class SaveBaseClass(Retrieve):
     """
 
     def __init__(
-            self, template, handler_reg, root_map=None, base_folders=None,
-            **kwargs
+        self, template, handler_reg, root_map=None, base_folders=None, **kwargs
     ):
         if base_folders is None:
             base_folders = []
@@ -119,7 +118,7 @@ class SaveBaseClass(Retrieve):
         }
 
         # Use independent vars to create the filename
-        independent_var_string = ""
+        independent_var_string = "_"
         for dim in sorted(self.dim_names):
             # Only use scalar data in filenames
             if len(self.in_dep_shapes[dim]) == 0:
@@ -127,7 +126,7 @@ class SaveBaseClass(Retrieve):
                     name=dim,
                     data=f"{{event[data][{dim}]:1.{doc['data_keys'][dim]['precision']}f}}",
                     # TODO: fill in the sig figs
-                    units=f"{doc['data_keys'][dim]['units']}",
+                    units=f"{doc['data_keys'][dim].get('units', 'arb')}",
                 )
 
         self.descriptor_templates[doc["uid"]] = pfmt.format(
@@ -144,13 +143,15 @@ class SaveBaseClass(Retrieve):
                 self.descriptor_templates[doc["descriptor"]],
                 event=doc,
                 base_folder=bf,
-            ).replace(".", ",")
+            )
+            .replace(".", ",")
+            .replace("__", "_")
             for bf in self.base_folders
         ]
         # Note that formally there are more steps to the formatting, but we
         #  should have the folder by now
         for filename in self.filenames:
-            print(f'Saving file to {filename}')
+            print(f"Saving file to {filename}")
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         return super().event(doc)
 
@@ -260,7 +261,7 @@ class SaveMeta(SaveBaseClass):
 
         for filename in self.filenames:
             fn = clean_template(pfmt.format(filename, ext=".yaml"))
-            print(f'Saving file to {fn}')
+            print(f"Saving file to {fn}")
             os.makedirs(os.path.dirname(fn), exist_ok=True)
             dump_yml(fn, doc)
 

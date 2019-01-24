@@ -34,7 +34,7 @@ def test_save_run_server(tmpdir, proxy, RE, hw):
         RE.subscribe(p)
 
         # Tiny fake pipeline
-        pp = Publisher(proxy[0], prefix=b"clean_an")
+        pp = Publisher(proxy[0], prefix=b"an")
         raw_source = Stream()
         SimpleFromEventStream(
             "event",

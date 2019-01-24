@@ -17,8 +17,10 @@ from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
-from xpdan.pipelines.to_event_model import \
-    pipeline_order as tem_pipeline_order, to_event_stream_no_ind
+from xpdan.pipelines.to_event_model import (
+    pipeline_order as tem_pipeline_order,
+    to_event_stream_no_ind,
+)
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar
@@ -92,11 +94,12 @@ def create_analysis_pipeline(order, **kwargs):
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"an",
-        serializer=serializer
+        glbl_dict["inbound_proxy_address"], prefix=b"an", serializer=serializer
     )
     # strip the dependant vars form the raw data
     raw_stripped = raw_source.starmap(StripDepVar())
+    # TODO: inspect this from the namespace
+    #  look for SimpleToEventStream nodes
     namespace.update(
         to_event_stream_with_ind(
             raw_stripped,
@@ -123,7 +126,7 @@ def create_analysis_pipeline(order, **kwargs):
     )
     # '''
 
-    # """
+    """
     an_with_no_ind_pub = Publisher(
         glbl_dict["inbound_proxy_address"], prefix=b"clean_an",
         serializer=serializer
@@ -173,7 +176,7 @@ def run_server(
         outbound_proxy_address,
         # accept the raw data
         prefix=prefix,
-        deserializer=deserializer
+        deserializer=deserializer,
     )
     install_qt_kicker(loop=d.loop)
 

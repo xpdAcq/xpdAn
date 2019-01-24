@@ -29,10 +29,10 @@ assets:
 
 
 def run_server(
-        folder,
-        outbound_proxy_address=glbl_dict["outbound_proxy_address"],
-        prefix=None,
-        handlers=None,
+    folder,
+    outbound_proxy_address=glbl_dict["outbound_proxy_address"],
+    prefix=None,
+    handlers=None,
 ):
     """Start up the portable databroker server
 
@@ -45,12 +45,12 @@ def run_server(
         ``glbl_dict["outbound_proxy_address"]``
     prefix : bytes or list of bytes, optional
         The Publisher channels to listen to. Defaults to
-        ``[b"clean_an", b"raw"]``
+        ``[b"an", b"raw"]``
     """
     # TODO: convert to bytestrings if needed
     # TODO: maybe separate this into different processes?
     if prefix is None:
-        prefix = [b"clean_an", b"raw"]
+        prefix = [b"an", b"raw"]
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     portable_folder = folder
     portable_configs = {}
@@ -59,13 +59,13 @@ def run_server(
         os.makedirs(fn, exist_ok=True)
         # if the path doesn't exist then make the databrokers
         with open(
-                os.path.join(portable_folder, f"{folder_name}.yml"), "w"
+            os.path.join(portable_folder, f"{folder_name}.yml"), "w"
         ) as f:
             f.write(portable_template.format(folder_name))
         print(portable_template.format(folder_name))
 
         print(fn)
-            # TODO: add more files here, eg. a databroker readme/tutorial
+        # TODO: add more files here, eg. a databroker readme/tutorial
         portable_configs[folder_name] = yaml.load(
             io.StringIO(portable_template.format(fn))
         )
@@ -76,12 +76,13 @@ def run_server(
         handlers = an_broker.reg.handler_reg
 
     an_source = Stream()
-    zed = an_source.Store(os.path.join(
-        portable_configs["an"]["metadatastore"]["config"][
-            "directory"
-        ],
-        "data",
-    ), NpyWriter)
+    zed = an_source.Store(
+        os.path.join(
+            portable_configs["an"]["metadatastore"]["config"]["directory"],
+            "data",
+        ),
+        NpyWriter,
+    )
     zed.starsink(an_broker.insert)
 
     raw_broker = Broker.from_config(portable_configs["raw"])

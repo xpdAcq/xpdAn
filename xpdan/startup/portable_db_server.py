@@ -1,17 +1,14 @@
 import io
-from pprint import pprint
+import os
 
 import fire
-
-from bluesky.utils import apply_to_dict_recursively, sanitize_np
+import yaml
 from databroker import Broker
 from rapidz import Stream
 from shed.writers import NpyWriter
 from xpdan.vend.callbacks.core import RunRouter, ExportCallback
 from xpdan.vend.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
-import os
-import yaml
 
 portable_template = """description: '{0} database'
 metadatastore:

@@ -1,6 +1,7 @@
+import os
 import time
-from pprint import pprint
 
+import numpy as np
 from bluesky.callbacks.core import CallbackBase
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save
@@ -9,8 +10,6 @@ from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
 from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
-import numpy as np
-import os
 
 
 class StartStopCallback(CallbackBase):

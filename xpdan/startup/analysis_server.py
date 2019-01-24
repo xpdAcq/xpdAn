@@ -29,9 +29,6 @@ from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.extra import std_gen, median_gen, z_score_gen
 from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
 
-from xpdan.startup.pack_unpack import serializer, deserializer
-
-
 order = (
     pipeline_order
     + [
@@ -94,8 +91,7 @@ def create_analysis_pipeline(order, **kwargs):
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"an", serializer=serializer
-    )
+        glbl_dict["inbound_proxy_address"], prefix=b"an")
     # strip the dependant vars form the raw data
     raw_stripped = raw_source.starmap(StripDepVar())
     # TODO: inspect this from the namespace

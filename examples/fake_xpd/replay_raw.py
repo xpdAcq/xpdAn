@@ -1,12 +1,9 @@
 """Replay example XPD data into ZMQ proxy"""
 import copy
 import time
-from pprint import pprint
 
 from databroker.broker import Broker
 from xpdan.vend.callbacks.zmq import Publisher
-
-from xpdan.startup.pack_unpack import serializer, deserializer
 
 # pull from local data, not needed at beamline
 db = Broker.named("live_demo_data")

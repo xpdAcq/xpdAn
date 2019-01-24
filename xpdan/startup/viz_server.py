@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib.colors import SymLogNorm
 
 from bluesky.utils import install_qt_kicker
-from xpdan.startup.pack_unpack import deserializer
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
 from xpdan.vend.callbacks.core import RunRouter
@@ -36,8 +35,7 @@ def run_server(
     if prefix is None:
         prefix = [b"an", b"raw"]
 
-    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix,
-                         deserializer=deserializer)
+    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix,)
     install_qt_kicker(loop=d.loop)
 
     rr = RunRouter(

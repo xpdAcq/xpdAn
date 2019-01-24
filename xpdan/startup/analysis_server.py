@@ -172,7 +172,6 @@ def run_server(
         outbound_proxy_address,
         # accept the raw data
         prefix=prefix,
-        deserializer=deserializer,
     )
     install_qt_kicker(loop=d.loop)
 

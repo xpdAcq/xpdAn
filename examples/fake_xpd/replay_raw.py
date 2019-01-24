@@ -12,7 +12,7 @@ db.prepare_hook = lambda x, y: copy.deepcopy(y)
 from xpdconf.conf import glbl_dict
 
 p = Publisher(
-    glbl_dict["inbound_proxy_address"], prefix=b"raw", serializer=serializer
+    glbl_dict["inbound_proxy_address"], prefix=b"raw",
 )
 
 stopped = False
@@ -53,9 +53,9 @@ try:
             print(e[0])
             # pprint(e[1])
             p(*e)
-            if e[0] == "event":
-                input()
-            # input()
+            #if e[0] == "event":
+                #input()
+            input()
             # time.sleep(1)
         # e = ("stop", stop)
         # p(*e)

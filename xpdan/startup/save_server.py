@@ -46,7 +46,7 @@ def run_server(
     template=base_template,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     db_names=("exp_db", "an_db"),
-    prefix=b'an'
+    prefix=[b'an', 'raw']
 ):
     """Run analysis server
 

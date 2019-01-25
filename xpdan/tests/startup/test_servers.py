@@ -14,19 +14,20 @@ from xpdan.startup.portable_db_server import (
     run_server as portable_db_run_sever
 )
 from xpdan.startup.viz_server import run_server as viz_run_server
+from xpdan.startup.analysis_server import run_server as analysis_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
 
-def test_save_run_server(tmpdir, proxy, RE, hw):
+def test_protable_db_run_server(tmpdir, proxy, RE, hw):
     fn = str(tmpdir)
 
-    def delayed_sigint(delay):
+    def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
         os.kill(os.getpid(), signal.SIGINT)
 
-    def run_exp(delay):
+    def run_exp(delay):  # pragma: no cover
         time.sleep(delay)
         print("running exp")
 
@@ -74,12 +75,12 @@ def test_save_run_server(tmpdir, proxy, RE, hw):
 
 
 def test_viz_run_server(tmpdir, proxy, RE, hw):
-    def delayed_sigint(delay):
+    def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
         os.kill(os.getpid(), signal.SIGINT)
 
-    def run_exp(delay):
+    def run_exp(delay):  # pragma: no cover
         time.sleep(delay)
         print("running exp")
 
@@ -122,3 +123,33 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
 
     # make certain we opened some figs
     assert plt.get_fignums()
+
+
+def test_analysis_run_server(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    try:
+        print("running server")
+        analysis_run_server()
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()

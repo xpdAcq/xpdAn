@@ -57,9 +57,3 @@ def dump_yml(filename, data):
 
 def poni_saver(filename, calibration):
     calibration.geoRef.save(filename)
-
-from xpdtools.tools import PDFGetter
-def sanitize_pdfgetx(val):
-    if isinstance(val, PDFGetter):
-        return str(val)
-    return val

@@ -25,6 +25,16 @@ xpdan\.999\-load module
     :undoc-members:
     :show-inheritance:
 
+.. _xpdan_callbacks:
+
+xpdan\.callbacks module
+-----------------------------
+
+.. automodule:: xpdan.callbacks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 xpdan\.data\_reduction module
 -----------------------------
 

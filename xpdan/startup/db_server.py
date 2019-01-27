@@ -12,6 +12,19 @@ def run_server(
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     prefix=b"an",
 ):
+    """Start up the databroker server for analyzed data.
+
+    Parameters
+    ----------
+    data_dir : str
+        The directory to save the array data into.
+    outbound_proxy_address : str, optional
+        The address and port of the zmq proxy. Defaults to
+        ``glbl_dict["outbound_proxy_address"]``
+    prefix : bytes or list of bytes, optional
+        The Publisher channels to listen to. Defaults to
+        ``b"an"``
+    """
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     an_broker = glbl_dict["an_db"]

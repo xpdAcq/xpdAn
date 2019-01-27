@@ -45,7 +45,7 @@ order = (
 
 
 def start_analysis(save=True, vis=True, **kwargs):
-    """Start analysis pipeline
+    """Start analysis pipeline [Depreciated]
 
     Parameters
     ----------
@@ -83,6 +83,21 @@ def start_analysis(save=True, vis=True, **kwargs):
 
 
 def create_analysis_pipeline(order, **kwargs):
+    """Create the analysis pipeline from an list of chunks and pipeline kwargs
+
+    Parameters
+    ----------
+    order : list of functions
+        The list of pipeline chunk functions
+    kwargs : Any
+        The kwargs to pass to the pipeline creation
+
+    Returns
+    -------
+    namespace : dict
+        The namespace of the pipeline
+
+    """
     namespace = link(
         *order, raw_source=Stream(stream_name="raw source"), **kwargs
     )
@@ -117,6 +132,49 @@ def run_server(
     prefix=b"raw",
     **kwargs
 ):
+    """Function to run the analysis server.
+
+    Parameters
+    ----------
+    order : list, optional
+        The order of pipeline chunk functions to be called. Defaults to the
+        standard order, ``xpdan.startup.analysis_server.order``
+    db : databroker.Broker instance, optional
+        The databroker to pull data from. This is used for accessing dark and
+        background data. Defaults to the location listed in the
+        ``xpdconf.conf.glbl_dict``.
+    outbound_proxy_address : str, optional
+        The location of the ZMQ proxy sending data to this server. Defaults
+        to the location listed in the ``xpdconf.conf.glbl_dict``.
+    prefix : bytes or list of bytes, optional
+        Which publisher(s) to listen to for data. Defaults to ``b"raw"``
+    kwargs : Any
+        Keyword arguments passed into the pipeline creation. These are used
+        to modify the data processing.
+
+    If using the default pipeline these include:
+
+      - ``bg_scale=1`` The background scale factor. Defaults to 1
+      - ``calib_setting`` : The calibration setting, if set to
+        ``{"setting": False}`` the user will not be prompted to perform
+        calibration on calibration samples.
+        This is useful for not performing calibration when re analyzing an
+        entire experiment.
+      - ``polarization_factor`` The polarization factor used to correct
+        the image. Defaults to .99
+      - ``mask_setting`` The setting for the frequency of the mask. If set
+        to ``{'setting': 'auto'}`` each image gets a mask generated for it,
+        if set to ``{'setting': 'first'}`` only the first image in the
+        series has a mask generated for it and all subsequent images in the
+        series use that mask, if set to ``{'setting': 'none'}`` then no
+        image is masked. Defaults to ``{'setting': 'auto'}``.
+      - ``mask_kwargs`` The keyword arguments passed to
+        ``xpdtools.tools.mask_img``. Defaults to ``dict(edge=30,
+        lower_thresh=0.0, upper_thresh=None, alpha=3, auto_type="median",
+        tmsk=None,)``
+      - kwargs passed to PDFgetx3. Please see the PDFgetx3 documentation:
+        https://www.diffpy.org/doc/pdfgetx/2.0.0/options.html#pdf-parameters
+    """
     db.prepare_hook = lambda x, y: copy.deepcopy(y)
 
     if "db" not in kwargs:

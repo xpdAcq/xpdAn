@@ -1,11 +1,8 @@
-from pprint import pprint
-
 import fire
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import SymLogNorm
-
 from bluesky.utils import install_qt_kicker
+from matplotlib.colors import SymLogNorm
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
 from xpdan.vend.callbacks.core import RunRouter
@@ -28,6 +25,20 @@ def run_server(
     prefix=None,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
 ):
+    """Start up the visualization server
+
+    Parameters
+    ----------
+    handlers : dict
+        The map between handler specs and handler classes, defaults to
+        the map used by the experimental databroker if possible
+    prefix : bytes or list of bytes, optional
+        The Publisher channels to listen to. Defaults to
+        ``[b"an", b"raw"]``
+    outbound_proxy_address : str, optional
+        The address and port of the zmq proxy. Defaults to
+        ``glbl_dict["outbound_proxy_address"]``
+    """
 
     if handlers is None:
         for db in ["exp_db", "an_db"]:

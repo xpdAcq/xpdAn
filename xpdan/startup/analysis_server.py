@@ -12,6 +12,7 @@ import fire
 from bluesky.utils import install_qt_kicker
 from rapidz import Stream
 from rapidz.link import link
+from shed import SimpleToEventStream
 from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
@@ -93,63 +94,15 @@ def create_analysis_pipeline(order, **kwargs):
         glbl_dict["inbound_proxy_address"], prefix=b"an")
     # strip the dependant vars form the raw data
     raw_stripped = source.starmap(StripDepVar())
-    # TODO: inspect this from the namespace
-    #  look for SimpleToEventStream nodes
     namespace.update(
         to_event_stream_with_ind(
             raw_stripped,
-            *[
-                namespace[k]
-                for k in [
-                    "dark_corrected_tes",
-                    "bg_corrected_tes",
-                    "geometry_tes",
-                    "mask_tes",
-                    "integration_tes",
-                    "fq_tes",
-                    "sq_tes",
-                    "mask_overlay_tes",
-                    "pdf_tes",
-                    "max_tes",
-                    "max_pdf_tes",
-                    "z_score_tes",
-                ]
-                if k in namespace
-            ],
+            *[node for node in namespace.values() if isinstance(
+                node, SimpleToEventStream)],
             publisher=an_with_ind_pub
         )
     )
-    # '''
 
-    """
-    an_with_no_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"clean_an",
-        serializer=serializer
-    )
-    namespace.update(
-        to_event_stream_no_ind(
-            *[
-                namespace[k]
-                for k in [
-                    # "dark_corrected_tes",
-                    # "bg_corrected_tes",
-                    # XXX: reinstate this when pyfai has a saver
-                    # "geometry_tes",
-                    # "mask_tes",
-                    "integration_tes",
-                    "fq_tes",
-                    "sq_test",
-                    # "mask_overlay_tes",
-                    "pdf_tes",
-                    "max_tes",
-                    "max_pdf_tes",
-                ]
-                if k in namespace
-            ],
-            publisher=an_with_no_ind_pub
-        )
-    )
-    # """
     return namespace
 
 

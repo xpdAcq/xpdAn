@@ -12,15 +12,18 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+import multiprocessing
 import os
 import shutil
 import sys
 import tempfile
+import time
 import uuid
 import pytest
 import numpy as np
 import copy
 
+from xpdan.vend.callbacks.zmq import Proxy
 from xpdsim import xpd_pe1c as det
 from bluesky.tests.conftest import (
     db,
@@ -95,7 +98,7 @@ def ltdb(request):
     db = build_sqlite_backed_broker(request)
     db.prepare_hook = lambda name, doc: copy.deepcopy(doc)
     reg = db.reg
-    reg.register_handler('NPY_SEQ', NumpySeqHandler)
+    reg.register_handler("NPY_SEQ", NumpySeqHandler)
     return db
 
 
@@ -233,10 +236,23 @@ def test_md():
     }
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def close_mpl_figs():
     existing = plt.get_fignums()
     yield
     new_and_existing = plt.get_fignums()
     for fig in set(new_and_existing) ^ set(existing):
         plt.close(fig)
+
+
+@pytest.fixture(scope="module")
+def proxy():
+    def start_proxy():  # pragma: no cover
+        Proxy(5567, 5568).start()
+
+    proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
+    proxy_proc.start()
+    time.sleep(5)  # Give this plenty of time to start up.
+    yield "127.0.0.1:5567", "127.0.0.1:5568"
+    proxy_proc.terminate()
+    proxy_proc.join()

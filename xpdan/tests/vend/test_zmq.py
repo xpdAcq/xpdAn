@@ -14,7 +14,7 @@ import cloudpickle
 def test_zmq(RE, hw):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.
-    def start_proxy():
+    def start_proxy():  # pragma: no cover
         Proxy(5567, 5568).start()
 
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
@@ -32,7 +32,7 @@ def test_zmq(RE, hw):
     # it receives over a Queue to this process, so we can count them for our
     # test.
 
-    def make_and_start_dispatcher(queue):
+    def make_and_start_dispatcher(queue):  # pragma: no cover
         def put_in_queue(name, doc):
             print('putting ', name, 'in queue')
             queue.put((name, doc))
@@ -85,7 +85,7 @@ def test_zmq_components():
     # process, which coverage misses.
     pid = os.getpid()
 
-    def delayed_sigint(delay):
+    def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         os.kill(os.getpid(), signal.SIGINT)
 
@@ -123,7 +123,7 @@ def test_zmq_components():
 def test_zmq_no_RE(RE):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.
-    def start_proxy():
+    def start_proxy():  # pragma: no cover
         Proxy(5567, 5568).start()
 
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
@@ -140,7 +140,7 @@ def test_zmq_no_RE(RE):
     # it receives over a Queue to this process, so we can count them for our
     # test.
 
-    def make_and_start_dispatcher(queue):
+    def make_and_start_dispatcher(queue):  # pragma: no cover
         def put_in_queue(name, doc):
             print('putting ', name, 'in queue')
             queue.put((name, doc))
@@ -190,7 +190,7 @@ def test_zmq_no_RE(RE):
 def test_zmq_no_RE_newserializer(RE):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.
-    def start_proxy():
+    def start_proxy():  # pragma: no cover
         Proxy(5567, 5568).start()
 
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
@@ -207,7 +207,7 @@ def test_zmq_no_RE_newserializer(RE):
     # it receives over a Queue to this process, so we can count them for our
     # test.
 
-    def make_and_start_dispatcher(queue):
+    def make_and_start_dispatcher(queue):  # pragma: no cover
         def put_in_queue(name, doc):
             print('putting ', name, 'in queue')
             queue.put((name, doc))
@@ -257,7 +257,7 @@ def test_zmq_no_RE_newserializer(RE):
 def test_zmq_prefix(RE, hw):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.
-    def start_proxy():
+    def start_proxy():  # pragma: no cover
         Proxy(5567, 5568).start()
 
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
@@ -278,7 +278,7 @@ def test_zmq_prefix(RE, hw):
     # it receives over a Queue to this process, so we can count them for our
     # test.
 
-    def make_and_start_dispatcher(queue):
+    def make_and_start_dispatcher(queue):  # pragma: no cover
         def put_in_queue(name, doc):
             print('putting ', name, 'in queue')
             queue.put((name, doc))
@@ -330,7 +330,7 @@ def test_zmq_prefix(RE, hw):
 def test_zmq_multi_prefix(RE, hw):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.
-    def start_proxy():
+    def start_proxy():  # pragma: no cover
         Proxy(5567, 5568).start()
 
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
@@ -351,7 +351,7 @@ def test_zmq_multi_prefix(RE, hw):
     # it receives over a Queue to this process, so we can count them for our
     # test.
 
-    def make_and_start_dispatcher(queue):
+    def make_and_start_dispatcher(queue):  # pragma: no cover
         def put_in_queue(name, doc):
             print('putting ', name, 'in queue')
             queue.put((name, doc))

@@ -1,6 +1,7 @@
 """
 Useful callbacks for the Run Engine
 """
+import itertools
 from itertools import count
 import warnings
 from collections import deque, namedtuple, OrderedDict
@@ -8,6 +9,8 @@ import time as ttime
 
 from datetime import datetime
 import logging
+from pprint import pprint
+
 from bluesky.utils import ensure_uid
 from collections import defaultdict
 
@@ -423,19 +426,6 @@ class LiveTable(CallbackBase):
         self._out(out_str)
 
 
-class StartStopCallback(CallbackBase):
-    def __init__(self):
-        self.t0 = 0
-
-    def start(self, doc):
-        self.t0 = doc["time"]
-        print("START ANALYSIS ON {}".format(doc["uid"]))
-
-    def stop(self, doc):
-        print("FINISH ANALYSIS ON {}".format(doc.get("run_start", "NA")))
-        print("Analysis time {}".format(doc["time"] - self.t0))
-
-
 class RunRouter(CallbackBase):
     """
     Routes documents, by run, to callbacks it creates from factory functions.
@@ -545,7 +535,7 @@ class RunRouter(CallbackBase):
     def stop(self, doc):
         start_uid = doc["run_start"]
         # Clean up references.
-        cbs = self.callbacks.pop(start_uid)
+        cbs = self.callbacks.pop(start_uid, [])
         if not cbs:
             return
         to_remove = []
@@ -638,7 +628,11 @@ class Retrieve(CallbackBase):
             ev = event
         data = ev["data"]
         filled = ev["filled"]
-        for k in set(data) & fields & set(k for k in data if not filled.get(k, True)):
+        for k in (
+            set(data)
+            & fields
+            & set(k for k in data if not filled.get(k, True))
+        ):
             # Try to fill the data
             try:
                 v = self.retrieve_datum(data[k])
@@ -714,18 +708,29 @@ class StripDepVar(CallbackBase):
 
     def start(self, doc):
         self.independent_vars = set(
-            [n[0] for n, s in doc.get("hints", {}).get("dimensions", [])]
+            itertools.chain.from_iterable(
+                [n for n, s in doc.get("hints", {}).get("dimensions", [])]
+            )
         )
 
     def descriptor(self, doc):
         new_doc = dict(doc)
-        # TODO: maybe use all the keys in the set? (hints, object_keys, etc.)
-        data_keys = set(new_doc["object_keys"].keys())
-        for k in ["data_keys", "hints", "configuration", "object_keys"]:
+
+        # Step 1 determine which configuration and object keys to keep
+        throw_out_keys = set()
+        for k, v in new_doc["object_keys"].items():
+            # If they share any keys then keep this component, it serves up
+            # independent vars
+            if not self.independent_vars & set(v):
+                throw_out_keys.add(k)
+
+        for k in ["hints", "configuration", "object_keys"]:
             new_doc[k] = dict(doc[k])
-            # all the things not in independent_vars
-            for key in self.independent_vars ^ data_keys:
+            for key in throw_out_keys:
                 new_doc[k].pop(key, None)
+
+        for k in self.independent_vars ^ set(new_doc["data_keys"]):
+            new_doc["data_keys"].pop(k, None)
         return new_doc
 
     def event(self, doc):
@@ -736,6 +741,25 @@ class StripDepVar(CallbackBase):
         data_keys = set(new_doc["data"].keys())
         # all the things not in
         for key in self.independent_vars ^ data_keys:
-            new_doc["data"].pop(key)
-            new_doc["timestamps"].pop(key)
+            new_doc["data"].pop(key, None)
+            new_doc["timestamps"].pop(key, None)
+            new_doc.get("filled", {}).pop(key, None)
         return new_doc
+
+
+def hinted_fields(descriptor):
+    # Figure out which columns to put in the table.
+    obj_names = list(descriptor["object_keys"])
+    # We will see if these objects hint at whether
+    # a subset of their data keys ('fields') are interesting. If they
+    # did, we'll use those. If these didn't, we know that the RunEngine
+    # *always* records their complete list of fields, so we can use
+    # them all unselectively.
+    columns = []
+    for obj_name in obj_names:
+        try:
+            fields = descriptor.get("hints", {}).get(obj_name, {})["fields"]
+        except KeyError:
+            fields = descriptor["object_keys"][obj_name]
+        columns.extend(fields)
+    return columns

@@ -1,4 +1,7 @@
+import os
 import time
+
+import numpy as np
 from bluesky.callbacks.core import CallbackBase
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save
@@ -7,8 +10,6 @@ from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
 from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
-import numpy as np
-import os
 
 
 class StartStopCallback(CallbackBase):
@@ -16,14 +17,37 @@ class StartStopCallback(CallbackBase):
 
     def __init__(self):
         self.t0 = 0
+        self.event_t0 = None
+        self.total_analysis_time = 0
+        self.n_events = 1
 
     def start(self, doc):
         self.t0 = time.time()
-        print('START ANALYSIS ON {}'.format(doc['uid']))
+        self.total_analysis_time = 0
+        self.n_events = 1
+        print("START ANALYSIS ON {}".format(doc["uid"]))
+
+    def event(self, doc):
+        self.n_events = doc["seq_num"]
+        if not self.event_t0:
+            self.event_t0 = time.time()
+        else:
+            self.total_analysis_time += time.time() - self.event_t0
+            print(
+                "Single Event Analysis time {}".format(
+                    time.time() - self.event_t0
+                )
+            )
+            self.event_t0 = time.time()
 
     def stop(self, doc):
         print("FINISH ANALYSIS ON {}".format(doc.get("run_start", "NA")))
-        print('Analysis time {}'.format(time.time() - self.t0))
+        print(
+            "Average Event analysis time {}".format(
+                self.total_analysis_time / self.n_events
+            )
+        )
+        print("Analysis time {}".format(time.time() - self.t0))
 
 
 class SaveBaseClass(Retrieve):
@@ -43,8 +67,9 @@ class SaveBaseClass(Retrieve):
         document is received
     """
 
-    def __init__(self, template, handler_reg, root_map=None,
-                 base_folders=None, **kwargs):
+    def __init__(
+        self, template, handler_reg, root_map=None, base_folders=None, **kwargs
+    ):
         if base_folders is None:
             base_folders = []
         elif isinstance(base_folders, str):
@@ -60,7 +85,7 @@ class SaveBaseClass(Retrieve):
         self.dep_shapes = {}
         # If you see this filename something bad happened (no metadata was
         #  captured/formatted)
-        self.filenames = 'something_horrible_happened.xxx'
+        self.filenames = "something_horrible_happened.xxx"
 
         super().__init__(handler_reg, root_map)
 
@@ -72,32 +97,17 @@ class SaveBaseClass(Retrieve):
             if d[0][0] != "time"
         ]
 
-        # Use independent vars to create the filename
-        independent_var_string = "_"
-        for dim in sorted(self.dim_names):
-            independent_var_string += "{name}_{data}_{units}_".format(
-                name=dim,
-                data=f"{{event[data][{dim}]:1.{{descriptor[data_keys]"
-                f"[{dim}][precision]}}f}}",
-                # TODO: fill in the sig figs
-                units=f"{{descriptor[data_keys][{dim}][units]}}",
-            )
-
         # use the magic formatter to leave things behind
         self.start_template = render2(
             self._template,
             start=doc,
             human_timestamp=_timestampstr(doc["time"]),
-            __independent_vars__=independent_var_string,
             **doc,
             **self.kwargs,
         )
         return super().start(doc)
 
     def descriptor(self, doc):
-        self.descriptor_templates[doc["uid"]] = pfmt.format(
-            self.start_template, descriptor=doc
-        )
         self.in_dep_shapes = {
             n: doc["data_keys"][n]["shape"] for n in self.dim_names
         }
@@ -105,16 +115,42 @@ class SaveBaseClass(Retrieve):
             n: doc["data_keys"][n]["shape"]
             for n in set(self.dim_names) ^ set(doc["data_keys"])
         }
+
+        # Use independent vars to create the filename
+        independent_var_string = "_"
+        for dim in sorted(self.dim_names):
+            # Only use scalar data in filenames
+            if len(self.in_dep_shapes[dim]) == 0:
+                independent_var_string += "{name}_{data}_{units}_".format(
+                    name=dim,
+                    data=f"{{event[data][{dim}]:1.{doc['data_keys'][dim]['precision']}f}}",
+                    # TODO: fill in the sig figs
+                    units=f"{doc['data_keys'][dim].get('units', 'arb')}",
+                )
+
+        self.descriptor_templates[doc["uid"]] = pfmt.format(
+            self.start_template,
+            descriptor=doc,
+            __independent_vars__=independent_var_string,
+        )
+
         return super().descriptor(doc)
 
     def event(self, doc):
-        self.filenames = [pfmt.format(
-            self.descriptor_templates[doc["descriptor"]], event=doc,
-            base_folder=bf
-        ).replace(".", ",") for bf in self.base_folders]
+        self.filenames = [
+            pfmt.format(
+                self.descriptor_templates[doc["descriptor"]],
+                event=doc,
+                base_folder=bf,
+            )
+            .replace(".", ",")
+            .replace("__", "_")
+            for bf in self.base_folders
+        ]
         # Note that formally there are more steps to the formatting, but we
         #  should have the folder by now
         for filename in self.filenames:
+            print(f"Saving file to {filename}")
             os.makedirs(os.path.dirname(filename), exist_ok=True)
         return super().event(doc)
 
@@ -217,15 +253,19 @@ class SaveMeta(SaveBaseClass):
         doc = dict(doc)
         doc["analysis_stage"] = "meta"
         super().start(doc)
-        os.makedirs(
-            os.path.dirname(
-                clean_template(pfmt.format(self.filenames, ext=".yaml"))
-            ),
-            exist_ok=True,
-        )
+        self.filenames = [
+            pfmt.format(self.start_template, base_folder=bf).replace(".", ",")
+            for bf in self.base_folders
+        ]
 
         for filename in self.filenames:
-            dump_yml(clean_template(pfmt.format(filename, ext=".yaml")), doc)
+            fn = clean_template(pfmt.format(filename, ext=".yaml"))
+            print(f"Saving file to {fn}")
+            os.makedirs(os.path.dirname(fn), exist_ok=True)
+            dump_yml(fn, doc)
+
+    def event(self, doc):
+        pass
 
 
 class SaveCalib(SaveBaseClass):
@@ -235,19 +275,18 @@ class SaveCalib(SaveBaseClass):
         doc = super().event(doc)
 
         for filename in self.filenames:
-            doc["calib"].save(
+            doc["data"]["calibration"].save(
                 clean_template(pfmt.format(filename, ext=".poni"))
             )
 
 
 SAVER_MAP = {
     "dark_sub": SaveTiff,
-    "mean_intensity": SaveIntensity,
+    "integration": SaveIntensity,
     "mask": SaveMask,
     "pdf": SavePDFgetx3,
     "fq": SavePDFgetx3,
     "sq": SavePDFgetx3,
-    # Tricky because we need to kart the object around, maybe?
     "calib": SaveCalib,
     "raw": SaveMeta,
 }

@@ -10,7 +10,7 @@ from bluesky.examples import stepscan
 from bluesky.object_plans import AbsScanPlan
 from bluesky.plan_stubs import pause
 from bluesky.plan_stubs import trigger_and_read
-from bluesky.plans import (scan, grid_scan, count, inner_product_scan)
+from bluesky.plans import scan, grid_scan, count, inner_product_scan
 from bluesky.preprocessors import run_wrapper, subs_wrapper
 from bluesky.preprocessors import stage_decorator, run_decorator
 from bluesky.run_engine import Msg, RunEngineInterrupted
@@ -19,66 +19,80 @@ from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
 
 from xpdan.vend.callbacks import CallbackCounter, LiveTable, LiveFit
 from xpdan.vend.callbacks.broker import BrokerCallbackBase
-from xpdan.vend.callbacks.core import Retrieve, ExportCallback, RunRouter, \
-    StripDepVar
-from xpdan.vend.callbacks.mpl_plotting import (LiveScatter, LivePlot, LiveGrid,
-                                               LiveFitPlot, LiveRaster,
-                                               LiveMesh)
+from xpdan.vend.callbacks.core import (
+    Retrieve,
+    ExportCallback,
+    RunRouter,
+    StripDepVar,
+)
+from xpdan.vend.callbacks.mpl_plotting import (
+    LiveScatter,
+    LivePlot,
+    LiveGrid,
+    LiveFitPlot,
+    LiveRaster,
+    LiveMesh,
+)
 
 
 def test_retrieve(RE, hw):
-    rt = Retrieve(handler_reg={'NPY_SEQ': NumpySeqHandler})
+    rt = Retrieve(handler_reg={"NPY_SEQ": NumpySeqHandler})
     RE.subscribe(rt)
 
     @stage_decorator([hw.img])
     @run_decorator()
     def plan(dets):
         data_id = yield from trigger_and_read(dets)
-        data = rt.retrieve_datum(data_id['img']['value'])
+        data = rt.retrieve_datum(data_id["img"]["value"])
         np.testing.assert_allclose(data, np.ones((10, 10)))
 
     RE(plan([hw.img]))
 
 
 def test_retrieve_db(RE, hw, db):
-    rt = Retrieve(handler_reg={'NPY_SEQ': NumpySeqHandler})
+    rt = Retrieve(handler_reg={"NPY_SEQ": NumpySeqHandler})
     RE.subscribe(db.insert)
 
     RE(count([hw.img]))
 
     docs = list(map(lambda x: rt(*x), db[-1].documents()))
     names = [n for n, d in docs]
-    assert 'datum' in names
+    assert "datum" in names
     for n, d in docs:
-        if n == 'event':
-            data = d['data']['img']
+        if n == "event":
+            data = d["data"]["img"]
             np.testing.assert_allclose(data, np.ones((10, 10)))
 
 
 def test_export_file(RE, hw, tmpdir):
-    rt = ExportCallback(str(tmpdir), handler_reg={'NPY_SEQ': NumpySeqHandler})
+
+    base_dir = str(tmpdir) + "/export_test"
+    rt = ExportCallback(base_dir, handler_reg={"NPY_SEQ": NumpySeqHandler})
     L = []
     L2 = []
     RE.subscribe(lambda n, d: L2.append((n, d)))
     RE.subscribe(lambda n, d: L.append(rt(n, d)))
 
     RE(count([hw.img], 1))
-    assert len(os.listdir(str(tmpdir))) == 1
-    assert L[2][1]['root'] == str(tmpdir)
-    assert L2[2][1]['root'] != L[2][1]['root']
+    assert len(os.listdir(base_dir)) == 1
+    assert L[2][1]["root"] == base_dir
+    assert L2[2][1]["root"] != L[2][1]["root"]
 
 
 def test_export(RE, hw, tmpdir, db):
-    rt = ExportCallback(str(tmpdir), handler_reg={'NPY_SEQ': NumpySeqHandler})
+    rt = ExportCallback(
+        str(tmpdir) + "/export_test", handler_reg={"NPY_SEQ": NumpySeqHandler}
+    )
     RE.subscribe(lambda n, d: db.insert(*rt(n, d)))
 
     RE(count([hw.img], 1))
-    for (n, d), (n2, d2) in zip(db[-1].documents(fill=True),
-                                db[-1].documents()):
-        if n == 'event':
-            data = d['data']['img']
+    for (n, d), (n2, d2) in zip(
+        db[-1].documents(fill=True), db[-1].documents()
+    ):
+        if n == "event":
+            data = d["data"]["img"]
             np.testing.assert_allclose(data, np.ones((10, 10)))
-            assert d['data']['img'] != d2['data']['img']
+            assert d["data"]["img"] != d2["data"]["img"]
 
 
 def test_run_router(RE, hw):
@@ -104,13 +118,14 @@ def test_run_router(RE, hw):
 
     assert L == LL
 
+
 def exception_raiser(name, doc):
     raise Exception("it's an exception that better not kill the scan!!")
 
 
 def test_all(RE, hw):
     c = CallbackCounter()
-    RE(stepscan(hw.det, hw.motor), {'all': c})
+    RE(stepscan(hw.det, hw.motor), {"all": c})
     assert c.value == 10 + 1 + 2  # events, descriptor, start and stop
 
     c = CallbackCounter()
@@ -161,22 +176,37 @@ def test_subs_input(hw):
     # Test input normalization on OO plans
     obj_ascan = AbsScanPlan([hw.det], hw.motor, 1, 5, 4)
     obj_ascan.subs = cb1
-    assert obj_ascan.subs == {'all': [cb1], 'start': [], 'stop': [],
-                              'descriptor': [], 'event': []}
-    obj_ascan.subs.update({'start': [cb2]})
-    assert obj_ascan.subs == {'all': [cb1], 'start': [cb2], 'stop': [],
-                              'descriptor': [], 'event': []}
+    assert obj_ascan.subs == {
+        "all": [cb1],
+        "start": [],
+        "stop": [],
+        "descriptor": [],
+        "event": [],
+    }
+    obj_ascan.subs.update({"start": [cb2]})
+    assert obj_ascan.subs == {
+        "all": [cb1],
+        "start": [cb2],
+        "stop": [],
+        "descriptor": [],
+        "event": [],
+    }
     obj_ascan.subs = [cb2, cb3]
-    assert obj_ascan.subs == {'all': [cb2, cb3], 'start': [], 'stop': [],
-                              'descriptor': [], 'event': []}
+    assert obj_ascan.subs == {
+        "all": [cb2, cb3],
+        "start": [],
+        "stop": [],
+        "descriptor": [],
+        "event": [],
+    }
 
 
 def test_subscribe_msg(RE, hw):
-    assert RE.state == 'idle'
+    assert RE.state == "idle"
     c = CallbackCounter()
 
     def counting_stepscan(det, motor):
-        yield Msg('subscribe', None, c, 'start')
+        yield Msg("subscribe", None, c, "start")
         yield from stepscan(det, motor)
 
     RE(counting_stepscan(hw.det, hw.motor))  # should advance c
@@ -188,25 +218,30 @@ def test_subscribe_msg(RE, hw):
 
 
 def test_unknown_cb_raises(RE):
-
     def f(name, doc):
         pass
 
     with pytest.raises(KeyError):
-        RE.subscribe(f, 'not a thing')
+        RE.subscribe(f, "not a thing")
     # back-compat alias for subscribe
     with pytest.raises(KeyError):
-        RE.subscribe_lossless(f, 'not a thing')
+        RE.subscribe_lossless(f, "not a thing")
     with pytest.raises(KeyError):
-        RE._subscribe_lossless(f, 'not a thing')
+        RE._subscribe_lossless(f, "not a thing")
 
 
 def test_table_warns():
-    table = LiveTable(['field'])
-    table('start', {})
+    table = LiveTable(["field"])
+    table("start", {})
     with pytest.warns(UserWarning):
-        table('descriptor', {'uid': 'asdf', 'name': 'primary',
-                             'data_keys': {'field': {'dtype': 'array'}}})
+        table(
+            "descriptor",
+            {
+                "uid": "asdf",
+                "name": "primary",
+                "data_keys": {"field": {"dtype": "array"}},
+            },
+        )
 
 
 def test_table(RE, hw):
@@ -216,15 +251,15 @@ def test_table(RE, hw):
         hw.motor.precision = 2
         hw.motor.setpoint.put(0.0)  # Make dtype 'number' not 'integer'.
         hw.det.put(0.0)  # Make dtype 'number' not 'integer'.
-        assert hw.det.describe()['det']['precision'] == 2
-        assert hw.motor.describe()['motor']['precision'] == 2
-        assert hw.det.describe()['det']['dtype'] == 'number'
-        assert hw.motor.describe()['motor']['dtype'] == 'number'
+        assert hw.det.describe()["det"]["precision"] == 2
+        assert hw.motor.describe()["motor"]["precision"] == 2
+        assert hw.det.describe()["det"]["dtype"] == "number"
+        assert hw.motor.describe()["motor"]["dtype"] == "number"
 
-        table = LiveTable(['det', 'motor'], min_width=16, extra_pad=2)
-        ad_scan = bp.adaptive_scan([hw.det], 'det', hw.motor,
-                                   -15.0, 5., .01, 1, .05,
-                                   True)
+        table = LiveTable(["det", "motor"], min_width=16, extra_pad=2)
+        ad_scan = bp.adaptive_scan(
+            [hw.det], "det", hw.motor, -15.0, 5., .01, 1, .05, True
+        )
         # use lossless sub here because rows can get dropped
         token = RE.subscribe(table)
         RE(ad_scan)
@@ -232,11 +267,11 @@ def test_table(RE, hw):
 
     fout.seek(0)
 
-    for ln, kn in zip(fout, KNOWN_TABLE.split('\n')):
+    for ln, kn in zip(fout, KNOWN_TABLE.split("\n")):
         # this is to strip the `\n` from the print output
         ln = ln.rstrip()
 
-        if ln[0] == '+':
+        if ln[0] == "+":
             # test the full line on the divider lines
             assert ln == kn
         else:
@@ -249,7 +284,7 @@ def test_table(RE, hw):
 def test_table_external(RE, hw, db):
     RE.subscribe(db.insert)
     hw.img.reg = db.reg
-    RE(count([hw.img]), LiveTable(['img']))
+    RE(count([hw.img]), LiveTable(["img"]))
 
 
 KNOWN_TABLE = """+------------+--------------+----------------+----------------+
@@ -335,21 +370,22 @@ def test_live_fit(RE, hw):
     try:
         import lmfit
     except ImportError:
-        raise pytest.skip('requires lmfit')
+        raise pytest.skip("requires lmfit")
 
     def gaussian(x, A, sigma, x0):
         return A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
 
     model = lmfit.Model(gaussian)
-    init_guess = {'A': 2,
-                  'sigma': lmfit.Parameter('sigma', 3, min=0),
-                  'x0': -0.2}
-    cb = LiveFit(model, 'det', {'x': 'motor'}, init_guess,
-                 update_every=50)
+    init_guess = {
+        "A": 2,
+        "sigma": lmfit.Parameter("sigma", 3, min=0),
+        "x0": -0.2,
+    }
+    cb = LiveFit(model, "det", {"x": "motor"}, init_guess, update_every=50)
     RE(scan([hw.det], hw.motor, -1, 1, 50), cb)
     # results are in cb.result.values
 
-    expected = {'A': 1, 'sigma': 1, 'x0': 0}
+    expected = {"A": 1, "sigma": 1, "x0": 0}
     for k, v in expected.items():
         assert np.allclose(cb.result.values[k], v, atol=1e-6)
 
@@ -359,7 +395,7 @@ def test_live_fit_multidim(RE, hw):
     try:
         import lmfit
     except ImportError:
-        raise pytest.skip('requires lmfit')
+        raise pytest.skip("requires lmfit")
 
     hw.motor1.delay = 0
     hw.motor2.delay = 0
@@ -368,19 +404,28 @@ def test_live_fit_multidim(RE, hw):
     def gaussian(x, y, A, sigma, x0, y0):
         return A * np.exp(-((x - x0) ** 2 + (y - y0) ** 2) / (2 * sigma ** 2))
 
-    model = lmfit.Model(gaussian, ['x', 'y'])
-    init_guess = {'A': 2,
-                  'sigma': lmfit.Parameter('sigma', 3, min=0),
-                  'x0': -0.2,
-                  'y0': 0.3}
-    cb = LiveFit(model, 'det4', {'x': 'motor1', 'y': 'motor2'}, init_guess,
-                 update_every=50)
-    RE(grid_scan([hw.det4],
-                 hw.motor1, -1, 1, 10,
-                 hw.motor2, -1, 1, 10, False),
-       cb)
+    model = lmfit.Model(gaussian, ["x", "y"])
+    init_guess = {
+        "A": 2,
+        "sigma": lmfit.Parameter("sigma", 3, min=0),
+        "x0": -0.2,
+        "y0": 0.3,
+    }
+    cb = LiveFit(
+        model,
+        "det4",
+        {"x": "motor1", "y": "motor2"},
+        init_guess,
+        update_every=50,
+    )
+    RE(
+        grid_scan(
+            [hw.det4], hw.motor1, -1, 1, 10, hw.motor2, -1, 1, 10, False
+        ),
+        cb,
+    )
 
-    expected = {'A': 1, 'sigma': 1, 'x0': 0, 'y0': 0}
+    expected = {"A": 1, "sigma": 1, "x0": 0, "y0": 0}
     for k, v in expected.items():
         assert np.allclose(cb.result.values[k], v, atol=1e-6)
 
@@ -389,31 +434,33 @@ def test_live_fit_plot(RE, hw):
     try:
         import lmfit
     except ImportError:
-        raise pytest.skip('requires lmfit')
+        raise pytest.skip("requires lmfit")
 
     def gaussian(x, A, sigma, x0):
         return A * np.exp(-(x - x0) ** 2 / (2 * sigma ** 2))
 
     model = lmfit.Model(gaussian)
-    init_guess = {'A': 2,
-                  'sigma': lmfit.Parameter('sigma', 3, min=0),
-                  'x0': -0.2}
-    livefit = LiveFit(model, 'det', {'x': 'motor'}, init_guess,
-                      update_every=50)
-    lfplot = LiveFitPlot(livefit, color='r')
-    lplot = LivePlot('det', 'motor', ax=plt.gca(), marker='o', ls='none')
+    init_guess = {
+        "A": 2,
+        "sigma": lmfit.Parameter("sigma", 3, min=0),
+        "x0": -0.2,
+    }
+    livefit = LiveFit(
+        model, "det", {"x": "motor"}, init_guess, update_every=50
+    )
+    lfplot = LiveFitPlot(livefit, color="r")
+    lplot = LivePlot("det", "motor", ax=plt.gca(), marker="o", ls="none")
     RE(scan([hw.det], hw.motor, -1, 1, 50), [lplot, lfplot])
-    expected = {'A': 1, 'sigma': 1, 'x0': 0}
+    expected = {"A": 1, "sigma": 1, "x0": 0}
     for k, v in expected.items():
         assert np.allclose(livefit.result.values[k], v, atol=1e-6)
 
 
-@pytest.mark.parametrize('int_meth, stop_num, msg_num',
-                         [('stop', 1, 5),
-                          ('abort', 1, 5),
-                          ('halt', 1, 3)])
-def test_interrupted_with_callbacks(RE, int_meth,
-                                    stop_num, msg_num):
+@pytest.mark.parametrize(
+    "int_meth, stop_num, msg_num",
+    [("stop", 1, 5), ("abort", 1, 5), ("halt", 1, 3)],
+)
+def test_interrupted_with_callbacks(RE, int_meth, stop_num, msg_num):
 
     docs = defaultdict(list)
 
@@ -424,50 +471,86 @@ def test_interrupted_with_callbacks(RE, int_meth,
     RE.msg_hook = MsgCollector()
 
     with pytest.raises(RunEngineInterrupted):
-        RE(subs_wrapper(run_wrapper(pause()),
-                        {'all': collector_cb}))
+        RE(subs_wrapper(run_wrapper(pause()), {"all": collector_cb}))
     getattr(RE, int_meth)()
 
-    assert len(docs['start']) == 1
-    assert len(docs['event']) == 0
-    assert len(docs['descriptor']) == 0
-    assert len(docs['stop']) == stop_num
+    assert len(docs["start"]) == 1
+    assert len(docs["event"]) == 0
+    assert len(docs["descriptor"]) == 0
+    assert len(docs["stop"]) == stop_num
     assert len(RE.msg_hook.msgs) == msg_num
 
 
 def test_live_grid(RE, hw):
     hw.motor1.delay = 0
     hw.motor2.delay = 0
-    RE(grid_scan([hw.det4],
-                 hw.motor1, -3, 3, 6,
-                 hw.motor2, -5, 5, 10, False),
-       LiveGrid((6, 10), 'det4'))
+    RE(
+        grid_scan([hw.det4], hw.motor1, -3, 3, 6, hw.motor2, -5, 5, 10, False),
+        LiveGrid((6, 10), "det4"),
+    )
 
     # Test the deprecated name.
     with pytest.warns(UserWarning):
-        RE(grid_scan([hw.det4], hw.motor1, -3, 3, 6, hw.motor2,
-                     -5, 5, 10, False),
-           LiveRaster((6, 10), 'det4'))
+        RE(
+            grid_scan(
+                [hw.det4], hw.motor1, -3, 3, 6, hw.motor2, -5, 5, 10, False
+            ),
+            LiveRaster((6, 10), "det4"),
+        )
 
 
 def test_live_scatter(RE, hw):
-    RE(grid_scan([hw.det5],
-                 hw.jittery_motor1, -3, 3, 6,
-                 hw.jittery_motor2, -5, 5, 10, False),
-       LiveScatter('jittery_motor1', 'jittery_motor2', 'det5',
-                   xlim=(-3, 3), ylim=(-5, 5)))
+    RE(
+        grid_scan(
+            [hw.det5],
+            hw.jittery_motor1,
+            -3,
+            3,
+            6,
+            hw.jittery_motor2,
+            -5,
+            5,
+            10,
+            False,
+        ),
+        LiveScatter(
+            "jittery_motor1",
+            "jittery_motor2",
+            "det5",
+            xlim=(-3, 3),
+            ylim=(-5, 5),
+        ),
+    )
 
     # Test the deprecated name.
     with pytest.warns(UserWarning):
-        RE(grid_scan([hw.det5],
-                     hw.jittery_motor1, -3, 3, 6,
-                     hw.jittery_motor2, -5, 5, 10, False),
-           LiveMesh('jittery_motor1', 'jittery_motor2', 'det5',
-                    xlim=(-3, 3), ylim=(-5, 5)))
+        RE(
+            grid_scan(
+                [hw.det5],
+                hw.jittery_motor1,
+                -3,
+                3,
+                6,
+                hw.jittery_motor2,
+                -5,
+                5,
+                10,
+                False,
+            ),
+            LiveMesh(
+                "jittery_motor1",
+                "jittery_motor2",
+                "det5",
+                xlim=(-3, 3),
+                ylim=(-5, 5),
+            ),
+        )
 
 
-@pytest.mark.xfail(raises=InterfaceError,
-                   reason='something funny going on with 3.5, 3.6 and sqlite')
+@pytest.mark.xfail(
+    raises=InterfaceError,
+    reason="something funny going on with 3.5, 3.6 and sqlite",
+)
 def test_broker_base(RE, hw, db):
     class BrokerChecker(BrokerCallbackBase):
         def __init__(self, field, *, db=None):
@@ -475,10 +558,10 @@ def test_broker_base(RE, hw, db):
 
         def event(self, doc):
             super().event(doc)
-            assert isinstance(doc['data'][self.fields[0]], np.ndarray)
+            assert isinstance(doc["data"][self.fields[0]], np.ndarray)
 
     RE.subscribe(db.insert)
-    bc = BrokerChecker(('img',), db=db)
+    bc = BrokerChecker(("img",), db=db)
     RE.subscribe(bc)
     hw.img.reg = db.reg
     RE(count([hw.img]))
@@ -491,51 +574,99 @@ def test_broker_base_no_unpack(RE, hw, db):
 
         def event(self, doc):
             super().event(doc)
-            assert isinstance(doc['data'][self.fields[0]], np.ndarray)
+            assert isinstance(doc["data"][self.fields[0]], np.ndarray)
 
-    bc = BrokerChecker(('img',), db=db)
+    bc = BrokerChecker(("img",), db=db)
     RE.subscribe(bc)
     RE(count([hw.direct_img]))
 
 
 def test_plotting_hints(RE, hw, db):
-    ''' This tests the run and checks that the correct hints are created.
+    """ This tests the run and checks that the correct hints are created.
         Hints are mainly created to help the BestEffortCallback in plotting the
         data.
         Use a callback to do the checking.
-    '''
+    """
     dc = DocCollector()
     RE.subscribe(dc.insert)
 
     # check that the inner product hints are passed correctly
-    hint = {'dimensions': [([hw.motor1.name, hw.motor2.name, hw.motor3.name],
-                            'primary')]}
-    RE(inner_product_scan([hw.det], 20, hw.motor1, -1, 1, hw.motor2, -1, 1,
-                          hw.motor3, -2, 0))
-    assert dc.start[-1]['hints'] == hint
+    hint = {
+        "dimensions": [
+            ([hw.motor1.name, hw.motor2.name, hw.motor3.name], "primary")
+        ]
+    }
+    RE(
+        inner_product_scan(
+            [hw.det], 20, hw.motor1, -1, 1, hw.motor2, -1, 1, hw.motor3, -2, 0
+        )
+    )
+    assert dc.start[-1]["hints"] == hint
 
     # check that the outer product (grid_scan) hints are passed correctly
-    hint = {'dimensions': [(['motor1'], 'primary'),
-                           (['motor2'], 'primary'),
-                           (['motor3'], 'primary')]}
+    hint = {
+        "dimensions": [
+            (["motor1"], "primary"),
+            (["motor2"], "primary"),
+            (["motor3"], "primary"),
+        ]
+    }
     # grid_scan passes "rectilinear" gridding as well
     # make sure this is also passed
     output_hint = hint.copy()
-    output_hint['gridding'] = 'rectilinear'
-    RE(grid_scan([hw.det], hw.motor1, -1, 1, 2, hw.motor2, -1, 1, 2,
-                 True, hw.motor3, -2, 0, 2, True))
+    output_hint["gridding"] = "rectilinear"
+    RE(
+        grid_scan(
+            [hw.det],
+            hw.motor1,
+            -1,
+            1,
+            2,
+            hw.motor2,
+            -1,
+            1,
+            2,
+            True,
+            hw.motor3,
+            -2,
+            0,
+            2,
+            True,
+        )
+    )
 
-    assert dc.start[-1]['hints'] == output_hint
+    assert dc.start[-1]["hints"] == output_hint
 
     # check that if gridding is supplied, it's not overwritten by grid_scan
     # check that the outer product (grid_scan) hints are passed correctly
-    hint = {'dimensions': [(['motor1'], 'primary'),
-                           (['motor2'], 'primary'),
-                           (['motor3'], 'primary')],
-            'gridding': 'rectilinear'}
-    RE(grid_scan([hw.det], hw.motor1, -1, 1, 2, hw.motor2, -1, 1, 2,
-                 True, hw.motor3, -2, 0, 2, True))
-    assert dc.start[-1]['hints'] == hint
+    hint = {
+        "dimensions": [
+            (["motor1"], "primary"),
+            (["motor2"], "primary"),
+            (["motor3"], "primary"),
+        ],
+        "gridding": "rectilinear",
+    }
+    RE(
+        grid_scan(
+            [hw.det],
+            hw.motor1,
+            -1,
+            1,
+            2,
+            hw.motor2,
+            -1,
+            1,
+            2,
+            True,
+            hw.motor3,
+            -2,
+            0,
+            2,
+            True,
+        )
+    )
+    assert dc.start[-1]["hints"] == hint
 
 
 def test_strip_dep_var(RE, hw):
@@ -550,15 +681,15 @@ def test_strip_dep_var(RE, hw):
 
     for (n1, d1), (n2, d2) in zip(L, LL):
         assert n1 == n2
-        if n1 == 'descriptor':
+        if n1 == "descriptor":
             assert d1 != d2
             for k in ["data_keys", "hints", "configuration", "object_keys"]:
-                for kk in ['det']:
+                for kk in ["det"]:
                     assert kk not in d2[k]
-        elif n1 == 'event':
+        elif n1 == "event":
             assert d1 != d2
             for k in ["data", "timestamps"]:
-                for kk in ['det_a', 'det_b']:
+                for kk in ["det_a", "det_b"]:
                     assert kk not in d2[k]
         else:
             assert d1 == d2

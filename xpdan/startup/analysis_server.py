@@ -85,14 +85,14 @@ def create_analysis_pipeline(order, **kwargs):
     namespace = link(
         *order, raw_source=Stream(stream_name="raw source"), **kwargs
     )
-    raw_source = namespace["raw_source"]
+    source = namespace["source"]
 
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
         glbl_dict["inbound_proxy_address"], prefix=b"an")
     # strip the dependant vars form the raw data
-    raw_stripped = raw_source.starmap(StripDepVar())
+    raw_stripped = source.starmap(StripDepVar())
     # TODO: inspect this from the namespace
     #  look for SimpleToEventStream nodes
     namespace.update(

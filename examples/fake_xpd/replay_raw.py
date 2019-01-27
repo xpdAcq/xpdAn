@@ -2,6 +2,7 @@
 import copy
 import time
 
+from pprint import pprint
 from databroker.broker import Broker
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -51,7 +52,7 @@ try:
             if e[0] == "stop":
                 stopped = True
             print(e[0])
-            # pprint(e[1])
+            pprint(e[1])
             p(*e)
             #if e[0] == "event":
                 #input()
@@ -62,6 +63,8 @@ try:
         # time.sleep(1)
 finally:
     if not stopped:
+        print('stop')
+        pprint(stop)
         p("stop", stop)
 
 print(time.time() - t0)

@@ -22,6 +22,19 @@ assets:
     class: 'Registry'
     config:
         dbpath: '{0}/assets.sqlite'
+handlers:
+    NPY_SEQ:
+        module: 'ophyd.sim'
+        class: 'NumpySeqHandler'
+"""
+
+load_script = """
+from databroker import Broker
+import yaml
+dbs = {}
+for yaml_file in ['raw', 'an']:
+    with open(f'{yaml_file}.yml', 'r') as f:
+        dbs[yaml_file] = Broker.from_config(yaml.load(f))
 """
 
 
@@ -56,18 +69,20 @@ def run_server(
         os.makedirs(fn, exist_ok=True)
         # if the path doesn't exist then make the databrokers
         with open(
-            os.path.join(portable_folder, f"{folder_name}.yml"), "w"
+                os.path.join(portable_folder, f"{folder_name}.yml"), "w"
         ) as f:
             f.write(portable_template.format(folder_name))
         print(portable_template.format(folder_name))
 
         print(fn)
-        # TODO: add more files here, eg. a databroker readme/tutorial
         portable_configs[folder_name] = yaml.load(
             io.StringIO(portable_template.format(fn))
         )
         os.makedirs(os.path.join(fn, "data"), exist_ok=True)
 
+    # TODO: add more files here, eg. a databroker readme/tutorial
+    with open(os.path.join(portable_folder, 'db_load.py'), 'w') as f:
+        f.write(load_script)
     an_broker = Broker.from_config(portable_configs["an"])
     if handlers is None:
         handlers = an_broker.reg.handler_reg
@@ -99,21 +114,20 @@ def run_server(
 
     rr = RunRouter(
         [
-            lambda x: lambda *nd: raw_source.emit(nd)
+            lambda x: (lambda *nd: raw_source.emit(nd))
             if x.get("analysis_stage", "") == "raw"
             else None
         ]
         + [
-            lambda x: lambda *nd: an_source.emit(nd)
-            if x.get("analysis_stage", None) == k
-            else None
-            for k in [
-                # TODO: put this in when we have the writers hooked up
-                # 'calib',
-                "integration",
-                "fq",
-                "pdf",
-            ]
+            lambda x: (lambda *nd: an_source.emit(nd))
+            if x.get("analysis_stage", None) == 'pdf'
+            else None,
+            lambda x: (lambda *nd: an_source.emit(nd))
+            if x.get("analysis_stage", None) == 'max'
+            else None,
+            lambda x: (lambda *nd: an_source.emit(nd))
+            if x.get("analysis_stage", None) == 'integration'
+            else None,
         ]
     )
 

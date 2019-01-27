@@ -42,7 +42,8 @@ def run_server(
         [
             lambda x: BestEffortCallback(
                 # fig_factory=fig_factory, teardown=teardown,
-                table_enabled=False
+                table_enabled=False,
+                overplot=False
             ),
             lambda x: LiveWaterfall(
                 "r", "gr", units=("A", "1/A**2"), window_title="PDF"

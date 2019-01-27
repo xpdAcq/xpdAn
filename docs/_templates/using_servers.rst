@@ -14,12 +14,13 @@ Currently there are four servers implemented,
 ``viz``.
 Each server is started by the command ``<server_name>_server`` on the command
 line while inside the analysis conda environment.
-For example, to start the analysis one would run
+For example, to start the analysis (with a background scale of .75) one would
+run
 
 .. code-block:: bash
 
  conda activate {{ analysis_env }}
- analysis_server
+ analysis_server --bg_scale=.75
 
 Some of the servers take optional arguments and keyword arguments.
 All the servers are using ``Fire`` to create command line interfaces.

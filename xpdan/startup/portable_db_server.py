@@ -69,7 +69,7 @@ def run_server(
         os.makedirs(fn, exist_ok=True)
         # if the path doesn't exist then make the databrokers
         with open(
-                os.path.join(portable_folder, f"{folder_name}.yml"), "w"
+            os.path.join(portable_folder, f"{folder_name}.yml"), "w"
         ) as f:
             f.write(portable_template.format(folder_name))
         print(portable_template.format(folder_name))
@@ -81,7 +81,7 @@ def run_server(
         os.makedirs(os.path.join(fn, "data"), exist_ok=True)
 
     # TODO: add more files here, eg. a databroker readme/tutorial
-    with open(os.path.join(portable_folder, 'db_load.py'), 'w') as f:
+    with open(os.path.join(portable_folder, "db_load.py"), "w") as f:
         f.write(load_script)
     an_broker = Broker.from_config(portable_configs["an"])
     if handlers is None:
@@ -120,13 +120,10 @@ def run_server(
         ]
         + [
             lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'pdf'
+            if x.get("analysis_stage", None) == "pdf"
             else None,
             lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'max'
-            else None,
-            lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'integration'
+            if x.get("analysis_stage", None) == "integration"
             else None,
         ]
     )

@@ -1,3 +1,5 @@
+from pprint import pprint
+
 import fire
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,9 +35,12 @@ def run_server(
                 handlers = glbl_dict[db].reg.handler_reg
                 break
     if prefix is None:
-        prefix = [b"an", b"raw"]
+        prefix = [
+            b"an",
+            # b"raw"
+        ]
 
-    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix,)
+    d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)
 
     rr = RunRouter(
@@ -43,7 +48,7 @@ def run_server(
             lambda x: BestEffortCallback(
                 # fig_factory=fig_factory, teardown=teardown,
                 table_enabled=False,
-                overplot=False
+                overplot=False,
             ),
             lambda x: LiveWaterfall(
                 "r", "gr", units=("A", "1/A**2"), window_title="PDF"

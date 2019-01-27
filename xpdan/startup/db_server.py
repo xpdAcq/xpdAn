@@ -22,13 +22,10 @@ def run_server(
     rr = RunRouter(
         [
             lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'pdf'
+            if x.get("analysis_stage", None) == "pdf"
             else None,
             lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'max'
-            else None,
-            lambda x: (lambda *nd: an_source.emit(nd))
-            if x.get("analysis_stage", None) == 'integration'
+            if x.get("analysis_stage", None) == "integration"
             else None,
         ]
     )

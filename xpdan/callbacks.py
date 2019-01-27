@@ -34,7 +34,7 @@ class StartStopCallback(CallbackBase):
         else:
             self.total_analysis_time += time.time() - self.event_t0
             print(
-                "Simgle Event Analysis time {}".format(
+                "Single Event Analysis time {}".format(
                     time.time() - self.event_t0
                 )
             )

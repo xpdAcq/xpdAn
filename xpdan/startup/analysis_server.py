@@ -91,14 +91,18 @@ def create_analysis_pipeline(order, **kwargs):
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"an")
+        glbl_dict["inbound_proxy_address"], prefix=b"an"
+    )
     # strip the dependant vars form the raw data
     raw_stripped = source.starmap(StripDepVar())
     namespace.update(
         to_event_stream_with_ind(
             raw_stripped,
-            *[node for node in namespace.values() if isinstance(
-                node, SimpleToEventStream)],
+            *[
+                node
+                for node in namespace.values()
+                if isinstance(node, SimpleToEventStream)
+            ],
             publisher=an_with_ind_pub
         )
     )

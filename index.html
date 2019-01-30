@@ -163,6 +163,44 @@ the software, please post it as a new thread at <a class="reference external" hr
 </div>
 </div>
 </div>
+<div class="section" id="v0-4-0">
+<h1>v0.4.0<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h1>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li>analysis server for running analysis in an external process
+without saving or visualization</li>
+<li>DB server for saving data into databrokers</li>
+<li><code class="docutils literal notranslate"><span class="pre">ExportCallback</span></code> for copying data for databroker export</li>
+<li><code class="docutils literal notranslate"><span class="pre">Retrieve</span></code> callback for accessing data from resources and datums</li>
+<li><code class="docutils literal notranslate"><span class="pre">ReturnCallback</span></code> a callback which always returns name document pairs</li>
+<li><code class="docutils literal notranslate"><span class="pre">RunRouter</span></code> which allows us to make pipelines on the fly</li>
+<li>Server for handling saving of data</li>
+<li>Tests for the servers</li>
+<li>All the callbacks from <code class="docutils literal notranslate"><span class="pre">bluesky</span></code></li>
+</ul>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li>Chunk the analysis pipelines into pieces so they can be composed</li>
+<li><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> also reports the analysis time for diagnostics</li>
+<li>Multiple detectors are supported for the main processing pipeline
+note that this does not support multiple detectors at the same
+time.</li>
+<li><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> now prints event analysis times</li>
+<li>Moved file saving print statements closer to saving action</li>
+<li>Moved <code class="docutils literal notranslate"><span class="pre">hinted_fields</span></code> to the <code class="docutils literal notranslate"><span class="pre">xpdan.vend.callbacks.core</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">BestEffortCallback</span></code> has a teardown kwarg for managing figures
+at the end of a run, preventing us from having too many windows
+open.</li>
+</ul>
+<p><strong>Fixed:</strong></p>
+<ul class="simple">
+<li>Removed <code class="docutils literal notranslate"><span class="pre">sanitize_np</span></code> from zmq system.</li>
+</ul>
+<p><strong>Authors:</strong></p>
+<ul class="simple">
+<li>Christopher J. Wright</li>
+</ul>
+</div>
 <div class="section" id="v0-3-6">
 <h1>v0.3.6<a class="headerlink" href="#v0-3-6" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>

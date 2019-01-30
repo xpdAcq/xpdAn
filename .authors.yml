@@ -1,0 +1,29 @@
+- name: Christopher J. Wright
+  email: cjwright4242@gmail.com
+  alternate_emails:
+  - cjwright4242gh@gmail.com
+  aliases:
+  - christopher
+  num_commits: 523
+  first_commit: 2016-09-14 12:27:08
+- name: Timothy Liu
+  email: chiahaoliu@users.noreply.github.com
+  alternate_emails:
+  - chbrahmsliu@gmail.com
+  aliases:
+  - chiahaoliu
+  num_commits: 109
+  first_commit: 2016-06-14 14:21:57
+  github: chiahaoliu
+- name: XPD Operator
+  email: xf28id1@xf28id1-ws2.cs.nsls2.local
+  num_commits: 7
+  first_commit: 2016-07-08 17:13:00
+- name: eculbertson
+  email: eac2240@columbia.edu
+  num_commits: 11
+  first_commit: 2017-10-17 13:08:55
+- name: Simon Billinge
+  email: sbillinge@users.noreply.github.com
+  num_commits: 1
+  first_commit: 2016-09-21 19:35:26

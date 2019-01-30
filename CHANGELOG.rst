@@ -4,6 +4,46 @@
 
 .. current developments
 
+v0.4.0
+====================
+
+**Added:**
+
+* analysis server for running analysis in an external process
+  without saving or visualization
+* DB server for saving data into databrokers
+* ``ExportCallback`` for copying data for databroker export
+* ``Retrieve`` callback for accessing data from resources and datums
+* ``ReturnCallback`` a callback which always returns name document pairs
+* ``RunRouter`` which allows us to make pipelines on the fly
+* Server for handling saving of data
+* Tests for the servers
+* All the callbacks from ``bluesky``
+
+**Changed:**
+
+* Chunk the analysis pipelines into pieces so they can be composed
+* ``StartStopCallback`` also reports the analysis time for diagnostics
+* Multiple detectors are supported for the main processing pipeline
+  note that this does not support multiple detectors at the same
+  time.
+* ``StartStopCallback`` now prints event analysis times
+* Moved file saving print statements closer to saving action
+* Moved ``hinted_fields`` to the ``xpdan.vend.callbacks.core``
+* ``BestEffortCallback`` has a teardown kwarg for managing figures
+  at the end of a run, preventing us from having too many windows
+  open.
+
+**Fixed:**
+
+* Removed ``sanitize_np`` from zmq system.
+
+**Authors:**
+
+* Christopher J. Wright
+
+
+
 v0.3.6
 ====================
 

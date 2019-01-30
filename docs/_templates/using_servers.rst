@@ -52,9 +52,16 @@ start it.'
 {% for name, blurb in servers_dict.items() %}
 
 ``{{ name }}``
-------------
+++++++++++++++
 {{ blurb }}
 
 See the ``run_server`` function in the
 :ref:`{{ name }}_server` for the keyword arguments.
 {% endfor %}
+
+
+Running from ipython
+--------------------
+All of these server commands can be run from ipython (and python) directly.
+This provides more control over the servers operation, especially for the
+analysis server.

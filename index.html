@@ -79,6 +79,7 @@
             
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_servers.html">Using Servers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -154,10 +155,52 @@
 <p>To post questions about anything XPD, including software, and to see archived answers, please join the <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a></p>
 <p><code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> is a Python package that aids data analysis at the XPD beamlime.</p>
 <p>The goal of the <code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> package is to simplify your analysis workflow during beamtime,
-so that you can focus more on scientific aspects of your experiment.</p>
+so that you can focus more on the scientific aspects of your experiment.</p>
 <p>To get started, please go to <a class="reference internal" href="quickstart.html#quick-start"><span class="std std-ref">Quick Start</span></a></p>
 <p>If you have suggestions for new features in xpdAcq, or want to report a bug or simply ask a question about
 the software, please post it as a new thread at <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users</a></p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="xpdan.html">xpdan package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="xpdan.pipelines.html">xpdan.pipelines package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-main-module">xpdan.pipelines.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-save-tiff-module">xpdan.pipelines.save_tiff module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="xpdan.startup.html">xpdan.startup package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-analysis-server-module">xpdan.startup.analysis_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-db-server-module">xpdan.startup.db_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-portable-db-server-module">xpdan.startup.portable_db_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-save-server-module">xpdan.startup.save_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-viz-server-module">xpdan.startup.viz_server module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-callbacks-module">xpdan.callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl">xpdan.glbl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-tools-module">xpdan.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="section" id="change-log">
 <h3>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h3>
 </div>
@@ -317,55 +360,6 @@ dark or background.</li>
 <li>Speed up masking via median based sigma clipping</li>
 <li>Z score visualization to callback pipeline</li>
 </ul>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="xpdan.html">xpdan package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="xpdan.tests.html">xpdan.tests package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#xpdan-tests-conftest-module">xpdan.tests.conftest module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_data_reduction">xpdan.tests.test_data_reduction module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_data_reduction_core">xpdan.tests.test_data_reduction_core module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_db_utils">xpdan.tests.test_db_utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.test_fuzzybroker">xpdan.tests.test_fuzzybroker module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#xpdan-tests-test-tools-module">xpdan.tests.test_tools module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests.utils">xpdan.tests.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.tests.html#module-xpdan.tests">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="xpdan.pipelines.html">xpdan.pipelines package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-main-module">xpdan.pipelines.main module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-save-tiff-module">xpdan.pipelines.save_tiff module</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="xpdan.startup.html">xpdan.startup package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="xpdan.startup.html#xpdan-startup-analysis-module">xpdan.startup.analysis module</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.dev_utils">xpdan.dev_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.fuzzybroker">xpdan.fuzzybroker module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.glbl">xpdan.glbl module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-glbl-gen-module">xpdan.glbl_gen module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-tools-module">xpdan.tools module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-utils-module">xpdan.utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>

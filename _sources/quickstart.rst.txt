@@ -17,19 +17,27 @@ XPD Data Analysis Workflow Summary
 ------------------------------------
 
 This is a brief summary of the steps you have to take to enable real-time data analysis analysis at XPD.
-more information about these steps can be found later in the more detailed documentation. Treat this quickstart as a reference that you may return back to.
+More information about these steps can be found later in the more detailed documentation.
+Treat this quickstart as a reference that you may return back to.
 Carry out the steps in this order to ensure a successful analysis.
 
   1. If you haven't already, join `XPD-Users Google group <https://groups.google.com/forum/#!forum/xpd-users;context-place=overview>`_ . Look here for answers if you get stuck and if the answer to your question is not already there, please ask it!
 
-  2. Setup the analysis by running ``setup_analysis`` in a terminal.
+  2. Insert your USB hard drive (or any other storage system) and mount it
 
-  3. To begin running the analysis pipeline run ``start_analysis()``.
+  3. Start the servers, see :ref:`using_servers`_ for details on the server setups
 
-  4. Your data will be automatically saved and visualized via the analysis pipeline.
+    1. Run ``analysis_server``
+
+    2. Run ``portable_db_server path/to/folder/on/USB/drive``
+
+    3. Run ``save_server path/to/different/folder/on/USB/drive``
+
+  4. Your data will be automatically processed, saved and visualized via the servers.
 
     * The data will be saved in the directory
-      ``.../xpdUser/tiff_base/``.
+      ``.../xpdUser/tiff_base/`` and whichever directory you provided on the
+      save server command.
 
     * The pipeline will save:
 
@@ -39,7 +47,7 @@ Carry out the steps in this order to ensure a successful analysis.
             1. by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).
             2. alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis
             3. alternative ehavior available is to not mask any images.
-            4. These settings can be changed by either updating the ``mask_settings`` dict loaded into the analysis terminal or by starting analysis with the ``mask_setting``` kwarg set to the new dict. The three posibilities are denoted by "auto", "first", and "none" respectively. For example, to set the mask to only be created on the first image of the scan one would type ``mask_setting.update({'setting': 'first'})``, it is important to update the dict, not reassign it (so don't use ``mask_setting = {'setting': 'first'}``).
+            4. These settings can be changed by either running the analysis server with the ``--mask_settings`` kwarg. The three posibilities are denoted by "auto", "first", and "none" respectively. For example, to set the mask to only be created on the first image of the scan one would type ``--mask_setting={'setting': 'first'}``.
         3. Integrated scattered intensity, I(Q) (as ``.chi``)
         4. I(tth) (as ``.chi``), note that this is the same as I(Q) on the tth grid.
         5. The structure and reduced structure factor S(Q) and F(Q) (as ``.sq`` and ``.fq`` respecifvely)
@@ -57,9 +65,9 @@ Carry out the steps in this order to ensure a successful analysis.
         5. F(Q)
         6. G(r)
 
-  5. To change the pipeline configuration stop the ``start_analysis()`` by
-     typing ``Ctrl+C`` in the terminal where it is running. Then edit one of the configuration
-     dictionaries which are loaded into ipython as variables.
+  5. To change the pipeline configuration stop the analysis server by
+     typing ``Ctrl+C`` in the terminal where it is running.
+     Then re-run the command with new keyword arguments.
 
      * ``mask_kwargs`` which controls the mask creation (see the `xpdtools docs <https://xpdacq.github.io/xpdtools/xpdtools.html#xpdtools.tools.mask_img>`_)
      * ``pdf_kwargs`` which controls the PDF creation
@@ -78,7 +86,7 @@ Carry out the steps in this order to ensure a successful analysis.
 
      Then restart the analysis with ``start_analysis()``.
      Additionally ``start_analysis()`` accepts modification to these
-     dictionaries when it is called see: :ref:`xpdan_startup`. 
+     dictionaries when it is called see: :ref:`xpdan_startup`.
      
      For example:
      

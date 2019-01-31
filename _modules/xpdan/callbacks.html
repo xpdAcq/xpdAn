@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.callbacks &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../using_servers.html">Using Servers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.callbacks</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.callbacks</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">bluesky.callbacks.core</span> <span class="k">import</span> <span class="n">CallbackBase</span>
+<span class="kn">from</span> <span class="nn">skbeam.io</span> <span class="k">import</span> <span class="n">save_output</span>
+<span class="kn">from</span> <span class="nn">skbeam.io.fit2d</span> <span class="k">import</span> <span class="n">fit2d_save</span>
+<span class="kn">from</span> <span class="nn">tifffile</span> <span class="k">import</span> <span class="n">imsave</span>
+<span class="kn">from</span> <span class="nn">xpdan.formatters</span> <span class="k">import</span> <span class="n">pfmt</span><span class="p">,</span> <span class="n">clean_template</span><span class="p">,</span> <span class="n">render2</span>
+<span class="kn">from</span> <span class="nn">xpdan.io</span> <span class="k">import</span> <span class="n">pdf_saver</span><span class="p">,</span> <span class="n">dump_yml</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">Retrieve</span>
+<span class="kn">from</span> <span class="nn">xpdtools.dev_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span>
+
+
+<div class="viewcode-block" id="StartStopCallback"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.StartStopCallback">[docs]</a><span class="k">class</span> <span class="nc">StartStopCallback</span><span class="p">(</span><span class="n">CallbackBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print the time for analysis&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_analysis_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_events</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="StartStopCallback.start"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.StartStopCallback.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_analysis_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_events</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;START ANALYSIS ON </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="StartStopCallback.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.StartStopCallback.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_events</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;seq_num&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_analysis_time</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Single Event Analysis time </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StartStopCallback.stop"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.StartStopCallback.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;FINISH ANALYSIS ON </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_start&quot;</span><span class="p">,</span> <span class="s2">&quot;NA&quot;</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Average Event analysis time </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">total_analysis_time</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_events</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analysis time </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="SaveBaseClass"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveBaseClass">[docs]</a><span class="k">class</span> <span class="nc">SaveBaseClass</span><span class="p">(</span><span class="n">Retrieve</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for saving files with human friendly file names.</span>
+
+<span class="sd">    For each document this class applys a format to the string based off the</span>
+<span class="sd">    document which has been seen. When the time comes for the file to be</span>
+<span class="sd">    written any templating which has not been formatted will be removed from</span>
+<span class="sd">    the filename.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    template : str</span>
+<span class="sd">        The templated filename</span>
+<span class="sd">    handler_reg : dict</span>
+<span class="sd">        The registry of file handlers for loading files from disk</span>
+<span class="sd">    root_map : dict</span>
+<span class="sd">        Mapping between the old file root and a new root, used for loading</span>
+<span class="sd">        files from disk</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        All extra kwargs are passed to the filename formatter when the start</span>
+<span class="sd">        document is received</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Every instance of ``__independent_vars__`` will be replaced with</span>
+<span class="sd">    ``{name}_{data}_{units}_`` for each independent variable of the experiment</span>
+<span class="sd">    in the template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">handler_reg</span><span class="p">,</span> <span class="n">root_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">base_folders</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">base_folders</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base_folders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_folders</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">base_folders</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_folders</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_folders</span> <span class="o">=</span> <span class="n">base_folders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template</span> <span class="o">=</span> <span class="n">template</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_template</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descriptor_templates</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_dep_shapes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># If you see this filename something bad happened (no metadata was</span>
+        <span class="c1">#  captured/formatted)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span> <span class="o">=</span> <span class="s2">&quot;something_horrible_happened.xxx&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">handler_reg</span><span class="p">,</span> <span class="n">root_map</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SaveBaseClass.start"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveBaseClass.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="c1"># Get the independent vars</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hints&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dimensions&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;time&quot;</span>
+        <span class="p">]</span>
+
+        <span class="c1"># use the magic formatter to leave things behind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_template</span> <span class="o">=</span> <span class="n">render2</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+            <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]),</span>
+            <span class="o">**</span><span class="n">doc</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SaveBaseClass.descriptor"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveBaseClass.descriptor">[docs]</a>    <span class="k">def</span> <span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_dep_shapes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">n</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data_keys&quot;</span><span class="p">][</span><span class="n">n</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_names</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">n</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data_keys&quot;</span><span class="p">][</span><span class="n">n</span><span class="p">][</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_names</span><span class="p">)</span> <span class="o">^</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data_keys&quot;</span><span class="p">])</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Use independent vars to create the filename</span>
+        <span class="n">independent_var_string</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_names</span><span class="p">):</span>
+            <span class="c1"># Only use scalar data in filenames</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dep_shapes</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">independent_var_string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">_</span><span class="si">{data}</span><span class="s2">_</span><span class="si">{units}</span><span class="s2">_&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;{{event[data][</span><span class="si">{dim}</span><span class="s2">]:1.</span><span class="si">{doc[&#39;data_keys&#39;][dim][&#39;precision&#39;]}</span><span class="s2">f}}&quot;</span><span class="p">,</span>
+                    <span class="c1"># TODO: fill in the sig figs</span>
+                    <span class="n">units</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;{doc[&#39;data_keys&#39;][dim].get(&#39;units&#39;, &#39;arb&#39;)}&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">descriptor_templates</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_template</span><span class="p">,</span>
+            <span class="n">descriptor</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+            <span class="n">__independent_vars__</span><span class="o">=</span><span class="n">independent_var_string</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">descriptor</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SaveBaseClass.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveBaseClass.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">descriptor_templates</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;descriptor&quot;</span><span class="p">]],</span>
+                <span class="n">event</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+                <span class="n">base_folder</span><span class="o">=</span><span class="n">bf</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_folders</span>
+        <span class="p">]</span>
+        <span class="c1"># Note that formally there are more steps to the formatting, but we</span>
+        <span class="c1">#  should have the folder by now</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Saving file to </span><span class="si">{filename}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SaveTiff"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveTiff">[docs]</a><span class="k">class</span> <span class="nc">SaveTiff</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving Tiff files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveTiff.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveTiff.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="c1"># fill the document</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">two_d_var</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">]:</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+                <span class="n">imsave</span><span class="p">(</span>
+                    <span class="n">clean_template</span><span class="p">(</span>
+                        <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;_</span><span class="si">{two_d_var}</span><span class="s2">.tiff&quot;</span><span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">two_d_var</span><span class="p">],</span>
+                <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SaveIntensity"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveIntensity">[docs]</a><span class="k">class</span> <span class="nc">SaveIntensity</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving Q and tth ``.chi`` files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveIntensity.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveIntensity.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="c1"># fill the document</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">one_d_ind_var</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">]:</span>
+            <span class="k">for</span> <span class="n">one_d_dep_var</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="p">]:</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+                    <span class="n">save_output</span><span class="p">(</span>
+                        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">one_d_ind_var</span><span class="p">],</span>
+                        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">one_d_dep_var</span><span class="p">],</span>
+                        <span class="n">clean_template</span><span class="p">(</span>
+                            <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">filename</span><span class="p">,</span>
+                                <span class="n">ext</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;_</span><span class="si">{one_d_dep_var}</span><span class="s2">_</span><span class="si">{one_d_ind_var}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="p">{</span><span class="s2">&quot;tth&quot;</span><span class="p">:</span> <span class="s2">&quot;2theta&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="s2">&quot;Q&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">one_d_ind_var</span><span class="p">),</span>
+                    <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SaveMask"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveMask">[docs]</a><span class="k">class</span> <span class="nc">SaveMask</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving masks as ``.msk`` and ``.npy`` files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveMask.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveMask.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="c1"># fill the document</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">two_d_var</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="p">]:</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+                <span class="n">fit2d_save</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">two_d_var</span><span class="p">]),</span>
+                    <span class="n">clean_template</span><span class="p">(</span><span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)),</span>
+                <span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">clean_template</span><span class="p">(</span><span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;_mask.npy&quot;</span><span class="p">)),</span>
+                    <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">two_d_var</span><span class="p">],</span>
+                <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SavePDFgetx3"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SavePDFgetx3">[docs]</a><span class="k">class</span> <span class="nc">SavePDFgetx3</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving PDF, F(Q), S(Q) files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SavePDFgetx3.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SavePDFgetx3.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="c1"># fill the document</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">one_d_ind_var</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">]:</span>
+            <span class="k">for</span> <span class="n">one_d_dep_var</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dep_shapes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="p">]:</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+                    <span class="n">pdf_saver</span><span class="p">(</span>
+                        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">one_d_ind_var</span><span class="p">],</span>
+                        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="n">one_d_dep_var</span><span class="p">],</span>
+                        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;config&quot;</span><span class="p">],</span>
+                        <span class="n">clean_template</span><span class="p">(</span>
+                            <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;.</span><span class="si">{one_d_dep_var}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SaveMeta"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveMeta">[docs]</a><span class="k">class</span> <span class="nc">SaveMeta</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving metadata files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveMeta.start"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveMeta.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;analysis_stage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;meta&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_template</span><span class="p">,</span> <span class="n">base_folder</span><span class="o">=</span><span class="n">bf</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_folders</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">clean_template</span><span class="p">(</span><span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.yaml&quot;</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Saving file to </span><span class="si">{fn}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fn</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">dump_yml</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SaveMeta.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveMeta.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="SaveCalib"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveCalib">[docs]</a><span class="k">class</span> <span class="nc">SaveCalib</span><span class="p">(</span><span class="n">SaveBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for saving pyFAI calibrations as ``.poni`` files&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SaveCalib.event"><a class="viewcode-back" href="../../xpdan.html#xpdan.callbacks.SaveCalib.event">[docs]</a>    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">event</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">:</span>
+            <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;calibration&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">clean_template</span><span class="p">(</span><span class="n">pfmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;.poni&quot;</span><span class="p">))</span>
+            <span class="p">)</span></div></div>
+
+
+<span class="n">SAVER_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;dark_sub&quot;</span><span class="p">:</span> <span class="n">SaveTiff</span><span class="p">,</span>
+    <span class="s2">&quot;integration&quot;</span><span class="p">:</span> <span class="n">SaveIntensity</span><span class="p">,</span>
+    <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="n">SaveMask</span><span class="p">,</span>
+    <span class="s2">&quot;pdf&quot;</span><span class="p">:</span> <span class="n">SavePDFgetx3</span><span class="p">,</span>
+    <span class="s2">&quot;fq&quot;</span><span class="p">:</span> <span class="n">SavePDFgetx3</span><span class="p">,</span>
+    <span class="s2">&quot;sq&quot;</span><span class="p">:</span> <span class="n">SavePDFgetx3</span><span class="p">,</span>
+    <span class="s2">&quot;calib&quot;</span><span class="p">:</span> <span class="n">SaveCalib</span><span class="p">,</span>
+    <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">SaveMeta</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

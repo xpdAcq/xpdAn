@@ -92,7 +92,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#xpdan-999-load-module">xpdan.999-load module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#xpdan-callbacks-module">xpdan.callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-xpdan.callbacks">xpdan.callbacks module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-xpdan.db_utils">xpdan.db_utils module</a></li>
@@ -179,9 +179,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="xpdan.pipelines.html">xpdan.pipelines package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-main-module">xpdan.pipelines.main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#module-xpdan.pipelines.main">xpdan.pipelines.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#xpdan-pipelines-save-tiff-module">xpdan.pipelines.save_tiff module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.pipelines.html#module-xpdan.pipelines.save_tiff">xpdan.pipelines.save_tiff module</a></li>
 </ul>
 </li>
 </ul>
@@ -206,8 +206,153 @@
 <div class="section" id="xpdan-999-load-module">
 <h2>xpdan.999-load module<a class="headerlink" href="#xpdan-999-load-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="xpdan-callbacks-module">
-<span id="xpdan-callbacks"></span><h2>xpdan.callbacks module<a class="headerlink" href="#xpdan-callbacks-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.callbacks">
+<span id="xpdan-callbacks-module"></span><span id="xpdan-callbacks"></span><h2>xpdan.callbacks module<a class="headerlink" href="#module-xpdan.callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xpdan.callbacks.SaveBaseClass">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveBaseClass</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.vend.callbacks.core.Retrieve</span></code></p>
+<p>Base class for saving files with human friendly file names.</p>
+<p>For each document this class applys a format to the string based off the
+document which has been seen. When the time comes for the file to be
+written any templating which has not been formatted will be removed from
+the filename.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>template</strong> (<em>str</em>) – The templated filename</li>
+<li><strong>handler_reg</strong> (<em>dict</em>) – The registry of file handlers for loading files from disk</li>
+<li><strong>root_map</strong> (<em>dict</em>) – Mapping between the old file root and a new root, used for loading
+files from disk</li>
+<li><strong>kwargs</strong> (<em>dict</em>) – All extra kwargs are passed to the filename formatter when the start
+document is received</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Every instance of <code class="docutils literal notranslate"><span class="pre">__independent_vars__</span></code> will be replaced with
+<code class="docutils literal notranslate"><span class="pre">{name}_{data}_{units}_</span></code> for each independent variable of the experiment
+in the template.</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveBaseClass.descriptor">
+<code class="descname">descriptor</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.descriptor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.callbacks.SaveBaseClass.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.callbacks.SaveBaseClass.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SaveCalib">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveCalib</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving pyFAI calibrations as <code class="docutils literal notranslate"><span class="pre">.poni</span></code> files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveCalib.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SaveIntensity">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveIntensity</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving Q and tth <code class="docutils literal notranslate"><span class="pre">.chi</span></code> files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveIntensity.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SaveMask">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveMask</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving masks as <code class="docutils literal notranslate"><span class="pre">.msk</span></code> and <code class="docutils literal notranslate"><span class="pre">.npy</span></code> files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveMask.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SaveMeta">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveMeta</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving metadata files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveMeta.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.callbacks.SaveMeta.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SavePDFgetx3">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SavePDFgetx3</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving PDF, F(Q), S(Q) files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SavePDFgetx3.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.SaveTiff">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveTiff</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
+<p>Callback for saving Tiff files</p>
+<dl class="method">
+<dt id="xpdan.callbacks.SaveTiff.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xpdan.callbacks.StartStopCallback">
+<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">StartStopCallback</code><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluesky.callbacks.core.CallbackBase</span></code></p>
+<p>Print the time for analysis</p>
+<dl class="method">
+<dt id="xpdan.callbacks.StartStopCallback.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.callbacks.StartStopCallback.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.callbacks.StartStopCallback.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-xpdan.data_reduction">
 <span id="xpdan-data-reduction-module"></span><h2>xpdan.data_reduction module<a class="headerlink" href="#module-xpdan.data_reduction" title="Permalink to this headline">¶</a></h2>

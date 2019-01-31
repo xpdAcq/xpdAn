@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.pipelines.main &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../using_servers.html">Using Servers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.pipelines.main</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.pipelines.main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">shed.simple</span> <span class="k">import</span> <span class="n">SimpleFromEventStream</span> <span class="k">as</span> <span class="n">FromEventStream</span>
+<span class="kn">from</span> <span class="nn">rapidz</span> <span class="k">import</span> <span class="n">move_to_first</span><span class="p">,</span> <span class="n">union</span>
+<span class="kn">from</span> <span class="nn">xpdan.callbacks</span> <span class="k">import</span> <span class="n">StartStopCallback</span>
+<span class="kn">from</span> <span class="nn">xpdan.db_utils</span> <span class="k">import</span> <span class="n">query_background</span><span class="p">,</span> <span class="n">query_dark</span><span class="p">,</span> <span class="n">temporal_prox</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.pipeline_utils</span> <span class="k">import</span> <span class="n">_timestampstr</span><span class="p">,</span> <span class="n">clear_combine_latest</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">Retrieve</span>
+<span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="k">import</span> <span class="n">glbl_dict</span>
+<span class="kn">from</span> <span class="nn">xpdtools.calib</span> <span class="k">import</span> <span class="n">_save_calib_param</span>
+<span class="kn">from</span> <span class="nn">xpdtools.pipelines.raw_pipeline</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">image_process</span><span class="p">,</span>
+    <span class="n">calibration</span><span class="p">,</span>
+    <span class="n">scattering_correction</span><span class="p">,</span>
+    <span class="n">gen_mask</span><span class="p">,</span>
+    <span class="n">integration</span><span class="p">,</span>
+    <span class="n">pdf_gen</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># TODO: use oracle to get rid of this</span>
+<div class="viewcode-block" id="clear_geo_gen"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.clear_geo_gen">[docs]</a><span class="k">def</span> <span class="nf">clear_geo_gen</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">geometry_img_shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># If new calibration uid invalidate our current calibration cache</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;detector_calibration_client_uid&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span>
+    <span class="n">move_to_first</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="p">(</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">geometry_img_shape</span><span class="o">.</span><span class="n">lossless_buffer</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<span class="c1"># TODO: use oracle to get rid of this</span>
+<div class="viewcode-block" id="clear_comp"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.clear_comp">[docs]</a><span class="k">def</span> <span class="nf">clear_comp</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">iq_comp</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Clear composition every start document</span>
+    <span class="c1"># FIXME: Needs to go after the iq_comp is defined</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">)</span>
+    <span class="n">move_to_first</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">clear_combine_latest</span><span class="p">(</span><span class="n">iq_comp</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="save_cal"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.save_cal">[docs]</a><span class="k">def</span> <span class="nf">save_cal</span><span class="p">(</span><span class="n">start_timestamp</span><span class="p">,</span> <span class="n">gen_geo_cal</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Save out calibration data to special place</span>
+    <span class="n">h_timestamp</span> <span class="o">=</span> <span class="n">start_timestamp</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">_timestampstr</span><span class="p">)</span>
+    <span class="p">(</span>
+        <span class="n">gen_geo_cal</span><span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">zip_latest</span><span class="p">(</span><span class="n">h_timestamp</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">starsink</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">_save_calib_param</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;config_base&quot;</span><span class="p">],</span> <span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;calib_config_name&quot;</span><span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="nb">locals</span><span class="p">()</span></div>
+
+
+<span class="c1"># TODO: chunk this up a bit more so we can separate XRD from PDF</span>
+<div class="viewcode-block" id="start_gen"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.start_gen">[docs]</a><span class="k">def</span> <span class="nf">start_gen</span><span class="p">(</span>
+    <span class="n">raw_source</span><span class="p">,</span>
+    <span class="n">image_names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;pe1_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pe2_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pe3_image&quot;</span><span class="p">),</span>
+    <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
+    <span class="n">calibration_md_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    raw_source</span>
+<span class="sd">    image_name</span>
+<span class="sd">    db : databroker.Broker</span>
+<span class="sd">        The databroker to use</span>
+<span class="sd">    calibration_md_folder</span>
+<span class="sd">    kwargs</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">calibration_md_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">calibration_md_folder</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;folder&quot;</span><span class="p">:</span> <span class="s2">&quot;xpdAcq_calib_info.yml&quot;</span><span class="p">}</span>
+    <span class="c1"># raw_source.sink(lambda x: print(x[0]))</span>
+    <span class="c1"># Build the general pipeline from the raw_pipeline</span>
+
+    <span class="c1"># TODO: change this when new dark logic comes</span>
+    <span class="c1"># Check that the data isn&#39;t a dark</span>
+    <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">upstream</span><span class="o">=</span><span class="n">raw_source</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;sc_dk_field_uid&quot;</span> <span class="ow">in</span> <span class="n">x</span>
+    <span class="p">)</span>
+    <span class="c1"># Fill the raw event stream</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">raw_source</span><span class="o">.</span><span class="n">combine_latest</span><span class="p">(</span><span class="n">dk_uid</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">starmap</span><span class="p">(</span>
+            <span class="n">Retrieve</span><span class="p">(</span><span class="n">handler_reg</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">reg</span><span class="o">.</span><span class="n">handler_reg</span><span class="p">,</span> <span class="n">root_map</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">reg</span><span class="o">.</span><span class="n">root_map</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">,</span> <span class="s2">&quot;datum&quot;</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="c1"># source.sink(print)</span>
+    <span class="c1"># Get all the documents</span>
+    <span class="n">start_docs</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">)</span>
+    <span class="n">descriptor_docs</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;descriptor&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">,</span> <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+    <span class="p">)</span>
+    <span class="n">event_docs</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">,</span> <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span>
+    <span class="p">)</span>
+    <span class="n">all_docs</span> <span class="o">=</span> <span class="n">event_docs</span><span class="o">.</span><span class="n">combine_latest</span><span class="p">(</span>
+        <span class="n">start_docs</span><span class="p">,</span> <span class="n">descriptor_docs</span><span class="p">,</span> <span class="n">emit_on</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;raw_event&quot;</span><span class="p">:</span> <span class="n">e</span><span class="p">,</span>
+            <span class="s2">&quot;raw_start&quot;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span>
+            <span class="s2">&quot;raw_descriptor&quot;</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span>
+            <span class="s2">&quot;human_timestamp&quot;</span><span class="p">:</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]),</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># PDF specific</span>
+    <span class="n">composition</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;composition_string&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span>
+
+    <span class="c1"># Calibration information</span>
+    <span class="n">wavelength</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;bt_wavelength&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+        <span class="n">history</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">calibrant</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;dSpacing&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">,</span> <span class="n">principle</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+        <span class="n">history</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="n">is_calibration_img</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;detector_calibration_server_uid&quot;</span> <span class="ow">in</span> <span class="n">x</span>
+    <span class="p">)</span>
+    <span class="c1"># Only pass through new calibrations (prevents us from recalculating cals)</span>
+    <span class="n">geo_input</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;calibration_md&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">,</span> <span class="n">principle</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">start_timestamp</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span>
+
+    <span class="c1"># Clean out the cached darks and backgrounds on start</span>
+    <span class="c1"># so that this will run regardless of background/dark status</span>
+    <span class="c1"># note that we get the proper data (if it exists downstream)</span>
+    <span class="c1"># FIXME: this is kinda an anti-pattern and needs to go lower in the</span>
+    <span class="c1"># pipeline</span>
+    <span class="n">start_docs</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">raw_background_dark</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">start_docs</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">raw_background</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">start_docs</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">raw_foreground_dark</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+
+    <span class="n">bg_query</span> <span class="o">=</span> <span class="n">start_docs</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">query_background</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
+    <span class="n">bg_docs</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">bg_query</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">start_docs</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">temporal_prox</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="p">[])</span>
+        <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">documents</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get foreground dark</span>
+    <span class="n">fg_dark_query</span> <span class="o">=</span> <span class="n">start_docs</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">query_dark</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
+    <span class="n">fg_dark_query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">==</span> <span class="p">[])</span><span class="o">.</span><span class="n">sink</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No dark found!&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">raw_foreground_dark</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">FromEventStream</span><span class="p">(</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">image_name</span><span class="p">),</span>
+                <span class="n">fg_dark_query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="p">[])</span>
+                <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">documents</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Get bg dark</span>
+    <span class="n">bg_dark_query</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">bg_docs</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="n">query_dark</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="n">db</span>
+    <span class="p">)</span>
+
+    <span class="n">raw_background_dark</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">FromEventStream</span><span class="p">(</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">image_name</span><span class="p">),</span>
+                <span class="n">bg_dark_query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="p">[])</span>
+                <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">documents</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                <span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw_background_dark&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Pull darks from their stream if it exists</span>
+    <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span><span class="p">:</span>
+        <span class="p">(</span>
+            <span class="n">FromEventStream</span><span class="p">(</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">image_name</span><span class="p">),</span> <span class="n">source</span><span class="p">,</span> <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;dark&quot;</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">raw_foreground_dark</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Get background</span>
+    <span class="n">raw_background</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">FromEventStream</span><span class="p">(</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">image_name</span><span class="p">),</span>
+                <span class="n">bg_docs</span><span class="p">,</span>
+                <span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw_background&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Get foreground</span>
+    <span class="n">img_counter</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s2">&quot;seq_num&quot;</span><span class="p">,),</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;seq_num&quot;</span><span class="p">,</span>
+        <span class="c1"># This doesn&#39;t make sense in multi-stream settings</span>
+        <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_foreground</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">FromEventStream</span><span class="p">(</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">,</span>
+                <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">image_name</span><span class="p">),</span>
+                <span class="n">source</span><span class="p">,</span>
+                <span class="n">principle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                <span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw_foreground&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">raw_source</span><span class="o">.</span><span class="n">starsink</span><span class="p">(</span><span class="n">StartStopCallback</span><span class="p">())</span>
+    <span class="k">return</span> <span class="nb">locals</span><span class="p">()</span></div>
+
+
+<span class="n">pipeline_order</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">start_gen</span><span class="p">,</span>
+    <span class="n">image_process</span><span class="p">,</span>
+    <span class="n">calibration</span><span class="p">,</span>
+    <span class="n">clear_geo_gen</span><span class="p">,</span>
+    <span class="n">save_cal</span><span class="p">,</span>
+    <span class="n">scattering_correction</span><span class="p">,</span>
+    <span class="n">gen_mask</span><span class="p">,</span>
+    <span class="n">integration</span><span class="p">,</span>
+    <span class="n">pdf_gen</span><span class="p">,</span>
+    <span class="n">clear_comp</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># If main print visualize pipeline</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">rapidz</span> <span class="k">import</span> <span class="n">Stream</span>
+    <span class="kn">from</span> <span class="nn">rapidz.link</span> <span class="k">import</span> <span class="n">link</span>
+
+    <span class="n">raw_source</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw_source&quot;</span><span class="p">)</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">link</span><span class="p">(</span><span class="o">*</span><span class="n">pipeline_order</span><span class="p">,</span> <span class="n">raw_source</span><span class="o">=</span><span class="n">raw_source</span><span class="p">)</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">source_node</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

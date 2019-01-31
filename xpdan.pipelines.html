@@ -88,9 +88,9 @@
 <li class="toctree-l2 current"><a class="reference internal" href="xpdan.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">xpdan.pipelines package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#xpdan-pipelines-main-module">xpdan.pipelines.main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.main">xpdan.pipelines.main module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.pipeline_utils">xpdan.pipelines.pipeline_utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#xpdan-pipelines-save-tiff-module">xpdan.pipelines.save_tiff module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-xpdan.pipelines.save_tiff">xpdan.pipelines.save_tiff module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="xpdan.startup.html">xpdan.startup package</a></li>
@@ -98,7 +98,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-999-load-module">xpdan.999-load module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="xpdan.html#xpdan-callbacks-module">xpdan.callbacks module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.callbacks">xpdan.callbacks module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction">xpdan.data_reduction module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.data_reduction_core">xpdan.data_reduction_core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="xpdan.html#module-xpdan.db_utils">xpdan.db_utils module</a></li>
@@ -182,8 +182,43 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="xpdan-pipelines-main-module">
-<h2>xpdan.pipelines.main module<a class="headerlink" href="#xpdan-pipelines-main-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.pipelines.main">
+<span id="xpdan-pipelines-main-module"></span><h2>xpdan.pipelines.main module<a class="headerlink" href="#module-xpdan.pipelines.main" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xpdan.pipelines.main.clear_comp">
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">clear_comp</code><span class="sig-paren">(</span><em>source</em>, <em>iq_comp</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#clear_comp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.clear_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.main.clear_geo_gen">
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">clear_geo_gen</code><span class="sig-paren">(</span><em>source</em>, <em>geometry_img_shape</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#clear_geo_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.clear_geo_gen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.main.save_cal">
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">save_cal</code><span class="sig-paren">(</span><em>start_timestamp</em>, <em>gen_geo_cal</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#save_cal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.save_cal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.pipelines.main.start_gen">
+<code class="descclassname">xpdan.pipelines.main.</code><code class="descname">start_gen</code><span class="sig-paren">(</span><em>raw_source</em>, <em>image_names=('pe1_image'</em>, <em>'pe2_image'</em>, <em>'pe3_image')</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>calibration_md_folder=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#start_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.start_gen" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>raw_source</strong></li>
+<li><strong>image_name</strong></li>
+<li><strong>db</strong> (<em>databroker.Broker</em>) – The databroker to use</li>
+<li><strong>calibration_md_folder</strong></li>
+<li><strong>kwargs</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-xpdan.pipelines.pipeline_utils">
 <span id="xpdan-pipelines-pipeline-utils-module"></span><h2>xpdan.pipelines.pipeline_utils module<a class="headerlink" href="#module-xpdan.pipelines.pipeline_utils" title="Permalink to this headline">¶</a></h2>
@@ -282,8 +317,8 @@ folder_tag</p>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="xpdan-pipelines-save-tiff-module">
-<h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#xpdan-pipelines-save-tiff-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-xpdan.pipelines.save_tiff">
+<span id="xpdan-pipelines-save-tiff-module"></span><h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#module-xpdan.pipelines.save_tiff" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

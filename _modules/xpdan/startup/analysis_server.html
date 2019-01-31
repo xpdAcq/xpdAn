@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.startup.analysis_server &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../using_servers.html">Using Servers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.startup.analysis_server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.startup.analysis_server</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Server for analyzing data at XPD</span>
+
+<span class="sd">Notes</span>
+<span class="sd">-----</span>
+<span class="sd">This module can be called via a ``fire`` cli or used interactively.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">fire</span>
+
+<span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="k">import</span> <span class="n">install_qt_kicker</span>
+<span class="kn">from</span> <span class="nn">rapidz</span> <span class="k">import</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">rapidz.link</span> <span class="k">import</span> <span class="n">link</span>
+<span class="kn">from</span> <span class="nn">shed</span> <span class="k">import</span> <span class="n">SimpleToEventStream</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.extra</span> <span class="k">import</span> <span class="n">z_score_tem</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="n">pipeline_order</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.qoi</span> <span class="k">import</span> <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">qoi_pipeline_order</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.save</span> <span class="k">import</span> <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">save_pipeline_order</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.to_event_model</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">tem_pipeline_order</span><span class="p">,</span>
+    <span class="n">to_event_stream_no_ind</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.to_event_model</span> <span class="k">import</span> <span class="n">to_event_stream_with_ind</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.vis</span> <span class="k">import</span> <span class="n">vis_pipeline</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">StripDepVar</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.zmq</span> <span class="k">import</span> <span class="n">Publisher</span><span class="p">,</span> <span class="n">RemoteDispatcher</span>
+<span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="k">import</span> <span class="n">glbl_dict</span>
+<span class="kn">from</span> <span class="nn">xpdtools.pipelines.extra</span> <span class="k">import</span> <span class="n">std_gen</span><span class="p">,</span> <span class="n">median_gen</span><span class="p">,</span> <span class="n">z_score_gen</span>
+<span class="kn">from</span> <span class="nn">xpdtools.pipelines.qoi</span> <span class="k">import</span> <span class="n">max_intensity_mean</span><span class="p">,</span> <span class="n">max_gr_mean</span>
+
+<span class="n">order</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pipeline_order</span>
+    <span class="o">+</span> <span class="p">[</span>
+        <span class="c1"># std_gen,</span>
+        <span class="c1"># median_gen,</span>
+        <span class="c1"># z_score_gen,</span>
+        <span class="c1"># z_score_tem,</span>
+        <span class="n">max_intensity_mean</span><span class="p">,</span>
+        <span class="n">max_gr_mean</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">+</span> <span class="n">tem_pipeline_order</span>
+    <span class="o">+</span> <span class="n">qoi_pipeline_order</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="start_analysis"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.start_analysis">[docs]</a><span class="k">def</span> <span class="nf">start_analysis</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start analysis pipeline [Depreciated]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mask_kwargs : dict</span>
+<span class="sd">        The kwargs passed to the masking see xpdtools.tools.mask_img</span>
+<span class="sd">    pdf_kwargs : dict</span>
+<span class="sd">        The kwargs passed to the pdf generator, see xpdtools.tools.pdf_getter</span>
+<span class="sd">    fq_kwargs : dict</span>
+<span class="sd">        The kwargs passed to the fq generator, see xpdtools.tools.fq_getter</span>
+<span class="sd">    mask_setting : dict</span>
+<span class="sd">        The setting of the mask</span>
+<span class="sd">    save_template : str</span>
+<span class="sd">        The template string for file saving</span>
+<span class="sd">    base_folder : str</span>
+<span class="sd">        The base folder for saving files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warn</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">(</span><span class="s2">&quot;Use the server instead&quot;</span><span class="p">))</span>
+    <span class="c1"># TODO: also start up grave vis, maybe?</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;outbound_proxy_address&quot;</span><span class="p">])</span>
+    <span class="n">install_qt_kicker</span><span class="p">(</span>
+        <span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span>
+    <span class="p">)</span>  <span class="c1"># This may need to be d._loop depending on tag</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">pipeline_order</span>
+    <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">+=</span> <span class="n">save_pipeline_order</span>
+    <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">+=</span> <span class="p">[</span><span class="n">vis_pipeline</span><span class="p">]</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">link</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">order</span><span class="p">,</span> <span class="n">raw_source</span><span class="o">=</span><span class="n">Stream</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw source&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
+    <span class="n">raw_source</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">raw_source</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Analysis Server&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="create_analysis_pipeline"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.create_analysis_pipeline">[docs]</a><span class="k">def</span> <span class="nf">create_analysis_pipeline</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the analysis pipeline from an list of chunks and pipeline kwargs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    order : list of functions</span>
+<span class="sd">        The list of pipeline chunk functions</span>
+<span class="sd">    kwargs : Any</span>
+<span class="sd">        The kwargs to pass to the pipeline creation</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    namespace : dict</span>
+<span class="sd">        The namespace of the pipeline</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">link</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">order</span><span class="p">,</span> <span class="n">raw_source</span><span class="o">=</span><span class="n">Stream</span><span class="p">(</span><span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;raw source&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span>
+
+    <span class="c1"># do inspection of pipeline for ToEventModel nodes, maybe?</span>
+    <span class="c1"># for analyzed data with independent data (vis and save)</span>
+    <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span>
+        <span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># strip the dependant vars form the raw data</span>
+    <span class="n">raw_stripped</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">StripDepVar</span><span class="p">())</span>
+    <span class="n">namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">to_event_stream_with_ind</span><span class="p">(</span>
+            <span class="n">raw_stripped</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">node</span>
+                <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">namespace</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">SimpleToEventStream</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="n">an_with_ind_pub</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">namespace</span></div>
+
+
+<div class="viewcode-block" id="run_server"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.run_server">[docs]</a><span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span>
+    <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+    <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
+    <span class="n">outbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;outbound_proxy_address&quot;</span><span class="p">],</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function to run the analysis server.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    order : list, optional</span>
+<span class="sd">        The order of pipeline chunk functions to be called. Defaults to the</span>
+<span class="sd">        standard order, ``xpdan.startup.analysis_server.order``</span>
+<span class="sd">    db : databroker.Broker instance, optional</span>
+<span class="sd">        The databroker to pull data from. This is used for accessing dark and</span>
+<span class="sd">        background data. Defaults to the location listed in the</span>
+<span class="sd">        ``xpdconf.conf.glbl_dict``.</span>
+<span class="sd">    outbound_proxy_address : str, optional</span>
+<span class="sd">        The location of the ZMQ proxy sending data to this server. Defaults</span>
+<span class="sd">        to the location listed in the ``xpdconf.conf.glbl_dict``.</span>
+<span class="sd">    prefix : bytes or list of bytes, optional</span>
+<span class="sd">        Which publisher(s) to listen to for data. Defaults to ``b&quot;raw&quot;``</span>
+<span class="sd">    kwargs : Any</span>
+<span class="sd">        Keyword arguments passed into the pipeline creation. These are used</span>
+<span class="sd">        to modify the data processing.</span>
+
+<span class="sd">    If using the default pipeline these include:</span>
+
+<span class="sd">      - ``bg_scale=1`` The background scale factor. Defaults to 1</span>
+<span class="sd">      - ``calib_setting`` : The calibration setting, if set to</span>
+<span class="sd">        ``{&quot;setting&quot;: False}`` the user will not be prompted to perform</span>
+<span class="sd">        calibration on calibration samples.</span>
+<span class="sd">        This is useful for not performing calibration when re analyzing an</span>
+<span class="sd">        entire experiment.</span>
+<span class="sd">      - ``polarization_factor`` The polarization factor used to correct</span>
+<span class="sd">        the image. Defaults to .99</span>
+<span class="sd">      - ``mask_setting`` The setting for the frequency of the mask. If set</span>
+<span class="sd">        to ``{&#39;setting&#39;: &#39;auto&#39;}`` each image gets a mask generated for it,</span>
+<span class="sd">        if set to ``{&#39;setting&#39;: &#39;first&#39;}`` only the first image in the</span>
+<span class="sd">        series has a mask generated for it and all subsequent images in the</span>
+<span class="sd">        series use that mask, if set to ``{&#39;setting&#39;: &#39;none&#39;}`` then no</span>
+<span class="sd">        image is masked. Defaults to ``{&#39;setting&#39;: &#39;auto&#39;}``.</span>
+<span class="sd">      - ``mask_kwargs`` The keyword arguments passed to</span>
+<span class="sd">        ``xpdtools.tools.mask_img``. Defaults to ``dict(edge=30,</span>
+<span class="sd">        lower_thresh=0.0, upper_thresh=None, alpha=3, auto_type=&quot;median&quot;,</span>
+<span class="sd">        tmsk=None,)``</span>
+<span class="sd">      - kwargs passed to PDFgetx3. Please see the PDFgetx3 documentation:</span>
+<span class="sd">        https://www.diffpy.org/doc/pdfgetx/2.0.0/options.html#pdf-parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">prepare_hook</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;db&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
+
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span>
+        <span class="n">outbound_proxy_address</span><span class="p">,</span>
+        <span class="c1"># accept the raw data</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Analysis Server&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="run_main"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.run_main">[docs]</a><span class="k">def</span> <span class="nf">run_main</span><span class="p">():</span>
+    <span class="n">fire</span><span class="o">.</span><span class="n">Fire</span><span class="p">(</span><span class="n">run_server</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run_main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

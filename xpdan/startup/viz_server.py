@@ -44,7 +44,15 @@ def run_server(
     install_qt_kicker(loop=d.loop)
 
     rr = RunRouter(
-        [
+        [lambda x: if_correct_start(
+                LiveImage(
+                    handler_reg=handlers,
+                    cmap="viridis",
+                    norm=SymLogNorm(1),
+                    limit_func=lambda x: (np.nanmin(x), np.nanmax(x)),
+                ),
+                x,
+            ),
             lambda x: BestEffortCallback(
                 # fig_factory=fig_factory, teardown=teardown,
                 table_enabled=False,
@@ -70,15 +78,6 @@ def run_server(
                 "mean",
                 units=("Degree", "Intensity"),
                 window_title="{} vs {}".format("mean", "tth"),
-            ),
-            lambda x: if_correct_start(
-                LiveImage(
-                    handler_reg=handlers,
-                    cmap="viridis",
-                    norm=SymLogNorm(1),
-                    limit_func=lambda x: (np.nanmin(x), np.nanmax(x)),
-                ),
-                x,
             ),
         ]
     )

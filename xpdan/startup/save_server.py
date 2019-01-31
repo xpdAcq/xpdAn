@@ -48,17 +48,25 @@ def run_server(
     db_names=("exp_db", "an_db"),
     prefix=None
 ):
-    """Run analysis server
+    """Run file saving server
 
     Parameters
     ----------
     base_folders : list or str or str, optional
         Either a list of strings for base folders to save data into or a
-        single str for a base folder to save data into. Defaults to the value
-        of ``glbl_dict["tiff_base"]``.
+        single str for a base folder to save data into.
+
+        Defaults to the value of ``glbl_dict["tiff_base"]``.
     template : str, optional
-        The string used as a template for the file names. Defaults to
-        ``"{base_folder}/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[uid]:.6}_{event[seq_num]:04d}{ext}"``
+        The string used as a template for the file names. Please see the
+        :ref:`xpdan_callbacks` module docs for mor information on the
+         templating.
+
+        Defaults to::
+
+          "{base_folder}/{folder_prefix}/"
+          "{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}"
+          "_{__independent_vars__}{start[uid]:.6}_{event[seq_num]:04d}{ext}"
     outbound_proxy_address : str
         The address of the ZMQ proxy
     db_names : iterable of str

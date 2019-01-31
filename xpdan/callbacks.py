@@ -51,7 +51,12 @@ class StartStopCallback(CallbackBase):
 
 
 class SaveBaseClass(Retrieve):
-    """Base class for saving files with friendly file names
+    """Base class for saving files with human friendly file names.
+
+    For each document this class applys a format to the string based off the
+    document which has been seen. When the time comes for the file to be
+    written any templating which has not been formatted will be removed from
+    the filename.
 
     Parameters
     ----------
@@ -65,6 +70,12 @@ class SaveBaseClass(Retrieve):
     kwargs : dict
         All extra kwargs are passed to the filename formatter when the start
         document is received
+
+    Notes
+    -----
+    Every instance of ``__independent_vars__`` will be replaced with
+    ``{name}_{data}_{units}_`` for each independent variable of the experiment
+    in the template.
     """
 
     def __init__(

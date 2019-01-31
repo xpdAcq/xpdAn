@@ -56,9 +56,13 @@ def run_server(
     prefix : bytes or list of bytes, optional
         The Publisher channels to listen to. Defaults to
         ``[b"an", b"raw"]``
+    handlers : dict
+        The map between handler specs and handler classes, defaults to
+        the map used by the experimental databroker if possible
     """
     # TODO: convert to bytestrings if needed
     # TODO: maybe separate this into different processes?
+    # TODO: support multiple locations for folders
     if prefix is None:
         prefix = [b"an", b"raw"]
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
@@ -84,8 +88,6 @@ def run_server(
     with open(os.path.join(portable_folder, "db_load.py"), "w") as f:
         f.write(load_script)
     an_broker = Broker.from_config(portable_configs["an"])
-    if handlers is None:
-        handlers = an_broker.reg.handler_reg
 
     an_source = Stream()
     zed = an_source.Store(
@@ -98,6 +100,8 @@ def run_server(
     zed.starsink(an_broker.insert)
 
     raw_broker = Broker.from_config(portable_configs["raw"])
+    if handlers is None:
+        handlers = raw_broker.reg.handler_reg
 
     raw_source = Stream()
     raw_source.starmap(

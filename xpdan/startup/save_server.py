@@ -36,7 +36,7 @@ base_template = (
     # The writers handle the trailing ``_``
     "{human_timestamp}_"
     "{__independent_vars__}"
-    "{start[uid]:.6}_"
+    "{start[original_start_uid]:.6}_"
     "{event[seq_num]:04d}{ext}"
 )
 

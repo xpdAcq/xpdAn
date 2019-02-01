@@ -1,6 +1,6 @@
 $PROJECT = 'xpdAn'
 $ACTIVITIES = ['version_bump',
-               'authors',
+               #'authors',
                'changelog',
                'tag',
                'push_tag',

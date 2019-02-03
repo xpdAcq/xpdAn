@@ -107,6 +107,8 @@ class SaveBaseClass(Retrieve):
             for d in doc.get("hints", {}).get("dimensions")
             if d[0][0] != "time"
         ]
+        if 'original_start_uid' not in doc:
+            doc['original_start_uid'] = doc['uid']
 
         # use the magic formatter to leave things behind
         self.start_template = render2(

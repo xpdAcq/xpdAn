@@ -88,13 +88,13 @@ def start_gen(
     # Build the general pipeline from the raw_pipeline
 
     # TODO: change this when new dark logic comes
-    # Check that the data isn't a dark
-    dk_uid = FromEventStream("start", (), upstream=raw_source).map(
-        lambda x: "sc_dk_field_uid" in x
+    # Check that the data isn't a dark (dark_frame = True when taking a dark)
+    not_dark_scan = FromEventStream("start", (), upstream=raw_source).map(
+        lambda x: not x.get('dark_frame', False)
     )
     # Fill the raw event stream
     source = (
-        raw_source.combine_latest(dk_uid)
+        raw_source.combine_latest(not_dark_scan)
         .filter(lambda x: x[1])
         .pluck(0)
         .starmap(

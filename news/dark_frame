@@ -1,0 +1,15 @@
+**Added:** None
+
+**Changed:**
+
+* Use ``dark_frame=True`` to determine if a scan is a dark scan.  This means
+  that scans without darks can now be processed, although they will use the
+  most recenlty cached dark.
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

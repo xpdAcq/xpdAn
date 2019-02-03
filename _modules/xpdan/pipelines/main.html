@@ -236,13 +236,13 @@
     <span class="c1"># Build the general pipeline from the raw_pipeline</span>
 
     <span class="c1"># TODO: change this when new dark logic comes</span>
-    <span class="c1"># Check that the data isn&#39;t a dark</span>
-    <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">upstream</span><span class="o">=</span><span class="n">raw_source</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;sc_dk_field_uid&quot;</span> <span class="ow">in</span> <span class="n">x</span>
+    <span class="c1"># Check that the data isn&#39;t a dark (dark_frame = True when taking a dark)</span>
+    <span class="n">not_dark_scan</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">upstream</span><span class="o">=</span><span class="n">raw_source</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dark_frame&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="c1"># Fill the raw event stream</span>
     <span class="n">source</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">raw_source</span><span class="o">.</span><span class="n">combine_latest</span><span class="p">(</span><span class="n">dk_uid</span><span class="p">)</span>
+        <span class="n">raw_source</span><span class="o">.</span><span class="n">combine_latest</span><span class="p">(</span><span class="n">not_dark_scan</span><span class="p">)</span>
         <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="o">.</span><span class="n">pluck</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="o">.</span><span class="n">starmap</span><span class="p">(</span>

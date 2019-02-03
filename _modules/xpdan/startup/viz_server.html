@@ -194,10 +194,7 @@
                 <span class="n">handlers</span> <span class="o">=</span> <span class="n">glbl_dict</span><span class="p">[</span><span class="n">db</span><span class="p">]</span><span class="o">.</span><span class="n">reg</span><span class="o">.</span><span class="n">handler_reg</span>
                 <span class="k">break</span>
     <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">,</span>
-            <span class="c1"># b&quot;raw&quot;</span>
-        <span class="p">]</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="n">outbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
     <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
@@ -213,31 +210,10 @@
                 <span class="n">x</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">BestEffortCallback</span><span class="p">(</span>
-                <span class="c1"># fig_factory=fig_factory, teardown=teardown,</span>
                 <span class="n">table_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">overplot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(</span>
-                <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;gr&quot;</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;1/A**2&quot;</span><span class="p">),</span> <span class="n">window_title</span><span class="o">=</span><span class="s2">&quot;PDF&quot;</span>
-            <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(</span>
-                <span class="s2">&quot;q&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-                <span class="n">units</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;1/A&quot;</span><span class="p">,</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">),</span>
-                <span class="n">window_title</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> vs </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">),</span>
-            <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(</span>
-                <span class="s2">&quot;q&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;std&quot;</span><span class="p">,</span>
-                <span class="n">units</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;1/A&quot;</span><span class="p">,</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">),</span>
-                <span class="n">window_title</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> vs </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">),</span>
-            <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(</span>
-                <span class="s2">&quot;tth&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;mean&quot;</span><span class="p">,</span>
-                <span class="n">units</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Degree&quot;</span><span class="p">,</span> <span class="s2">&quot;Intensity&quot;</span><span class="p">),</span>
-                <span class="n">window_title</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> vs </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;tth&quot;</span><span class="p">),</span>
-            <span class="p">),</span>
+         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">()</span>
         <span class="p">]</span>
     <span class="p">)</span>
 

@@ -10,7 +10,7 @@ from warnings import warn
 import fire
 
 from bluesky.utils import install_qt_kicker
-from rapidz import Stream
+from rapidz import Stream, move_to_first
 from rapidz.link import link
 from shed import SimpleToEventStream
 from xpdan.pipelines.extra import z_score_tem
@@ -109,7 +109,7 @@ def create_analysis_pipeline(order, **kwargs):
         glbl_dict["inbound_proxy_address"], prefix=b"an"
     )
     # strip the dependant vars form the raw data
-    raw_stripped = source.starmap(StripDepVar())
+    raw_stripped = move_to_first(source.starmap(StripDepVar()))
     namespace.update(
         to_event_stream_with_ind(
             raw_stripped,
@@ -130,6 +130,7 @@ def run_server(
     db=glbl_dict["exp_db"],
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     prefix=b"raw",
+    plot_graph=False,
     **kwargs
 ):
     """Function to run the analysis server.
@@ -175,6 +176,7 @@ def run_server(
       - kwargs passed to PDFgetx3. Please see the PDFgetx3 documentation:
         https://www.diffpy.org/doc/pdfgetx/2.0.0/options.html#pdf-parameters
     """
+    print(kwargs)
     db.prepare_hook = lambda x, y: copy.deepcopy(y)
 
     if "db" not in kwargs:
@@ -190,6 +192,8 @@ def run_server(
     install_qt_kicker(loop=d.loop)
 
     d.subscribe(lambda *x: namespace["raw_source"].emit(x))
+    if plot_graph:
+        namespace['raw_source'].visualize(source_node=True)
     print("Starting Analysis Server")
     d.start()
 

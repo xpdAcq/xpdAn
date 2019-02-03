@@ -1,0 +1,19 @@
+**Added:**
+
+* Units for most reduced data streams (mostly so waterfall can plot them)
+* Added ``plot_graph`` to analysis server so we can visualize the graph
+
+**Changed:**
+
+* ``raw_stripped`` is run first, so all the aligned data can be emitted ASAP.
+  This means that data can be saved as soon as it is created, rather than 
+  waiting for the last data to be processed.
+* Simplified the plotting via the new ``LiveWaterfall`` callback.
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

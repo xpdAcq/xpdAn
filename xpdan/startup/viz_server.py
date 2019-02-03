@@ -46,10 +46,7 @@ def run_server(
                 handlers = glbl_dict[db].reg.handler_reg
                 break
     if prefix is None:
-        prefix = [
-            b"an",
-            # b"raw"
-        ]
+        prefix = [b"an", b"raw"]
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)
@@ -65,31 +62,10 @@ def run_server(
                 x,
             ),
             lambda x: BestEffortCallback(
-                # fig_factory=fig_factory, teardown=teardown,
                 table_enabled=False,
                 overplot=False,
             ),
-            lambda x: LiveWaterfall(
-                "r", "gr", units=("A", "1/A**2"), window_title="PDF"
-            ),
-            lambda x: LiveWaterfall(
-                "q",
-                "mean",
-                units=("1/A", "Intensity"),
-                window_title="{} vs {}".format("mean", "q"),
-            ),
-            lambda x: LiveWaterfall(
-                "q",
-                "std",
-                units=("1/A", "Intensity"),
-                window_title="{} vs {}".format("std", "q"),
-            ),
-            lambda x: LiveWaterfall(
-                "tth",
-                "mean",
-                units=("Degree", "Intensity"),
-                window_title="{} vs {}".format("mean", "tth"),
-            ),
+         lambda x: LiveWaterfall()
         ]
     )
 

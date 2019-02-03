@@ -50,12 +50,15 @@ def gen_mask(mask, pol_corrected_img, **kwargs):
 def integration(mean, q, tth, std=None, median=None, **kwargs):
     merge_names = ["mean"]
     merge_streams = []
+    data_key_md = {'mean': {'units': 'intensity'}}
     if std:
         merge_names += ["std"]
         merge_streams += [std]
+        data_key_md.update({'std': {'units': 'std intensity'}})
     if median:
         merge_names += ["median"]
         merge_streams += [median]
+        data_key_md.update({'std': {'units': 'intensity'}})
     if merge_streams:
         merge = mean.zip(*merge_streams)
         # need to splay so we have everything at the same level
@@ -67,12 +70,15 @@ def integration(mean, q, tth, std=None, median=None, **kwargs):
         integration_merge = merge.combine_latest(q, tth, emit_on=0)
 
     merge_names += ["q", "tth"]
+    data_key_md.update({'q': {'units': '1/A'}, 'tth': {'units': 'Degrees'}})
+
     integration_tes = SimpleToEventStream(
         integration_merge,
         merge_names,
         analysis_stage="integration",
         # TODO: might push q/tth into the same list
         hints=dict(dimensions=[(["q"], "primary"), (["tth"], "primary")]),
+        data_key_md=data_key_md
     )
     return locals()
 
@@ -83,12 +89,14 @@ def pdf_gen(fq, sq, pdf, **kwargs):
         ("q", "fq", "config"),
         analysis_stage="fq",
         hints=dict(dimensions=[(["q"], "primary")]),
+        data_key_md={'q': {'units': '1/A'}, 'fq': {'units': 'arb'}}
     )
     sq_tes = SimpleToEventStream(
         fq,
         ("q", "sq", "config"),
         analysis_stage="sq",
         hints=dict(dimensions=[(["q"], "primary")]),
+        data_key_md={'q': {'units': '1/A'}, 'sq': {'units': 'arb'}}
     )
 
     pdf_tes = SimpleToEventStream(
@@ -96,6 +104,7 @@ def pdf_gen(fq, sq, pdf, **kwargs):
         ("r", "gr", "config"),
         analysis_stage="pdf",
         hints=dict(dimensions=[(["r"], "primary")]),
+        data_key_md={'r': {'units': 'A'}, 'gr': {'units': '1/A**2'}}
     )
     return locals()
 

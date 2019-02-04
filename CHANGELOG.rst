@@ -4,6 +4,28 @@
 
 .. current developments
 
+v0.5.0
+====================
+
+**Added:**
+
+* Units for most reduced data streams (mostly so waterfall can plot them)
+* Added ``plot_graph`` to analysis server so we can visualize the graph
+
+**Changed:**
+
+* Use ``dark_frame=True`` to determine if a scan is a dark scan.  This means
+  that scans without darks can now be processed, although they will use the
+  most recenlty cached dark.
+* ``raw_stripped`` is run first, so all the aligned data can be emitted ASAP.
+  This means that data can be saved as soon as it is created, rather than 
+  waiting for the last data to be processed.
+* Simplified the plotting via the new ``LiveWaterfall`` callback.
+* Support ``original_start_uid`` system
+* use raw start document time for file naming
+
+
+
 v0.4.1
 ====================
 

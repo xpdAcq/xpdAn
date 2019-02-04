@@ -206,6 +206,26 @@ the software, please post it as a new thread at <a class="reference external" hr
 </div>
 </div>
 </div>
+<div class="section" id="v0-5-0">
+<h1>v0.5.0<a class="headerlink" href="#v0-5-0" title="Permalink to this headline">¶</a></h1>
+<p><strong>Added:</strong></p>
+<ul class="simple">
+<li>Units for most reduced data streams (mostly so waterfall can plot them)</li>
+<li>Added <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> to analysis server so we can visualize the graph</li>
+</ul>
+<p><strong>Changed:</strong></p>
+<ul class="simple">
+<li>Use <code class="docutils literal notranslate"><span class="pre">dark_frame=True</span></code> to determine if a scan is a dark scan.  This means
+that scans without darks can now be processed, although they will use the
+most recenlty cached dark.</li>
+<li><code class="docutils literal notranslate"><span class="pre">raw_stripped</span></code> is run first, so all the aligned data can be emitted ASAP.
+This means that data can be saved as soon as it is created, rather than
+waiting for the last data to be processed.</li>
+<li>Simplified the plotting via the new <code class="docutils literal notranslate"><span class="pre">LiveWaterfall</span></code> callback.</li>
+<li>Support <code class="docutils literal notranslate"><span class="pre">original_start_uid</span></code> system</li>
+<li>use raw start document time for file naming</li>
+</ul>
+</div>
 <div class="section" id="v0-4-1">
 <h1>v0.4.1<a class="headerlink" href="#v0-4-1" title="Permalink to this headline">¶</a></h1>
 </div>

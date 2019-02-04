@@ -109,12 +109,14 @@ class SaveBaseClass(Retrieve):
         ]
         if 'original_start_uid' not in doc:
             doc['original_start_uid'] = doc['uid']
+        if 'original_start_time' not in doc:
+            doc['original_start_time'] = doc['time']
 
         # use the magic formatter to leave things behind
         self.start_template = render2(
             self._template,
             start=doc,
-            human_timestamp=_timestampstr(doc["time"]),
+            human_timestamp=_timestampstr(doc["original_start_time"]),
             **doc,
             **self.kwargs,
         )

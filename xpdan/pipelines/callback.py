@@ -107,19 +107,12 @@ class MainCallback(CallbackBase):
                     # norm=LogNorm()
                 ),
                 "iq": LiveWaterfall(
-                    "q", "iq", units=("Q (A^-1)", "Arb"), window_title="I(Q)"
                 ),
                 "itth": LiveWaterfall(
-                    "tth", "iq", units=("tth", "Arb"), window_title="I(tth)"
                 ),
                 "fq": LiveWaterfall(
-                    "q", "fq", units=("Q (A^-1)", "F(Q)"), window_title="F(Q)"
                 ),
                 "pdf": LiveWaterfall(
-                    "r",
-                    "pdf",
-                    units=("r (A)", "G(r) A^-2"),
-                    window_title="G(r)",
                 ),
                 "zscore": LiveImage(
                     "img", window_title="Z Score Image", cmap="viridis"

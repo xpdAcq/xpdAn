@@ -40,7 +40,9 @@ def gen_mask(mask, pol_corrected_img, **kwargs):
     mask_tes = SimpleToEventStream(mask, ("mask",), analysis_stage="mask")
 
     mask_overlay_tes = SimpleToEventStream(
-        pol_corrected_img.combine_latest(mask).starmap(overlay_mask),
+        # This is registered later than the mask creation, thus we can emit on 
+        # the img, since the mask is gaurenteed to exist
+        pol_corrected_img.combine_latest(mask, emit_on=0).starmap(overlay_mask),
         ("mask_overlay",),
         analysis_stage="mask_overlay",
     )

@@ -257,12 +257,14 @@
         <span class="p">]</span>
         <span class="k">if</span> <span class="s1">&#39;original_start_uid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
             <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;original_start_uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;original_start_time&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+            <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;original_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
 
         <span class="c1"># use the magic formatter to leave things behind</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_template</span> <span class="o">=</span> <span class="n">render2</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span>
             <span class="n">start</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
-            <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]),</span>
+            <span class="n">human_timestamp</span><span class="o">=</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;original_start_time&quot;</span><span class="p">]),</span>
             <span class="o">**</span><span class="n">doc</span><span class="p">,</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>

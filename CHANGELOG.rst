@@ -4,6 +4,15 @@
 
 .. current developments
 
+v0.5.1
+====================
+
+**Fixed:**
+
+* Fix mask overlay order so it isn't delayed
+
+
+
 v0.5.0
 ====================
 

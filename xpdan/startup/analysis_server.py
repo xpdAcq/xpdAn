@@ -82,7 +82,10 @@ def start_analysis(save=True, vis=True, **kwargs):
     d.start()
 
 
-def create_analysis_pipeline(order, **kwargs):
+def create_analysis_pipeline(
+        order,
+        inbound_proxy_address=glbl_dict["inbound_proxy_address"],
+        **kwargs):
     """Create the analysis pipeline from an list of chunks and pipeline kwargs
 
     Parameters
@@ -106,7 +109,7 @@ def create_analysis_pipeline(order, **kwargs):
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
     an_with_ind_pub = Publisher(
-        glbl_dict["inbound_proxy_address"], prefix=b"an"
+        inbound_proxy_address, prefix=b"an"
     )
     # strip the dependant vars form the raw data
     raw_stripped = move_to_first(source.starmap(StripDepVar()))
@@ -129,6 +132,7 @@ def run_server(
     order=order,
     db=glbl_dict["exp_db"],
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
+    inbound_proxy_address=glbl_dict["inbound_proxy_address"],
     prefix=b"raw",
     plot_graph=False,
     **kwargs
@@ -182,7 +186,10 @@ def run_server(
     if "db" not in kwargs:
         kwargs.update(db=db)
 
-    namespace = create_analysis_pipeline(order, **kwargs)
+    namespace = create_analysis_pipeline(
+        order,
+        inbound_proxy_address=inbound_proxy_address,
+        **kwargs)
 
     d = RemoteDispatcher(
         outbound_proxy_address,

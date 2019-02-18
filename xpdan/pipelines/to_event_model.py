@@ -6,7 +6,8 @@ from xpdtools.tools import overlay_mask, splay_tuple
 
 def to_event_stream_with_ind(raw_stripped, *nodes, publisher, **kwargs):
     for node in nodes:
-        merge = AlignEventStreams(raw_stripped, node)
+        merge = AlignEventStreams(raw_stripped, node,
+                                  event_stream_name='primary')
         merge.starsink(publisher)
     return locals()
 

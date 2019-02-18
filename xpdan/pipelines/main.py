@@ -179,6 +179,7 @@ def start_gen(
                 .map(lambda x: x if not isinstance(x, list) else x[0])
                 .map(lambda x: x.documents(fill=True))
                 .flatten(),
+                event_stream_name="primary"
             )
             for image_name in image_names
         ]
@@ -199,6 +200,7 @@ def start_gen(
                 .map(lambda x: x.documents(fill=True))
                 .flatten(),
                 stream_name="raw_background_dark",
+                event_stream_name="primary"
             )
             for image_name in image_names
         ]
@@ -222,6 +224,7 @@ def start_gen(
                 ("data", image_name),
                 bg_docs,
                 stream_name="raw_background",
+                event_stream_name="primary"
             )
             for image_name in image_names
         ]

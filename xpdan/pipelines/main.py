@@ -62,7 +62,7 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
 # TODO: chunk this up a bit more so we can separate XRD from PDF
 def start_gen(
     raw_source,
-    image_names=("pe1_image", "pe2_image", "pe3_image"),
+    image_names=glbl_dict['image_fields'],
     db=glbl_dict["exp_db"],
     calibration_md_folder=None,
     **kwargs

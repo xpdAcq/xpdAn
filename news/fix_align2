@@ -1,0 +1,14 @@
+**Added:** None
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:**
+
+* Image streams specifically listen to the primary event stream
+* ``AlignEventStream`` with the raw data listens to the primary event stream
+
+**Security:** None

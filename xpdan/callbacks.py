@@ -107,10 +107,10 @@ class SaveBaseClass(Retrieve):
             for d in doc.get("hints", {}).get("dimensions")
             if d[0][0] != "time"
         ]
-        if 'original_start_uid' not in doc:
-            doc['original_start_uid'] = doc['uid']
-        if 'original_start_time' not in doc:
-            doc['original_start_time'] = doc['time']
+        if "original_start_uid" not in doc:
+            doc["original_start_uid"] = doc["uid"]
+        if "original_start_time" not in doc:
+            doc["original_start_time"] = doc["time"]
 
         # use the magic formatter to leave things behind
         self.start_template = render2(
@@ -305,3 +305,40 @@ SAVER_MAP = {
     "calib": SaveCalib,
     "raw": SaveMeta,
 }
+
+
+class Live3DView(CallbackBase):
+    def __init__(self):
+        self.cs_dict = {}
+        self.x_dict = {}
+        self.fields = []
+
+    def descriptor(self, doc):
+        import mayavi.mlab as mlab
+
+        self.fields = [
+            k for k, v in doc["data_keys"].items() if len(v["shape"]) == 3
+        ]
+        for field in self.fields:
+            self.cs_dict[field] = mlab.figure(field)
+            self.x_dict[field] = None
+
+    def event(self, doc):
+        import mayavi.mlab as mlab
+        for field in self.fields:
+            data = doc["data"][field]
+            figure = self.cs_dict[field]
+            x = self.x_dict[field]
+            if x is None:
+                x = mlab.pipeline.scalar_field(data, figure=figure)
+                self.x_dict[field] = x
+                mlab.pipeline.image_plane_widget(
+                    x,
+                    plane_orientation="z_axes",
+                    slice_index=3,
+                    figure=figure
+                )
+                mlab.pipeline.volume(x, figure=figure)
+            else:
+                x.mlab_source.scalars = data
+

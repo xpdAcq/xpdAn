@@ -46,7 +46,7 @@ def run_server(
                 handlers = glbl_dict[db].reg.handler_reg
                 break
     if prefix is None:
-        prefix = [b"an", b"raw"]
+        prefix = [b"an", b"raw", b"tomo"]
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)

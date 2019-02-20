@@ -1,6 +1,7 @@
+import operator as op
+
 from rapidz import Stream
 from shed import SimpleToEventStream, SimpleFromEventStream
-from toolz import pluck
 
 
 def pencil_tomo(source: Stream, qoi_name, translation, rotation, **kwargs):
@@ -25,24 +26,37 @@ def pencil_tomo(source: Stream, qoi_name, translation, rotation, **kwargs):
     # Extract the index for the translation and rotation so we can
     # extract the dimensions and extents
     # TODO: turn into proper function
-    translation_position = SimpleFromEventStream('start', ('motors', )).map(
+    translation_position = SimpleFromEventStream('start', ('motors', ),
+                                                 upstream=source).map(
         lambda x: x.index(translation))
-    rotation_position = SimpleFromEventStream('start', ('motors',)).map(
+    rotation_position = SimpleFromEventStream('start', ('motors',),
+                                              upstream=source).map(
         lambda x: x.index(rotation))
 
-    dims = SimpleFromEventStream('start', ('shapes',),
+    dims = SimpleFromEventStream('start', ('shape',),
                                  upstream=source)
-    th_dim = rotation_position.zip(dims).starmap(pluck)
-    x_dim = translation_position.zip(dims).starmap(pluck)
+    th_dim = dims.zip(rotation_position).starmap(op.getitem)
+    x_dim = dims.zip(translation_position).starmap(op.getitem)
 
     extents = SimpleFromEventStream('start', ('extents', ),
                                     upstream=source)
-    th_extents = rotation_position.zip(extents).starmap(pluck)
-    x_extents = translation_position.zip(extents).starmap(pluck)
+    th_extents = extents.zip(rotation_position).starmap(op.getitem)
+    x_extents = extents.zip(translation_position).starmap(op.getitem)
 
     qoi = SimpleFromEventStream('event', ('data', qoi_name),
-                                upstream=source)
-    center = SimpleFromEventStream('start', ('center',),
+                                upstream=source, principle=True)
+    center = SimpleFromEventStream('start', ('tomo', 'center',),
+                                   upstream=source)
+    return locals()
+
+
+def full_field_tomo(source: Stream, qoi_name, rotation, **kwargs):
+    # TODO: may need to do deg2rad?
+    theta = SimpleFromEventStream('event', ('data', rotation), upstream=source)
+
+    qoi = SimpleFromEventStream('event', ('data', qoi_name),
+                                upstream=source, principle=True)
+    center = SimpleFromEventStream('start', ('tomo', 'center',),
                                    upstream=source)
     return locals()
 
@@ -50,7 +64,7 @@ def pencil_tomo(source: Stream, qoi_name, translation, rotation, **kwargs):
 def tomo_event_stream(rec, *, qoi_name, **kwargs):
     rec_tes = SimpleToEventStream(
         rec,
-        (qoi_name,),
+        (f'{qoi_name}_tomo',),
         analysis_stage='{}_tomo'.format(qoi_name)
     )
     return locals()

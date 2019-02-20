@@ -1,14 +1,15 @@
 import bluesky.plans as bp
-import bluesky.plan_stubs as bps
+import numpy as np
 from ophyd.sim import SynSignal
 from xpdan.startup.tomo_server import tomo_callback_factory
 from xpdan.vend.callbacks.core import RunRouter
-import numpy as np
 
 
 def test_pencil_tomo_pipeline(RE, hw):
     L = []
-    rr = RunRouter([lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))])
+    rr = RunRouter(
+        [lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))]
+    )
     RE.subscribe(rr)
     RE(
         bp.grid_scan(
@@ -27,7 +28,7 @@ def test_pencil_tomo_pipeline(RE, hw):
                     "type": "pencil",
                     "translation": "motor2",
                     "rotation": "motor1",
-                    "center": 0.0
+                    "center": 0.0,
                 }
             },
         )
@@ -38,10 +39,15 @@ def test_pencil_tomo_pipeline(RE, hw):
 
 def test_full_field_tomo_pipeline(RE, hw):
     L = []
-    rr = RunRouter([lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))])
+    rr = RunRouter(
+        [lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))]
+    )
     RE.subscribe(rr)
-    direct_img = SynSignal(func=lambda: np.array(np.random.random((10, 10))),
-                           name='img', labels={'detectors'})
+    direct_img = SynSignal(
+        func=lambda: np.array(np.random.random((10, 10))),
+        name="img",
+        labels={"detectors"},
+    )
     RE(
         bp.scan(
             [direct_img],
@@ -53,12 +59,12 @@ def test_full_field_tomo_pipeline(RE, hw):
                 "tomo": {
                     "type": "full_field",
                     "rotation": "motor1",
-                    "center": 0.0
+                    "center": 0.0,
                 }
             },
         )
     )
     # det1
     assert len(L) == 30 + 3
-    print(L[-2][1]['data']['img_tomo'].shape)
-    assert len(L[4][1]['data']['img_tomo'].shape) == 3
+    print(L[-2][1]["data"]["img_tomo"].shape)
+    assert len(L[4][1]["data"]["img_tomo"].shape) == 3

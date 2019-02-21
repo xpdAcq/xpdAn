@@ -320,7 +320,9 @@ class Live3DView(CallbackBase):
             k for k, v in doc["data_keys"].items() if len(v["shape"]) == 3
         ]
         for field in self.fields:
-            self.cs_dict[field] = mlab.figure(field)
+            fig = mlab.figure(field)
+            mlab.clf(fig)
+            self.cs_dict[field] = fig
             self.x_dict[field] = None
 
     def event(self, doc):

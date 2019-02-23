@@ -4,6 +4,16 @@
 
 .. current developments
 
+v0.5.2
+====================
+
+**Fixed:**
+
+* Image streams specifically listen to the primary event stream
+* ``AlignEventStream`` with the raw data listens to the primary event stream
+
+
+
 v0.5.1
 ====================
 

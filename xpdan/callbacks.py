@@ -308,6 +308,8 @@ SAVER_MAP = {
 
 
 class Live3DView(CallbackBase):
+    """Callback for visualizing 3D data """
+
     def __init__(self):
         self.cs_dict = {}
         self.x_dict = {}
@@ -327,6 +329,7 @@ class Live3DView(CallbackBase):
 
     def event(self, doc):
         import mayavi.mlab as mlab
+
         for field in self.fields:
             data = doc["data"][field]
             figure = self.cs_dict[field]
@@ -335,12 +338,8 @@ class Live3DView(CallbackBase):
                 x = mlab.pipeline.scalar_field(data, figure=figure)
                 self.x_dict[field] = x
                 mlab.pipeline.image_plane_widget(
-                    x,
-                    plane_orientation="z_axes",
-                    slice_index=3,
-                    figure=figure
+                    x, plane_orientation="z_axes", slice_index=3, figure=figure
                 )
                 mlab.pipeline.volume(x, figure=figure)
             else:
                 x.mlab_source.scalars = data
-

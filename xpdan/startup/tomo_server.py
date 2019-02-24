@@ -39,7 +39,7 @@ class PencilTomoCallback(CallbackBase):
 
     This class acts as a descriptor router for documents"""
 
-    def __init__(self, pipeline_factory, publisher):
+    def __init__(self, pipeline_factory, publisher, **kwargs):
         self.pipeline_factory = pipeline_factory
         self.publisher = publisher
 
@@ -48,6 +48,7 @@ class PencilTomoCallback(CallbackBase):
         self.translation = None
         self.rotation = None
         self.sources = []
+        self.kwargs = kwargs
 
     def start(self, doc):
         self.start_doc = doc
@@ -86,6 +87,7 @@ class PencilTomoCallback(CallbackBase):
                 rotation=self.rotation,
                 x_dimension=self.start_doc["shape"][translation_pos],
                 th_dimension=self.start_doc["shape"][rotation_pos],
+                **self.kwargs,
             )
             for s, qoi in zip(self.sources, qois)
         ]
@@ -115,7 +117,7 @@ class FullFieldTomoCallback(CallbackBase):
 
         This class acts as a descriptor router for documents"""
 
-    def __init__(self, pipeline_factory, publisher):
+    def __init__(self, pipeline_factory, publisher, **kwargs):
         self.pipeline_factory = pipeline_factory
         self.publisher = publisher
 
@@ -123,6 +125,7 @@ class FullFieldTomoCallback(CallbackBase):
         self.dim_names = []
         self.rotation = None
         self.sources = []
+        self.kwargs = kwargs
 
     def start(self, doc):
         self.start_doc = doc
@@ -152,7 +155,7 @@ class FullFieldTomoCallback(CallbackBase):
         self.sources = [Stream(stream_name=str(qoi)) for qoi in qois]
         pipelines = [
             self.pipeline_factory(
-                source=s, qoi_name=qoi, rotation=self.rotation
+                source=s, qoi_name=qoi, rotation=self.rotation, **self.kwargs
             )
             for s, qoi in zip(self.sources, qois)
         ]
@@ -173,15 +176,19 @@ class FullFieldTomoCallback(CallbackBase):
         # Need to destroy pipeline
 
 
-def tomo_callback_factory(doc, publisher):
+def tomo_callback_factory(doc, publisher, **kwargs):
     # TODO: Eventually extract from plan hints?
     if doc.get("tomo", {}).get("type", None) == "pencil":
         return PencilTomoCallback(
-            lambda **kwargs: link(*pencil_order, **kwargs), publisher
+            lambda **inner_kwargs: link(*pencil_order, **inner_kwargs),
+            publisher,
+            **kwargs,
         )
     elif doc.get("tomo", {}).get("type", None) == "full_field":
         return FullFieldTomoCallback(
-            lambda **kwargs: link(*full_field_order, **kwargs), publisher
+            lambda **inner_kwargs: link(*full_field_order, **inner_kwargs),
+            publisher,
+            **kwargs,
         )
 
 
@@ -190,12 +197,34 @@ def run_server(
     inbound_proxy_address=glbl_dict["inbound_proxy_address"],
     outbound_prefix=(b"raw", b"an", b"qoi"),
     inbound_prefix=b"tomo",
-    **kwargs
+    **kwargs,
 ):
+    """Server for performing tomographic reconstructions
+
+    Parameters
+    ----------
+    outbound_proxy_address : str, optional
+        The outbound ip address for the ZMQ server. Defaults to the value
+        from the global dict
+    inbound_proxy_address : str, optional
+        The inbound ip address for the ZMQ server. Defaults to the value
+        from the global dict
+    outbound_prefix : bytes or sequence of bytes
+        The data channels to listen to
+    inbound_prefix : bytes
+        The data channel to publish to
+    kwargs : dict
+        kwargs passed to the reconstruction, for instance ``algorithm`` could
+        be passed in with the associated tomopy algorithm to change the
+        reconstruction algorithm from gridrec to something else.
+
+    """
     print(kwargs)
     publisher = Publisher(inbound_proxy_address, prefix=inbound_prefix)
 
-    rr = RunRouter([lambda x: tomo_callback_factory(x, publisher=publisher)])
+    rr = RunRouter(
+        [lambda x: tomo_callback_factory(x, publisher=publisher, **kwargs)]
+    )
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=outbound_prefix)
     install_qt_kicker(loop=d.loop)

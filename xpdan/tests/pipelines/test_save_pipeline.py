@@ -52,6 +52,7 @@ def test_main_pipeline(
         subindent = " " * 4 * (level + 1)
         for f in files:
             print("{}{}".format(subindent, f))
+    time.sleep(2)
     print(os.listdir(fast_tmp_dir))
     print(os.listdir(os.path.join(fast_tmp_dir, name)))
     assert name in os.listdir(fast_tmp_dir)

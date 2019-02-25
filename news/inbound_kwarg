@@ -1,0 +1,15 @@
+**Added:**
+
+* Add ``inbound_proxy_address`` so we can access the publisher at runtime
+
+**Changed:**
+
+* Use ``image_fields`` for loading the images
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

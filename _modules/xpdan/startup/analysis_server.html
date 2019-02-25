@@ -232,7 +232,10 @@
     <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="create_analysis_pipeline"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.create_analysis_pipeline">[docs]</a><span class="k">def</span> <span class="nf">create_analysis_pipeline</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="create_analysis_pipeline"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.create_analysis_pipeline">[docs]</a><span class="k">def</span> <span class="nf">create_analysis_pipeline</span><span class="p">(</span>
+        <span class="n">order</span><span class="p">,</span>
+        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create the analysis pipeline from an list of chunks and pipeline kwargs</span>
 
 <span class="sd">    Parameters</span>
@@ -256,7 +259,7 @@
     <span class="c1"># do inspection of pipeline for ToEventModel nodes, maybe?</span>
     <span class="c1"># for analyzed data with independent data (vis and save)</span>
     <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span>
-        <span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span>
+        <span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span>
     <span class="p">)</span>
     <span class="c1"># strip the dependant vars form the raw data</span>
     <span class="n">raw_stripped</span> <span class="o">=</span> <span class="n">move_to_first</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">StripDepVar</span><span class="p">()))</span>
@@ -279,6 +282,7 @@
     <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
     <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
     <span class="n">outbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;outbound_proxy_address&quot;</span><span class="p">],</span>
+    <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span>
     <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
     <span class="n">plot_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
@@ -332,7 +336,10 @@
     <span class="k">if</span> <span class="s2">&quot;db&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
 
-    <span class="n">namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span>
+        <span class="n">order</span><span class="p">,</span>
+        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span>
         <span class="n">outbound_proxy_address</span><span class="p">,</span>

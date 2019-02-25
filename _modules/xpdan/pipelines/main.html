@@ -212,7 +212,7 @@
 <span class="c1"># TODO: chunk this up a bit more so we can separate XRD from PDF</span>
 <div class="viewcode-block" id="start_gen"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.start_gen">[docs]</a><span class="k">def</span> <span class="nf">start_gen</span><span class="p">(</span>
     <span class="n">raw_source</span><span class="p">,</span>
-    <span class="n">image_names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;pe1_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pe2_image&quot;</span><span class="p">,</span> <span class="s2">&quot;pe3_image&quot;</span><span class="p">),</span>
+    <span class="n">image_names</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s1">&#39;image_fields&#39;</span><span class="p">],</span>
     <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
     <span class="n">calibration_md_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>

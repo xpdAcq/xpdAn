@@ -79,7 +79,8 @@ class SaveBaseClass(Retrieve):
     """
 
     def __init__(
-        self, template, handler_reg, root_map=None, base_folders=None, **kwargs
+            self, template, handler_reg, root_map=None, base_folders=None,
+            **kwargs
     ):
         if base_folders is None:
             base_folders = []
@@ -158,8 +159,8 @@ class SaveBaseClass(Retrieve):
                 event=doc,
                 base_folder=bf,
             )
-            .replace(".", ",")
-            .replace("__", "_")
+                .replace(".", ",")
+                .replace("__", "_")
             for bf in self.base_folders
         ]
         # Note that formally there are more steps to the formatting, but we
@@ -312,8 +313,15 @@ class Live3DView(CallbackBase):
 
     def __init__(self):
         self.cs_dict = {}
-        self.x_dict = {}
+        self.source_dict = {}
         self.fields = []
+        self.pipeline_dict = {}
+
+    def start(self, doc):
+        self.cs_dict = {}
+        self.source_dict = {}
+        self.fields = []
+        self.pipeline_dict = {}
 
     def descriptor(self, doc):
         import mayavi.mlab as mlab
@@ -325,7 +333,8 @@ class Live3DView(CallbackBase):
             fig = mlab.figure(field)
             mlab.clf(fig)
             self.cs_dict[field] = fig
-            self.x_dict[field] = None
+            self.source_dict[field] = None
+            self.pipeline_dict[field] = []
 
     def event(self, doc):
         import mayavi.mlab as mlab
@@ -333,13 +342,22 @@ class Live3DView(CallbackBase):
         for field in self.fields:
             data = doc["data"][field]
             figure = self.cs_dict[field]
-            x = self.x_dict[field]
+            x = self.source_dict[field]
             if x is None:
                 x = mlab.pipeline.scalar_field(data, figure=figure)
-                self.x_dict[field] = x
-                mlab.pipeline.image_plane_widget(
-                    x, plane_orientation="z_axes", slice_index=3, figure=figure
-                )
+                self.source_dict[field] = x
+                for i, orientation in enumerate('xyz'):
+                    self.pipeline_dict[field].append(
+                        mlab.pipeline.image_plane_widget(
+                            x,
+                            plane_orientation=f"{orientation}_axes",
+                            slice_index=data.shape[i] // 2,
+                            figure=figure
+                        ))
                 mlab.pipeline.volume(x, figure=figure)
             else:
                 x.mlab_source.scalars = data
+                for p in self.pipeline_dict[field]:
+                    sl = p.ipw.slice_index
+                    p.update_pipeline()
+                    p.ipw.slice_index = sl

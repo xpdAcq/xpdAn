@@ -13,6 +13,7 @@
 #
 ##############################################################################
 import os
+import time
 
 import pytest
 
@@ -32,6 +33,7 @@ def test_integrate_core_smoke(exp_db, fast_tmp_dir, kwargs,
     old_times = [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
                  os.listdir(fast_tmp_dir)]
     integrate_and_save(exp_db[-1], db=exp_db, save_dir=fast_tmp_dir, **kwargs)
+    time.sleep(2)
     assert (set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
         old_times) != set(
         [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in

@@ -55,6 +55,19 @@ If you want to run analysis while data is being acquired you will need to do
 a few things (note that all these need to be running in terminals which have
 been activated into the {{ collection_env }}:
 
-1. Start a new proxy via ``bluesky-0MQ-proxy 5567 5568 -vvv`` (this will
+#. Start a new proxy via ``bluesky-0MQ-proxy 5567 5568 -vvv`` (this will
    start a new proxy on the localhost).
-1. Start each server 
+
+#. Start each server with the extra kwargs
+   ``--outbound-proxy-address='localhost:5568' --inbound-proxy-address='localhost:5567'``.
+   This makes certain that the servers are talking to the correct proxy
+
+#. Start the ``save_server`` with the extra kwarg
+   ``--template="{base_folder}/{start['bt_safN']/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[uid]:.6}_{event[seq_num]:04d}{ext}"``.
+   This makes certain to put the data under
+   its own (SAF named) folder rather than the current user's folder (note that
+   this is not needed if the data is from the current user.
+
+#. See the steps above for passing data into the servers, note that you need
+   to use the localhost proxy address rather than the one from the
+   ``glbl_dict``

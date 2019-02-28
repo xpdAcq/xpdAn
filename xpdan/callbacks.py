@@ -10,7 +10,7 @@ from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
 from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
-
+import mayavi.mlab as mlab
 
 class StartStopCallback(CallbackBase):
     """Print the time for analysis"""
@@ -324,7 +324,6 @@ class Live3DView(CallbackBase):
         self.pipeline_dict = {}
 
     def descriptor(self, doc):
-        import mayavi.mlab as mlab
 
         self.fields = [
             k for k, v in doc["data_keys"].items() if len(v["shape"]) == 3
@@ -337,7 +336,6 @@ class Live3DView(CallbackBase):
             self.pipeline_dict[field] = []
 
     def event(self, doc):
-        import mayavi.mlab as mlab
 
         for field in self.fields:
             data = doc["data"][field]

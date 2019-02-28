@@ -1,7 +1,9 @@
 import operator as op
 
-from rapidz import Stream
+from rapidz import Stream, move_to_first
 from shed import SimpleToEventStream, SimpleFromEventStream
+from xpdan.vend.callbacks.core import StripDepVar
+import numpy as np
 
 
 def pencil_tomo(source: Stream, qoi_name, translation, rotation, **kwargs):
@@ -51,8 +53,7 @@ def pencil_tomo(source: Stream, qoi_name, translation, rotation, **kwargs):
 
 
 def full_field_tomo(source: Stream, qoi_name, rotation, **kwargs):
-    # TODO: may need to do deg2rad?
-    theta = SimpleFromEventStream('event', ('data', rotation), upstream=source)
+    theta = SimpleFromEventStream('event', ('data', rotation), upstream=source).map(np.deg2rad)
 
     qoi = SimpleFromEventStream('event', ('data', qoi_name),
                                 upstream=source, principle=True)
@@ -61,7 +62,9 @@ def full_field_tomo(source: Stream, qoi_name, rotation, **kwargs):
     return locals()
 
 
-def tomo_event_stream(rec, *, qoi_name, **kwargs):
+def tomo_event_stream(source, rec, *, qoi_name, **kwargs):
+    raw_stripped = move_to_first(source.starmap(StripDepVar()))
+
     rec_tes = SimpleToEventStream(
         rec,
         (f'{qoi_name}_tomo',),

@@ -1,10 +1,12 @@
 import itertools
+from pprint import pprint
 
 import fire
 from bluesky.utils import install_qt_kicker
 from rapidz import Stream
 from rapidz.link import link
-from xpdan.pipelines.to_event_model import to_event_stream_no_ind
+from xpdan.pipelines.to_event_model import to_event_stream_no_ind, \
+    to_event_stream_with_ind
 from xpdan.pipelines.tomo import (
     pencil_tomo,
     tomo_event_stream,

@@ -63,8 +63,8 @@ def run_server(
                 ),
                 x,
             ),
-            lambda x: BestEffortCallback(table_enabled=False, overplot=False),
-            lambda x: LiveWaterfall(),
+            # lambda x: BestEffortCallback(table_enabled=False, overplot=False),
+            #lambda x: LiveWaterfall(),
             lambda x: Live3DView(),
         ]
     )

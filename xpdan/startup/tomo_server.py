@@ -3,10 +3,12 @@ from pprint import pprint
 
 import fire
 from bluesky.utils import install_qt_kicker
-from rapidz import Stream
+from rapidz import Stream, move_to_first
 from rapidz.link import link
-from xpdan.pipelines.to_event_model import to_event_stream_no_ind, \
-    to_event_stream_with_ind
+from xpdan.pipelines.to_event_model import (
+    to_event_stream_no_ind,
+    to_event_stream_with_ind,
+)
 from xpdan.pipelines.tomo import (
     pencil_tomo,
     tomo_event_stream,
@@ -94,7 +96,9 @@ class PencilTomoCallback(CallbackBase):
             for s, qoi in zip(self.sources, qois)
         ]
         for p in pipelines:
-            to_event_stream_no_ind(p["rec_tes"], publisher=self.publisher)
+            to_event_stream_no_ind(
+                p["rec_tes"], p["sinogram_tes"], publisher=self.publisher
+            )
 
         for s in self.sources:
             s.emit(("start", self.start_doc))
@@ -162,7 +166,9 @@ class FullFieldTomoCallback(CallbackBase):
             for s, qoi in zip(self.sources, qois)
         ]
         for p in pipelines:
-            to_event_stream_no_ind(p["rec_tes"], publisher=self.publisher)
+            to_event_stream_no_ind(
+                p["sinogram_tes"], p["rec_tes"], publisher=self.publisher
+            )
 
         for s in self.sources:
             s.emit(("start", self.start_doc))
@@ -218,7 +224,7 @@ def run_server(
     kwargs : dict
         kwargs passed to the reconstruction, for instance ``algorithm`` could
         be passed in with the associated tomopy algorithm to change the
-        reconstruction algorithm from gridrec to something else.
+        reconstructgion algorithm from gridrec to something else.
 
     """
     print(kwargs)

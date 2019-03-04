@@ -50,6 +50,8 @@ run:
     default: {conda: xray-vision}
   rapidz:
     default: {conda: rapidz}
+  mayavi:
+    defaul: {conda: mayavi}
 test:
   pytest:
     default:

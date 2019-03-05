@@ -51,7 +51,7 @@ run:
   rapidz:
     default: {conda: rapidz}
   mayavi:
-    defaul: {conda: mayavi}
+    default: {conda: mayavi}
 test:
   pytest:
     default:

@@ -154,6 +154,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="k">import</span> <span class="n">install_qt_kicker</span>
 <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">SymLogNorm</span>
+<span class="kn">from</span> <span class="nn">xpdan.callbacks</span> <span class="k">import</span> <span class="n">Live3DView</span>
 <span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.best_effort</span> <span class="k">import</span> <span class="n">BestEffortCallback</span>
 <span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.broker</span> <span class="k">import</span> <span class="n">LiveImage</span>
 <span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">RunRouter</span>
@@ -197,13 +198,14 @@
                 <span class="n">handlers</span> <span class="o">=</span> <span class="n">glbl_dict</span><span class="p">[</span><span class="n">db</span><span class="p">]</span><span class="o">.</span><span class="n">reg</span><span class="o">.</span><span class="n">handler_reg</span>
                 <span class="k">break</span>
     <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;tomo&quot;</span><span class="p">]</span>
 
     <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="n">outbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
     <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
 
     <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
-        <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">if_correct_start</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">if_correct_start</span><span class="p">(</span>
                 <span class="n">LiveImage</span><span class="p">(</span>
                     <span class="n">handler_reg</span><span class="o">=</span><span class="n">handlers</span><span class="p">,</span>
                     <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
@@ -212,11 +214,9 @@
                 <span class="p">),</span>
                 <span class="n">x</span><span class="p">,</span>
             <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">BestEffortCallback</span><span class="p">(</span>
-                <span class="n">table_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">overplot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">),</span>
-         <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">()</span>
+            <span class="c1"># lambda x: BestEffortCallback(table_enabled=False, overplot=False),</span>
+            <span class="c1"># lambda x: LiveWaterfall(),</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Live3DView</span><span class="p">(),</span>
         <span class="p">]</span>
     <span class="p">)</span>
 

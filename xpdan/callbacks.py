@@ -12,6 +12,7 @@ from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
 import mayavi.mlab as mlab
 
+
 class StartStopCallback(CallbackBase):
     """Print the time for analysis"""
 
@@ -79,8 +80,7 @@ class SaveBaseClass(Retrieve):
     """
 
     def __init__(
-            self, template, handler_reg, root_map=None, base_folders=None,
-            **kwargs
+        self, template, handler_reg, root_map=None, base_folders=None, **kwargs
     ):
         if base_folders is None:
             base_folders = []
@@ -159,8 +159,8 @@ class SaveBaseClass(Retrieve):
                 event=doc,
                 base_folder=bf,
             )
-                .replace(".", ",")
-                .replace("__", "_")
+            .replace(".", ",")
+            .replace("__", "_")
             for bf in self.base_folders
         ]
         # Note that formally there are more steps to the formatting, but we
@@ -344,14 +344,15 @@ class Live3DView(CallbackBase):
             if x is None:
                 x = mlab.pipeline.scalar_field(data, figure=figure)
                 self.source_dict[field] = x
-                for i, orientation in enumerate('xyz'):
+                for i, orientation in enumerate("xyz"):
                     self.pipeline_dict[field].append(
                         mlab.pipeline.image_plane_widget(
                             x,
                             plane_orientation=f"{orientation}_axes",
                             slice_index=data.shape[i] // 2,
-                            figure=figure
-                        ))
+                            figure=figure,
+                        )
+                    )
                 mlab.pipeline.volume(x, figure=figure)
             else:
                 x.mlab_source.scalars = data

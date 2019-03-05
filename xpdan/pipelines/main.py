@@ -90,7 +90,7 @@ def start_gen(
     # TODO: change this when new dark logic comes
     # Check that the data isn't a dark (dark_frame = True when taking a dark)
     not_dark_scan = FromEventStream("start", (), upstream=raw_source).map(
-        lambda x: not x.get('dark_frame', False)
+        lambda x: not x.get("dark_frame", False)
     )
     # Fill the raw event stream
     source = (
@@ -179,7 +179,7 @@ def start_gen(
                 .map(lambda x: x if not isinstance(x, list) else x[0])
                 .map(lambda x: x.documents(fill=True))
                 .flatten(),
-                event_stream_name="primary"
+                event_stream_name="primary",
             )
             for image_name in image_names
         ]
@@ -200,7 +200,7 @@ def start_gen(
                 .map(lambda x: x.documents(fill=True))
                 .flatten(),
                 stream_name="raw_background_dark",
-                event_stream_name="primary"
+                event_stream_name="primary",
             )
             for image_name in image_names
         ]
@@ -224,7 +224,7 @@ def start_gen(
                 ("data", image_name),
                 bg_docs,
                 stream_name="raw_background",
-                event_stream_name="primary"
+                event_stream_name="primary",
             )
             for image_name in image_names
         ]

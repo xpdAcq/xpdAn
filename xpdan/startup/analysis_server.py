@@ -200,7 +200,7 @@ def run_server(
 
     d.subscribe(lambda *x: namespace["raw_source"].emit(x))
     if plot_graph:
-        namespace['raw_source'].visualize(source_node=True)
+        namespace["raw_source"].visualize(source_node=True)
     print("Starting Analysis Server")
     d.start()
 

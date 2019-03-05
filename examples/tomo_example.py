@@ -72,9 +72,20 @@ for i in range(8):
 # Run Full Field Scans, each scan has more slices, showing how we can minimize
 # the number of slices by interleaving them by half
 for i in [2 ** n for n in range(2, 8)] + [180]:
-    RE(bp.list_scan([det], m, l[:i], md={'tomo': {'type': 'full_field',
-                                                  'rotation': 'motor1',
-                                                  'center': rot_center}}))
+    RE(
+        bp.list_scan(
+            [det],
+            m,
+            l[:i],
+            md={
+                "tomo": {
+                    "type": "full_field",
+                    "rotation": "motor1",
+                    "center": rot_center,
+                }
+            },
+        )
+    )
     print(i)
     time.sleep(3)
 # Run in pencil beam geometry (this takes a long time!)

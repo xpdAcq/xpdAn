@@ -70,9 +70,7 @@ def tomo_event_stream(source, rec, sinogram, *, qoi_name, **kwargs):
     raw_stripped = move_to_first(source.starmap(StripDepVar()))
 
     rec_tes = SimpleToEventStream(
-        rec,
-        (f"{qoi_name}_tomo",),
-        analysis_stage="{}_tomo".format(qoi_name),
+        rec, (f"{qoi_name}_tomo",), analysis_stage="{}_tomo".format(qoi_name)
     )
 
     # Don't run the sinogram for now, since it can produce issues with the viz

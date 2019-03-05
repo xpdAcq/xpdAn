@@ -6,7 +6,6 @@ names = [
     "portable_db_server",
     "viz_server",
     "analysis_server",
-    "tomo_server",
 ]
 
 entry_points = {

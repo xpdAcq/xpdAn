@@ -10,6 +10,7 @@ from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
 from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
+import mayavi.mlab as mlab
 
 
 class StartStopCallback(CallbackBase):
@@ -107,10 +108,10 @@ class SaveBaseClass(Retrieve):
             for d in doc.get("hints", {}).get("dimensions")
             if d[0][0] != "time"
         ]
-        if 'original_start_uid' not in doc:
-            doc['original_start_uid'] = doc['uid']
-        if 'original_start_time' not in doc:
-            doc['original_start_time'] = doc['time']
+        if "original_start_uid" not in doc:
+            doc["original_start_uid"] = doc["uid"]
+        if "original_start_time" not in doc:
+            doc["original_start_time"] = doc["time"]
 
         # use the magic formatter to leave things behind
         self.start_template = render2(
@@ -305,3 +306,57 @@ SAVER_MAP = {
     "calib": SaveCalib,
     "raw": SaveMeta,
 }
+
+
+class Live3DView(CallbackBase):
+    """Callback for visualizing 3D data """
+
+    def __init__(self):
+        self.cs_dict = {}
+        self.source_dict = {}
+        self.fields = []
+        self.pipeline_dict = {}
+
+    def start(self, doc):
+        self.cs_dict = {}
+        self.source_dict = {}
+        self.fields = []
+        self.pipeline_dict = {}
+
+    def descriptor(self, doc):
+
+        self.fields = [
+            k for k, v in doc["data_keys"].items() if len(v["shape"]) == 3
+        ]
+        for field in self.fields:
+            fig = mlab.figure(field)
+            mlab.clf(fig)
+            self.cs_dict[field] = fig
+            self.source_dict[field] = None
+            self.pipeline_dict[field] = []
+
+    def event(self, doc):
+
+        for field in self.fields:
+            data = doc["data"][field]
+            figure = self.cs_dict[field]
+            x = self.source_dict[field]
+            if x is None:
+                x = mlab.pipeline.scalar_field(data, figure=figure)
+                self.source_dict[field] = x
+                for i, orientation in enumerate("xyz"):
+                    self.pipeline_dict[field].append(
+                        mlab.pipeline.image_plane_widget(
+                            x,
+                            plane_orientation=f"{orientation}_axes",
+                            slice_index=data.shape[i] // 2,
+                            figure=figure,
+                        )
+                    )
+                mlab.pipeline.volume(x, figure=figure)
+            else:
+                x.mlab_source.scalars = data
+                for p in self.pipeline_dict[field]:
+                    sl = p.ipw.slice_index
+                    p.update_pipeline()
+                    p.ipw.slice_index = sl

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bluesky.utils import install_qt_kicker
 from matplotlib.colors import SymLogNorm
+from xpdan.callbacks import Live3DView
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
 from xpdan.vend.callbacks.core import RunRouter
@@ -46,13 +47,14 @@ def run_server(
                 handlers = glbl_dict[db].reg.handler_reg
                 break
     if prefix is None:
-        prefix = [b"an", b"raw"]
+        prefix = [b"an", b"raw", b"tomo"]
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)
 
     rr = RunRouter(
-        [lambda x: if_correct_start(
+        [
+            lambda x: if_correct_start(
                 LiveImage(
                     handler_reg=handlers,
                     cmap="viridis",
@@ -61,11 +63,9 @@ def run_server(
                 ),
                 x,
             ),
-            lambda x: BestEffortCallback(
-                table_enabled=False,
-                overplot=False,
-            ),
-         lambda x: LiveWaterfall()
+            # lambda x: BestEffortCallback(table_enabled=False, overplot=False),
+            # lambda x: LiveWaterfall(),
+            lambda x: Live3DView(),
         ]
     )
 

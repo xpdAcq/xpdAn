@@ -30,6 +30,7 @@ the software, please post it as a new thread at `XPD-Users
 
    quickstart
    using_servers
+   post_analysis
 
 
 .. toctree::

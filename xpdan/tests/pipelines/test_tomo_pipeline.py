@@ -34,7 +34,8 @@ def test_pencil_tomo_pipeline(RE, hw):
         )
     )
     # det1
-    assert len(L) == 30 * 5 + 3
+    # sinogram and recon
+    assert len(L) == (30 * 5 + 3) * 2
 
 
 def test_full_field_tomo_pipeline(RE, hw):
@@ -65,6 +66,7 @@ def test_full_field_tomo_pipeline(RE, hw):
         )
     )
     # det1
-    assert len(L) == 30 + 3
+    # sinogram and recon
+    assert len(L) == (30 + 3) * 2
     print(L[-2][1]["data"]["img_tomo"].shape)
     assert len(L[4][1]["data"]["img_tomo"].shape) == 3

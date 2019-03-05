@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Post Analysis &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="xpdan package" href="xpdan.html" />
+    <link rel="prev" title="Using Servers" href="using_servers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_servers.html">Using Servers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Post Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-on-a-new-proxy">Running on a new proxy</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Post Analysis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/post_analysis.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="post-analysis">
+<span id="id1"></span><h1>Post Analysis<a class="headerlink" href="#post-analysis" title="Permalink to this headline">¶</a></h1>
+<p>Analysis can be done after the data has been acquired using the xpdAn server
+system.
+This can allow for running the analysis with different parameters or
+modification of the documents to fix errors made at run time (eg. the dark is
+incorrectly mapped to the data)</p>
+<div class="admonition danger">
+<p class="first admonition-title">Danger</p>
+<p class="last">This will cause problems if either the data was taken from a different
+beamtime or a scan is currently running. If this is the case a second proxy
+should be started and a new set of servers should point to that proxy (see
+below).</p>
+</div>
+<p>Here is an example in which we pass data through to the analysis directly,
+to follow along you will need to activate the collection-2019-1.2-xpd and
+start up ipython.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make the databroker</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">databroker</span> <span class="kn">import</span> <span class="n">Broker</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">Broker</span><span class="o">.</span><span class="n">named</span><span class="p">(</span><span class="s1">&#39;xpd&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">prepare_hook</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+
+<span class="c1"># load up the global configuration so we can get the ZMQ proxy address</span>
+<span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="kn">import</span> <span class="n">glbl_dict</span>
+
+<span class="c1"># import the publisher which will send our data to the proxy</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.zmq</span> <span class="kn">import</span> <span class="n">Publisher</span>
+<span class="c1"># tell the publisher to send the data to the proxy with the prefix of raw</span>
+<span class="c1"># (which stands for raw data)</span>
+<span class="n">pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s1">&#39;inbound_proxy_address&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
+
+ <span class="n">better_dark_uid</span> <span class="o">=</span> <span class="s1">&#39;hello world&#39;</span>
+ <span class="c1"># get the header</span>
+ <span class="n">hdr</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+ <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">hdr</span><span class="o">.</span><span class="n">documents</span><span class="p">():</span>
+     <span class="c1"># change the dark</span>
+     <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>
+         <span class="n">doc</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sc_dk_field_uid</span><span class="o">=</span><span class="n">better_dark_uid</span><span class="p">)</span>
+     <span class="c1"># send the data to the analysis system</span>
+     <span class="n">pub</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="section" id="running-on-a-new-proxy">
+<h2>Running on a new proxy<a class="headerlink" href="#running-on-a-new-proxy" title="Permalink to this headline">¶</a></h2>
+<p>If you want to run analysis while data is being acquired you will need to do
+a few things (note that all these need to be running in terminals which have
+been activated into the collection-2019-1.2-xpd:</p>
+<ol class="arabic simple">
+<li>Start a new proxy via <code class="docutils literal notranslate"><span class="pre">bluesky-0MQ-proxy</span> <span class="pre">5567</span> <span class="pre">5568</span> <span class="pre">-vvv</span></code> (this will
+start a new proxy on the localhost).</li>
+<li>Start each server with the extra kwargs
+<code class="docutils literal notranslate"><span class="pre">--outbound-proxy-address='localhost:5568'</span> <span class="pre">--inbound-proxy-address='localhost:5567'</span></code>.
+This makes certain that the servers are talking to the correct proxy</li>
+<li>Start the <code class="docutils literal notranslate"><span class="pre">save_server</span></code> with the extra kwarg
+<code class="docutils literal notranslate"><span class="pre">--template=&quot;{base_folder}/{start['bt_safN']/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[uid]:.6}_{event[seq_num]:04d}{ext}&quot;</span></code>.
+This makes certain to put the data under
+its own (SAF named) folder rather than the current user’s folder (note that
+this is not needed if the data is from the current user.</li>
+<li>See the steps above for passing data into the servers, note that you need
+to use the localhost proxy address rather than the one from the
+<code class="docutils literal notranslate"><span class="pre">glbl_dict</span></code></li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="xpdan.html" class="btn btn-neutral float-right" title="xpdan package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="using_servers.html" class="btn btn-neutral float-left" title="Using Servers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

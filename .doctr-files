@@ -11,6 +11,7 @@
 ./_modules/xpdan/startup/save_server.html
 ./_modules/xpdan/startup/viz_server.html
 ./_sources/index.rst.txt
+./_sources/post_analysis.rst.txt
 ./_sources/quickstart.rst.txt
 ./_sources/using_servers.rst.txt
 ./_sources/xpdan.pipelines.rst.txt
@@ -74,6 +75,7 @@
 ./genindex.html
 ./index.html
 ./objects.inv
+./post_analysis.html
 ./py-modindex.html
 ./quickstart.html
 ./search.html

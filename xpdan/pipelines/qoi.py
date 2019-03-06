@@ -1,6 +1,6 @@
 """Event Model mirror of xpdtools.pipelines.qoi meant to accept nodes
 from the raw pipeline and convert them to Event Model"""
-from shed.simple import SimpleToEventStream
+from shed.simple import SimpleToEventStream, SimpleFromEventStream
 
 
 def max_intensity_mean(mean_max, q_at_mean_max, **kwargs):
@@ -22,3 +22,16 @@ def max_gr_mean(gr_max, r_at_gr_max, **kwargs):
 
 
 pipeline_order = [max_intensity_mean, max_gr_mean]
+
+
+def amorphsivity_fem(source, **kwargs):
+    pdf = SimpleFromEventStream(
+        "event", ("data", "gr"), source, principle=True
+    )
+    return locals()
+
+
+def amorphsivity_tem(amorphsivity, **kwargs):
+    amorphsivity_em = SimpleToEventStream(amorphsivity, "amorphsivity",
+                                          analysis_stage='amorphsivity')
+    return locals()

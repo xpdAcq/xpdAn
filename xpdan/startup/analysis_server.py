@@ -151,6 +151,9 @@ def run_server(
     outbound_proxy_address : str, optional
         The location of the ZMQ proxy sending data to this server. Defaults
         to the location listed in the ``xpdconf.conf.glbl_dict``.
+    inbound_proxy_address : str, optional
+        The inbound ip address for the ZMQ server. Defaults to the value
+        from the global dict
     prefix : bytes or list of bytes, optional
         Which publisher(s) to listen to for data. Defaults to ``b"raw"``
     kwargs : Any

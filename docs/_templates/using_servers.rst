@@ -10,7 +10,8 @@ Currently there are four servers implemented,
 ``analysis``,
 ``portable_db``,
 ``db``,
-``save`` and
+``save``,
+``qoi`` and
 ``viz``.
 Each server is started by the command ``<server_name>_server`` on the command
 line while inside the analysis conda environment.
@@ -44,6 +45,8 @@ save='The save server saves files with human readable filenames to various
 folders.
 Users will need to specify which folder(s) they would like the data to be
 placed in before running their experiments.',
+qoi='The QOI server performs additional data processing and analysis,
+extracting quantities of interest from raw and reduced data.
 viz='The viz server visualizes raw and processed data as it becomes available.
 This server should already be running, only beamline staff should need to
 start it.'
@@ -65,3 +68,8 @@ Running from ipython
 All of these server commands can be run from ipython (and python) directly.
 This provides more control over the servers operation, especially for the
 analysis server.
+Each server can be imported via
+``from xpdan.startup.<server_name> import run_server`` replacing
+``<server_name>`` with the appropriate name, eg.
+``from xpdan.startup.qoi_server import run_server`` to import the quantity
+of interest server.

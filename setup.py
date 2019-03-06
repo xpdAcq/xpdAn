@@ -6,6 +6,7 @@ names = [
     "portable_db_server",
     "viz_server",
     "analysis_server",
+    "qoi_server",
 ]
 
 entry_points = {
@@ -16,7 +17,7 @@ entry_points = {
 
 setup(
     name="xpdan",
-    version='0.5.2',
+    version="0.5.2",
     packages=find_packages(),
     description="data processing module",
     zip_safe=False,

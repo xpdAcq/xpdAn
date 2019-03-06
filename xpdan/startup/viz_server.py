@@ -46,8 +46,6 @@ def run_server(
             if db in glbl_dict:
                 handlers = glbl_dict[db].reg.handler_reg
                 break
-    if prefix is None:
-        prefix = [b"an", b"raw", b"tomo"]
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)
@@ -63,8 +61,8 @@ def run_server(
                 ),
                 x,
             ),
-            # lambda x: BestEffortCallback(table_enabled=False, overplot=False),
-            # lambda x: LiveWaterfall(),
+            lambda x: BestEffortCallback(table_enabled=False, overplot=False),
+            lambda x: LiveWaterfall(),
             lambda x: Live3DView(),
         ]
     )

@@ -1,0 +1,14 @@
+**Added:**
+
+* Add ``qoi_server`` CLI and module for computing various quantities of interest
+* Added amorphsivity to QOIs
+
+**Changed:** None
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

@@ -5,10 +5,11 @@ import threading
 import time
 
 import matplotlib.pyplot as plt
+import numpy as np
 from shed.simple import SimpleFromEventStream
 
 import bluesky.plans as bp
-from ophyd.sim import NumpySeqHandler
+from ophyd.sim import NumpySeqHandler, SynSignal
 from rapidz import Stream
 from xpdconf.conf import glbl_dict
 from xpdan.startup.portable_db_server import (
@@ -17,6 +18,7 @@ from xpdan.startup.portable_db_server import (
 from xpdan.startup.viz_server import run_server as viz_run_server
 from xpdan.startup.analysis_server import run_server as analysis_run_server
 from xpdan.startup.db_server import run_server as db_run_server
+from xpdan.startup.qoi_server import run_server as qoi_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -208,3 +210,34 @@ def test_db_run_server(tmpdir, proxy, RE, hw, db):
     exp_proc.terminate()
     exp_proc.join()
     assert db[-1].start['analysis_stage'] == 'pdf'
+
+
+def test_qoi_run_server(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        det = SynSignal(func=lambda: np.ones(10), name='gr')
+        RE(bp.count([det], md=dict(analysis_stage="pdf")))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    try:
+        print("running server")
+        qoi_run_server()
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()

@@ -1,0 +1,19 @@
+**Added:**
+
+* Support for 3D pencil beam reconstructions
+* Support for Registry backed full field reconstructions
+* ``ctPDF_example.py`` example for pencil beam
+
+**Changed:**
+
+* ``tomo_example.py`` runs on a registry backed detector
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:**
+
+* Pencil beam no longer tries to run independent var reconstructions
+
+**Security:** None

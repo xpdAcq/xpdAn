@@ -6,7 +6,7 @@ import dxchange
 import numpy as np
 import tomopy
 from bluesky.run_engine import RunEngine
-from ophyd.sim import SynSignal, hw
+from ophyd.sim import SynSignal, hw, SynSignalWithRegistry
 from xpdan.vend.callbacks.zmq import Publisher
 from xpdconf.conf import glbl_dict
 
@@ -50,12 +50,13 @@ class Pencil:
 
 
 f = FullField()
-det = SynSignal(f, name="img", labels={"detectors"})
+# det = SynSignal(f, name="img", labels={"detectors"})
+det = SynSignalWithRegistry(f, name="img", labels={"detectors"},)
 det.kind = "hinted"
 
-g = Pencil()
-det2 = SynSignal(g, name="img", labels={"detectors"})
-det2.kind = "hinted"
+#g = Pencil()
+#det2 = SynSignal(g, name="img", labels={"detectors"})
+#det2.kind = "hinted"
 
 RE = RunEngine()
 RE.md['analysis_stage'] = 'raw'

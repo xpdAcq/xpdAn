@@ -16,7 +16,7 @@ from xpdan.pipelines.tomo import (
     full_field_tomo,
 )
 from xpdan.vend.callbacks import CallbackBase
-from xpdan.vend.callbacks.core import RunRouter
+from xpdan.vend.callbacks.core import RunRouter, Retrieve
 from xpdan.vend.callbacks.zmq import Publisher, RemoteDispatcher
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.tomo import (
@@ -131,7 +131,7 @@ class PencilTomoCallback(CallbackBase):
         # Need to destroy pipeline
 
 
-class FullFieldTomoCallback(CallbackBase):
+class FullFieldTomoCallback(Retrieve):
     """This class caches and passes documents into the pencil tomography
         pipeline.
 
@@ -140,7 +140,10 @@ class FullFieldTomoCallback(CallbackBase):
 
         This class acts as a descriptor router for documents"""
 
-    def __init__(self, pipeline_factory, publisher, **kwargs):
+    def __init__(self, pipeline_factory, publisher, handler_reg,
+                 root_map=None, executor=None,
+                 **kwargs):
+        super().__init__(handler_reg, root_map, executor)
         self.pipeline_factory = pipeline_factory
         self.publisher = publisher
 
@@ -151,6 +154,7 @@ class FullFieldTomoCallback(CallbackBase):
         self.kwargs = kwargs
 
     def start(self, doc):
+        super().start(doc)
         self.start_doc = doc
         self.dim_names = [
             d[0][0]
@@ -192,6 +196,7 @@ class FullFieldTomoCallback(CallbackBase):
             s.emit(("descriptor", doc))
 
     def event(self, doc):
+        doc = super().event(doc)
         for s in self.sources:
             s.emit(("event", doc))
 
@@ -201,7 +206,7 @@ class FullFieldTomoCallback(CallbackBase):
         # Need to destroy pipeline
 
 
-def tomo_callback_factory(doc, publisher, **kwargs):
+def tomo_callback_factory(doc, publisher, handler_reg=None, **kwargs):
     # TODO: Eventually extract from plan hints?
     tomo_dict = doc.get("tomo", {})
     if tomo_dict.get("type", None) == "pencil":
@@ -222,6 +227,7 @@ def tomo_callback_factory(doc, publisher, **kwargs):
         return FullFieldTomoCallback(
             lambda **inner_kwargs: link(*full_field_order, **inner_kwargs),
             publisher,
+            handler_reg,
             **kwargs,
         )
 
@@ -254,10 +260,13 @@ def run_server(
 
     """
     print(kwargs)
+    db = glbl_dict['exp_db']
+    handler_reg = db.reg.handler_reg
     publisher = Publisher(inbound_proxy_address, prefix=inbound_prefix)
 
     rr = RunRouter(
-        [lambda x: tomo_callback_factory(x, publisher=publisher, **kwargs)]
+        [lambda x: tomo_callback_factory(x, publisher=publisher,
+                                         handler_reg=handler_reg, **kwargs)]
     )
 
     d = RemoteDispatcher(outbound_proxy_address, prefix=outbound_prefix)

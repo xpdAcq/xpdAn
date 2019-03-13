@@ -234,14 +234,16 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        qoi_run_server()
+        qoi_run_server(_publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L
 
 
 def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
@@ -271,14 +273,16 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        tomo_run_server()
+        tomo_run_server(_publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L
 
 
 def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
@@ -310,14 +314,16 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        tomo_run_server()
+        tomo_run_server(_publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L
 
 
 def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
@@ -346,11 +352,13 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        tomo_run_server()
+        tomo_run_server(_publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L

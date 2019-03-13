@@ -236,6 +236,7 @@ def run_server(
     inbound_proxy_address=glbl_dict["inbound_proxy_address"],
     outbound_prefix=(b"raw", b"an", b"qoi"),
     inbound_prefix=b"tomo",
+    _publisher=None,
     **kwargs,
 ):
     """Server for performing tomographic reconstructions
@@ -261,7 +262,10 @@ def run_server(
     print(kwargs)
     db = glbl_dict['exp_db']
     handler_reg = db.reg.handler_reg
-    publisher = Publisher(inbound_proxy_address, prefix=inbound_prefix)
+    if _publisher is None:
+        publisher = Publisher(inbound_proxy_address, prefix=inbound_prefix)
+    else:
+        publisher = _publisher
 
     rr = RunRouter(
         [lambda x: tomo_callback_factory(x, publisher=publisher,

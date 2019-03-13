@@ -93,7 +93,6 @@ class PencilTomoCallback(CallbackBase):
 
         # Only compute QOIs on scalars, currently
         qois = [k for k, v in dep_shapes.items() if len(v) == 0]
-        print(qois, [doc["data_keys"][n]['dtype'] for n in qois], indep_vars)
         rotation_pos = self.start_doc["motors"].index(self.rotation)
         translation_pos = self.start_doc["motors"].index(self.translation)
 

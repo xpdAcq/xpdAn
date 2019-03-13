@@ -89,12 +89,15 @@ def start_gen(
 
     # TODO: change this when new dark logic comes
     # Check that the data isn't a dark (dark_frame = True when taking a dark)
-    not_dark_scan = FromEventStream("start", (), upstream=raw_source).map(
+    not_dark_scan = FromEventStream("start", (), upstream=raw_source,
+                                    stream_name='not dark scan').map(
         lambda x: not x.get("dark_frame", False)
     )
     # Fill the raw event stream
     source = (
-        raw_source.combine_latest(not_dark_scan)
+        # Emit on works here because we emit on the not_dark_scan first due
+        # to the ordering of the nodes!
+        raw_source.combine_latest(not_dark_scan, emit_on=0)
         .filter(lambda x: x[1])
         .pluck(0)
         .starmap(
@@ -102,7 +105,7 @@ def start_gen(
         )
         .filter(lambda x: x[0] not in ["resource", "datum"])
     )
-    # source.sink(print)
+    # source.sink(lambda x: print('Source says ', x))
     # Get all the documents
     start_docs = FromEventStream("start", (), source)
     descriptor_docs = FromEventStream(

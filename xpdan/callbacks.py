@@ -341,22 +341,24 @@ class Live3DView(CallbackBase):
             data = doc["data"][field]
             figure = self.cs_dict[field]
             x = self.source_dict[field]
-            if x is None:
-                x = mlab.pipeline.scalar_field(data, figure=figure)
-                self.source_dict[field] = x
-                for i, orientation in enumerate("xyz"):
-                    self.pipeline_dict[field].append(
-                        mlab.pipeline.image_plane_widget(
-                            x,
-                            plane_orientation=f"{orientation}_axes",
-                            slice_index=data.shape[i] // 2,
-                            figure=figure,
+            # Don't plot data which is (N, M, 1) because Mayavi doesn't like it
+            if data.shape[-1] != 1:
+                if x is None:
+                    x = mlab.pipeline.scalar_field(data, figure=figure)
+                    self.source_dict[field] = x
+                    for i, orientation in enumerate("xyz"):
+                        self.pipeline_dict[field].append(
+                            mlab.pipeline.image_plane_widget(
+                                x,
+                                plane_orientation=f"{orientation}_axes",
+                                slice_index=data.shape[i] // 2,
+                                figure=figure,
+                            )
                         )
-                    )
-                mlab.pipeline.volume(x, figure=figure)
-            else:
-                x.mlab_source.scalars = data
-                for p in self.pipeline_dict[field]:
-                    sl = p.ipw.slice_index
-                    p.update_pipeline()
-                    p.ipw.slice_index = sl
+                    mlab.pipeline.volume(x, figure=figure)
+                else:
+                    x.mlab_source.scalars = data
+                    for p in self.pipeline_dict[field]:
+                        sl = p.ipw.slice_index
+                        p.update_pipeline()
+                        p.ipw.slice_index = sl

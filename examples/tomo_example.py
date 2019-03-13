@@ -26,6 +26,8 @@ m = hw.motor1
 m.kind = "hinted"
 mm = hw.motor2
 mm.kind = "hinted"
+mmm = hw.motor3
+mmm.kind = "hinted"
 
 
 class FullField:
@@ -42,8 +44,8 @@ class Pencil:
         v = m.get()[0]
         vv = mm.get()[0]
         out = proj2[int(v), :, int(vv)]
-        print(v, vv)
-        time.sleep(.1)
+        print(v, vv, mmm.get()[0])
+        time.sleep(.5)
         return np.squeeze(out)
 
 
@@ -56,9 +58,11 @@ det2 = SynSignal(g, name="img", labels={"detectors"})
 det2.kind = "hinted"
 
 RE = RunEngine()
+RE.md['analysis_stage'] = 'raw'
 p = Publisher(glbl_dict["inbound_proxy_address"], prefix=b"raw")
 t = RE.subscribe(p)
 # RE.subscribe(print)
+
 # Build scan
 l = [0, 90]
 for i in range(8):
@@ -88,6 +92,7 @@ for i in [2 ** n for n in range(2, 8)] + [180]:
     )
     print(i)
     time.sleep(3)
+'''
 # Run in pencil beam geometry (this takes a long time!)
 RE(
     bp.grid_scan(
@@ -111,4 +116,35 @@ RE(
         },
     )
 )
+# Run in 3D pencil beam geometry
+RE(
+    bp.grid_scan(
+        [det2],
+        mmm,
+        0,
+        2,
+        10,
+        m,
+        0,
+        180,
+        41,
+        True,
+        mm,
+        200,
+        401,
+        21,
+        True,
+
+        md={
+            "tomo": {
+                "type": "pencil",
+                "rotation": "motor1",
+                "translation": "motor2",
+                "stack": "motor3",
+                "center": rot_center - 200,
+            }
+        },
+    )
+)
 RE.abort()
+'''

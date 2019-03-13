@@ -7,6 +7,7 @@ names = [
     "viz_server",
     "analysis_server",
     "qoi_server",
+    "tomo_server",
 ]
 
 entry_points = {

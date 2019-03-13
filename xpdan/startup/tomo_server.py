@@ -5,6 +5,7 @@ import fire
 from bluesky.utils import install_qt_kicker
 from rapidz import Stream, move_to_first
 from rapidz.link import link
+from shed import SimpleToEventStream
 from xpdan.pipelines.to_event_model import (
     to_event_stream_no_ind,
     to_event_stream_with_ind,
@@ -22,12 +23,21 @@ from xpdtools.pipelines.tomo import (
     tomo_prep,
     tomo_pipeline_piecewise,
     tomo_pipeline_theta,
+    tomo_stack_2D,
 )
 
-pencil_order = [
+pencil_order_2D = [
     pencil_tomo,
     tomo_prep,
     tomo_pipeline_piecewise,
+    tomo_event_stream,
+]
+
+pencil_order_3D = [
+    pencil_tomo,
+    tomo_prep,
+    tomo_pipeline_piecewise,
+    tomo_stack_2D,
     tomo_event_stream,
 ]
 
@@ -51,6 +61,7 @@ class PencilTomoCallback(CallbackBase):
         self.dim_names = []
         self.translation = None
         self.rotation = None
+        self.stack = None
         self.sources = []
         self.kwargs = kwargs
 
@@ -61,24 +72,28 @@ class PencilTomoCallback(CallbackBase):
             for d in doc.get("hints", {}).get("dimensions")
             if d[0][0] != "time"
         ]
-        self.translation = doc["tomo"]["translation"]
-        self.rotation = doc["tomo"]["rotation"]
+        tomo_dict = doc["tomo"]
+        self.translation = tomo_dict["translation"]
+        self.rotation = tomo_dict["rotation"]
+        if 'stack' in tomo_dict:
+            self.stack = tomo_dict['stack']
 
     def descriptor(self, doc):
+        indep_vars = list(
+                itertools.chain.from_iterable(
+                    [doc["object_keys"][n] for n in self.dim_names]
+                ))
+
         # TODO: only listen to primary stream
         dep_shapes = {
             n: doc["data_keys"][n]["shape"]
             for n in doc["data_keys"]
-            if n
-            not in list(
-                itertools.chain.from_iterable(
-                    [doc["object_keys"][n] for n in self.dim_names]
-                )
-            )
+            if (n not in indep_vars) and (doc["data_keys"][n]['dtype'] not in ['PDFConfig', 'AzimuthalIntegrator'])
         }
 
         # Only compute QOIs on scalars, currently
         qois = [k for k, v in dep_shapes.items() if len(v) == 0]
+        print(qois, [doc["data_keys"][n]['dtype'] for n in qois], indep_vars)
         rotation_pos = self.start_doc["motors"].index(self.rotation)
         translation_pos = self.start_doc["motors"].index(self.translation)
 
@@ -89,6 +104,7 @@ class PencilTomoCallback(CallbackBase):
                 qoi_name=qoi,
                 translation=self.translation,
                 rotation=self.rotation,
+                stack=self.stack,
                 x_dimension=self.start_doc["shape"][translation_pos],
                 th_dimension=self.start_doc["shape"][rotation_pos],
                 **self.kwargs,
@@ -97,7 +113,8 @@ class PencilTomoCallback(CallbackBase):
         ]
         for p in pipelines:
             to_event_stream_no_ind(
-                p["rec_tes"], p["sinogram_tes"], publisher=self.publisher
+                *[node for node in p.values() if isinstance(node, SimpleToEventStream)],
+                publisher=self.publisher
             )
 
         for s in self.sources:
@@ -186,13 +203,22 @@ class FullFieldTomoCallback(CallbackBase):
 
 def tomo_callback_factory(doc, publisher, **kwargs):
     # TODO: Eventually extract from plan hints?
-    if doc.get("tomo", {}).get("type", None) == "pencil":
-        return PencilTomoCallback(
-            lambda **inner_kwargs: link(*pencil_order, **inner_kwargs),
-            publisher,
-            **kwargs,
-        )
-    elif doc.get("tomo", {}).get("type", None) == "full_field":
+    tomo_dict = doc.get("tomo", {})
+    if tomo_dict.get("type", None) == "pencil":
+        if "stack" in tomo_dict:
+            return PencilTomoCallback(
+                lambda **inner_kwargs: link(*pencil_order_3D, **inner_kwargs),
+                publisher,
+                **kwargs,
+            )
+
+        else:
+            return PencilTomoCallback(
+                lambda **inner_kwargs: link(*pencil_order_2D, **inner_kwargs),
+                publisher,
+                **kwargs,
+            )
+    elif tomo_dict.get("type", None) == "full_field":
         return FullFieldTomoCallback(
             lambda **inner_kwargs: link(*full_field_order, **inner_kwargs),
             publisher,

@@ -570,9 +570,9 @@ class Retrieve(CallbackBase):
             root_map = {}
         if handler_reg is None:
             handler_reg = {}
-        self.resources = None
-        self.handlers = None
-        self.datums = None
+        self.resources = {}
+        self.handlers = {}
+        self.datums = {}
         self.root_map = root_map
         self.handler_reg = handler_reg
 

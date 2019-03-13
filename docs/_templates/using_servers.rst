@@ -46,10 +46,11 @@ folders.
 Users will need to specify which folder(s) they would like the data to be
 placed in before running their experiments.',
 qoi='The QOI server performs additional data processing and analysis,
-extracting quantities of interest from raw and reduced data.
+extracting quantities of interest from raw and reduced data.',
 viz='The viz server visualizes raw and processed data as it becomes available.
 This server should already be running, only beamline staff should need to
-start it.'
+start it.',
+tomo='The tomo server runs tomographic reconstructions on all scalar data (raw and analyzed). The reconstruction algorithm can be changed via the ``algorithm`` keyword.'
 ) %}
 
 {% for name, blurb in servers_dict.items() %}

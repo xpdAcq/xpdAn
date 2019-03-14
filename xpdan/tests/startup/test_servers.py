@@ -226,6 +226,7 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
         p = Publisher(proxy[0], prefix=b"raw")
         RE.subscribe(p)
         det = SynSignal(func=lambda: np.ones(10), name='gr')
+        RE(bp.count([det], md=dict(analysis_stage="raw")))
         RE(bp.count([det], md=dict(analysis_stage="pdf")))
 
     # Run experiment in another process (after delay)

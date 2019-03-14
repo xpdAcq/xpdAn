@@ -1,0 +1,13 @@
+**Added:** None
+
+**Changed:**
+
+* ``mayavi`` callback is accessed via a shim in case it doesn't exist
+
+**Deprecated:** None
+
+**Removed:** None
+
+**Fixed:** None
+
+**Security:** None

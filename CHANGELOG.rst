@@ -4,6 +4,29 @@
 
 .. current developments
 
+v0.6.0
+====================
+
+**Added:**
+
+* Add ``inbound_proxy_address`` so we can access the publisher at runtime
+* Add ``qoi_server`` CLI and module for computing various quantities of interest
+* Added amorphsivity to QOIs
+* Support for 3D pencil beam reconstructions
+* Support for Registry backed full field reconstructions
+* ``ctPDF_example.py`` example for pencil beam
+
+**Changed:**
+
+* Use ``image_fields`` for loading the images
+* ``tomo_example.py`` runs on a registry backed detector
+
+**Fixed:**
+
+* Pencil beam no longer tries to run independent var reconstructions
+
+
+
 v0.5.2
 ====================
 

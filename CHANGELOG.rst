@@ -4,6 +4,15 @@
 
 .. current developments
 
+v0.6.1
+====================
+
+**Changed:**
+
+* ``mayavi`` callback is accessed via a shim in case it doesn't exist
+
+
+
 v0.6.0
 ====================
 

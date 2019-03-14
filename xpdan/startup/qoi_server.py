@@ -15,6 +15,7 @@ def run_server(
     prefix=None,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     inbound_proxy_address=glbl_dict["inbound_proxy_address"],
+    _publisher=None,
     **kwargs
 ):
     """Start up the visualization server
@@ -40,7 +41,10 @@ def run_server(
     d = RemoteDispatcher(outbound_proxy_address, prefix=prefix)
     install_qt_kicker(loop=d.loop)
 
-    an_with_ind_pub = Publisher(inbound_proxy_address, prefix=b"qoi")
+    if _publisher is None:
+        an_with_ind_pub = Publisher(inbound_proxy_address, prefix=b"qoi")
+    else:
+        an_with_ind_pub = _publisher
 
     raw_source = Stream()
 

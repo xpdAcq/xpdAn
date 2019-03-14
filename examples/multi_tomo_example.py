@@ -76,7 +76,7 @@ for i in range(8):
             l.append(j)
 # Run Full Field Scans, each scan has more slices, showing how we can minimize
 # the number of slices by interleaving them by half
-for i in [180]:
+for i in [2 ** n for n in range(2, 8)] + [180]:
     RE(
         bp.list_scan(
             [det],

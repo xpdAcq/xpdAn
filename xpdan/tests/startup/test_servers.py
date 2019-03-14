@@ -19,6 +19,7 @@ from xpdan.startup.viz_server import run_server as viz_run_server
 from xpdan.startup.analysis_server import run_server as analysis_run_server
 from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.qoi_server import run_server as qoi_run_server
+from xpdan.startup.tomo_server import  run_server as tomo_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -225,6 +226,7 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
         p = Publisher(proxy[0], prefix=b"raw")
         RE.subscribe(p)
         det = SynSignal(func=lambda: np.ones(10), name='gr')
+        RE(bp.count([det], md=dict(analysis_stage="raw")))
         RE(bp.count([det], md=dict(analysis_stage="pdf")))
 
     # Run experiment in another process (after delay)
@@ -233,11 +235,131 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        qoi_run_server()
+        qoi_run_server(_publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L
+
+
+def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+
+        RE(bp.grid_scan([hw.noisy_det],
+                   hw.motor1, 0, 2, 2,
+                   hw.motor2, 0, 2, 2, True,
+                   md={'tomo': {'type': 'pencil',
+                                'rotation': 'motor1',
+                                "translation": "motor2",
+                                'center': 1}}))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
+    try:
+        print("running server")
+        tomo_run_server(_publisher=lambda *x: L.append(x))
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+    assert L
+
+
+def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+
+        RE(bp.grid_scan([hw.noisy_det],
+                   hw.motor3, 0, 2, 2,
+                   hw.motor1, 0, 2, 2, True,
+                   hw.motor2, 0, 2, 2, True,
+                   md={'tomo': {'type': 'pencil',
+                                'rotation': 'motor1',
+                                "translation": "motor2",
+                                "stack": "motor3",
+                                'center': 1}}))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
+    try:
+        print("running server")
+        tomo_run_server(_publisher=lambda *x: L.append(x))
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+    assert L
+
+
+def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+
+        det = SynSignal(func=lambda: np.ones((10, 10)), name='gr')
+        RE(bp.scan([det],
+                   hw.motor1, 0, 2, 2,
+                   md={'tomo': {'type': 'full_field',
+                                'rotation': 'motor1',
+                                'center': 1}}))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
+    try:
+        print("running server")
+        tomo_run_server(_publisher=lambda *x: L.append(x))
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+    assert L

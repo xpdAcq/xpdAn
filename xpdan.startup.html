@@ -236,6 +236,8 @@ background data. Defaults to the location listed in the
 <code class="docutils literal notranslate"><span class="pre">xpdconf.conf.glbl_dict</span></code>.</li>
 <li><strong>outbound_proxy_address</strong> (<em>str, optional</em>) – The location of the ZMQ proxy sending data to this server. Defaults
 to the location listed in the <code class="docutils literal notranslate"><span class="pre">xpdconf.conf.glbl_dict</span></code>.</li>
+<li><strong>inbound_proxy_address</strong> (<em>str, optional</em>) – The inbound ip address for the ZMQ server. Defaults to the value
+from the global dict</li>
 <li><strong>prefix</strong> (<em>bytes or list of bytes, optional</em>) – Which publisher(s) to listen to for data. Defaults to <code class="docutils literal notranslate"><span class="pre">b&quot;raw&quot;</span></code></li>
 <li><strong>kwargs</strong> (<em>Any</em>) – Keyword arguments passed into the pipeline creation. These are used
 to modify the data processing.</li>

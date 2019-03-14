@@ -10,7 +10,8 @@ Currently there are four servers implemented,
 ``analysis``,
 ``portable_db``,
 ``db``,
-``save`` and
+``save``,
+``qoi`` and
 ``viz``.
 Each server is started by the command ``<server_name>_server`` on the command
 line while inside the analysis conda environment.
@@ -75,6 +76,15 @@ See the ``run_server`` function in the
 :ref:`save_server` for the keyword arguments.
 
 
+``qoi``
+++++++++++++++
+The QOI server performs additional data processing and analysis,
+extracting quantities of interest from raw and reduced data.
+
+See the ``run_server`` function in the
+:ref:`qoi_server` for the keyword arguments.
+
+
 ``viz``
 ++++++++++++++
 The viz server visualizes raw and processed data as it becomes available.
@@ -85,9 +95,22 @@ See the ``run_server`` function in the
 :ref:`viz_server` for the keyword arguments.
 
 
+``tomo``
+++++++++++++++
+The tomo server runs tomographic reconstructions on all scalar data (raw and analyzed). The reconstruction algorithm can be changed via the ``algorithm`` keyword.
+
+See the ``run_server`` function in the
+:ref:`tomo_server` for the keyword arguments.
+
+
 
 Running from ipython
 --------------------
 All of these server commands can be run from ipython (and python) directly.
 This provides more control over the servers operation, especially for the
 analysis server.
+Each server can be imported via
+``from xpdan.startup.<server_name> import run_server`` replacing
+``<server_name>`` with the appropriate name, eg.
+``from xpdan.startup.qoi_server import run_server`` to import the quantity
+of interest server.

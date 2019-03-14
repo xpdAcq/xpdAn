@@ -18,7 +18,7 @@ entry_points = {
 
 setup(
     name="xpdan",
-    version="0.5.2",
+    version='0.6.0',
     packages=find_packages(),
     description="data processing module",
     zip_safe=False,

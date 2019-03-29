@@ -213,63 +213,63 @@ the software, please post it as a new thread at <a class="reference external" hr
 <h1>v0.6.1<a class="headerlink" href="#v0-6-1" title="Permalink to this headline">¶</a></h1>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">mayavi</span></code> callback is accessed via a shim in case it doesn’t exist</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mayavi</span></code> callback is accessed via a shim in case it doesn’t exist</p></li>
 </ul>
 </div>
 <div class="section" id="v0-6-0">
 <h1>v0.6.0<a class="headerlink" href="#v0-6-0" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li>Add <code class="docutils literal notranslate"><span class="pre">inbound_proxy_address</span></code> so we can access the publisher at runtime</li>
-<li>Add <code class="docutils literal notranslate"><span class="pre">qoi_server</span></code> CLI and module for computing various quantities of interest</li>
-<li>Added amorphsivity to QOIs</li>
-<li>Support for 3D pencil beam reconstructions</li>
-<li>Support for Registry backed full field reconstructions</li>
-<li><code class="docutils literal notranslate"><span class="pre">ctPDF_example.py</span></code> example for pencil beam</li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">inbound_proxy_address</span></code> so we can access the publisher at runtime</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">qoi_server</span></code> CLI and module for computing various quantities of interest</p></li>
+<li><p>Added amorphsivity to QOIs</p></li>
+<li><p>Support for 3D pencil beam reconstructions</p></li>
+<li><p>Support for Registry backed full field reconstructions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctPDF_example.py</span></code> example for pencil beam</p></li>
 </ul>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li>Use <code class="docutils literal notranslate"><span class="pre">image_fields</span></code> for loading the images</li>
-<li><code class="docutils literal notranslate"><span class="pre">tomo_example.py</span></code> runs on a registry backed detector</li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">image_fields</span></code> for loading the images</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tomo_example.py</span></code> runs on a registry backed detector</p></li>
 </ul>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Pencil beam no longer tries to run independent var reconstructions</li>
+<li><p>Pencil beam no longer tries to run independent var reconstructions</p></li>
 </ul>
 </div>
 <div class="section" id="v0-5-2">
 <h1>v0.5.2<a class="headerlink" href="#v0-5-2" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Image streams specifically listen to the primary event stream</li>
-<li><code class="docutils literal notranslate"><span class="pre">AlignEventStream</span></code> with the raw data listens to the primary event stream</li>
+<li><p>Image streams specifically listen to the primary event stream</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AlignEventStream</span></code> with the raw data listens to the primary event stream</p></li>
 </ul>
 </div>
 <div class="section" id="v0-5-1">
 <h1>v0.5.1<a class="headerlink" href="#v0-5-1" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Fix mask overlay order so it isn’t delayed</li>
+<li><p>Fix mask overlay order so it isn’t delayed</p></li>
 </ul>
 </div>
 <div class="section" id="v0-5-0">
 <h1>v0.5.0<a class="headerlink" href="#v0-5-0" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li>Units for most reduced data streams (mostly so waterfall can plot them)</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> to analysis server so we can visualize the graph</li>
+<li><p>Units for most reduced data streams (mostly so waterfall can plot them)</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> to analysis server so we can visualize the graph</p></li>
 </ul>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li>Use <code class="docutils literal notranslate"><span class="pre">dark_frame=True</span></code> to determine if a scan is a dark scan.  This means
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">dark_frame=True</span></code> to determine if a scan is a dark scan.  This means
 that scans without darks can now be processed, although they will use the
-most recenlty cached dark.</li>
-<li><code class="docutils literal notranslate"><span class="pre">raw_stripped</span></code> is run first, so all the aligned data can be emitted ASAP.
+most recenlty cached dark.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raw_stripped</span></code> is run first, so all the aligned data can be emitted ASAP.
 This means that data can be saved as soon as it is created, rather than
-waiting for the last data to be processed.</li>
-<li>Simplified the plotting via the new <code class="docutils literal notranslate"><span class="pre">LiveWaterfall</span></code> callback.</li>
-<li>Support <code class="docutils literal notranslate"><span class="pre">original_start_uid</span></code> system</li>
-<li>use raw start document time for file naming</li>
+waiting for the last data to be processed.</p></li>
+<li><p>Simplified the plotting via the new <code class="docutils literal notranslate"><span class="pre">LiveWaterfall</span></code> callback.</p></li>
+<li><p>Support <code class="docutils literal notranslate"><span class="pre">original_start_uid</span></code> system</p></li>
+<li><p>use raw start document time for file naming</p></li>
 </ul>
 </div>
 <div class="section" id="v0-4-1">
@@ -279,140 +279,140 @@ waiting for the last data to be processed.</li>
 <h1>v0.4.0<a class="headerlink" href="#v0-4-0" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li>analysis server for running analysis in an external process
-without saving or visualization</li>
-<li>DB server for saving data into databrokers</li>
-<li><code class="docutils literal notranslate"><span class="pre">ExportCallback</span></code> for copying data for databroker export</li>
-<li><code class="docutils literal notranslate"><span class="pre">Retrieve</span></code> callback for accessing data from resources and datums</li>
-<li><code class="docutils literal notranslate"><span class="pre">ReturnCallback</span></code> a callback which always returns name document pairs</li>
-<li><code class="docutils literal notranslate"><span class="pre">RunRouter</span></code> which allows us to make pipelines on the fly</li>
-<li>Server for handling saving of data</li>
-<li>Tests for the servers</li>
-<li>All the callbacks from <code class="docutils literal notranslate"><span class="pre">bluesky</span></code></li>
+<li><p>analysis server for running analysis in an external process
+without saving or visualization</p></li>
+<li><p>DB server for saving data into databrokers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ExportCallback</span></code> for copying data for databroker export</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Retrieve</span></code> callback for accessing data from resources and datums</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ReturnCallback</span></code> a callback which always returns name document pairs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RunRouter</span></code> which allows us to make pipelines on the fly</p></li>
+<li><p>Server for handling saving of data</p></li>
+<li><p>Tests for the servers</p></li>
+<li><p>All the callbacks from <code class="docutils literal notranslate"><span class="pre">bluesky</span></code></p></li>
 </ul>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li>Chunk the analysis pipelines into pieces so they can be composed</li>
-<li><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> also reports the analysis time for diagnostics</li>
-<li>Multiple detectors are supported for the main processing pipeline
+<li><p>Chunk the analysis pipelines into pieces so they can be composed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> also reports the analysis time for diagnostics</p></li>
+<li><p>Multiple detectors are supported for the main processing pipeline
 note that this does not support multiple detectors at the same
-time.</li>
-<li><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> now prints event analysis times</li>
-<li>Moved file saving print statements closer to saving action</li>
-<li>Moved <code class="docutils literal notranslate"><span class="pre">hinted_fields</span></code> to the <code class="docutils literal notranslate"><span class="pre">xpdan.vend.callbacks.core</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">BestEffortCallback</span></code> has a teardown kwarg for managing figures
+time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StartStopCallback</span></code> now prints event analysis times</p></li>
+<li><p>Moved file saving print statements closer to saving action</p></li>
+<li><p>Moved <code class="docutils literal notranslate"><span class="pre">hinted_fields</span></code> to the <code class="docutils literal notranslate"><span class="pre">xpdan.vend.callbacks.core</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BestEffortCallback</span></code> has a teardown kwarg for managing figures
 at the end of a run, preventing us from having too many windows
-open.</li>
+open.</p></li>
 </ul>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Removed <code class="docutils literal notranslate"><span class="pre">sanitize_np</span></code> from zmq system.</li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">sanitize_np</span></code> from zmq system.</p></li>
 </ul>
 <p><strong>Authors:</strong></p>
 <ul class="simple">
-<li>Christopher J. Wright</li>
+<li><p>Christopher J. Wright</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-6">
 <h1>v0.3.6<a class="headerlink" href="#v0-3-6" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Both the foreground dark and foreground light are properly pulled based off
-their stream names</li>
+<li><p>Both the foreground dark and foreground light are properly pulled based off
+their stream names</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-5">
 <h1>v0.3.5<a class="headerlink" href="#v0-3-5" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Restore calib saving</li>
-<li>Make certain that files are saved before additional analysis is performed.
+<li><p>Restore calib saving</p></li>
+<li><p>Make certain that files are saved before additional analysis is performed.
 This should make the pipeline more robust to analysis failures near the
-end of the pipeline.</li>
-<li><code class="docutils literal notranslate"><span class="pre">xpdan.callbacks.StopStartCallback</span></code> to be no-stop doc tolerant</li>
-<li><code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> now properly reports a <code class="docutils literal notranslate"><span class="pre">bt_uid</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">xpdan.db_utils.query_dark</span></code> now always returns a list</li>
+end of the pipeline.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xpdan.callbacks.StopStartCallback</span></code> to be no-stop doc tolerant</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> now properly reports a <code class="docutils literal notranslate"><span class="pre">bt_uid</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xpdan.db_utils.query_dark</span></code> now always returns a list</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-4">
 <h1>v0.3.4<a class="headerlink" href="#v0-3-4" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">save_tiff</span></code> pipeline for simple save tiff</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_tiff</span></code> pipeline for simple save tiff</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-3">
 <h1>v0.3.3<a class="headerlink" href="#v0-3-3" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Splay out args for calibration saving properly</li>
-<li>Pull calibration information from <code class="docutils literal notranslate"><span class="pre">dSpacings</span></code></li>
+<li><p>Splay out args for calibration saving properly</p></li>
+<li><p>Pull calibration information from <code class="docutils literal notranslate"><span class="pre">dSpacings</span></code></p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-2">
 <h1>v0.3.2<a class="headerlink" href="#v0-3-2" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Cast to numpy float32 on way into pipeline</li>
+<li><p>Cast to numpy float32 on way into pipeline</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-1">
 <h1>v0.3.1<a class="headerlink" href="#v0-3-1" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li>Add print statement for server startup</li>
+<li><p>Add print statement for server startup</p></li>
 </ul>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li>metadata now stored into its own folder</li>
+<li><p>metadata now stored into its own folder</p></li>
 </ul>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Files saved in sub dir of <code class="docutils literal notranslate"><span class="pre">tiff_base</span></code></li>
-<li>Filter out <code class="docutils literal notranslate"><span class="pre">None</span></code> produced by <code class="docutils literal notranslate"><span class="pre">Filler</span></code> on <code class="docutils literal notranslate"><span class="pre">datum/resource</span></code> docs</li>
+<li><p>Files saved in sub dir of <code class="docutils literal notranslate"><span class="pre">tiff_base</span></code></p></li>
+<li><p>Filter out <code class="docutils literal notranslate"><span class="pre">None</span></code> produced by <code class="docutils literal notranslate"><span class="pre">Filler</span></code> on <code class="docutils literal notranslate"><span class="pre">datum/resource</span></code> docs</p></li>
 </ul>
 </div>
 <div class="section" id="v0-3-0">
 <h1>v0.3.0<a class="headerlink" href="#v0-3-0" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">Filler</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_combine_latest</span></code> to <code class="docutils literal notranslate"><span class="pre">pipeline_utils</span></code></li>
-<li>Tests for main pipeline</li>
-<li>Support for QOI plotting</li>
-<li><code class="docutils literal notranslate"><span class="pre">start_analysis</span></code> function for starting the <code class="docutils literal notranslate"><span class="pre">RemoteDispatcher</span></code> and pushing
-data through the pipeline live</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Filler</span></code> and <code class="docutils literal notranslate"><span class="pre">clear_combine_latest</span></code> to <code class="docutils literal notranslate"><span class="pre">pipeline_utils</span></code></p></li>
+<li><p>Tests for main pipeline</p></li>
+<li><p>Support for QOI plotting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_analysis</span></code> function for starting the <code class="docutils literal notranslate"><span class="pre">RemoteDispatcher</span></code> and pushing
+data through the pipeline live</p></li>
 </ul>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">db_utils</span></code> query functions signatures are now reversed (docs first, db
-second)</li>
-<li>Simplified <code class="docutils literal notranslate"><span class="pre">render_and_clean</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">MainCallback</span></code> <code class="docutils literal notranslate"><span class="pre">analysis_stage</span></code> syntax in line with pipeline</li>
-<li><code class="docutils literal notranslate"><span class="pre">conftest</span></code> databroker now reports raw dicts</li>
-<li>Separated saving, visualization, and QOI pipeline chunks</li>
-<li>Darks and Backgrounds are zeroed out at start of scan in case scan has no
-dark or background.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db_utils</span></code> query functions signatures are now reversed (docs first, db
+second)</p></li>
+<li><p>Simplified <code class="docutils literal notranslate"><span class="pre">render_and_clean</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MainCallback</span></code> <code class="docutils literal notranslate"><span class="pre">analysis_stage</span></code> syntax in line with pipeline</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conftest</span></code> databroker now reports raw dicts</p></li>
+<li><p>Separated saving, visualization, and QOI pipeline chunks</p></li>
+<li><p>Darks and Backgrounds are zeroed out at start of scan in case scan has no
+dark or background.</p></li>
 </ul>
 <p><strong>Removed:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">xpdan.tools</span></code> is now in <code class="docutils literal notranslate"><span class="pre">xpdtools.tools</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">shim</span></code> module is now in <code class="docutils literal notranslate"><span class="pre">xpdtools</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xpdan.tools</span></code> is now in <code class="docutils literal notranslate"><span class="pre">xpdtools.tools</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shim</span></code> module is now in <code class="docutils literal notranslate"><span class="pre">xpdtools</span></code></p></li>
 </ul>
 <p><strong>Fixed:</strong></p>
 <ul class="simple">
-<li>Analysis pipeline now runs on xpdtools pipeline</li>
+<li><p>Analysis pipeline now runs on xpdtools pipeline</p></li>
 </ul>
 </div>
 <div class="section" id="v0-2-3rc">
 <h1>v0.2.3rc<a class="headerlink" href="#v0-2-3rc" title="Permalink to this headline">¶</a></h1>
 <p><strong>Changed:</strong></p>
 <ul class="simple">
-<li>xpdAcq now outsources <a href="#id1"><span class="problematic" id="id2">``</span></a>glbl` configuration management to xpdConf</li>
-<li>Use conda-forge <code class="docutils literal notranslate"><span class="pre">xpdconf</span></code> for CI builds</li>
+<li><p>xpdAcq now outsources <a href="#id1"><span class="problematic" id="id2">``</span></a>glbl` configuration management to xpdConf</p></li>
+<li><p>Use conda-forge <code class="docutils literal notranslate"><span class="pre">xpdconf</span></code> for CI builds</p></li>
 </ul>
 <p><strong>Removed:</strong></p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">load_configuration</span></code> (which is now in xpdConf)</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load_configuration</span></code> (which is now in xpdConf)</p></li>
 </ul>
 </div>
 <div class="section" id="v0-2-2">
@@ -422,20 +422,20 @@ dark or background.</li>
 <h1>v0.2.1<a class="headerlink" href="#v0-2-1" title="Permalink to this headline">¶</a></h1>
 <p><strong>Added:</strong></p>
 <ul class="simple">
-<li>Requirements folder</li>
-<li><code class="docutils literal notranslate"><span class="pre">push_tag</span></code> to rever</li>
-<li>Flexible folder tag</li>
-<li>Add rever changelog activity</li>
-<li>Speed up masking via median based sigma clipping</li>
-<li>Z score visualization to callback pipeline</li>
+<li><p>Requirements folder</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">push_tag</span></code> to rever</p></li>
+<li><p>Flexible folder tag</p></li>
+<li><p>Add rever changelog activity</p></li>
+<li><p>Speed up masking via median based sigma clipping</p></li>
+<li><p>Z score visualization to callback pipeline</p></li>
 </ul>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 

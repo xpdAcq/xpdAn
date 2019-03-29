@@ -163,8 +163,8 @@ This can allow for running the analysis with different parameters or
 modification of the documents to fix errors made at run time (eg. the dark is
 incorrectly mapped to the data)</p>
 <div class="admonition danger">
-<p class="first admonition-title">Danger</p>
-<p class="last">This will cause problems if either the data was taken from a different
+<p class="admonition-title">Danger</p>
+<p>This will cause problems if either the data was taken from a different
 beamtime or a scan is currently running. If this is the case a second proxy
 should be started and a new set of servers should point to that proxy (see
 below).</p>
@@ -206,19 +206,19 @@ start up ipython.</p>
 a few things (note that all these need to be running in terminals which have
 been activated into the collection-2019-1.2-xpd:</p>
 <ol class="arabic simple">
-<li>Start a new proxy via <code class="docutils literal notranslate"><span class="pre">bluesky-0MQ-proxy</span> <span class="pre">5567</span> <span class="pre">5568</span> <span class="pre">-vvv</span></code> (this will
-start a new proxy on the localhost).</li>
-<li>Start each server with the extra kwargs
+<li><p>Start a new proxy via <code class="docutils literal notranslate"><span class="pre">bluesky-0MQ-proxy</span> <span class="pre">5567</span> <span class="pre">5568</span> <span class="pre">-vvv</span></code> (this will
+start a new proxy on the localhost).</p></li>
+<li><p>Start each server with the extra kwargs
 <code class="docutils literal notranslate"><span class="pre">--outbound-proxy-address='localhost:5568'</span> <span class="pre">--inbound-proxy-address='localhost:5567'</span></code>.
-This makes certain that the servers are talking to the correct proxy</li>
-<li>Start the <code class="docutils literal notranslate"><span class="pre">save_server</span></code> with the extra kwarg
+This makes certain that the servers are talking to the correct proxy</p></li>
+<li><p>Start the <code class="docutils literal notranslate"><span class="pre">save_server</span></code> with the extra kwarg
 <code class="docutils literal notranslate"><span class="pre">--template=&quot;{base_folder}/{start['bt_safN']/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[uid]:.6}_{event[seq_num]:04d}{ext}&quot;</span></code>.
 This makes certain to put the data under
 its own (SAF named) folder rather than the current user’s folder (note that
-this is not needed if the data is from the current user.</li>
-<li>See the steps above for passing data into the servers, note that you need
+this is not needed if the data is from the current user.</p></li>
+<li><p>See the steps above for passing data into the servers, note that you need
 to use the localhost proxy address rather than the one from the
-<code class="docutils literal notranslate"><span class="pre">glbl_dict</span></code></li>
+<code class="docutils literal notranslate"><span class="pre">glbl_dict</span></code></p></li>
 </ol>
 </div>
 </div>

@@ -171,88 +171,77 @@ Treat this quickstart as a reference that you may return back to.
 Carry out the steps in this order to ensure a successful analysis.</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>If you haven’t already, join <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a> . Look here for answers if you get stuck and if the answer to your question is not already there, please ask it!</li>
-<li>Insert your USB hard drive (or any other storage system) and mount it</li>
-<li>Start the servers, see <a href="#id3"><span class="problematic" id="id4">:ref:`using_servers`_</span></a> for details on the server setups</li>
+<li><p>If you haven’t already, join <a class="reference external" href="https://groups.google.com/forum/#!forum/xpd-users;context-place=overview">XPD-Users Google group</a> . Look here for answers if you get stuck and if the answer to your question is not already there, please ask it!</p></li>
+<li><p>Insert your USB hard drive (or any other storage system) and mount it</p></li>
+<li><p>Start the servers, see <a href="#id3"><span class="problematic" id="id4">:ref:`using_servers`_</span></a> for details on the server setups</p></li>
 </ol>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Run <code class="docutils literal notranslate"><span class="pre">analysis_server</span></code></li>
-<li>Run <code class="docutils literal notranslate"><span class="pre">portable_db_server</span> <span class="pre">path/to/folder/on/USB/drive</span></code></li>
-<li>Run <code class="docutils literal notranslate"><span class="pre">save_server</span> <span class="pre">path/to/different/folder/on/USB/drive</span></code></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">analysis_server</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">portable_db_server</span> <span class="pre">path/to/folder/on/USB/drive</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">save_server</span> <span class="pre">path/to/different/folder/on/USB/drive</span></code></p></li>
 </ol>
 </div></blockquote>
 <ol class="arabic simple" start="4">
-<li>Your data will be automatically processed, saved and visualized via the servers.</li>
+<li><p>Your data will be automatically processed, saved and visualized via the servers.</p></li>
 </ol>
 <blockquote>
 <div><ul>
-<li><p class="first">The data will be saved in the directory
+<li><p>The data will be saved in the directory
 <code class="docutils literal notranslate"><span class="pre">.../xpdUser/tiff_base/</span></code> and whichever directory you provided on the
-save server command.</p>
-</li>
-<li><p class="first">The pipeline will save:</p>
+save server command.</p></li>
+<li><p>The pipeline will save:</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">Dark corrected image (as <code class="docutils literal notranslate"><span class="pre">.tiff</span></code>)</p>
-</li>
-<li><p class="first">Mask</p>
+<li><p>Dark corrected image (as <code class="docutils literal notranslate"><span class="pre">.tiff</span></code>)</p></li>
+<li><p>Mask</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).</li>
-<li>alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis</li>
-<li>alternative ehavior available is to not mask any images.</li>
-<li>These settings can be changed by either running the analysis server with the <code class="docutils literal notranslate"><span class="pre">--mask_settings</span></code> kwarg. The three posibilities are denoted by “auto”, “first”, and “none” respectively. For example, to set the mask to only be created on the first image of the scan one would type <code class="docutils literal notranslate"><span class="pre">--mask_setting={'setting':</span> <span class="pre">'first'}</span></code>.</li>
+<li><p>by default a mask is auto-computed on the every image of the scan and used for real-time analysis (you are always given an unmasked tiff file so you can change the masking behavior later).</p></li>
+<li><p>alternative behavior avialable is to auto-compute the mask on the first image and this mask is used for all subsequent images in real-time analysisa new mask for each image or to turn off masking altogether during real-time analysis</p></li>
+<li><p>alternative ehavior available is to not mask any images.</p></li>
+<li><p>These settings can be changed by either running the analysis server with the <code class="docutils literal notranslate"><span class="pre">--mask_settings</span></code> kwarg. The three posibilities are denoted by “auto”, “first”, and “none” respectively. For example, to set the mask to only be created on the first image of the scan one would type <code class="docutils literal notranslate"><span class="pre">--mask_setting={'setting':</span> <span class="pre">'first'}</span></code>.</p></li>
 </ol>
 </div></blockquote>
 </li>
-<li><p class="first">Integrated scattered intensity, I(Q) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>)</p>
-</li>
-<li><p class="first">I(tth) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>), note that this is the same as I(Q) on the tth grid.</p>
-</li>
-<li><p class="first">The structure and reduced structure factor S(Q) and F(Q) (as <code class="docutils literal notranslate"><span class="pre">.sq</span></code> and <code class="docutils literal notranslate"><span class="pre">.fq</span></code> respecifvely)</p>
-</li>
-<li><p class="first">The PDF, G(r) (as <code class="docutils literal notranslate"><span class="pre">.gr</span></code>)</p>
-</li>
-<li><p class="first">Calibration parameters (as <code class="docutils literal notranslate"><span class="pre">.poni</span></code>, if the scan is an calibration scan)</p>
-</li>
-<li><p class="first">Scan metadata (as <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>)</p>
-</li>
+<li><p>Integrated scattered intensity, I(Q) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>)</p></li>
+<li><p>I(tth) (as <code class="docutils literal notranslate"><span class="pre">.chi</span></code>), note that this is the same as I(Q) on the tth grid.</p></li>
+<li><p>The structure and reduced structure factor S(Q) and F(Q) (as <code class="docutils literal notranslate"><span class="pre">.sq</span></code> and <code class="docutils literal notranslate"><span class="pre">.fq</span></code> respecifvely)</p></li>
+<li><p>The PDF, G(r) (as <code class="docutils literal notranslate"><span class="pre">.gr</span></code>)</p></li>
+<li><p>Calibration parameters (as <code class="docutils literal notranslate"><span class="pre">.poni</span></code>, if the scan is an calibration scan)</p></li>
+<li><p>Scan metadata (as <code class="docutils literal notranslate"><span class="pre">.yaml</span></code>)</p></li>
 </ol>
 </div></blockquote>
 </li>
-<li><p class="first">The pipeline will plot:</p>
+<li><p>The pipeline will plot:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>Dark corrected image</li>
-<li>Dark, Polarization, Background corrected Masked image</li>
-<li>I(Q)</li>
-<li>I(tth)</li>
-<li>F(Q)</li>
-<li>G(r)</li>
+<li><p>Dark corrected image</p></li>
+<li><p>Dark, Polarization, Background corrected Masked image</p></li>
+<li><p>I(Q)</p></li>
+<li><p>I(tth)</p></li>
+<li><p>F(Q)</p></li>
+<li><p>G(r)</p></li>
 </ol>
 </div></blockquote>
 </li>
 </ul>
 </div></blockquote>
 <ol class="arabic" start="5">
-<li><p class="first">To change the pipeline configuration stop the analysis server by
+<li><p>To change the pipeline configuration stop the analysis server by
 typing <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> in the terminal where it is running.
 Then re-run the command with new keyword arguments.</p>
 <ul>
-<li><p class="first"><code class="docutils literal notranslate"><span class="pre">mask_kwargs</span></code> which controls the mask creation (see the <a class="reference external" href="https://xpdacq.github.io/xpdtools/xpdtools.html#xpdtools.tools.mask_img">xpdtools docs</a>)</p>
-</li>
-<li><p class="first"><code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span></code> which controls the PDF creation</p>
-</li>
-<li><p class="first"><code class="docutils literal notranslate"><span class="pre">fq_kwargs</span></code> which controls the FQ/SQ creation</p>
-</li>
-<li><p class="first"><code class="docutils literal notranslate"><span class="pre">mask_setting</span></code> which controls how often masks are created:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">mask_kwargs</span></code> which controls the mask creation (see the <a class="reference external" href="https://xpdacq.github.io/xpdtools/xpdtools.html#xpdtools.tools.mask_img">xpdtools docs</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span></code> which controls the PDF creation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fq_kwargs</span></code> which controls the FQ/SQ creation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mask_setting</span></code> which controls how often masks are created:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">auto</span></code>: a mask is autocalculated for, and applied to, each image,</li>
-<li><code class="docutils literal notranslate"><span class="pre">first</span></code>: a new mask is autocalculated for the first image in the scan,
-then this mask is applied to all images in the scan,</li>
-<li><code class="docutils literal notranslate"><span class="pre">none</span></code>: no mask is applied)</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auto</span></code>: a mask is autocalculated for, and applied to, each image,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">first</span></code>: a new mask is autocalculated for the first image in the scan,
+then this mask is applied to all images in the scan,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code>: no mask is applied)</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -274,8 +263,8 @@ dictionaries when it is called see: <a class="reference internal" href="xpdan.st
 mask from the first image of the scan on the other images, and change
 the auto masking tolarance to 2 standard deviations.</p>
 <div class="admonition danger">
-<p class="first admonition-title">Danger</p>
-<p class="last">Never run <code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span> <span class="pre">=</span> <span class="pre">{'qmax':</span> <span class="pre">30}</span></code> or the like with any of the
+<p class="admonition-title">Danger</p>
+<p>Never run <code class="docutils literal notranslate"><span class="pre">pdf_kwargs</span> <span class="pre">=</span> <span class="pre">{'qmax':</span> <span class="pre">30}</span></code> or the like with any of the
 configuration dictionaries, this will detach them from the pipeline
 and you will need to reset the analysis completely (exit ipython
 and run <code class="docutils literal notranslate"><span class="pre">setup_analysis</span></code> again).</p>

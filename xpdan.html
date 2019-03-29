@@ -220,22 +220,18 @@
 document which has been seen. When the time comes for the file to be
 written any templating which has not been formatted will be removed from
 the filename.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>template</strong> (<em>str</em>) – The templated filename</li>
-<li><strong>handler_reg</strong> (<em>dict</em>) – The registry of file handlers for loading files from disk</li>
-<li><strong>root_map</strong> (<em>dict</em>) – Mapping between the old file root and a new root, used for loading
-files from disk</li>
-<li><strong>kwargs</strong> (<em>dict</em>) – All extra kwargs are passed to the filename formatter when the start
-document is received</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>template</strong> (<em>str</em>) – The templated filename</p></li>
+<li><p><strong>handler_reg</strong> (<em>dict</em>) – The registry of file handlers for loading files from disk</p></li>
+<li><p><strong>root_map</strong> (<em>dict</em>) – Mapping between the old file root and a new root, used for loading
+files from disk</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – All extra kwargs are passed to the filename formatter when the start
+document is received</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Every instance of <code class="docutils literal notranslate"><span class="pre">__independent_vars__</span></code> will be replaced with
 <code class="docutils literal notranslate"><span class="pre">{name}_{data}_{units}_</span></code> for each independent variable of the experiment
@@ -363,41 +359,37 @@ in the template.</p>
 <dt id="xpdan.data_reduction.integrate_and_save">
 <code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>polarization_factor=0.99</em>, <em>mask_setting='default'</em>, <em>mask_kwargs={'alpha': 3.0</em>, <em>'bs_width': 13</em>, <em>'edge': 30</em>, <em>'lower_thresh': 0.0</em>, <em>'tri_offset': 13</em>, <em>'v_asym': 0}</em>, <em>image_data_key='pe1_image'</em>, <em>pdf_config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for given list of headers</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
 (horizontal). default is 0.99. set to None for no
-correction.</li>
-<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
-images. Defaults to ‘default’</li>
-<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+correction.</p></li>
+<li><p><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</p></li>
+<li><p><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
 default is defined by an_glbl.auto_mask_dict.
-Please refer to documentation for more details</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
-<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+Please refer to documentation for more details</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
+<li><p><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">complete docstring of masking functionality could be find in
+<p class="admonition-title">Note</p>
+<p>complete docstring of masking functionality could be find in
 <code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -405,41 +397,37 @@ Please refer to documentation for more details</li>
 <dt id="xpdan.data_reduction.integrate_and_save_last">
 <code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save_last</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for the latest header</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
 (horizontal). default is 0.99. set to None for no
-correction.</li>
-<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
-images. Defaults to ‘default’</li>
-<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+correction.</p></li>
+<li><p><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</p></li>
+<li><p><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
 default is defined by an_glbl.auto_mask_dict.
-Please refer to documentation for more details</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
-<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+Please refer to documentation for more details</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
+<li><p><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">complete docstring of masking functionality could be find in
+<p class="admonition-title">Note</p>
+<p>complete docstring of masking functionality could be find in
 <code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -447,46 +435,38 @@ Please refer to documentation for more details</li>
 <dt id="xpdan.data_reduction.save_last_tiff">
 <code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_last_tiff</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_last_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.data_reduction.save_tiff">
 <code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_tiff</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -496,41 +476,37 @@ the function call (keyword only argument)</li>
 <dt id="xpdan.data_reduction_core.integrate_and_save">
 <code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">integrate_and_save</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db</em>, <em>save_dir</em>, <em>visualize=False</em>, <em>polarization_factor=0.99</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>image_data_key='pe1_image'</em>, <em>pdf_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for given list of headers</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
 (horizontal). default is 0.99. set to None for no
-correction.</li>
-<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
-images. Defaults to ‘default’</li>
-<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+correction.</p></li>
+<li><p><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</p></li>
+<li><p><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
 default is defined by an_glbl.auto_mask_dict.
-Please refer to documentation for more details</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
-<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+Please refer to documentation for more details</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
+<li><p><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">complete docstring of masking functionality could be find in
+<p class="admonition-title">Note</p>
+<p>complete docstring of masking functionality could be find in
 <code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -538,41 +514,37 @@ Please refer to documentation for more details</li>
 <dt id="xpdan.data_reduction_core.integrate_and_save_last">
 <code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">integrate_and_save_last</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save_last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for the latest header</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>polarization_factor</strong> (<em>float, optional</em>) – polarization correction factor, ranged from -1(vertical) to +1
 (horizontal). default is 0.99. set to None for no
-correction.</li>
-<li><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
-images. Defaults to ‘default’</li>
-<li><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
+correction.</p></li>
+<li><p><strong>mask_setting</strong> (<em>str optional</em>) – If ‘default’ reuse mask created for first image, otherwise mask all
+images. Defaults to ‘default’</p></li>
+<li><p><strong>mask_kwargs</strong> (<em>dict, optional</em>) – dictionary stores options for automasking functionality.
 default is defined by an_glbl.auto_mask_dict.
-Please refer to documentation for more details</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
-<li><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
-<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></li>
+Please refer to documentation for more details</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
+<li><p><strong>pdf_config</strong> (<em>dict, optional</em>) – Configuration for making PDFs, see pdfgetx3 docs. Defaults to
+<code class="docutils literal notranslate"><span class="pre">dict(dataformat='QA',</span> <span class="pre">qmaxinst=28,</span> <span class="pre">qmax=22)</span></code></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">complete docstring of masking functionality could be find in
+<p class="admonition-title">Note</p>
+<p>complete docstring of masking functionality could be find in
 <code class="docutils literal notranslate"><span class="pre">mask_img</span></code></p>
 </div>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">xpdan.tools.mask_img()</span></code></p>
 </div>
 </dd></dl>
 
@@ -580,46 +552,38 @@ Please refer to documentation for more details</li>
 <dt id="xpdan.data_reduction_core.save_last_tiff">
 <code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">save_last_tiff</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_last_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_last_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.data_reduction_core.save_tiff">
 <code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">save_tiff</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db</em>, <em>save_dir</em>, <em>visualize=False</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</li>
-<li><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
-the function call (keyword only argument)</li>
-<li><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
-<cite>save_dir=</cite> in the function call (keyword only argument)</li>
-<li><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</li>
-<li><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<em>list</em>) – a list of databroker.header objects</p></li>
+<li><p><strong>db</strong> (<em>databroker.broker.Broker instance</em>) – The databroker holding the data, this must be specified as a <cite>db=</cite> in
+the function call (keyword only argument)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em>) – The folder in which to save the data, this must be specified as a
+<cite>save_dir=</cite> in the function call (keyword only argument)</p></li>
+<li><p><strong>visualize</strong> (<em>bool, optional</em>) – If True visualize the data. Defaults to False</p></li>
+<li><p><strong>image_data_key</strong> (<em>str, optional</em>) – The key for the image data, defaults to <cite>pe1_image</cite></p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -629,104 +593,88 @@ the function call (keyword only argument)</li>
 <dt id="xpdan.db_utils.query_background">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">query_background</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get background data from databroker</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db</strong> (<em>Broker instance</em>)</li>
-<li><strong>docs</strong> (<em>tuple of dict</em>)</li>
-<li><strong>schema</strong> (<em>int</em>) – Schema version</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>Broker instance</em>)</p></li>
+<li><p><strong>docs</strong> (<em>tuple of dict</em>)</p></li>
+<li><p><strong>schema</strong> (<em>int</em>) – Schema version</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of headers which meet the criteria</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of Header</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of headers which meet the criteria</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of Header</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.db_utils.query_dark">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">query_dark</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_dark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get dark data from databroker</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db</strong> (<em>Broker instance</em>)</li>
-<li><strong>docs</strong> (<em>tuple of dict</em>)</li>
-<li><strong>schema</strong> (<em>int</em>) – Schema version</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>Broker instance</em>)</p></li>
+<li><p><strong>docs</strong> (<em>tuple of dict</em>)</p></li>
+<li><p><strong>schema</strong> (<em>int</em>) – Schema version</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of headers which meet the criteria</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of Header</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of headers which meet the criteria</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of Header</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.db_utils.scan_diff">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">scan_diff</code><span class="sig-paren">(</span><em>hdrs</em>, <em>verbose=True</em>, <em>blacklist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata differences between scans in hdrs list</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hdrs</strong> (<em>list of Header objects</em>) – The headers to be diffed</li>
-<li><strong>verbose</strong> (<em>bool, optional</em>) – If true prints the results. Defaults to True</li>
-<li><strong>blacklist</strong> (<em>list of str, optional</em>) – List of keys to not be included in diff. If None, defaults to <cite>uid</cite></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hdrs</strong> (<em>list of Header objects</em>) – The headers to be diffed</p></li>
+<li><p><strong>verbose</strong> (<em>bool, optional</em>) – If true prints the results. Defaults to True</p></li>
+<li><p><strong>blacklist</strong> (<em>list of str, optional</em>) – List of keys to not be included in diff. If None, defaults to <cite>uid</cite></p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The dictionary of keys with at least one different value across the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dictionary of keys with at least one different value across the
 scans. The values are the results for each header.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.db_utils.scan_summary">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">scan_summary</code><span class="sig-paren">(</span><em>hdrs</em>, <em>fields=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide one line summaries of headers</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hdrs</strong> (<em>list of headers</em>) – The headers from the databroker</li>
-<li><strong>fields</strong> (<em>list of str, optional</em>) – ‘Specify a list of fields to summarize. If None, the following
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hdrs</strong> (<em>list of headers</em>) – The headers from the databroker</p></li>
+<li><p><strong>fields</strong> (<em>list of str, optional</em>) – ‘Specify a list of fields to summarize. If None, the following
 will be returned
 <code class="docutils literal notranslate"><span class="pre">['sample_name',</span> <span class="pre">'sp_type',</span> <span class="pre">'sp_startingT',</span> <span class="pre">'sp_endingT']</span></code>
-defaults to None</li>
-<li><strong>verbose</strong> (<em>bool, optional</em>) – If True print the summary</li>
+defaults to None</p></li>
+<li><p><strong>verbose</strong> (<em>bool, optional</em>) – If True print the summary</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of summary strings</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of summary strings</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -737,30 +685,26 @@ defaults to None</li>
 have a particular key value, such as ‘sample_name’=’Ni’</p>
 <p>Function returns a list of indices for the position in the list,
 associated with the metadata key values.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>hdrs</strong> (<em>list of Header objects</em>) – The dictionary containing {‘key-value’:[list of scan indices]}.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hdrs</strong> (<em>list of Header objects</em>) – The dictionary containing {‘key-value’:[list of scan indices]}.
 For example a search over ‘sample_name’ might return
-{‘Ni’:[0,1,2,3,4,9,10],’gold nanoparticles’:[5,6,7,8]}</li>
-<li><strong>key</strong> (<em>str</em>) – The scans will be sorted by the values of this metadata key,
-e.g., ‘sample_name’</li>
-<li><strong>verbose</strong> (<em>bool, optional</em>) – If true prints the results. Defaults to True</li>
+{‘Ni’:[0,1,2,3,4,9,10],’gold nanoparticles’:[5,6,7,8]}</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – The scans will be sorted by the values of this metadata key,
+e.g., ‘sample_name’</p></li>
+<li><p><strong>verbose</strong> (<em>bool, optional</em>) – If true prints the results. Defaults to True</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The dictionary containing {‘key-value’:[list of scan indices]}.
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dictionary containing {‘key-value’:[list of scan indices]}.
 For example a search over ‘sample_name’ might return
 {‘Ni’:[0,1,2,3,4,9,10],’gold nanoparticles’:[5,6,7,8]}</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -783,58 +727,47 @@ For example a search over ‘sample_name’ might return
 <dt id="xpdan.fuzzybroker.FuzzyBroker.beamtime_dates">
 <code class="descname">beamtime_dates</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get info for each beamtime</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>keys</strong> (<em>iterable of str</em>) – The keys to be included in the return</li>
-<li><strong>beamtime_key</strong> (<em>str</em>) – The key for the unique beamtime key</li>
-<li><strong>print_results</strong> (<em>bool</em>) – If true prints the information</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>iterable of str</em>) – The keys to be included in the return</p></li>
+<li><p><strong>beamtime_key</strong> (<em>str</em>) – The key for the unique beamtime key</p></li>
+<li><p><strong>print_results</strong> (<em>bool</em>) – If true prints the information</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of beamtimes and their associated information</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of dicts</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of beamtimes and their associated information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="xpdan.fuzzybroker.FuzzyBroker.fuzzy_search">
 <code class="descname">fuzzy_search</code><span class="sig-paren">(</span><em>keys</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker for given keys</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>keys</strong> (<em>list of str</em>) – The list of strings to be accessed</p>
-</li>
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int or ‘all’, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned, if ‘all’ all are returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>keys</strong> (<em>list of str</em>) – The list of strings to be accessed</p></li>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int or ‘all’, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned, if ‘all’ all are returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This search can take a long time as they turn over the entire
 databroker searching for the <code class="docutils literal notranslate"><span class="pre">search_string</span></code> please make a point to
@@ -845,35 +778,28 @@ filter the databroker to shorten the total search time</p>
 <dt id="xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search">
 <code class="descname">fuzzy_set_search</code><span class="sig-paren">(</span><em>key</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the most similar set of values to the search string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>key</strong> (<em>list of str</em>) – The list of strings to be accessed</p>
-</li>
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>key</strong> (<em>list of str</em>) – The list of strings to be accessed</p></li>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of headers which are close to the query. The queried value
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of headers which are close to the query. The queried value
 will be unique in the list so a search for piLast=’Alice’ will
 return only one header with Alice as the PI.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="c1"># Contains runs from Bob, Alice, Bob, and Eve</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fuzzy_set_search</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;bt_piLast&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob&#39;</span><span class="p">)</span>
@@ -886,31 +812,25 @@ return only one header with Alice as the PI.</p>
 <dt id="xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search">
 <code class="descname">super_fuzzy_search</code><span class="sig-paren">(</span><em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of headers which contain close matches</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of headers which contain close matches</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This search can take a long time as they turn over the entire
 databroker (and all of the dictionaries inside) searching for the
@@ -924,96 +844,76 @@ shorten the total search time.</p>
 <dt id="xpdan.fuzzybroker.beamtime_dates">
 <code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">beamtime_dates</code><span class="sig-paren">(</span><em>db</em>, <em>keys=('beamtime_uid'</em>, <em>'bt_safN'</em>, <em>'facility'</em>, <em>'beamline')</em>, <em>beamtime_key='beamtime_uid'</em>, <em>print_results=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get info for each beamtime</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>db</strong> (<em>databroker instance</em>) – The databroker to be searched</li>
-<li><strong>keys</strong> (<em>iterable of str</em>) – The keys to be included in the return</li>
-<li><strong>beamtime_key</strong> (<em>str</em>) – The key for the unique beamtime key</li>
-<li><strong>print_results</strong> (<em>bool</em>) – If true prints the information</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>databroker instance</em>) – The databroker to be searched</p></li>
+<li><p><strong>keys</strong> (<em>iterable of str</em>) – The keys to be included in the return</p></li>
+<li><p><strong>beamtime_key</strong> (<em>str</em>) – The key for the unique beamtime key</p></li>
+<li><p><strong>print_results</strong> (<em>bool</em>) – If true prints the information</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The list of beamtimes and their associated information</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of dicts</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of beamtimes and their associated information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.fuzzy_search">
 <code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">fuzzy_search</code><span class="sig-paren">(</span><em>db</em>, <em>keys</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker for given keys</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p>
-</li>
-<li><p class="first"><strong>keys</strong> (<em>list of str</em>) – The list of strings to be accessed</p>
-</li>
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int or ‘all’, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned, if ‘all’ all are returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p></li>
+<li><p><strong>keys</strong> (<em>list of str</em>) – The list of strings to be accessed</p></li>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int or ‘all’, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned, if ‘all’ all are returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.fuzzy_set_search">
 <code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">fuzzy_set_search</code><span class="sig-paren">(</span><em>db</em>, <em>key</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the most similar set of values to the search string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p>
-</li>
-<li><p class="first"><strong>key</strong> (<em>list of str</em>) – The list of strings to be accessed</p>
-</li>
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p></li>
+<li><p><strong>key</strong> (<em>list of str</em>) – The list of strings to be accessed</p></li>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">Broker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="c1"># Contains runs from Bob, Alice, Bob, and Eve</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fuzzy_set_search</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="s1">&#39;bt_piLast&#39;</span><span class="p">,</span> <span class="s1">&#39;Bob&#39;</span><span class="p">)</span>
@@ -1026,33 +926,26 @@ shorten the total search time.</p>
 <dt id="xpdan.fuzzybroker.super_fuzzy_search">
 <code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">super_fuzzy_search</code><span class="sig-paren">(</span><em>db</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p>
-</li>
-<li><p class="first"><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p>
-</li>
-<li><p class="first"><strong>size</strong> (<em>int, optional</em>) –</p>
-<dl class="docutils">
-<dt>The number of results to be returned.</dt>
-<dd><p class="first last">Defaults to 100 results</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>db</strong> (<em>databroker.DataBroker instance</em>) – The databroker to be searched</p></li>
+<li><p><strong>search_string</strong> (<em>str</em>) – The string to be searched for</p></li>
+<li><p><strong>size</strong> (<em>int, optional</em>) –</p>
+<dl class="simple">
+<dt>The number of results to be returned.</dt><dd><p>Defaults to 100 results</p>
 </dd>
 </dl>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

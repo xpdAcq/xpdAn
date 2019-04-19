@@ -257,7 +257,7 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
         RE(bp.grid_scan([hw.noisy_det],
@@ -296,7 +296,7 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
         RE(bp.grid_scan([hw.noisy_det],
@@ -337,7 +337,7 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
         det = SynSignal(func=lambda: np.ones((10, 10)), name='gr')

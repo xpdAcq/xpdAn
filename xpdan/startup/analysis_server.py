@@ -16,6 +16,7 @@ from shed import SimpleToEventStream
 from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
+from xpdan.pipelines.radiograph import fes_radiograph, tes_radiograph
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
 from xpdan.pipelines.to_event_model import (
     pipeline_order as tem_pipeline_order,
@@ -23,11 +24,12 @@ from xpdan.pipelines.to_event_model import (
 )
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
-from xpdan.vend.callbacks.core import StripDepVar
+from xpdan.vend.callbacks.core import StripDepVar, RunRouter
 from xpdan.vend.callbacks.zmq import Publisher, RemoteDispatcher
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.extra import std_gen, median_gen, z_score_gen
 from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
+from xpdtools.pipelines.radiograph import radiograph_correction, average
 
 order = (
     pipeline_order
@@ -41,6 +43,13 @@ order = (
     ]
     + tem_pipeline_order
     + qoi_pipeline_order
+)
+
+radiogram_order = (
+    fes_radiograph,
+    radiograph_correction,
+    average,
+    tes_radiograph,
 )
 
 
@@ -83,9 +92,8 @@ def start_analysis(save=True, vis=True, **kwargs):
 
 
 def create_analysis_pipeline(
-        order,
-        inbound_proxy_address=glbl_dict["inbound_proxy_address"],
-        **kwargs):
+    order, inbound_proxy_address=glbl_dict["inbound_proxy_address"], **kwargs
+):
     """Create the analysis pipeline from an list of chunks and pipeline kwargs
 
     Parameters
@@ -108,9 +116,7 @@ def create_analysis_pipeline(
 
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
-    an_with_ind_pub = Publisher(
-        inbound_proxy_address, prefix=b"an"
-    )
+    an_with_ind_pub = Publisher(inbound_proxy_address, prefix=b"an")
     # strip the dependant vars form the raw data
     raw_stripped = move_to_first(source.starmap(StripDepVar()))
     namespace.update(
@@ -128,13 +134,47 @@ def create_analysis_pipeline(
     return namespace
 
 
+def diffraction_router(
+    start, diffraction_dets, inbound_proxy_address, order=order, **kwargs
+):
+    # This does not support concurrent radiograms and diffractograms
+    # If there are diffraction detectors in the list, this is diffraction
+    if any(d in diffraction_dets for d in start["detectors"]):
+        xrd_namespace = create_analysis_pipeline(
+            order, inbound_proxy_address=inbound_proxy_address, **kwargs
+        )
+        print('analyzing as diffraction')
+        return lambda *x: xrd_namespace["raw_source"].emit(x)
+
+
+def radiogram_router(
+    start,
+    radiogram_dets,
+    inbound_proxy_address,
+    order=radiogram_order,
+    **kwargs
+):
+    # This does not support concurrent radiograms and diffractograms
+    # If there are diffraction detectors in the list, this is diffraction
+    if any(d in radiogram_dets for d in start["detectors"]) and 'sc_flat_field_uid' in start and 'sc_dk_field_uid' in start:
+        radiogram_namespace = create_analysis_pipeline(
+            order, inbound_proxy_address=inbound_proxy_address,
+            resets=start.get('motors', None),
+            **kwargs
+        )
+        print('analyzing as radiogram')
+        return lambda *x: radiogram_namespace["raw_source"].emit(x)
+
+
 def run_server(
     order=order,
+    radiogram_order=radiogram_order,
     db=glbl_dict["exp_db"],
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     inbound_proxy_address=glbl_dict["inbound_proxy_address"],
+    diffraction_dets=glbl_dict["diffraction_dets"],
+    radiogram_dets=glbl_dict["radiogram_dets"],
     prefix=b"raw",
-    plot_graph=False,
     **kwargs
 ):
     """Function to run the analysis server.
@@ -189,11 +229,6 @@ def run_server(
     if "db" not in kwargs:
         kwargs.update(db=db)
 
-    namespace = create_analysis_pipeline(
-        order,
-        inbound_proxy_address=inbound_proxy_address,
-        **kwargs)
-
     d = RemoteDispatcher(
         outbound_proxy_address,
         # accept the raw data
@@ -201,9 +236,22 @@ def run_server(
     )
     install_qt_kicker(loop=d.loop)
 
-    d.subscribe(lambda *x: namespace["raw_source"].emit(x))
-    if plot_graph:
-        namespace["raw_source"].visualize(source_node=True)
+    rr = RunRouter(
+        [diffraction_router],
+        order=order,
+        diffraction_dets=diffraction_dets,
+        inbound_proxy_address=inbound_proxy_address,
+    )
+
+    rr2 = RunRouter(
+        [radiogram_router],
+        order=radiogram_order,
+        radiogram_dets=radiogram_dets,
+        inbound_proxy_address=inbound_proxy_address,
+    )
+
+    d.subscribe(rr)
+    d.subscribe(rr2)
     print("Starting Analysis Server")
     d.start()
 

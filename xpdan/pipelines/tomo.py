@@ -1,4 +1,5 @@
 import operator as op
+from pprint import pprint
 
 from rapidz import Stream, move_to_first
 from shed import SimpleToEventStream, SimpleFromEventStream, LastCache

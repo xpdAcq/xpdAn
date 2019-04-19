@@ -91,7 +91,7 @@ class LiveImage(Retrieve):
         limit_func=None,
         auto_redraw=True,
         interpolation=None,
-        aspect='equal',
+        aspect="equal",
     ):
         super().__init__(handler_reg=handler_reg)
         self.aspect = aspect
@@ -105,7 +105,13 @@ class LiveImage(Retrieve):
 
     def descriptor(self, doc):
         self.fields = [
-            k for k, v in doc["data_keys"].items() if len(v["shape"]) == 2
+            k
+            for k, v in doc["data_keys"].items()
+            if len(v["shape"]) == 2
+            or (
+                len(v["shape"]) == 3
+                and len([dim for dim in v["shape"] if dim > 0]) == 2
+            )
         ]
         from xray_vision.backend.mpl.cross_section_2d import CrossSection
         import matplotlib.pyplot as plt
@@ -124,7 +130,7 @@ class LiveImage(Retrieve):
                 self.limit_func,
                 self.auto_redraw,
                 self.interpolation,
-                self.aspect
+                self.aspect,
             )
             cs._fig.canvas.set_window_title(field)
             cs._fig.show()

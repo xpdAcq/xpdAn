@@ -20,7 +20,9 @@ class Live3DView(CallbackBase):
     def descriptor(self, doc):
 
         self.fields = [
-            k for k, v in doc["data_keys"].items() if len(v["shape"]) == 3
+            k
+            for k, v in doc["data_keys"].items()
+            if len(v["shape"]) == 3 and all(dim > 0 for dim in v["shape"])
         ]
         for field in self.fields:
             fig = mlab.figure(field)

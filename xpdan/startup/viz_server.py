@@ -56,21 +56,22 @@ def run_server(
     install_qt_kicker(loop=d.loop)
 
     func_l = [
-            lambda x: if_correct_start(
-                LiveImage(
-                    handler_reg=handlers,
-                    cmap="viridis",
-                    norm=SymLogNorm(1),
-                    limit_func=lambda x: (np.nanmin(x), np.nanmax(x)),
-                    aspect='auto',
-                ),
-                x,
+        lambda x: if_correct_start(
+            LiveImage(
+                handler_reg=handlers,
+                cmap="viridis",
+                norm=SymLogNorm(1),
+                limit_func=lambda x: (np.nanmin(x), np.nanmax(x)),
             ),
-            lambda x: LiveWaterfall(),
-            lambda x: BestEffortCallback(table_enabled=False, overplot=False),
-        ]
+            x,
+        ),
+        lambda x: LiveWaterfall(),
+    ]
     if Live3DView:
-        func_l.append(lambda x: Live3DView())
+        func_l.append(lambda x: Live3DView() if 'tomo' in x['analysis_stage'] else None)
+    func_l.append(
+        lambda x: BestEffortCallback(table_enabled=False, overplot=False)
+    )
     rr = RunRouter(func_l)
 
     d.subscribe(rr)

@@ -159,6 +159,34 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
     exp_proc.terminate()
     exp_proc.join()
 
+def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    try:
+        print("running server")
+        analysis_run_server(radiogram_dets=['img'])
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
 
 def test_db_run_server(tmpdir, proxy, RE, hw, db):
     db.reg.handler_reg = {"NPY_SEQ": NumpySeqHandler}

@@ -91,6 +91,7 @@ class LiveImage(Retrieve):
         limit_func=None,
         auto_redraw=True,
         interpolation=None,
+        aspect=None,
     ):
         super().__init__(handler_reg=handler_reg)
         self.interpolation = interpolation
@@ -100,6 +101,7 @@ class LiveImage(Retrieve):
         self.cmap = cmap
         self.fields = []
         self.cs_dict = {}
+        self.aspect = aspect
 
     def descriptor(self, doc):
         self.fields = [

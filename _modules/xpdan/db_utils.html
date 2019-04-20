@@ -187,11 +187,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hdrs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">pprint</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">d</span></div>
@@ -216,15 +216,20 @@
 <span class="sd">        scans. The values are the results for each header.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">blacklist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">])</span>
+        <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">]</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">kv</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
         <span class="c1"># TODO: eventually support dict differences</span>
         <span class="c1"># See http://stackoverflow.com/a/11092607/5100330</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span>
-             <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Hashable</span><span class="p">)]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="n">hdrs</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">collections</span><span class="o">.</span><span class="n">Hashable</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">kv</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -253,23 +258,27 @@
 <span class="sd">        List of summary strings</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_type&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_startingT&#39;</span><span class="p">,</span> <span class="s1">&#39;sp_endingT&#39;</span><span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sample_name&quot;</span><span class="p">,</span> <span class="s2">&quot;sp_type&quot;</span><span class="p">,</span> <span class="s2">&quot;sp_startingT&quot;</span><span class="p">,</span> <span class="s2">&quot;sp_endingT&quot;</span><span class="p">]</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span>
     <span class="n">datas</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hdr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hdrs</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span>
-                <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-        <span class="n">data2</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span>
-                 <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">]</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
 
-        <span class="n">data2</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])]</span> <span class="o">+</span> <span class="n">data</span>
+        <span class="n">data2</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;time&quot;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">_timestampstr</span><span class="p">(</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;time&quot;</span><span class="p">])]</span> <span class="o">+</span> <span class="n">data</span>
 
-        <span class="n">data2</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;uid&#39;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]]</span>
+        <span class="n">data2</span><span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;uid&quot;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;uid&quot;</span><span class="p">][:</span><span class="mi">6</span><span class="p">]]</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">data2</span><span class="p">))</span>
         <span class="n">datas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -296,7 +305,39 @@
             <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
-        <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sc_dk_field_uid&#39;</span><span class="p">)</span>
+        <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sc_dk_field_uid&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dk_uid</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">dk_uid</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">z</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="query_flat_field"><a class="viewcode-back" href="../../xpdan.html#xpdan.db_utils.query_flat_field">[docs]</a><span class="k">def</span> <span class="nf">query_flat_field</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get flat_field data from databroker</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    db: Broker instance</span>
+<span class="sd">    docs: tuple of dict</span>
+<span class="sd">    schema: int</span>
+<span class="sd">        Schema version</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list of Header :</span>
+<span class="sd">        The list of headers which meet the criteria</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
+        <span class="n">dk_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sc_flat_field_uid&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dk_uid</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">dk_uid</span><span class="p">]</span>
@@ -328,11 +369,13 @@
             <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
-        <span class="n">sample_name</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bkgd_sample_name&#39;</span><span class="p">)</span>
+        <span class="n">sample_name</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bkgd_sample_name&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sample_name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">db</span><span class="p">(</span><span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
-                      <span class="n">bt_uid</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;bt_uid&#39;</span><span class="p">],</span>
-                      <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;$exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+            <span class="k">return</span> <span class="n">db</span><span class="p">(</span>
+                <span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
+                <span class="n">bt_uid</span><span class="o">=</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;bt_uid&quot;</span><span class="p">],</span>
+                <span class="n">is_dark</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;$exists&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span></div>
 
@@ -345,8 +388,8 @@
         <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">doc</span> <span class="o">=</span> <span class="n">docs</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
-    <span class="n">dt_sq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span>
+    <span class="n">dt_sq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">][</span><span class="s2">&quot;time&quot;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">dt_sq</span><span class="p">:</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">dt_sq</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dt_sq</span><span class="p">))</span>
         <span class="n">min_r</span> <span class="o">=</span> <span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))]</span>

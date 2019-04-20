@@ -632,6 +632,27 @@ the function call (keyword only argument)</p></li>
 </dd></dl>
 
 <dl class="function">
+<dt id="xpdan.db_utils.query_flat_field">
+<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_flat_field</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_flat_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_flat_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get flat_field data from databroker</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>db</strong> (<em>Broker instance</em>)</p></li>
+<li><p><strong>docs</strong> (<em>tuple of dict</em>)</p></li>
+<li><p><strong>schema</strong> (<em>int</em>) – Schema version</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of headers which meet the criteria</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of Header</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="xpdan.db_utils.scan_diff">
 <code class="descclassname">xpdan.db_utils.</code><code class="descname">scan_diff</code><span class="sig-paren">(</span><em>hdrs</em>, <em>verbose=True</em>, <em>blacklist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata differences between scans in hdrs list</p>

@@ -207,20 +207,22 @@
     <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
 
     <span class="n">func_l</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">if_correct_start</span><span class="p">(</span>
-                <span class="n">LiveImage</span><span class="p">(</span>
-                    <span class="n">handler_reg</span><span class="o">=</span><span class="n">handlers</span><span class="p">,</span>
-                    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
-                    <span class="n">norm</span><span class="o">=</span><span class="n">SymLogNorm</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-                    <span class="n">limit_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
-                <span class="p">),</span>
-                <span class="n">x</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">if_correct_start</span><span class="p">(</span>
+            <span class="n">LiveImage</span><span class="p">(</span>
+                <span class="n">handler_reg</span><span class="o">=</span><span class="n">handlers</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+                <span class="n">norm</span><span class="o">=</span><span class="n">SymLogNorm</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">limit_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
             <span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(),</span>
-            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">BestEffortCallback</span><span class="p">(</span><span class="n">table_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overplot</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-        <span class="p">]</span>
+            <span class="n">x</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">LiveWaterfall</span><span class="p">(),</span>
+    <span class="p">]</span>
     <span class="k">if</span> <span class="n">Live3DView</span><span class="p">:</span>
-        <span class="n">func_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Live3DView</span><span class="p">())</span>
+        <span class="n">func_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Live3DView</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;tomo&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;analysis_stage&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">func_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">BestEffortCallback</span><span class="p">(</span><span class="n">table_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overplot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span><span class="n">func_l</span><span class="p">)</span>
 
     <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>

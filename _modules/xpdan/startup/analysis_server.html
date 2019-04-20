@@ -167,6 +167,7 @@
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.extra</span> <span class="k">import</span> <span class="n">z_score_tem</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.main</span> <span class="k">import</span> <span class="n">pipeline_order</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.qoi</span> <span class="k">import</span> <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">qoi_pipeline_order</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.radiograph</span> <span class="k">import</span> <span class="n">fes_radiograph</span><span class="p">,</span> <span class="n">tes_radiograph</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.save</span> <span class="k">import</span> <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">save_pipeline_order</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.to_event_model</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">pipeline_order</span> <span class="k">as</span> <span class="n">tem_pipeline_order</span><span class="p">,</span>
@@ -174,11 +175,12 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.to_event_model</span> <span class="k">import</span> <span class="n">to_event_stream_with_ind</span>
 <span class="kn">from</span> <span class="nn">xpdan.pipelines.vis</span> <span class="k">import</span> <span class="n">vis_pipeline</span>
-<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">StripDepVar</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">StripDepVar</span><span class="p">,</span> <span class="n">RunRouter</span>
 <span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.zmq</span> <span class="k">import</span> <span class="n">Publisher</span><span class="p">,</span> <span class="n">RemoteDispatcher</span>
 <span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="k">import</span> <span class="n">glbl_dict</span>
 <span class="kn">from</span> <span class="nn">xpdtools.pipelines.extra</span> <span class="k">import</span> <span class="n">std_gen</span><span class="p">,</span> <span class="n">median_gen</span><span class="p">,</span> <span class="n">z_score_gen</span>
 <span class="kn">from</span> <span class="nn">xpdtools.pipelines.qoi</span> <span class="k">import</span> <span class="n">max_intensity_mean</span><span class="p">,</span> <span class="n">max_gr_mean</span>
+<span class="kn">from</span> <span class="nn">xpdtools.pipelines.radiograph</span> <span class="k">import</span> <span class="n">radiograph_correction</span><span class="p">,</span> <span class="n">average</span>
 
 <span class="n">order</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">pipeline_order</span>
@@ -192,6 +194,13 @@
     <span class="p">]</span>
     <span class="o">+</span> <span class="n">tem_pipeline_order</span>
     <span class="o">+</span> <span class="n">qoi_pipeline_order</span>
+<span class="p">)</span>
+
+<span class="n">radiogram_order</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">fes_radiograph</span><span class="p">,</span>
+    <span class="n">radiograph_correction</span><span class="p">,</span>
+    <span class="n">average</span><span class="p">,</span>
+    <span class="n">tes_radiograph</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -234,9 +243,8 @@
 
 
 <div class="viewcode-block" id="create_analysis_pipeline"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.create_analysis_pipeline">[docs]</a><span class="k">def</span> <span class="nf">create_analysis_pipeline</span><span class="p">(</span>
-        <span class="n">order</span><span class="p">,</span>
-        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">order</span><span class="p">,</span> <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create the analysis pipeline from an list of chunks and pipeline kwargs</span>
 
 <span class="sd">    Parameters</span>
@@ -259,9 +267,7 @@
 
     <span class="c1"># do inspection of pipeline for ToEventModel nodes, maybe?</span>
     <span class="c1"># for analyzed data with independent data (vis and save)</span>
-    <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span>
-        <span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span>
-    <span class="p">)</span>
+    <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span><span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">)</span>
     <span class="c1"># strip the dependant vars form the raw data</span>
     <span class="n">raw_stripped</span> <span class="o">=</span> <span class="n">move_to_first</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">StripDepVar</span><span class="p">()))</span>
     <span class="n">namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
@@ -279,13 +285,48 @@
     <span class="k">return</span> <span class="n">namespace</span></div>
 
 
+<div class="viewcode-block" id="diffraction_router"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.diffraction_router">[docs]</a><span class="k">def</span> <span class="nf">diffraction_router</span><span class="p">(</span>
+    <span class="n">start</span><span class="p">,</span> <span class="n">diffraction_dets</span><span class="p">,</span> <span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="c1"># This does not support concurrent radiograms and diffractograms</span>
+    <span class="c1"># If there are diffraction detectors in the list, this is diffraction</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">in</span> <span class="n">diffraction_dets</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">start</span><span class="p">[</span><span class="s2">&quot;detectors&quot;</span><span class="p">]):</span>
+        <span class="n">xrd_namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span>
+            <span class="n">order</span><span class="p">,</span> <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;analyzing as diffraction&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">xrd_namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="radiogram_router"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.radiogram_router">[docs]</a><span class="k">def</span> <span class="nf">radiogram_router</span><span class="p">(</span>
+    <span class="n">start</span><span class="p">,</span>
+    <span class="n">radiogram_dets</span><span class="p">,</span>
+    <span class="n">inbound_proxy_address</span><span class="p">,</span>
+    <span class="n">order</span><span class="o">=</span><span class="n">radiogram_order</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="c1"># This does not support concurrent radiograms and diffractograms</span>
+    <span class="c1"># If there are diffraction detectors in the list, this is diffraction</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">in</span> <span class="n">radiogram_dets</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">start</span><span class="p">[</span><span class="s2">&quot;detectors&quot;</span><span class="p">])</span>
+            <span class="ow">and</span> <span class="s1">&#39;sc_flat_field_uid&#39;</span> <span class="ow">in</span> <span class="n">start</span> <span class="ow">and</span> <span class="s1">&#39;sc_dk_field_uid&#39;</span> <span class="ow">in</span> <span class="n">start</span><span class="p">):</span>
+        <span class="n">radiogram_namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span>
+            <span class="n">order</span><span class="p">,</span> <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+            <span class="n">resets</span><span class="o">=</span><span class="n">start</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;motors&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;analyzing as radiogram&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">radiogram_namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="run_server"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.analysis_server.run_server">[docs]</a><span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span>
     <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+    <span class="n">radiogram_order</span><span class="o">=</span><span class="n">radiogram_order</span><span class="p">,</span>
     <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
     <span class="n">outbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;outbound_proxy_address&quot;</span><span class="p">],</span>
     <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span>
+    <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;diffraction_dets&quot;</span><span class="p">],</span>
+    <span class="n">radiogram_dets</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;radiogram_dets&quot;</span><span class="p">],</span>
     <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-    <span class="n">plot_graph</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Function to run the analysis server.</span>
@@ -340,11 +381,6 @@
     <span class="k">if</span> <span class="s2">&quot;db&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
 
-    <span class="n">namespace</span> <span class="o">=</span> <span class="n">create_analysis_pipeline</span><span class="p">(</span>
-        <span class="n">order</span><span class="p">,</span>
-        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
     <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span>
         <span class="n">outbound_proxy_address</span><span class="p">,</span>
         <span class="c1"># accept the raw data</span>
@@ -352,9 +388,22 @@
     <span class="p">)</span>
     <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
 
-    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">plot_graph</span><span class="p">:</span>
-        <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;raw_source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">source_node</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">diffraction_router</span><span class="p">],</span>
+        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+        <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">diffraction_dets</span><span class="p">,</span>
+        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">rr2</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">radiogram_router</span><span class="p">],</span>
+        <span class="n">order</span><span class="o">=</span><span class="n">radiogram_order</span><span class="p">,</span>
+        <span class="n">radiogram_dets</span><span class="o">=</span><span class="n">radiogram_dets</span><span class="p">,</span>
+        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">rr2</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting Analysis Server&quot;</span><span class="p">)</span>
     <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 

@@ -1,7 +1,8 @@
 import operator as op
+from pprint import pprint
 
 from rapidz import Stream, move_to_first
-from shed import SimpleToEventStream, SimpleFromEventStream
+from shed import SimpleToEventStream, SimpleFromEventStream, LastCache
 from xpdan.callbacks import StartStopCallback
 from xpdan.vend.callbacks.core import StripDepVar
 import numpy as np
@@ -81,20 +82,20 @@ def tomo_event_stream(
 
     rec_tes = SimpleToEventStream(
         rec, (f"{qoi_name}_tomo",), analysis_stage="{}_tomo".format(qoi_name)
-    )
+    ).LastCache()
+
     # If we have a 3D reconstruction translate it
     if rec_3D:
         rec_3D_tes = SimpleToEventStream(
             rec_3D,
             (f"{qoi_name}_tomo_3D",),
             analysis_stage="{}_tomo_3D".format(qoi_name),
-        )
+        ).LastCache()
 
-    # Don't run the sinogram for now, since it can produce issues with the viz
     sinogram_tes = SimpleToEventStream(
         sinogram,
         (f"{qoi_name}_sinogram",),
         analysis_stage="{}_sinogram".format(qoi_name),
-    )
+    ).LastCache()
 
     return locals()

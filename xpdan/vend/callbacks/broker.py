@@ -91,7 +91,7 @@ class LiveImage(Retrieve):
         limit_func=None,
         auto_redraw=True,
         interpolation=None,
-        aspect=None
+        aspect=None,
     ):
         super().__init__(handler_reg=handler_reg)
         self.interpolation = interpolation
@@ -104,14 +104,21 @@ class LiveImage(Retrieve):
         self.aspect = aspect
 
     def descriptor(self, doc):
-        data_keys = doc["data_keys"]
         self.fields = [
-            k for k, v in data_keys.items() if len(v["shape"]) == 2
+            k
+            for k, v in doc["data_keys"].items()
+            if len(v["shape"]) == 2
+            or (
+                len(v["shape"]) == 3
+                and len([dim for dim in v["shape"] if dim > 0]) == 2
+            )
         ]
+        data_keys = doc["data_keys"]
         if self.aspect is None:
             aspects = []
             for field in self.fields:
-                aspect_ratio = data_keys[field]["shape"][0] / data_keys[field]["shape"][1]
+                aspect_ratio = data_keys[field]["shape"][0] / data_keys[field][
+                    "shape"][1]
                 if any(s == -1 for s in data_keys[field]["shape"]):
                     aspects.append('auto')
                 elif aspect_ratio > 1.25 or aspect_ratio < .75:
@@ -137,7 +144,7 @@ class LiveImage(Retrieve):
                 self.limit_func,
                 self.auto_redraw,
                 self.interpolation,
-                aspect=asp
+                aspect=asp,
             )
             cs._fig.canvas.set_window_title(field)
             cs._fig.show()

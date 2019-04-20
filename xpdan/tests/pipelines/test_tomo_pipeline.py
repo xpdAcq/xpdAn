@@ -5,10 +5,11 @@ from xpdan.startup.tomo_server import tomo_callback_factory
 from xpdan.vend.callbacks.core import RunRouter
 
 
-def test_pencil_tomo_pipeline(RE, hw):
+def test_pencil_tomo_pipeline(RE, hw, db):
     L = []
     rr = RunRouter(
-        [lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))]
+        [lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x),
+                                         handler_reg=db.reg.handler_reg)]
     )
     RE.subscribe(rr)
     RE(
@@ -35,13 +36,15 @@ def test_pencil_tomo_pipeline(RE, hw):
     )
     # det1
     # sinogram and recon
-    assert len(L) == (30 * 5 + 3) * 2
+    assert len(L) == (30 * 5 + 2 + 1 +2) * 2
 
 
-def test_full_field_tomo_pipeline(RE, hw):
+def test_full_field_tomo_pipeline(RE, hw, db):
     L = []
     rr = RunRouter(
-        [lambda x: tomo_callback_factory(x, publisher=lambda *x: L.append(x))]
+        [lambda x: tomo_callback_factory(x,
+                                         publisher=lambda *x: L.append(x),
+                                         handler_reg=db.reg.handler_reg)]
     )
     RE.subscribe(rr)
     direct_img = SynSignal(
@@ -67,6 +70,7 @@ def test_full_field_tomo_pipeline(RE, hw):
     )
     # det1
     # sinogram and recon
-    assert len(L) == (30 + 3) * 2
+    # 30 events + start, stop, descriptor
+    assert len(L) == (30 + 2 + 1 + 2) * 2
     assert len(L[7][1]["data"]["img_tomo"].shape) == 3
     assert len(L[6][1]["data"]["img_sinogram"].shape) == 3

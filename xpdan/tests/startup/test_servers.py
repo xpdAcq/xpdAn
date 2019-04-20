@@ -19,7 +19,7 @@ from xpdan.startup.viz_server import run_server as viz_run_server
 from xpdan.startup.analysis_server import run_server as analysis_run_server
 from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.qoi_server import run_server as qoi_run_server
-from xpdan.startup.tomo_server import  run_server as tomo_run_server
+from xpdan.startup.tomo_server import run_server as tomo_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -152,7 +152,49 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
     threading.Thread(target=delayed_sigint, args=(10,)).start()
     try:
         print("running server")
-        analysis_run_server()
+        analysis_run_server(diffraction_dets=["img"])
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+
+
+def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw, db):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        RE.subscribe(db.insert)
+        dark, = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+        flat, = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+        RE(
+            bp.count(
+                [hw.img],
+                md=dict(
+                    analysis_stage="raw",
+                    sc_dk_field_uid=dark,
+                    sc_flat_field_uid=flat,
+                ),
+            )
+        )
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    try:
+        print("running server")
+        analysis_run_server(db=db, radiogram_dets=["img"])
 
     except KeyboardInterrupt:
         print("finished server")
@@ -162,7 +204,7 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
 
 def test_db_run_server(tmpdir, proxy, RE, hw, db):
     db.reg.handler_reg = {"NPY_SEQ": NumpySeqHandler}
-    glbl_dict['an_db'] = db
+    glbl_dict["an_db"] = db
     fn = str(tmpdir)
 
     def delayed_sigint(delay):  # pragma: no cover
@@ -210,7 +252,7 @@ def test_db_run_server(tmpdir, proxy, RE, hw, db):
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
-    assert db[-1].start['analysis_stage'] == 'pdf'
+    assert db[-1].start["analysis_stage"] == "pdf"
 
 
 def test_qoi_run_server(tmpdir, proxy, RE, hw):
@@ -225,7 +267,7 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
 
         p = Publisher(proxy[0], prefix=b"raw")
         RE.subscribe(p)
-        det = SynSignal(func=lambda: np.ones(10), name='gr')
+        det = SynSignal(func=lambda: np.ones(10), name="gr")
         RE(bp.count([det], md=dict(analysis_stage="raw")))
         RE(bp.count([det], md=dict(analysis_stage="pdf")))
 
@@ -257,16 +299,31 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
-        RE(bp.grid_scan([hw.noisy_det],
-                   hw.motor1, 0, 2, 2,
-                   hw.motor2, 0, 2, 2, True,
-                   md={'tomo': {'type': 'pencil',
-                                'rotation': 'motor1',
-                                "translation": "motor2",
-                                'center': 1}}))
+        RE(
+            bp.grid_scan(
+                [hw.noisy_det],
+                hw.motor1,
+                0,
+                2,
+                2,
+                hw.motor2,
+                0,
+                2,
+                2,
+                True,
+                md={
+                    "tomo": {
+                        "type": "pencil",
+                        "rotation": "motor1",
+                        "translation": "motor2",
+                        "center": 1,
+                    }
+                },
+            )
+        )
 
     # Run experiment in another process (after delay)
     exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
@@ -296,18 +353,37 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
-        RE(bp.grid_scan([hw.noisy_det],
-                   hw.motor3, 0, 2, 2,
-                   hw.motor1, 0, 2, 2, True,
-                   hw.motor2, 0, 2, 2, True,
-                   md={'tomo': {'type': 'pencil',
-                                'rotation': 'motor1',
-                                "translation": "motor2",
-                                "stack": "motor3",
-                                'center': 1}}))
+        RE(
+            bp.grid_scan(
+                [hw.noisy_det],
+                hw.motor3,
+                0,
+                2,
+                2,
+                hw.motor1,
+                0,
+                2,
+                2,
+                True,
+                hw.motor2,
+                0,
+                2,
+                2,
+                True,
+                md={
+                    "tomo": {
+                        "type": "pencil",
+                        "rotation": "motor1",
+                        "translation": "motor2",
+                        "stack": "motor3",
+                        "center": 1,
+                    }
+                },
+            )
+        )
 
     # Run experiment in another process (after delay)
     exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
@@ -337,15 +413,26 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
         time.sleep(delay)
         print("running exp")
 
-        p = Publisher(proxy[0], prefix=b"raw")
+        p = Publisher(proxy[0], prefix=b"an")
         RE.subscribe(p)
 
-        det = SynSignal(func=lambda: np.ones((10, 10)), name='gr')
-        RE(bp.scan([det],
-                   hw.motor1, 0, 2, 2,
-                   md={'tomo': {'type': 'full_field',
-                                'rotation': 'motor1',
-                                'center': 1}}))
+        det = SynSignal(func=lambda: np.ones((10, 10)), name="gr")
+        RE(
+            bp.scan(
+                [det],
+                hw.motor1,
+                0,
+                2,
+                2,
+                md={
+                    "tomo": {
+                        "type": "full_field",
+                        "rotation": "motor1",
+                        "center": 1,
+                    }
+                },
+            )
+        )
 
     # Run experiment in another process (after delay)
     exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)

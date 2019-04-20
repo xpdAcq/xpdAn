@@ -156,7 +156,8 @@ def radiogram_router(
 ):
     # This does not support concurrent radiograms and diffractograms
     # If there are diffraction detectors in the list, this is diffraction
-    if any(d in radiogram_dets for d in start["detectors"]) and 'sc_flat_field_uid' in start and 'sc_dk_field_uid' in start:
+    if (any(d in radiogram_dets for d in start["detectors"])
+            and 'sc_flat_field_uid' in start and 'sc_dk_field_uid' in start):
         radiogram_namespace = create_analysis_pipeline(
             order, inbound_proxy_address=inbound_proxy_address,
             resets=start.get('motors', None),

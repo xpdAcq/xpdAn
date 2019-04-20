@@ -117,7 +117,8 @@ class LiveImage(Retrieve):
         if self.aspect is None:
             aspects = []
             for field in self.fields:
-                aspect_ratio = data_keys[field]["shape"][0] / data_keys[field]["shape"][1]
+                aspect_ratio = data_keys[field]["shape"][0] / data_keys[field][
+                    "shape"][1]
                 if any(s == -1 for s in data_keys[field]["shape"]):
                     aspects.append('auto')
                 elif aspect_ratio > 1.25 or aspect_ratio < .75:

@@ -173,14 +173,15 @@ def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw, db):
         p = Publisher(proxy[0], prefix=b"raw")
         RE.subscribe(p)
         RE.subscribe(db.insert)
-        dark = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
-        flat = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+        dark, = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+        flat, = RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
         RE(
             bp.count(
                 [hw.img],
                 md=dict(
                     analysis_stage="raw",
-                    md={"sc_dk_field_uid": dark, "sc_full_field_uid": flat},
+                    sc_dk_field_uid=dark,
+                    sc_flat_field_uid=flat,
                 ),
             )
         )

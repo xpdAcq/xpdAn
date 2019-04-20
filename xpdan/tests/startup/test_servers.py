@@ -152,7 +152,7 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
     threading.Thread(target=delayed_sigint, args=(10,)).start()
     try:
         print("running server")
-        analysis_run_server()
+        analysis_run_server(diffraction_dets=['img'])
 
     except KeyboardInterrupt:
         print("finished server")

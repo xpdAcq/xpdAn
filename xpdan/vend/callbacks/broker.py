@@ -91,10 +91,8 @@ class LiveImage(Retrieve):
         limit_func=None,
         auto_redraw=True,
         interpolation=None,
-        aspect="equal",
     ):
         super().__init__(handler_reg=handler_reg)
-        self.aspect = aspect
         self.interpolation = interpolation
         self.auto_redraw = auto_redraw
         self.limit_func = limit_func
@@ -113,11 +111,24 @@ class LiveImage(Retrieve):
                 and len([dim for dim in v["shape"] if dim > 0]) == 2
             )
         ]
+        data_keys = doc["data_keys"]
+        if self.aspect is None:
+            aspects = []
+            for field in self.fields:
+                aspect_ratio = data_keys[field]["shape"][0] / data_keys[field]["shape"][1]
+                if any(s == -1 for s in data_keys[field]["shape"]):
+                    aspects.append('auto')
+                elif aspect_ratio > 1.25 or aspect_ratio < .75:
+                    aspects.append('auto')
+                else:
+                    aspects.append('equal')
+        else:
+            aspects = [self.aspect] * len(self.fields)
         from xray_vision.backend.mpl.cross_section_2d import CrossSection
         import matplotlib.pyplot as plt
 
         # only make new figure for new data otherwise use old data
-        for field in self.fields:
+        for field, asp in zip(self.fields, aspects):
             if field in self.cs_dict and plt.fignum_exists(
                 self.cs_dict[field]._fig.number
             ):
@@ -130,7 +141,7 @@ class LiveImage(Retrieve):
                 self.limit_func,
                 self.auto_redraw,
                 self.interpolation,
-                self.aspect,
+                aspect=asp,
             )
             cs._fig.canvas.set_window_title(field)
             cs._fig.show()

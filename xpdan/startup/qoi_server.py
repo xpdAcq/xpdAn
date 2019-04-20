@@ -18,13 +18,10 @@ def run_server(
     _publisher=None,
     **kwargs
 ):
-    """Start up the visualization server
+    """Start up the QOI server
 
     Parameters
     ----------
-    handlers : dict
-        The map between handler specs and handler classes, defaults to
-        the map used by the experimental databroker if possible
     prefix : bytes or list of bytes, optional
         The Publisher channels to listen to. Defaults to
         ``[b"an", b"raw"]``

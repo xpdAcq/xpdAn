@@ -62,10 +62,10 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
 # TODO: chunk this up a bit more so we can separate XRD from PDF
 def start_gen(
     raw_source,
-    image_names=glbl_dict['image_fields'],
+    image_names=glbl_dict["image_fields"],
     db=glbl_dict["exp_db"],
     calibration_md_folder=None,
-    **kwargs
+    **kwargs,
 ):
     """
 
@@ -89,10 +89,9 @@ def start_gen(
 
     # TODO: change this when new dark logic comes
     # Check that the data isn't a dark (dark_frame = True when taking a dark)
-    not_dark_scan = FromEventStream("start", (), upstream=raw_source,
-                                    stream_name='not dark scan').map(
-        lambda x: not x.get("dark_frame", False)
-    )
+    not_dark_scan = FromEventStream(
+        "start", (), upstream=raw_source, stream_name="not dark scan"
+    ).map(lambda x: not x.get("dark_frame", False))
     # Fill the raw event stream
     source = (
         # Emit on works here because we emit on the not_dark_scan first due
@@ -135,8 +134,25 @@ def start_gen(
     calibrant = FromEventStream(
         "start", ("dSpacing",), source, principle=True
     ).unique(history=1)
-    detector = FromEventStream("start", ("detector",), source).unique(
-        history=1
+    detector = (
+        FromEventStream("start", ("detector",), source)
+        .union(
+            *[
+                FromEventStream(
+                    "descriptor",
+                    (
+                        "configuration",
+                        image_name.split("_")[0],
+                        "data",
+                        f'{image_name.split("_")[0]}_detector_type',
+                    ),
+                    source,
+                    event_stream_name="primary",
+                )
+                for image_name in image_names
+            ]
+        )
+        .unique(history=1)
     )
 
     is_calibration_img = FromEventStream("start", (), source).map(

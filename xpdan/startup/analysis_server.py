@@ -44,6 +44,19 @@ order = (
     + tem_pipeline_order
     + qoi_pipeline_order
 )
+z_score_order = (
+    pipeline_order
+    + [
+        # std_gen,
+        # median_gen,
+        z_score_gen,
+        z_score_tem,
+        max_intensity_mean,
+        max_gr_mean,
+    ]
+    + tem_pipeline_order
+    + qoi_pipeline_order
+)
 
 radiogram_order = (
     fes_radiograph,
@@ -176,6 +189,7 @@ def run_server(
     diffraction_dets=glbl_dict["diffraction_dets"],
     radiogram_dets=glbl_dict["radiogram_dets"],
     prefix=b"raw",
+    zscore=False,
     **kwargs
 ):
     """Function to run the analysis server.
@@ -185,6 +199,10 @@ def run_server(
     order : list, optional
         The order of pipeline chunk functions to be called. Defaults to the
         standard order, ``xpdan.startup.analysis_server.order``
+    radiogram_order : list, optional
+        The order of pipeline chunk functions to be called for radiograph
+        analysis. Defaults to the standard order,
+        ``xpdan.startup.analysis_server.radiogram_order``
     db : databroker.Broker instance, optional
         The databroker to pull data from. This is used for accessing dark and
         background data. Defaults to the location listed in the
@@ -195,8 +213,16 @@ def run_server(
     inbound_proxy_address : str, optional
         The inbound ip address for the ZMQ server. Defaults to the value
         from the global dict
+    diffraction_dets : list of str, optional
+        The detectors used for diffraction, defaults to
+        ``glbl_dict["diffraction_dets"]``, pulled from the config file.
+    radiogram_dets: list of str, optional
+        The detectors used for radiographs, defaults to
+        ``glbl_dict["diffraction_dets"]``, pulled from the config file.
     prefix : bytes or list of bytes, optional
         Which publisher(s) to listen to for data. Defaults to ``b"raw"``
+    zscore : bool, optional
+        If True compute Z-Score, defaults to False
     kwargs : Any
         Keyword arguments passed into the pipeline creation. These are used
         to modify the data processing.
@@ -237,12 +263,20 @@ def run_server(
     )
     install_qt_kicker(loop=d.loop)
 
-    rr = RunRouter(
-        [diffraction_router],
-        order=order,
-        diffraction_dets=diffraction_dets,
-        inbound_proxy_address=inbound_proxy_address,
-    )
+    if zscore:
+        rr = RunRouter(
+            [diffraction_router],
+            order=z_score_order,
+            diffraction_dets=diffraction_dets,
+            inbound_proxy_address=inbound_proxy_address,
+        )
+    else:
+        rr = RunRouter(
+            [diffraction_router],
+            order=order,
+            diffraction_dets=diffraction_dets,
+            inbound_proxy_address=inbound_proxy_address,
+        )
 
     rr2 = RunRouter(
         [radiogram_router],

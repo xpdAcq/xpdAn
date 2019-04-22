@@ -4,6 +4,18 @@
 
 .. current developments
 
+v0.7.0
+====================
+
+**Added:**
+
+* Pull detector name from descriptor if possible
+* Analysis system for radiograph data processing
+* Routers for diffraction and radiograph analysis
+* ``zscore`` kwarg to analysis pipeline
+
+
+
 v0.6.1
 ====================
 

@@ -228,13 +228,16 @@
 
 <dl class="function">
 <dt id="xpdan.startup.analysis_server.run_server">
-<code class="descclassname">xpdan.startup.analysis_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>order=[&lt;function start_gen&gt;, &lt;function image_process&gt;, &lt;function calibration&gt;, &lt;function clear_geo_gen&gt;, &lt;function save_cal&gt;, &lt;function scattering_correction&gt;, &lt;function gen_mask&gt;, &lt;function integration&gt;, &lt;function pdf_gen&gt;, &lt;function clear_comp&gt;, &lt;function max_intensity_mean&gt;, &lt;function max_gr_mean&gt;, &lt;function image_process&gt;, &lt;function calibration&gt;, &lt;function gen_mask&gt;, &lt;function integration&gt;, &lt;function pdf_gen&gt;, &lt;function max_intensity_mean&gt;, &lt;function max_gr_mean&gt;], radiogram_order=(&lt;function fes_radiograph&gt;, &lt;function radiograph_correction&gt;, &lt;function average&gt;, &lt;function tes_radiograph&gt;), db=&lt;databroker._core.Broker object&gt;, outbound_proxy_address='127.0.0.1:5568', inbound_proxy_address='127.0.0.1:5567', diffraction_dets=['pe1c', 'pe1', 'pe2c', 'pe2'], radiogram_dets=['blackfly_det'], prefix=b'raw', **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/analysis_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.analysis_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.startup.analysis_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>order=[&lt;function start_gen&gt;, &lt;function image_process&gt;, &lt;function calibration&gt;, &lt;function clear_geo_gen&gt;, &lt;function save_cal&gt;, &lt;function scattering_correction&gt;, &lt;function gen_mask&gt;, &lt;function integration&gt;, &lt;function pdf_gen&gt;, &lt;function clear_comp&gt;, &lt;function max_intensity_mean&gt;, &lt;function max_gr_mean&gt;, &lt;function image_process&gt;, &lt;function calibration&gt;, &lt;function gen_mask&gt;, &lt;function integration&gt;, &lt;function pdf_gen&gt;, &lt;function max_intensity_mean&gt;, &lt;function max_gr_mean&gt;], radiogram_order=(&lt;function fes_radiograph&gt;, &lt;function radiograph_correction&gt;, &lt;function average&gt;, &lt;function tes_radiograph&gt;), db=&lt;databroker._core.Broker object&gt;, outbound_proxy_address='127.0.0.1:5568', inbound_proxy_address='127.0.0.1:5567', diffraction_dets=['pe1c', 'pe1', 'pe2c', 'pe2'], radiogram_dets=['blackfly_det'], prefix=b'raw', zscore=False, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/analysis_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.analysis_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to run the analysis server.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>order</strong> (<em>list, optional</em>) – The order of pipeline chunk functions to be called. Defaults to the
 standard order, <code class="docutils literal notranslate"><span class="pre">xpdan.startup.analysis_server.order</span></code></p></li>
+<li><p><strong>radiogram_order</strong> (<em>list, optional</em>) – The order of pipeline chunk functions to be called for radiograph
+analysis. Defaults to the standard order,
+<code class="docutils literal notranslate"><span class="pre">xpdan.startup.analysis_server.radiogram_order</span></code></p></li>
 <li><p><strong>db</strong> (<em>databroker.Broker instance, optional</em>) – The databroker to pull data from. This is used for accessing dark and
 background data. Defaults to the location listed in the
 <code class="docutils literal notranslate"><span class="pre">xpdconf.conf.glbl_dict</span></code>.</p></li>
@@ -242,7 +245,12 @@ background data. Defaults to the location listed in the
 to the location listed in the <code class="docutils literal notranslate"><span class="pre">xpdconf.conf.glbl_dict</span></code>.</p></li>
 <li><p><strong>inbound_proxy_address</strong> (<em>str, optional</em>) – The inbound ip address for the ZMQ server. Defaults to the value
 from the global dict</p></li>
+<li><p><strong>diffraction_dets</strong> (<em>list of str, optional</em>) – The detectors used for diffraction, defaults to
+<code class="docutils literal notranslate"><span class="pre">glbl_dict[&quot;diffraction_dets&quot;]</span></code>, pulled from the config file.</p></li>
+<li><p><strong>radiogram_dets</strong> (<em>list of str, optional</em>) – The detectors used for radiographs, defaults to
+<code class="docutils literal notranslate"><span class="pre">glbl_dict[&quot;diffraction_dets&quot;]</span></code>, pulled from the config file.</p></li>
 <li><p><strong>prefix</strong> (<em>bytes or list of bytes, optional</em>) – Which publisher(s) to listen to for data. Defaults to <code class="docutils literal notranslate"><span class="pre">b&quot;raw&quot;</span></code></p></li>
+<li><p><strong>zscore</strong> (<em>bool, optional</em>) – If True compute Z-Score, defaults to False</p></li>
 <li><p><strong>kwargs</strong> (<em>Any</em>) – Keyword arguments passed into the pipeline creation. These are used
 to modify the data processing.</p></li>
 <li><p><strong>If using the default pipeline these include</strong> –</p>

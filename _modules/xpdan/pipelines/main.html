@@ -213,10 +213,10 @@
 <span class="c1"># TODO: chunk this up a bit more so we can separate XRD from PDF</span>
 <div class="viewcode-block" id="start_gen"><a class="viewcode-back" href="../../../xpdan.pipelines.html#xpdan.pipelines.main.start_gen">[docs]</a><span class="k">def</span> <span class="nf">start_gen</span><span class="p">(</span>
     <span class="n">raw_source</span><span class="p">,</span>
-    <span class="n">image_names</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s1">&#39;image_fields&#39;</span><span class="p">],</span>
+    <span class="n">image_names</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;image_fields&quot;</span><span class="p">],</span>
     <span class="n">db</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;exp_db&quot;</span><span class="p">],</span>
     <span class="n">calibration_md_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 
@@ -240,10 +240,9 @@
 
     <span class="c1"># TODO: change this when new dark logic comes</span>
     <span class="c1"># Check that the data isn&#39;t a dark (dark_frame = True when taking a dark)</span>
-    <span class="n">not_dark_scan</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">upstream</span><span class="o">=</span><span class="n">raw_source</span><span class="p">,</span>
-                                    <span class="n">stream_name</span><span class="o">=</span><span class="s1">&#39;not dark scan&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dark_frame&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">not_dark_scan</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">upstream</span><span class="o">=</span><span class="n">raw_source</span><span class="p">,</span> <span class="n">stream_name</span><span class="o">=</span><span class="s2">&quot;not dark scan&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dark_frame&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
     <span class="c1"># Fill the raw event stream</span>
     <span class="n">source</span> <span class="o">=</span> <span class="p">(</span>
         <span class="c1"># Emit on works here because we emit on the not_dark_scan first due</span>
@@ -286,8 +285,25 @@
     <span class="n">calibrant</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span>
         <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;dSpacing&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">,</span> <span class="n">principle</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">detector</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
-        <span class="n">history</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">detector</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,),</span> <span class="n">source</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">union</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">FromEventStream</span><span class="p">(</span>
+                    <span class="s2">&quot;descriptor&quot;</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;configuration&quot;</span><span class="p">,</span>
+                        <span class="n">image_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;{image_name.split(&quot;_&quot;)[0]}_detector_type&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">source</span><span class="p">,</span>
+                    <span class="n">event_stream_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">image_name</span> <span class="ow">in</span> <span class="n">image_names</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">history</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="p">)</span>
 
     <span class="n">is_calibration_img</span> <span class="o">=</span> <span class="n">FromEventStream</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">source</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>

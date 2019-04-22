@@ -195,6 +195,19 @@
     <span class="o">+</span> <span class="n">tem_pipeline_order</span>
     <span class="o">+</span> <span class="n">qoi_pipeline_order</span>
 <span class="p">)</span>
+<span class="n">z_score_order</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">pipeline_order</span>
+    <span class="o">+</span> <span class="p">[</span>
+        <span class="c1"># std_gen,</span>
+        <span class="c1"># median_gen,</span>
+        <span class="n">z_score_gen</span><span class="p">,</span>
+        <span class="n">z_score_tem</span><span class="p">,</span>
+        <span class="n">max_intensity_mean</span><span class="p">,</span>
+        <span class="n">max_gr_mean</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="o">+</span> <span class="n">tem_pipeline_order</span>
+    <span class="o">+</span> <span class="n">qoi_pipeline_order</span>
+<span class="p">)</span>
 
 <span class="n">radiogram_order</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">fes_radiograph</span><span class="p">,</span>
@@ -327,6 +340,7 @@
     <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;diffraction_dets&quot;</span><span class="p">],</span>
     <span class="n">radiogram_dets</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;radiogram_dets&quot;</span><span class="p">],</span>
     <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+    <span class="n">zscore</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Function to run the analysis server.</span>
@@ -336,6 +350,10 @@
 <span class="sd">    order : list, optional</span>
 <span class="sd">        The order of pipeline chunk functions to be called. Defaults to the</span>
 <span class="sd">        standard order, ``xpdan.startup.analysis_server.order``</span>
+<span class="sd">    radiogram_order : list, optional</span>
+<span class="sd">        The order of pipeline chunk functions to be called for radiograph</span>
+<span class="sd">        analysis. Defaults to the standard order,</span>
+<span class="sd">        ``xpdan.startup.analysis_server.radiogram_order``</span>
 <span class="sd">    db : databroker.Broker instance, optional</span>
 <span class="sd">        The databroker to pull data from. This is used for accessing dark and</span>
 <span class="sd">        background data. Defaults to the location listed in the</span>
@@ -346,8 +364,16 @@
 <span class="sd">    inbound_proxy_address : str, optional</span>
 <span class="sd">        The inbound ip address for the ZMQ server. Defaults to the value</span>
 <span class="sd">        from the global dict</span>
+<span class="sd">    diffraction_dets : list of str, optional</span>
+<span class="sd">        The detectors used for diffraction, defaults to</span>
+<span class="sd">        ``glbl_dict[&quot;diffraction_dets&quot;]``, pulled from the config file.</span>
+<span class="sd">    radiogram_dets: list of str, optional</span>
+<span class="sd">        The detectors used for radiographs, defaults to</span>
+<span class="sd">        ``glbl_dict[&quot;diffraction_dets&quot;]``, pulled from the config file.</span>
 <span class="sd">    prefix : bytes or list of bytes, optional</span>
 <span class="sd">        Which publisher(s) to listen to for data. Defaults to ``b&quot;raw&quot;``</span>
+<span class="sd">    zscore : bool, optional</span>
+<span class="sd">        If True compute Z-Score, defaults to False</span>
 <span class="sd">    kwargs : Any</span>
 <span class="sd">        Keyword arguments passed into the pipeline creation. These are used</span>
 <span class="sd">        to modify the data processing.</span>
@@ -388,12 +414,20 @@
     <span class="p">)</span>
     <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
 
-    <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">diffraction_router</span><span class="p">],</span>
-        <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-        <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">diffraction_dets</span><span class="p">,</span>
-        <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">zscore</span><span class="p">:</span>
+        <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">diffraction_router</span><span class="p">],</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">z_score_order</span><span class="p">,</span>
+            <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">diffraction_dets</span><span class="p">,</span>
+            <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">diffraction_router</span><span class="p">],</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+            <span class="n">diffraction_dets</span><span class="o">=</span><span class="n">diffraction_dets</span><span class="p">,</span>
+            <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">inbound_proxy_address</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="n">rr2</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
         <span class="p">[</span><span class="n">radiogram_router</span><span class="p">],</span>

@@ -269,6 +269,7 @@ def run_server(
             order=z_score_order,
             diffraction_dets=diffraction_dets,
             inbound_proxy_address=inbound_proxy_address,
+            **kwargs
         )
     else:
         rr = RunRouter(
@@ -276,6 +277,7 @@ def run_server(
             order=order,
             diffraction_dets=diffraction_dets,
             inbound_proxy_address=inbound_proxy_address,
+            **kwargs
         )
 
     rr2 = RunRouter(
@@ -283,6 +285,7 @@ def run_server(
         order=radiogram_order,
         radiogram_dets=radiogram_dets,
         inbound_proxy_address=inbound_proxy_address,
+        **kwargs
     )
 
     d.subscribe(rr)

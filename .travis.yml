@@ -37,7 +37,7 @@ before_install:
   - export PATH=~/mc/bin:$PATH
   - conda config --set always_yes yes --set changeps1 no --set quiet true
   - conda config --add channels conda-forge
-  - conda update conda --yes
+  #- conda update conda --yes
   - export CONDARC=ci/condarc
   - export MDS_HOST=localhost
   - export MDS_DATABASE=test

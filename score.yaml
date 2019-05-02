@@ -8,70 +8,70 @@ install: pip install .
 build:
   pip:
     default:
-      cconda: setuptools
+      conda: setuptools
   python:
     default:
-      cconda: python==$TRAVIS_PYTHON_VERSION
+      conda: python==$TRAVIS_PYTHON_VERSION
 run:
   bluesky:
-    default: {cconda: bluesky}
+    default: {conda: bluesky}
   databroker:
-    default: {cconda: databroker}
+    default: {conda: databroker}
   matplotlib:
-    default: {cconda: matplotlib}
+    default: {conda: matplotlib}
   numpy:
-    default: {cconda: numpy}
+    default: {conda: numpy}
   ophyd:
-    default: {cconda: ophyd}
+    default: {conda: ophyd}
   pyfai:
-    default: {cconda: pyfai}
+    default: {conda: pyfai}
   pyxdameraulevenshtein:
-    default: {cconda: pyxdameraulevenshtein}
+    default: {conda: pyxdameraulevenshtein}
   pyyaml:
-    default: {cconda: pyyaml}
+    default: {conda: pyyaml}
   scikit-beam:
-    default: {cconda: scikit-beam}
+    default: {conda: scikit-beam}
   scipy:
-    default: {cconda: scipy}
+    default: {conda: scipy}
   shed:
-    default: {cconda: shed}
+    default: {conda: shed}
     bleeding: {orch: 'https://github.com/xpdAcq/SHED.git'}
   xpdconf:
-    default: {cconda: xpdconf}
+    default: {conda: xpdconf}
     bleeding: {orch: 'https://github.com/xpdAcq/xpdConf.git'}
   xpdsim:
-    default: {cconda: xpdsim}
+    default: {conda: xpdsim}
   xpdtools:
-    default: {cconda: xpdtools}
+    default: {conda: xpdtools}
     bleeding: {orch: 'https://github.com/xpdAcq/xpdtools.git'}
   xpdview:
-    default: {cconda: xpdview}
+    default: {conda: xpdview}
   xray-vision:
-    default: {cconda: xray-vision}
+    default: {conda: xray-vision}
   rapidz:
-    default: {cconda: rapidz}
+    default: {conda: rapidz}
   mayavi:
-    default: {cconda: mayavi}
+    default: {conda: mayavi}
 test:
   pytest:
     default:
-      cconda: pytest
+      conda: pytest
   flake8:
     default:
-      cconda: flake8
+      conda: flake8
   codecov:
     default:
-      cconda: codecov
+      conda: codecov
   coverage:
     default:
-      cconda: coverage
+      conda: coverage
   pytest-env:
     default:
-      cconda: pytest-env
+      conda: pytest-env
 docs:
   doctr:
-    default: {cconda: doctr}
+    default: {conda: doctr}
   sphinx:
-    default: {cconda: sphinx}
+    default: {conda: sphinx}
   sphinx_rtd_theme:
-    default: {cconda: sphinx_rtd_theme}
+    default: {conda: sphinx_rtd_theme}

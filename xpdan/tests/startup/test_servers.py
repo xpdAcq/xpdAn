@@ -334,7 +334,7 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x))
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
 
     except KeyboardInterrupt:
         print("finished server")
@@ -394,7 +394,7 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x))
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
 
     except KeyboardInterrupt:
         print("finished server")
@@ -443,7 +443,7 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x))
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
 
     except KeyboardInterrupt:
         print("finished server")

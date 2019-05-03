@@ -56,14 +56,14 @@ def run_server(
     source1 = Stream()
     source2 = Stream()
 
-    x = SimpleFromEventStream("event", ("data", x_name), upstream=source1)
+    q = SimpleFromEventStream("event", ("data", x_name), upstream=source1)
     iq = SimpleFromEventStream(
         "event", ("data", y_name), upstream=source1, principle=True
     )
 
     vals = [
         iq.combine_latest(
-            x.map(lambda x, y: np.argmin(np.abs(x - y)), pos), emit_on=0
+            q.map(lambda x, y: np.argmin(np.abs(x - y)), pos), emit_on=0
         ).starmap(lambda x, y: x[y])
         for pos in positions
     ]

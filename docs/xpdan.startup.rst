@@ -51,3 +51,30 @@ xpdan\.startup\.viz_server module
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. _tomo_server:
+
+xpdan\.startup\.tomo_server module
+----------------------------------
+.. automodule:: xpdan.startup.tomo_server
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. _qoi_server:
+
+xpdan\.startup\.qoi_server module
+-----------------------------
+.. automodule:: xpdan.startup.qoi_server
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. _intensity_server:
+
+xpdan\.startup\.intensity_server module
+-----------------------------
+.. automodule:: xpdan.startup.intensity_server
+    :members:
+    :undoc-members:
+    :show-inheritance:

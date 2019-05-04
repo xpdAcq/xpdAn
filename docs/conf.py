@@ -213,6 +213,8 @@ ctx = {'collection_env': 'collection-2019-1.2-xpd',
        'start_analysis': 'start_analysis()',
        'start_analysis_func': 'start_analysis',
        'setup_analysis': 'setup_analysis',
+       'len': len,
+       'list': list,
        }
 env = Environment(loader=FileSystemLoader([
             '_templates',

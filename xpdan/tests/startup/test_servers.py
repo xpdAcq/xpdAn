@@ -20,6 +20,7 @@ from xpdan.startup.analysis_server import run_server as analysis_run_server
 from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.qoi_server import run_server as qoi_run_server
 from xpdan.startup.tomo_server import run_server as tomo_run_server
+from xpdan.startup.intensity_server import run_server as intensity_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -444,6 +445,44 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
     try:
         print("running server")
         tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+    assert L
+
+
+def test_intensity_run_server(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        z = np.zeros(10)
+        z[3] = 1
+        x = SynSignal(func=lambda: np.arange(10), name="x")
+        y = SynSignal(func=lambda: z, name="y")
+        RE(bp.count([x, y], md=dict(analysis_stage="raw")))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
+    try:
+        print("running server")
+        intensity_run_server(positions=[3],
+                             stage='raw',
+                             _publisher=lambda *x: L.append(x))
 
     except KeyboardInterrupt:
         print("finished server")

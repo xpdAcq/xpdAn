@@ -1,18 +1,21 @@
 .. _using_servers:
 
+
 Using Servers
 =============
 
 One of the major features of ``xpdAn`` are servers which handle data
 processing, visualization, saving and database integration.
 
-Currently there are four servers implemented,
+Currently there are 8 servers implemented:
 ``analysis``,
 ``portable_db``,
 ``db``,
 ``save``,
-``qoi`` and
-``viz``.
+``qoi``,
+``viz``,
+``tomo``,
+and ``intensity``.
 Each server is started by the command ``<server_name>_server`` on the command
 line while inside the analysis conda environment.
 For example, to start the analysis (with a background scale of .75) one would
@@ -28,12 +31,12 @@ All the servers are using ``Fire`` to create command line interfaces.
 The documentation for ``Fire`` can be found
 `here <https://github.com/google/python-fire#python-fire->`_.
 
-
-
+Servers
++++++++
 
 
 ``analysis``
-++++++++++++++
+------------
 The analysis server handles the majority of the number crunching,
 reducing data from images to 1D scattering patterns and PDFs.
 
@@ -42,7 +45,7 @@ See the ``run_server`` function in the
 
 
 ``portable_db``
-++++++++++++++
+---------------
 The portable db server saves raw and analyzed data in a portable
 databroker for users to walk away with. Users will need to specify
 which folder they would like the data to be placed in before running
@@ -56,7 +59,7 @@ See the ``run_server`` function in the
 
 
 ``db``
-++++++++++++++
+------
 The db server stores analyzed data in a central database at 28-ID.
 This server should already be running, only beamline staff should need to
 start it.
@@ -66,7 +69,7 @@ See the ``run_server`` function in the
 
 
 ``save``
-++++++++++++++
+--------
 The save server saves files with human readable filenames to various
 folders.
 Users will need to specify which folder(s) they would like the data to be
@@ -77,7 +80,7 @@ See the ``run_server`` function in the
 
 
 ``qoi``
-++++++++++++++
+-------
 The QOI server performs additional data processing and analysis,
 extracting quantities of interest from raw and reduced data.
 
@@ -86,7 +89,7 @@ See the ``run_server`` function in the
 
 
 ``viz``
-++++++++++++++
+-------
 The viz server visualizes raw and processed data as it becomes available.
 This server should already be running, only beamline staff should need to
 start it.
@@ -96,16 +99,24 @@ See the ``run_server`` function in the
 
 
 ``tomo``
-++++++++++++++
+--------
 The tomo server runs tomographic reconstructions on all scalar data (raw and analyzed). The reconstruction algorithm can be changed via the ``algorithm`` keyword.
 
 See the ``run_server`` function in the
 :ref:`tomo_server` for the keyword arguments.
 
 
+``intensity``
+-------------
+The intensity server calculates the intensity at specified points from 1D patterns.
+
+See the ``run_server`` function in the
+:ref:`intensity_server` for the keyword arguments.
+
+
 
 Running from ipython
---------------------
+++++++++++++++++++++
 All of these server commands can be run from ipython (and python) directly.
 This provides more control over the servers operation, especially for the
 analysis server.

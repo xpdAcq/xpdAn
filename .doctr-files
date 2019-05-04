@@ -6,7 +6,9 @@
 ./_modules/xpdan/pipelines/main.html
 ./_modules/xpdan/pipelines/pipeline_utils.html
 ./_modules/xpdan/startup/db_server.html
+./_modules/xpdan/startup/intensity_server.html
 ./_modules/xpdan/startup/portable_db_server.html
+./_modules/xpdan/startup/qoi_server.html
 ./_modules/xpdan/startup/save_server.html
 ./_modules/xpdan/startup/viz_server.html
 ./_sources/index.rst.txt

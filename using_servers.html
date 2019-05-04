@@ -83,16 +83,18 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Using Servers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#analysis"><code class="docutils literal notranslate"><span class="pre">analysis</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#portable-db"><code class="docutils literal notranslate"><span class="pre">portable_db</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#db"><code class="docutils literal notranslate"><span class="pre">db</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#save"><code class="docutils literal notranslate"><span class="pre">save</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#qoi"><code class="docutils literal notranslate"><span class="pre">qoi</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#viz"><code class="docutils literal notranslate"><span class="pre">viz</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#tomo"><code class="docutils literal notranslate"><span class="pre">tomo</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#running-from-ipython">Running from ipython</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#servers">Servers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#analysis"><code class="docutils literal notranslate"><span class="pre">analysis</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#portable-db"><code class="docutils literal notranslate"><span class="pre">portable_db</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#db"><code class="docutils literal notranslate"><span class="pre">db</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#save"><code class="docutils literal notranslate"><span class="pre">save</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#qoi"><code class="docutils literal notranslate"><span class="pre">qoi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#viz"><code class="docutils literal notranslate"><span class="pre">viz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tomo"><code class="docutils literal notranslate"><span class="pre">tomo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intensity"><code class="docutils literal notranslate"><span class="pre">intensity</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#running-from-ipython">Running from ipython</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="post_analysis.html">Post Analysis</a></li>
@@ -168,13 +170,15 @@
 <span id="id1"></span><h1>Using Servers<a class="headerlink" href="#using-servers" title="Permalink to this headline">¶</a></h1>
 <p>One of the major features of <code class="docutils literal notranslate"><span class="pre">xpdAn</span></code> are servers which handle data
 processing, visualization, saving and database integration.</p>
-<p>Currently there are four servers implemented,
+<p>Currently there are 8 servers implemented:
 <code class="docutils literal notranslate"><span class="pre">analysis</span></code>,
 <code class="docutils literal notranslate"><span class="pre">portable_db</span></code>,
 <code class="docutils literal notranslate"><span class="pre">db</span></code>,
 <code class="docutils literal notranslate"><span class="pre">save</span></code>,
-<code class="docutils literal notranslate"><span class="pre">qoi</span></code> and
-<code class="docutils literal notranslate"><span class="pre">viz</span></code>.
+<code class="docutils literal notranslate"><span class="pre">qoi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">viz</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tomo</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">intensity</span></code>.
 Each server is started by the command <code class="docutils literal notranslate"><span class="pre">&lt;server_name&gt;_server</span></code> on the command
 line while inside the analysis conda environment.
 For example, to start the analysis (with a background scale of .75) one would
@@ -187,15 +191,17 @@ analysis_server --bg_scale<span class="o">=</span>.75
 All the servers are using <code class="docutils literal notranslate"><span class="pre">Fire</span></code> to create command line interfaces.
 The documentation for <code class="docutils literal notranslate"><span class="pre">Fire</span></code> can be found
 <a class="reference external" href="https://github.com/google/python-fire#python-fire-">here</a>.</p>
+<div class="section" id="servers">
+<h2>Servers<a class="headerlink" href="#servers" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="analysis">
-<h2><code class="docutils literal notranslate"><span class="pre">analysis</span></code><a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">analysis</span></code><a class="headerlink" href="#analysis" title="Permalink to this headline">¶</a></h3>
 <p>The analysis server handles the majority of the number crunching,
 reducing data from images to 1D scattering patterns and PDFs.</p>
 <p>See the <code class="docutils literal notranslate"><span class="pre">run_server</span></code> function in the
 <a class="reference internal" href="xpdan.startup.html#analysis-server"><span class="std std-ref">xpdan.startup.analysis_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="portable-db">
-<h2><code class="docutils literal notranslate"><span class="pre">portable_db</span></code><a class="headerlink" href="#portable-db" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">portable_db</span></code><a class="headerlink" href="#portable-db" title="Permalink to this headline">¶</a></h3>
 <p>The portable db server saves raw and analyzed data in a portable
 databroker for users to walk away with. Users will need to specify
 which folder they would like the data to be placed in before running
@@ -207,7 +213,7 @@ for more on how to use a databroker.</p>
 <a class="reference internal" href="xpdan.startup.html#portable-db-server"><span class="std std-ref">xpdan.startup.portable_db_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="db">
-<h2><code class="docutils literal notranslate"><span class="pre">db</span></code><a class="headerlink" href="#db" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">db</span></code><a class="headerlink" href="#db" title="Permalink to this headline">¶</a></h3>
 <p>The db server stores analyzed data in a central database at 28-ID.
 This server should already be running, only beamline staff should need to
 start it.</p>
@@ -215,7 +221,7 @@ start it.</p>
 <a class="reference internal" href="xpdan.startup.html#db-server"><span class="std std-ref">xpdan.startup.db_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="save">
-<h2><code class="docutils literal notranslate"><span class="pre">save</span></code><a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">save</span></code><a class="headerlink" href="#save" title="Permalink to this headline">¶</a></h3>
 <p>The save server saves files with human readable filenames to various
 folders.
 Users will need to specify which folder(s) they would like the data to be
@@ -224,14 +230,14 @@ placed in before running their experiments.</p>
 <a class="reference internal" href="xpdan.startup.html#save-server"><span class="std std-ref">xpdan.startup.save_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="qoi">
-<h2><code class="docutils literal notranslate"><span class="pre">qoi</span></code><a class="headerlink" href="#qoi" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">qoi</span></code><a class="headerlink" href="#qoi" title="Permalink to this headline">¶</a></h3>
 <p>The QOI server performs additional data processing and analysis,
 extracting quantities of interest from raw and reduced data.</p>
 <p>See the <code class="docutils literal notranslate"><span class="pre">run_server</span></code> function in the
-<span class="xref std std-ref">qoi_server</span> for the keyword arguments.</p>
+<a class="reference internal" href="xpdan.startup.html#qoi-server"><span class="std std-ref">xpdan.startup.qoi_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="viz">
-<h2><code class="docutils literal notranslate"><span class="pre">viz</span></code><a class="headerlink" href="#viz" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">viz</span></code><a class="headerlink" href="#viz" title="Permalink to this headline">¶</a></h3>
 <p>The viz server visualizes raw and processed data as it becomes available.
 This server should already be running, only beamline staff should need to
 start it.</p>
@@ -239,12 +245,20 @@ start it.</p>
 <a class="reference internal" href="xpdan.startup.html#viz-server"><span class="std std-ref">xpdan.startup.viz_server module</span></a> for the keyword arguments.</p>
 </div>
 <div class="section" id="tomo">
-<h2><code class="docutils literal notranslate"><span class="pre">tomo</span></code><a class="headerlink" href="#tomo" title="Permalink to this headline">¶</a></h2>
+<h3><code class="docutils literal notranslate"><span class="pre">tomo</span></code><a class="headerlink" href="#tomo" title="Permalink to this headline">¶</a></h3>
 <p>The tomo server runs tomographic reconstructions on all scalar data (raw and analyzed). The reconstruction algorithm can be changed via the <code class="docutils literal notranslate"><span class="pre">algorithm</span></code> keyword.</p>
 <p>See the <code class="docutils literal notranslate"><span class="pre">run_server</span></code> function in the
-<span class="xref std std-ref">tomo_server</span> for the keyword arguments.</p>
+<a class="reference internal" href="xpdan.startup.html#tomo-server"><span class="std std-ref">xpdan.startup.tomo_server module</span></a> for the keyword arguments.</p>
+</div>
+<div class="section" id="intensity">
+<h3><code class="docutils literal notranslate"><span class="pre">intensity</span></code><a class="headerlink" href="#intensity" title="Permalink to this headline">¶</a></h3>
+<p>The intensity server calculates the intensity at specified points from 1D patterns.</p>
+<p>See the <code class="docutils literal notranslate"><span class="pre">run_server</span></code> function in the
+<a class="reference internal" href="xpdan.startup.html#intensity-server"><span class="std std-ref">xpdan.startup.intensity_server module</span></a> for the keyword arguments.</p>
+</div>
+</div>
 <div class="section" id="running-from-ipython">
-<h3>Running from ipython<a class="headerlink" href="#running-from-ipython" title="Permalink to this headline">¶</a></h3>
+<h2>Running from ipython<a class="headerlink" href="#running-from-ipython" title="Permalink to this headline">¶</a></h2>
 <p>All of these server commands can be run from ipython (and python) directly.
 This provides more control over the servers operation, especially for the
 analysis server.
@@ -253,7 +267,6 @@ Each server can be imported via
 <code class="docutils literal notranslate"><span class="pre">&lt;server_name&gt;</span></code> with the appropriate name, eg.
 <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">xpdan.startup.qoi_server</span> <span class="pre">import</span> <span class="pre">run_server</span></code> to import the quantity
 of interest server.</p>
-</div>
 </div>
 </div>
 

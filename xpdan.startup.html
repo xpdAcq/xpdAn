@@ -96,6 +96,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-portable-db-server-module">xpdan.startup.portable_db_server module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-save-server-module">xpdan.startup.save_server module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-viz-server-module">xpdan.startup.viz_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-tomo-server-module">xpdan.startup.tomo_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-qoi-server-module">xpdan.startup.qoi_server module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#xpdan-startup-intensity-server-module">xpdan.startup.intensity_server module</a></li>
 </ul>
 </li>
 </ul>
@@ -326,6 +329,65 @@ the map used by the experimental databroker if possible</p></li>
 <code class="docutils literal notranslate"><span class="pre">[b&quot;an&quot;,</span> <span class="pre">b&quot;raw&quot;]</span></code></p></li>
 <li><p><strong>outbound_proxy_address</strong> (<em>str, optional</em>) – The address and port of the zmq proxy. Defaults to
 <code class="docutils literal notranslate"><span class="pre">glbl_dict[&quot;outbound_proxy_address&quot;]</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="xpdan-startup-tomo-server-module">
+<span id="tomo-server"></span><h2>xpdan.startup.tomo_server module<a class="headerlink" href="#xpdan-startup-tomo-server-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="xpdan-startup-qoi-server-module">
+<span id="qoi-server"></span><h2>xpdan.startup.qoi_server module<a class="headerlink" href="#xpdan-startup-qoi-server-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-xpdan.startup.qoi_server"></span><dl class="function">
+<dt id="xpdan.startup.qoi_server.run_main">
+<code class="descclassname">xpdan.startup.qoi_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.startup.qoi_server.run_server">
+<code class="descclassname">xpdan.startup.qoi_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start up the QOI server</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>bytes or list of bytes, optional</em>) – The Publisher channels to listen to. Defaults to
+<code class="docutils literal notranslate"><span class="pre">[b&quot;an&quot;,</span> <span class="pre">b&quot;raw&quot;]</span></code></p></li>
+<li><p><strong>outbound_proxy_address</strong> (<em>str, optional</em>) – The address and port of the zmq proxy. Defaults to
+<code class="docutils literal notranslate"><span class="pre">glbl_dict[&quot;outbound_proxy_address&quot;]</span></code></p></li>
+<li><p><strong>inbound_proxy_address</strong> (<em>str, optional</em>) – The inbound ip address for the ZMQ server. Defaults to the value
+from the global dict</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="xpdan-startup-intensity-server-module">
+<span id="intensity-server"></span><h2>xpdan.startup.intensity_server module<a class="headerlink" href="#xpdan-startup-intensity-server-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-xpdan.startup.intensity_server"></span><dl class="function">
+<dt id="xpdan.startup.intensity_server.run_main">
+<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="xpdan.startup.intensity_server.run_server">
+<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>positions=()</em>, <em>stage='integration'</em>, <em>x_name='q'</em>, <em>y_name='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start up server for extracting single intensities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>bytes or list of bytes, optional</em>) – The Publisher channels to listen to. Defaults to
+<code class="docutils literal notranslate"><span class="pre">[b&quot;an&quot;,</span> <span class="pre">b&quot;raw&quot;]</span></code></p></li>
+<li><p><strong>outbound_proxy_address</strong> (<em>str, optional</em>) – The address and port of the zmq proxy. Defaults to
+<code class="docutils literal notranslate"><span class="pre">glbl_dict[&quot;outbound_proxy_address&quot;]</span></code></p></li>
+<li><p><strong>inbound_proxy_address</strong> (<em>str, optional</em>) – The inbound ip address for the ZMQ server. Defaults to the value
+from the global dict</p></li>
+<li><p><strong>positions</strong> (<em>list of float</em>) – The positions to track</p></li>
+<li><p><strong>stage</strong> (<em>str</em>) – The analysis stage to use for the data</p></li>
+<li><p><strong>x_name</strong> (<em>str</em>) – The name of the pattern independent variable (<code class="docutils literal notranslate"><span class="pre">q</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span></code> for example)</p></li>
+<li><p><strong>y_name</strong> (<em>str</em>) – The name of the pattern dependent variable (<code class="docutils literal notranslate"><span class="pre">mean</span></code> or <code class="docutils literal notranslate"><span class="pre">gr</span></code> for example)</p></li>
 </ul>
 </dd>
 </dl>

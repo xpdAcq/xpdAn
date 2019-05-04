@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>xpdan.startup.qoi_server &mdash; xpdAn  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> xpdAn
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../using_servers.html">Using Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../post_analysis.html">Post Analysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../xpdan.html">xpdan package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">xpdAn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>xpdan.startup.qoi_server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for xpdan.startup.qoi_server</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">fire</span>
+<span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="k">import</span> <span class="n">install_qt_kicker</span>
+<span class="kn">from</span> <span class="nn">rapidz</span> <span class="k">import</span> <span class="n">move_to_first</span><span class="p">,</span> <span class="n">Stream</span>
+<span class="kn">from</span> <span class="nn">rapidz.link</span> <span class="k">import</span> <span class="n">link</span>
+<span class="kn">from</span> <span class="nn">shed</span> <span class="k">import</span> <span class="n">SimpleToEventStream</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.qoi</span> <span class="k">import</span> <span class="n">amorphsivity_fem</span><span class="p">,</span> <span class="n">amorphsivity_tem</span>
+<span class="kn">from</span> <span class="nn">xpdan.pipelines.to_event_model</span> <span class="k">import</span> <span class="n">to_event_stream_with_ind</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.core</span> <span class="k">import</span> <span class="n">RunRouter</span><span class="p">,</span> <span class="n">StripDepVar</span>
+<span class="kn">from</span> <span class="nn">xpdan.vend.callbacks.zmq</span> <span class="k">import</span> <span class="n">RemoteDispatcher</span><span class="p">,</span> <span class="n">Publisher</span>
+<span class="kn">from</span> <span class="nn">xpdconf.conf</span> <span class="k">import</span> <span class="n">glbl_dict</span>
+<span class="kn">from</span> <span class="nn">xpdtools.pipelines.qoi</span> <span class="k">import</span> <span class="n">amorphsivity_pipeline</span>
+
+
+<div class="viewcode-block" id="run_server"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.qoi_server.run_server">[docs]</a><span class="k">def</span> <span class="nf">run_server</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;outbound_proxy_address&quot;</span><span class="p">],</span>
+    <span class="n">inbound_proxy_address</span><span class="o">=</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s2">&quot;inbound_proxy_address&quot;</span><span class="p">],</span>
+    <span class="n">_publisher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start up the QOI server</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prefix : bytes or list of bytes, optional</span>
+<span class="sd">        The Publisher channels to listen to. Defaults to</span>
+<span class="sd">        ``[b&quot;an&quot;, b&quot;raw&quot;]``</span>
+<span class="sd">    outbound_proxy_address : str, optional</span>
+<span class="sd">        The address and port of the zmq proxy. Defaults to</span>
+<span class="sd">        ``glbl_dict[&quot;outbound_proxy_address&quot;]``</span>
+<span class="sd">    inbound_proxy_address : str, optional</span>
+<span class="sd">        The inbound ip address for the ZMQ server. Defaults to the value</span>
+<span class="sd">        from the global dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;an&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="n">outbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="n">install_qt_kicker</span><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">loop</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_publisher</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span><span class="n">inbound_proxy_address</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s2">&quot;qoi&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">an_with_ind_pub</span> <span class="o">=</span> <span class="n">_publisher</span>
+
+    <span class="n">raw_source</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">()</span>
+
+    <span class="c1"># create amorphous pipeline</span>
+    <span class="n">amorphous_ns</span> <span class="o">=</span> <span class="n">link</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span><span class="n">amorphsivity_fem</span><span class="p">,</span> <span class="n">amorphsivity_pipeline</span><span class="p">,</span> <span class="n">amorphsivity_tem</span><span class="p">],</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">Stream</span><span class="p">(),</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
+    <span class="c1"># Combine the data outputs with the raw independent data</span>
+    <span class="n">amorphous_ns</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">to_event_stream_with_ind</span><span class="p">(</span>
+            <span class="n">move_to_first</span><span class="p">(</span><span class="n">raw_source</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">StripDepVar</span><span class="p">())),</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">node</span>
+                <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">amorphous_ns</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">SimpleToEventStream</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">publisher</span><span class="o">=</span><span class="n">an_with_ind_pub</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">rr</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">y</span><span class="p">:</span> <span class="n">raw_source</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;analysis_stage&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;raw&quot;</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">y</span><span class="p">:</span> <span class="n">amorphous_ns</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;analysis_stage&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pdf&quot;</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting QOI Server&quot;</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="run_main"><a class="viewcode-back" href="../../../xpdan.startup.html#xpdan.startup.qoi_server.run_main">[docs]</a><span class="k">def</span> <span class="nf">run_main</span><span class="p">():</span>
+    <span class="n">fire</span><span class="o">.</span><span class="n">Fire</span><span class="p">(</span><span class="n">run_server</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run_main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Author
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -8,6 +8,8 @@ names = [
     "analysis_server",
     "qoi_server",
     "tomo_server",
+    'peak_server',
+    'intensity_server',
 ]
 
 entry_points = {

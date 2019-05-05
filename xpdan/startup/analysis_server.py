@@ -148,14 +148,11 @@ def create_analysis_pipeline(
 
 
 def diffraction_router(
-    start, diffraction_dets, inbound_proxy_address, order=order, **kwargs
+    start, diffraction_dets, xrd_namespace,
 ):
     # This does not support concurrent radiograms and diffractograms
     # If there are diffraction detectors in the list, this is diffraction
     if any(d in diffraction_dets for d in start["detectors"]):
-        xrd_namespace = create_analysis_pipeline(
-            order, inbound_proxy_address=inbound_proxy_address, **kwargs
-        )
         print('analyzing as diffraction')
         return lambda *x: xrd_namespace["raw_source"].emit(x)
 
@@ -264,21 +261,16 @@ def run_server(
     install_qt_kicker(loop=d.loop)
 
     if zscore:
-        rr = RunRouter(
-            [diffraction_router],
-            order=z_score_order,
-            diffraction_dets=diffraction_dets,
-            inbound_proxy_address=inbound_proxy_address,
-            **kwargs
-        )
+        _order = z_score_order
     else:
-        rr = RunRouter(
-            [diffraction_router],
-            order=order,
-            diffraction_dets=diffraction_dets,
-            inbound_proxy_address=inbound_proxy_address,
-            **kwargs
-        )
+        _order = order
+    rr = RunRouter(
+        [diffraction_router],
+        xrd_namespace=create_analysis_pipeline(
+            order=_order,
+            inbound_proxy_address=inbound_proxy_address, **kwargs
+        ), diffraction_dets=diffraction_dets
+    )
 
     rr2 = RunRouter(
         [radiogram_router],

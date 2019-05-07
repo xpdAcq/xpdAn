@@ -4,6 +4,27 @@
 
 .. current developments
 
+v0.8.0
+====================
+
+**Added:**
+
+* ``xpdan.startup.instensity_server`` for tracking positions in 1D patterns
+* peak position and width server
+* intensity server to setup.py
+* ``stage_blacklist`` to analysis server, allowing for speedups by not passing
+  large arrays back to the proxy.
+* ``xpdan.vend.callbacks.mpl_plotting.SavePlots`` callback for saving plots
+  when a scan is finished
+* ``save_folder`` kwarg for viz server. If provided save figures
+
+**Fixed:**
+
+* ``analysis_server`` kwargs are properly passed
+* analysis server reuses diffraction pipeline (getting rid of memory issues)
+
+
+
 v0.7.0
 ====================
 

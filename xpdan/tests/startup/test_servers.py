@@ -6,6 +6,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 from shed.simple import SimpleFromEventStream
 
 import bluesky.plans as bp
@@ -80,7 +81,8 @@ def test_portable_db_run_server(tmpdir, proxy, RE, hw):
             assert os.path.exists(os.path.join(fn, f"{k}/{kk}.json"))
 
 
-def test_viz_run_server(tmpdir, proxy, RE, hw):
+@pytest.mark.parametrize('save_folder', [None, True])
+def test_viz_run_server(tmpdir, proxy, RE, hw, save_folder):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
@@ -120,7 +122,11 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
     threading.Thread(target=delayed_sigint, args=(10,)).start()
     try:
         print("running server")
-        viz_run_server(handlers={"NPY_SEQ": NumpySeqHandler})
+        if save_folder:
+            viz_run_server(handlers={"NPY_SEQ": NumpySeqHandler},
+                           save_folder=tmpdir)
+        else:
+            viz_run_server(handlers={"NPY_SEQ": NumpySeqHandler})
 
     except KeyboardInterrupt:
         print("finished server")
@@ -129,9 +135,12 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
 
     # make certain we opened some figs
     assert plt.get_fignums()
+    if save_folder:
+        assert len(os.listdir(tmpdir)) == 2
 
 
-def test_analysis_run_server(tmpdir, proxy, RE, hw):
+@pytest.mark.parametrize('stage_blacklist', [(), ('mask',)])
+def test_analysis_run_server(tmpdir, proxy, RE, hw, stage_blacklist):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
@@ -151,14 +160,19 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        analysis_run_server(diffraction_dets=["img"])
+        analysis_run_server(diffraction_dets=["img"],
+                            _publisher=lambda *x: L.append(x),
+                            stage_blacklist=stage_blacklist)
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    if stage_blacklist:
+        assert not [n for n, d in L if n=='start' and d['analysis_stage'] in stage_blacklist]
 
 
 def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw, db):

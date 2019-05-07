@@ -6,6 +6,7 @@ from matplotlib.colors import SymLogNorm
 from xpdan.vend.callbacks.best_effort import BestEffortCallback
 from xpdan.vend.callbacks.broker import LiveImage
 from xpdan.vend.callbacks.core import RunRouter
+from xpdan.vend.callbacks.mpl_plotting import SavePlots
 from xpdan.vend.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
 from xpdview.callbacks import LiveWaterfall
@@ -30,6 +31,7 @@ def run_server(
     handlers=None,
     prefix=None,
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
+    save_folder=None,
 ):
     """Start up the visualization server
 
@@ -68,13 +70,17 @@ def run_server(
         lambda x: LiveWaterfall(),
     ]
     if Live3DView:
-        func_l.append(lambda x: Live3DView() if 'tomo' in x['analysis_stage'] else None)
+        func_l.append(
+            lambda x: Live3DView() if "tomo" in x["analysis_stage"] else None
+        )
     func_l.append(
         lambda x: BestEffortCallback(table_enabled=False, overplot=False)
     )
     rr = RunRouter(func_l)
 
     d.subscribe(rr)
+    if save_folder:
+        d.subscribe(SavePlots(save_folder))
     print("Starting Viz Server")
     d.start()
 

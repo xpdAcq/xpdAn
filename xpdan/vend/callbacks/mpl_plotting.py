@@ -4,6 +4,7 @@ import matplotlib.colors as mcolors
 from cycler import cycler
 import numpy as np
 import warnings
+import os
 
 from .core import CallbackBase, get_obj_fields
 
@@ -565,3 +566,17 @@ def plot_peak_stats(peak_stats, ax=None):
     legend = ax.legend(loc='best')
     arts.update({'points': points, 'vlines': vlines, 'legend': legend})
     return arts
+
+
+class SavePlots(CallbackBase):
+    def __init__(self, folder):
+        self.folder = folder
+        os.makedirs(self.folder, exist_ok=True)
+
+    def start(self, doc):
+        self.uid = doc["uid"]
+
+    def stop(self, doc):
+        for i in plt.get_figlabels():
+            fig = plt.figure(i)
+            fig.savefig(os.path.join(self.folder, f"{self.uid}_{i}.png"))

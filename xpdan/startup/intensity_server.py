@@ -16,6 +16,7 @@ def run_server(
     stage="integration",
     x_name="q",
     y_name="mean",
+    plot_graph=None,
 ):
     """Start up server for extracting single intensities
 
@@ -35,13 +36,14 @@ def run_server(
     stage : str
         The analysis stage to use for the data
     x_name : str
-        The name of the pattern independent variable (``q`` or ``r`` for example)
+        The name of the pattern independent variable (``q`` or ``r`` for
+        example)
     y_name : str
-        The name of the pattern dependent variable (``mean`` or ``gr`` for example)
-
-    Returns
-    -------
-
+        The name of the pattern dependent variable (``mean`` or ``gr`` for
+        example)
+    plot_graph : None or str, optional
+        If a string save a plot of the graph to that file, if None don't.
+        Defaults to None
     """
     if prefix is None:
         prefix = [b"an", b"raw"]
@@ -82,6 +84,9 @@ def run_server(
 
     z = move_to_first(source2.starmap(StripDepVar()))
     to_event_stream_with_ind(z, tes, publisher=pub)
+
+    if plot_graph:
+        tes.visualize(plot_graph, dpi="600", ranksep=".1")
 
     rr = RunRouter(
         [

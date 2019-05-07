@@ -17,6 +17,7 @@ def run_server(
     stage="integration",
     x_name="q",
     y_name="mean",
+    plot_graph=None,
 ):
     """Start up server for extracting single intensities
 
@@ -42,10 +43,9 @@ def run_server(
     y_name : str
         The name of the pattern dependent variable (``mean`` or ``gr`` for
         example)
-
-    Returns
-    -------
-
+    plot_graph : None or str, optional
+        If a string save a plot of the graph to that file, if None don't.
+        Defaults to None
     """
     if prefix is None:
         prefix = [b"an", b"raw"]
@@ -74,8 +74,17 @@ def run_server(
             q.map(lambda x, y: np.argmin(np.abs(x - y)), upper_bound),
             emit_on=0,
         ).starmap(lambda x, y, yy: x[y:yy])
-        peak_position = y_range.map(find_peaks).pluck(0).map(lambda x: x if len(x)==1 else 0)
-        peak_width = y_range.zip(peak_position).starmap(peak_widths).pluck(0).map(lambda x: x[0] if len(x)==1 else 0)
+        peak_position = (
+            y_range.map(find_peaks)
+            .pluck(0)
+            .map(lambda x: x if len(x) == 1 else 0)
+        )
+        peak_width = (
+            y_range.zip(peak_position)
+            .starmap(peak_widths)
+            .pluck(0)
+            .map(lambda x: x[0] if len(x) == 1 else 0)
+        )
         positions.append(peak_position)
         peak_wdths.append(peak_width)
 
@@ -88,6 +97,8 @@ def run_server(
 
     z = move_to_first(source2.starmap(StripDepVar()))
     to_event_stream_with_ind(z, tes, publisher=pub)
+    if plot_graph:
+        tes.visualize(plot_graph, dpi="600", ranksep=".1")
 
     rr = RunRouter(
         [

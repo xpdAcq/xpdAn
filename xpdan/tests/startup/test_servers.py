@@ -519,7 +519,8 @@ def test_intensity_run_server(tmpdir, proxy, RE, hw):
     try:
         print("running server")
         intensity_run_server(
-            positions=[3], stage="raw", _publisher=lambda *x: L.append(x)
+            positions=[3], stage="raw", x_name='x', y_name='y',
+            _publisher=lambda *x: L.append(x)
         )
 
     except KeyboardInterrupt:
@@ -559,7 +560,8 @@ def test_peak_run_server(tmpdir, proxy, RE, hw):
     try:
         print("running server")
         peak_run_server(
-            x_ranges=[3, 7], stage="raw", _publisher=lambda *x: L.append(x)
+            x_ranges=[3, 7], x_name='x', y_name='y',
+            stage="raw", _publisher=lambda *x: L.append(x)
         )
 
     except KeyboardInterrupt:

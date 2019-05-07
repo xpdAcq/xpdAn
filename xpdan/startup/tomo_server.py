@@ -271,7 +271,7 @@ def run_server(
     kwargs : dict
         kwargs passed to the reconstruction, for instance ``algorithm`` could
         be passed in with the associated tomopy algorithm to change the
-        reconstructgion algorithm from gridrec to something else.
+        reconstruction algorithm from fbp to something else.
 
     """
     print(kwargs)

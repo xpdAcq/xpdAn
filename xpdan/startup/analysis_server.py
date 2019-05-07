@@ -222,6 +222,8 @@ def run_server(
         ``glbl_dict["diffraction_dets"]``, pulled from the config file.
     prefix : bytes or list of bytes, optional
         Which publisher(s) to listen to for data. Defaults to ``b"raw"``
+    inbound_prefix : bytees
+        The prefix for outbound data, defaults to ``b"an"``
     zscore : bool, optional
         If True compute Z-Score, defaults to False
     stage_blacklist : list of str, optional

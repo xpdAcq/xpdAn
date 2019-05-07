@@ -318,7 +318,7 @@ data</p>
 
 <dl class="function">
 <dt id="xpdan.startup.viz_server.run_server">
-<code class="descclassname">xpdan.startup.viz_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>handlers=None</em>, <em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.startup.viz_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>handlers=None</em>, <em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>save_folder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up the visualization server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -373,7 +373,7 @@ from the global dict</p></li>
 
 <dl class="function">
 <dt id="xpdan.startup.intensity_server.run_server">
-<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>positions=()</em>, <em>stage='integration'</em>, <em>x_name='q'</em>, <em>y_name='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>positions=()</em>, <em>stage='integration'</em>, <em>x_name='q'</em>, <em>y_name='mean'</em>, <em>plot_graph=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up server for extracting single intensities</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -386,8 +386,12 @@ from the global dict</p></li>
 from the global dict</p></li>
 <li><p><strong>positions</strong> (<em>list of float</em>) – The positions to track</p></li>
 <li><p><strong>stage</strong> (<em>str</em>) – The analysis stage to use for the data</p></li>
-<li><p><strong>x_name</strong> (<em>str</em>) – The name of the pattern independent variable (<code class="docutils literal notranslate"><span class="pre">q</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span></code> for example)</p></li>
-<li><p><strong>y_name</strong> (<em>str</em>) – The name of the pattern dependent variable (<code class="docutils literal notranslate"><span class="pre">mean</span></code> or <code class="docutils literal notranslate"><span class="pre">gr</span></code> for example)</p></li>
+<li><p><strong>x_name</strong> (<em>str</em>) – The name of the pattern independent variable (<code class="docutils literal notranslate"><span class="pre">q</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span></code> for
+example)</p></li>
+<li><p><strong>y_name</strong> (<em>str</em>) – The name of the pattern dependent variable (<code class="docutils literal notranslate"><span class="pre">mean</span></code> or <code class="docutils literal notranslate"><span class="pre">gr</span></code> for
+example)</p></li>
+<li><p><strong>plot_graph</strong> (<em>None or str, optional</em>) – If a string save a plot of the graph to that file, if None don’t.
+Defaults to None</p></li>
 </ul>
 </dd>
 </dl>

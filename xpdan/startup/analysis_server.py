@@ -108,7 +108,7 @@ def create_analysis_pipeline(
     order,
     stage_blacklist=(),
     publisher=Publisher(glbl_dict["inbound_proxy_address"], prefix=b"an"),
-    **kwargs
+    **kwargs,
 ):
     """Create the analysis pipeline from an list of chunks and pipeline kwargs
 
@@ -141,10 +141,9 @@ def create_analysis_pipeline(
                 node
                 for node in namespace.values()
                 if isinstance(node, SimpleToEventStream)
-                and getattr(node, "analysis_stage", None)
-                not in stage_blacklist
+                and node.md.get("analysis_stage", None) not in stage_blacklist
             ],
-            publisher=publisher
+            publisher=publisher,
         )
     )
 
@@ -160,11 +159,7 @@ def diffraction_router(start, diffraction_dets, xrd_namespace):
 
 
 def radiogram_router(
-    start,
-    radiogram_dets,
-    order=radiogram_order,
-    publisher=None,
-    **kwargs
+    start, radiogram_dets, order=radiogram_order, publisher=None, **kwargs
 ):
     # This does not support concurrent radiograms and diffractograms
     # If there are diffraction detectors in the list, this is diffraction
@@ -177,7 +172,7 @@ def radiogram_router(
             order,
             publisher=publisher,
             resets=start.get("motors", None),
-            **kwargs
+            **kwargs,
         )
         print("analyzing as radiogram")
         return lambda *x: radiogram_namespace["raw_source"].emit(x)
@@ -192,11 +187,11 @@ def run_server(
     diffraction_dets=glbl_dict["diffraction_dets"],
     radiogram_dets=glbl_dict["radiogram_dets"],
     prefix=b"raw",
-    inbound_prefix=b'an',
+    inbound_prefix=b"an",
     zscore=False,
     stage_blacklist=(),
-    _publisher=None
-    **kwargs
+    _publisher=None,
+    **kwargs,
 ):
     """Function to run the analysis server.
 
@@ -289,8 +284,8 @@ def run_server(
         xrd_namespace=create_analysis_pipeline(
             order=_order,
             stage_blacklist=stage_blacklist,
-            publisher=publisher
-            **kwargs
+            publisher=publisher,
+            **kwargs,
         ),
         diffraction_dets=diffraction_dets,
     )
@@ -299,8 +294,8 @@ def run_server(
         [radiogram_router],
         order=radiogram_order,
         radiogram_dets=radiogram_dets,
-        publisher=publisher
-        **kwargs
+        publisher=publisher,
+        **kwargs,
     )
 
     d.subscribe(rr)

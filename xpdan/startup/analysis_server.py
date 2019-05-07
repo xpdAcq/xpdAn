@@ -105,7 +105,10 @@ def start_analysis(save=True, vis=True, **kwargs):
 
 
 def create_analysis_pipeline(
-    order, inbound_proxy_address=glbl_dict["inbound_proxy_address"], **kwargs
+    order,
+    stage_blacklist=(),
+    publisher=Publisher(glbl_dict["inbound_proxy_address"], prefix=b"an"),
+    **kwargs,
 ):
     """Create the analysis pipeline from an list of chunks and pipeline kwargs
 
@@ -129,7 +132,6 @@ def create_analysis_pipeline(
 
     # do inspection of pipeline for ToEventModel nodes, maybe?
     # for analyzed data with independent data (vis and save)
-    an_with_ind_pub = Publisher(inbound_proxy_address, prefix=b"an")
     # strip the dependant vars form the raw data
     raw_stripped = move_to_first(source.starmap(StripDepVar()))
     namespace.update(
@@ -139,44 +141,40 @@ def create_analysis_pipeline(
                 node
                 for node in namespace.values()
                 if isinstance(node, SimpleToEventStream)
+                and node.md.get("analysis_stage", None) not in stage_blacklist
             ],
-            publisher=an_with_ind_pub
+            publisher=publisher,
         )
     )
 
     return namespace
 
 
-def diffraction_router(
-    start, diffraction_dets, inbound_proxy_address, order=order, **kwargs
-):
+def diffraction_router(start, diffraction_dets, xrd_namespace):
     # This does not support concurrent radiograms and diffractograms
     # If there are diffraction detectors in the list, this is diffraction
     if any(d in diffraction_dets for d in start["detectors"]):
-        xrd_namespace = create_analysis_pipeline(
-            order, inbound_proxy_address=inbound_proxy_address, **kwargs
-        )
-        print('analyzing as diffraction')
+        print("analyzing as diffraction")
         return lambda *x: xrd_namespace["raw_source"].emit(x)
 
 
 def radiogram_router(
-    start,
-    radiogram_dets,
-    inbound_proxy_address,
-    order=radiogram_order,
-    **kwargs
+    start, radiogram_dets, order=radiogram_order, publisher=None, **kwargs
 ):
     # This does not support concurrent radiograms and diffractograms
     # If there are diffraction detectors in the list, this is diffraction
-    if (any(d in radiogram_dets for d in start["detectors"])
-            and 'sc_flat_field_uid' in start and 'sc_dk_field_uid' in start):
+    if (
+        any(d in radiogram_dets for d in start["detectors"])
+        and "sc_flat_field_uid" in start
+        and "sc_dk_field_uid" in start
+    ):
         radiogram_namespace = create_analysis_pipeline(
-            order, inbound_proxy_address=inbound_proxy_address,
-            resets=start.get('motors', None),
-            **kwargs
+            order,
+            publisher=publisher,
+            resets=start.get("motors", None),
+            **kwargs,
         )
-        print('analyzing as radiogram')
+        print("analyzing as radiogram")
         return lambda *x: radiogram_namespace["raw_source"].emit(x)
 
 
@@ -189,8 +187,11 @@ def run_server(
     diffraction_dets=glbl_dict["diffraction_dets"],
     radiogram_dets=glbl_dict["radiogram_dets"],
     prefix=b"raw",
+    inbound_prefix=b"an",
     zscore=False,
-    **kwargs
+    stage_blacklist=(),
+    _publisher=None,
+    **kwargs,
 ):
     """Function to run the analysis server.
 
@@ -221,8 +222,17 @@ def run_server(
         ``glbl_dict["diffraction_dets"]``, pulled from the config file.
     prefix : bytes or list of bytes, optional
         Which publisher(s) to listen to for data. Defaults to ``b"raw"``
+    inbound_prefix : bytees
+        The prefix for outbound data, defaults to ``b"an"``
     zscore : bool, optional
         If True compute Z-Score, defaults to False
+    stage_blacklist : list of str, optional
+        Stages to not publish. Defaults to an empty tuple. Not publishing
+        some of the large memory datasets (mask, mask_overlay,
+        bg_corrected_img, dark_sub) could speed up data processing by cutting
+        down on process communication times. Note that blacklisting some of
+        these (particularly mask and dark_sub) will cause some files to not be
+        written out by the ``save_server``.
     kwargs : Any
         Keyword arguments passed into the pipeline creation. These are used
         to modify the data processing.
@@ -253,6 +263,10 @@ def run_server(
     print(kwargs)
     db.prepare_hook = lambda x, y: copy.deepcopy(y)
 
+    publisher = Publisher(inbound_proxy_address, prefix=inbound_prefix)
+
+    if _publisher:
+        publisher = _publisher
     if "db" not in kwargs:
         kwargs.update(db=db)
 
@@ -264,28 +278,26 @@ def run_server(
     install_qt_kicker(loop=d.loop)
 
     if zscore:
-        rr = RunRouter(
-            [diffraction_router],
-            order=z_score_order,
-            diffraction_dets=diffraction_dets,
-            inbound_proxy_address=inbound_proxy_address,
-            **kwargs
-        )
+        _order = z_score_order
     else:
-        rr = RunRouter(
-            [diffraction_router],
-            order=order,
-            diffraction_dets=diffraction_dets,
-            inbound_proxy_address=inbound_proxy_address,
-            **kwargs
-        )
+        _order = order
+    rr = RunRouter(
+        [diffraction_router],
+        xrd_namespace=create_analysis_pipeline(
+            order=_order,
+            stage_blacklist=stage_blacklist,
+            publisher=publisher,
+            **kwargs,
+        ),
+        diffraction_dets=diffraction_dets,
+    )
 
     rr2 = RunRouter(
         [radiogram_router],
         order=radiogram_order,
         radiogram_dets=radiogram_dets,
-        inbound_proxy_address=inbound_proxy_address,
-        **kwargs
+        publisher=publisher,
+        **kwargs,
     )
 
     d.subscribe(rr)

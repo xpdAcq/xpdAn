@@ -5,6 +5,7 @@ from xpdconf.conf import glbl_dict
 from shed.simple import *
 from rapidz import Stream, zip as szip
 import numpy as np
+from scipy.signal import peak_widths, find_peaks
 
 
 def run_server(
@@ -12,7 +13,7 @@ def run_server(
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
     inbound_proxy_address=glbl_dict["inbound_proxy_address"],
     _publisher=None,
-    positions=(),
+    x_ranges=(),
     stage="integration",
     x_name="q",
     y_name="mean",
@@ -31,8 +32,9 @@ def run_server(
     inbound_proxy_address : str, optional
         The inbound ip address for the ZMQ server. Defaults to the value
         from the global dict
-    positions : list of float
-        The positions to track
+    x_ranges : list of float
+        The windows for peak selection (``[lower_one, upper_one, lower_two,
+        upper_two]``)
     stage : str
         The analysis stage to use for the data
     x_name : str
@@ -56,35 +58,45 @@ def run_server(
         pub = _publisher
 
     source1 = Stream()
+    source2 = Stream()
 
     q = SimpleFromEventStream("event", ("data", x_name), upstream=source1)
     iq = SimpleFromEventStream(
         "event", ("data", y_name), upstream=source1, principle=True
     )
+    windows = list(zip(x_ranges[::2], x_ranges[1::2]))
 
-    vals = [
-        iq.combine_latest(
-            q.map(lambda x, y: np.argmin(np.abs(x - y)), pos), emit_on=0
-        ).starmap(lambda x, y: x[y])
-        for pos in positions
-    ]
+    positions = []
+    peak_wdths = []
+    for lower_bound, upper_bound in windows:
+        y_range = iq.combine_latest(
+            q.map(lambda x, y: np.argmin(np.abs(x - y)), lower_bound),
+            q.map(lambda x, y: np.argmin(np.abs(x - y)), upper_bound),
+            emit_on=0,
+        ).starmap(lambda x, y, yy: x[y:yy])
+        peak_position = (
+            y_range.map(find_peaks)
+            .pluck(0)
+            .map(lambda x: x if len(x) == 1 else 0)
+        )
+        peak_width = (
+            y_range.zip(peak_position)
+            .starmap(peak_widths)
+            .pluck(0)
+            .map(lambda x: x[0] if len(x) == 1 else 0)
+        )
+        positions.append(peak_position)
+        peak_wdths.append(peak_width)
 
-    # Work around for janky tuple handling (fixed in new API)
-    if len(vals) > 1:
-        out = szip(*vals)
-    else:
-        out = vals[0]
     tes = SimpleToEventStream(
-        out,
-        [f"peak_{x_name}={p}" for p in positions],
-        analysis_stage="peak_intensity",
+        szip(*[p.pluck(0) for p in positions], *peak_wdths),
+        [f"peak_pos_{x_name}={l}-{u}" for l, u in windows]
+        + [f"peak_width_{x_name}={l}-{u}" for l, u in windows],
+        analysis_stage="peak_positions",
     )
-
-    source2 = Stream()
 
     z = move_to_first(source2.starmap(StripDepVar()))
     to_event_stream_with_ind(z, tes, publisher=pub)
-
     if plot_graph:
         tes.visualize(plot_graph, dpi="600", ranksep=".1")
 
@@ -99,7 +111,7 @@ def run_server(
         ]
     )
     rd.subscribe(rr)
-    print("Starting Intensity Server")
+    print("Starting Peak Server")
     rd.start()
 
 

@@ -23,7 +23,8 @@ from xpdtools.pipelines.tomo import (
     tomo_prep,
     tomo_pipeline_piecewise,
     tomo_pipeline_theta,
-    tomo_stack_2D)
+    tomo_stack_2D,
+)
 
 pencil_order = [
     pencil_tomo,
@@ -61,6 +62,7 @@ class PencilTomoCallback(CallbackBase):
         self.dim_names = []
         self.translation = None
         self.rotation = None
+        self.stack = None
         self.sources = []
         self.kwargs = kwargs
 
@@ -73,7 +75,7 @@ class PencilTomoCallback(CallbackBase):
         ]
         self.translation = doc["tomo"]["translation"]
         self.rotation = doc["tomo"]["rotation"]
-        self.stack = doc['tomo'].get('stack', None)
+        self.stack = doc["tomo"].get("stack", None)
 
     def descriptor(self, doc):
         # TODO: only listen to primary stream
@@ -86,11 +88,15 @@ class PencilTomoCallback(CallbackBase):
                     [doc["object_keys"][n] for n in self.dim_names]
                 )
             )
-               and doc["data_keys"][n]["dtype"] in ["number", "array", "integer"]
+            and doc["data_keys"][n]["dtype"] in ["number", "array", "integer"]
         }
 
         # Only compute QOIs on scalars, currently
-        qois = [k for k, v in dep_shapes.items() if len(v) == 0 and k != "PDFConfig"]
+        qois = [
+            k
+            for k, v in dep_shapes.items()
+            if len(v) == 0 and k != "PDFConfig"
+        ]
         rotation_pos = self.start_doc["motors"].index(self.rotation)
         translation_pos = self.start_doc["motors"].index(self.translation)
 
@@ -110,11 +116,9 @@ class PencilTomoCallback(CallbackBase):
         ]
         for p in pipelines:
             nodes = [p["rec_tes"], p["sinogram_tes"]]
-            if 'rec_3D_tes' in p:
+            if "rec_3D_tes" in p:
                 nodes += [p["rec_3D_tes"]]
-            to_event_stream_no_ind(
-                *nodes, publisher=self.publisher
-            )
+            to_event_stream_no_ind(*nodes, publisher=self.publisher)
 
         for s in self.sources:
             s.emit(("start", self.start_doc))
@@ -224,7 +228,7 @@ class FullFieldTomoCallback(Retrieve):
 def tomo_callback_factory(doc, publisher, handler_reg, **kwargs):
     # TODO: Eventually extract from plan hints?
     if doc.get("tomo", {}).get("type", None) == "pencil":
-        if len(doc['motors']) == 2:
+        if len(doc["motors"]) == 2:
             po = pencil_order
         else:
             po = d3_pencil_order
@@ -267,7 +271,7 @@ def run_server(
     kwargs : dict
         kwargs passed to the reconstruction, for instance ``algorithm`` could
         be passed in with the associated tomopy algorithm to change the
-        reconstructgion algorithm from gridrec to something else.
+        reconstruction algorithm from fbp to something else.
 
     """
     print(kwargs)

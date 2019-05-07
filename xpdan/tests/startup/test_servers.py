@@ -6,6 +6,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 from shed.simple import SimpleFromEventStream
 
 import bluesky.plans as bp
@@ -21,6 +22,7 @@ from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.qoi_server import run_server as qoi_run_server
 from xpdan.startup.tomo_server import run_server as tomo_run_server
 from xpdan.startup.intensity_server import run_server as intensity_run_server
+from xpdan.startup.peak_server import run_server as peak_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
@@ -80,7 +82,8 @@ def test_portable_db_run_server(tmpdir, proxy, RE, hw):
             assert os.path.exists(os.path.join(fn, f"{k}/{kk}.json"))
 
 
-def test_viz_run_server(tmpdir, proxy, RE, hw):
+@pytest.mark.parametrize("save_folder", [None, True])
+def test_viz_run_server(tmpdir, proxy, RE, hw, save_folder):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
@@ -120,7 +123,12 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
     threading.Thread(target=delayed_sigint, args=(10,)).start()
     try:
         print("running server")
-        viz_run_server(handlers={"NPY_SEQ": NumpySeqHandler})
+        if save_folder:
+            viz_run_server(
+                handlers={"NPY_SEQ": NumpySeqHandler}, save_folder=tmpdir
+            )
+        else:
+            viz_run_server(handlers={"NPY_SEQ": NumpySeqHandler})
 
     except KeyboardInterrupt:
         print("finished server")
@@ -129,9 +137,12 @@ def test_viz_run_server(tmpdir, proxy, RE, hw):
 
     # make certain we opened some figs
     assert plt.get_fignums()
+    if save_folder:
+        assert len(os.listdir(tmpdir)) == 2
 
 
-def test_analysis_run_server(tmpdir, proxy, RE, hw):
+@pytest.mark.parametrize("stage_blacklist", [(), ("mask",)])
+def test_analysis_run_server(tmpdir, proxy, RE, hw, stage_blacklist):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
@@ -151,17 +162,31 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        analysis_run_server(diffraction_dets=["img"])
+        analysis_run_server(
+            diffraction_dets=["img"],
+            _publisher=lambda *x: L.append(x),
+            stage_blacklist=stage_blacklist,
+        )
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    if stage_blacklist:
+        assert not [
+            d
+            for n, d in L
+            if n == "start" and d["analysis_stage"] in stage_blacklist
+        ]
 
 
-def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw, db):
+@pytest.mark.parametrize("stage_blacklist", [(), ("normalized_img",)])
+def test_analysis_run_server_radiogram(
+    tmpdir, proxy, RE, hw, db, stage_blacklist
+):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
         print("killing")
@@ -193,14 +218,27 @@ def test_analysis_run_server_radiogram(tmpdir, proxy, RE, hw, db):
 
     # send the message that will eventually kick us out of the server loop
     threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
     try:
         print("running server")
-        analysis_run_server(db=db, radiogram_dets=["img"])
+        analysis_run_server(
+            db=db,
+            radiogram_dets=["img"],
+            _publisher=lambda *x: L.append(x),
+            stage_blacklist=stage_blacklist,
+        )
 
     except KeyboardInterrupt:
         print("finished server")
     exp_proc.terminate()
     exp_proc.join()
+    assert L
+    if stage_blacklist:
+        assert not [
+            d
+            for n, d in L
+            if n == "start" and d["analysis_stage"] in stage_blacklist
+        ]
 
 
 def test_db_run_server(tmpdir, proxy, RE, hw, db):
@@ -335,7 +373,7 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm="fbp")
 
     except KeyboardInterrupt:
         print("finished server")
@@ -395,7 +433,7 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm="fbp")
 
     except KeyboardInterrupt:
         print("finished server")
@@ -444,7 +482,7 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm='fbp')
+        tomo_run_server(_publisher=lambda *x: L.append(x), algorithm="fbp")
 
     except KeyboardInterrupt:
         print("finished server")
@@ -480,9 +518,51 @@ def test_intensity_run_server(tmpdir, proxy, RE, hw):
     L = []
     try:
         print("running server")
-        intensity_run_server(positions=[3],
-                             stage='raw',
-                             _publisher=lambda *x: L.append(x))
+        intensity_run_server(
+            positions=[3], stage="raw", x_name='x', y_name='y',
+            _publisher=lambda *x: L.append(x)
+        )
+
+    except KeyboardInterrupt:
+        print("finished server")
+    exp_proc.terminate()
+    exp_proc.join()
+    # assert L
+
+
+def test_peak_run_server(tmpdir, proxy, RE, hw):
+    def delayed_sigint(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("killing")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def run_exp(delay):  # pragma: no cover
+        time.sleep(delay)
+        print("running exp")
+
+        p = Publisher(proxy[0], prefix=b"raw")
+        RE.subscribe(p)
+        z = np.zeros(10)
+        z[3] = 1
+        z[4] = 2
+        z[5] = 1
+        x = SynSignal(func=lambda: np.arange(10), name="x")
+        y = SynSignal(func=lambda: z, name="y")
+        RE(bp.count([x, y], md=dict(analysis_stage="raw")))
+
+    # Run experiment in another process (after delay)
+    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc.start()
+
+    # send the message that will eventually kick us out of the server loop
+    threading.Thread(target=delayed_sigint, args=(10,)).start()
+    L = []
+    try:
+        print("running server")
+        peak_run_server(
+            x_ranges=[3, 7], x_name='x', y_name='y',
+            stage="raw", _publisher=lambda *x: L.append(x)
+        )
 
     except KeyboardInterrupt:
         print("finished server")

@@ -36,17 +36,18 @@ start up ipython.
    # tell the publisher to send the data to the proxy with the prefix of raw
    # (which stands for raw data)
    pub = Publisher(glbl_dict['inbound_proxy_address'], prefix=b'raw')
+   
+   # leave this line out if you don't need to change the darks
+   better_dark_uid = 'hello world'
+   # get the header
+   hdr = db[-1]
 
-    better_dark_uid = 'hello world'
-    # get the header
-    hdr = db[-1]
-
-    for name, doc in hdr.documents():
-        # change the dark
-        if name == 'start':
-            doc.update(sc_dk_field_uid=better_dark_uid)
-        # send the data to the analysis system
-        pub((name, doc))
+   for name, doc in hdr.documents():
+       # change the dark (leave these lines out if not changing the dark)
+       if name == 'start':
+           doc.update(sc_dk_field_uid=better_dark_uid)
+       # send the data to the analysis system
+       pub(name, doc)
 
 
 Running on a new proxy

@@ -188,16 +188,17 @@ start up ipython.</p>
 <span class="c1"># (which stands for raw data)</span>
 <span class="n">pub</span> <span class="o">=</span> <span class="n">Publisher</span><span class="p">(</span><span class="n">glbl_dict</span><span class="p">[</span><span class="s1">&#39;inbound_proxy_address&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;raw&#39;</span><span class="p">)</span>
 
- <span class="n">better_dark_uid</span> <span class="o">=</span> <span class="s1">&#39;hello world&#39;</span>
- <span class="c1"># get the header</span>
- <span class="n">hdr</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># leave this line out if you don&#39;t need to change the darks</span>
+<span class="n">better_dark_uid</span> <span class="o">=</span> <span class="s1">&#39;hello world&#39;</span>
+<span class="c1"># get the header</span>
+<span class="n">hdr</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
- <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">hdr</span><span class="o">.</span><span class="n">documents</span><span class="p">():</span>
-     <span class="c1"># change the dark</span>
-     <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>
-         <span class="n">doc</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sc_dk_field_uid</span><span class="o">=</span><span class="n">better_dark_uid</span><span class="p">)</span>
-     <span class="c1"># send the data to the analysis system</span>
-     <span class="n">pub</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">hdr</span><span class="o">.</span><span class="n">documents</span><span class="p">():</span>
+    <span class="c1"># change the dark (leave these lines out if not changing the dark)</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sc_dk_field_uid</span><span class="o">=</span><span class="n">better_dark_uid</span><span class="p">)</span>
+    <span class="c1"># send the data to the analysis system</span>
+    <span class="n">pub</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="running-on-a-new-proxy">

@@ -181,6 +181,9 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw, stage_blacklist):
             for n, d in L
             if n == "start" and d["analysis_stage"] in stage_blacklist
         ]
+    starts = [doc for name, doc in L if name == 'start']
+    for s in starts:
+        assert "original_start_time" in s
 
 
 @pytest.mark.parametrize("stage_blacklist", [(), ("normalized_img",)])

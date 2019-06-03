@@ -214,9 +214,14 @@
 </div>
 <div class="section" id="module-xpdan.callbacks">
 <span id="xpdan-callbacks-module"></span><span id="xpdan-callbacks"></span><h2>xpdan.callbacks module<a class="headerlink" href="#module-xpdan.callbacks" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="xpdan.callbacks.SAVER_MAP">
+<code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SAVER_MAP</code><em class="property"> = {'calib': &lt;class 'xpdan.callbacks.SaveCalib'&gt;, 'dark_sub': &lt;class 'xpdan.callbacks.SaveTiff'&gt;, 'fq': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;, 'integration': &lt;class 'xpdan.callbacks.SaveIntensity'&gt;, 'mask': &lt;class 'xpdan.callbacks.SaveMask'&gt;, 'pdf': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;, 'raw': &lt;class 'xpdan.callbacks.SaveMeta'&gt;, 'sq': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;}</em><a class="headerlink" href="#xpdan.callbacks.SAVER_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="class">
 <dt id="xpdan.callbacks.SaveBaseClass">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveBaseClass</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveBaseClass</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.vend.callbacks.core.Retrieve</span></code></p>
 <p>Base class for saving files with human friendly file names.</p>
 <p>For each document this class applys a format to the string based off the
@@ -241,116 +246,116 @@ document is received</p></li>
 in the template.</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveBaseClass.descriptor">
-<code class="descname">descriptor</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.descriptor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">descriptor</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.descriptor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="xpdan.callbacks.SaveBaseClass.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="xpdan.callbacks.SaveBaseClass.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.start" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass.start" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SaveCalib">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveCalib</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveCalib</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving pyFAI calibrations as <code class="docutils literal notranslate"><span class="pre">.poni</span></code> files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveCalib.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveCalib.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveCalib.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SaveIntensity">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveIntensity</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveIntensity</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving Q and tth <code class="docutils literal notranslate"><span class="pre">.chi</span></code> files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveIntensity.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveIntensity.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveIntensity.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SaveMask">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveMask</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveMask</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving masks as <code class="docutils literal notranslate"><span class="pre">.msk</span></code> and <code class="docutils literal notranslate"><span class="pre">.npy</span></code> files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveMask.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMask.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMask.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SaveMeta">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveMeta</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveMeta</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving metadata files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveMeta.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="xpdan.callbacks.SaveMeta.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.start" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveMeta.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveMeta.start" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SavePDFgetx3">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SavePDFgetx3</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SavePDFgetx3</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving PDF, F(Q), S(Q) files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SavePDFgetx3.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SavePDFgetx3.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SavePDFgetx3.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.SaveTiff">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">SaveTiff</code><span class="sig-paren">(</span><em>template</em>, <em>handler_reg</em>, <em>root_map=None</em>, <em>base_folders=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveTiff</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xpdan.callbacks.SaveBaseClass" title="xpdan.callbacks.SaveBaseClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">xpdan.callbacks.SaveBaseClass</span></code></a></p>
 <p>Callback for saving Tiff files</p>
 <dl class="method">
 <dt id="xpdan.callbacks.SaveTiff.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveTiff.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveTiff.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="xpdan.callbacks.StartStopCallback">
-<em class="property">class </em><code class="descclassname">xpdan.callbacks.</code><code class="descname">StartStopCallback</code><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">StartStopCallback</code><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluesky.callbacks.core.CallbackBase</span></code></p>
 <p>Print the time for analysis</p>
 <dl class="method">
 <dt id="xpdan.callbacks.StartStopCallback.event">
-<code class="descname">event</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.event" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.event" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="xpdan.callbacks.StartStopCallback.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.start" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.start" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="xpdan.callbacks.StartStopCallback.stop">
-<code class="descname">stop</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.stop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">stop</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#StartStopCallback.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.StartStopCallback.stop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -358,9 +363,14 @@ in the template.</p>
 </div>
 <div class="section" id="module-xpdan.data_reduction">
 <span id="xpdan-data-reduction-module"></span><h2>xpdan.data_reduction module<a class="headerlink" href="#module-xpdan.data_reduction" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="xpdan.data_reduction.int_save_kwargs">
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">int_save_kwargs</code><em class="property"> = {'db': &lt;databroker._core.Broker object&gt;, 'mask_kwargs': {'alpha': 3.0, 'bs_width': 13, 'edge': 30, 'lower_thresh': 0.0, 'tri_offset': 13, 'v_asym': 0}, 'save_dir': '/home/travis/acqsim/xpdUser/tiff_base'}</em><a class="headerlink" href="#xpdan.data_reduction.int_save_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="function">
 <dt id="xpdan.data_reduction.integrate_and_save">
-<code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>polarization_factor=0.99</em>, <em>mask_setting='default'</em>, <em>mask_kwargs={'alpha': 3.0</em>, <em>'bs_width': 13</em>, <em>'edge': 30</em>, <em>'lower_thresh': 0.0</em>, <em>'tri_offset': 13</em>, <em>'v_asym': 0}</em>, <em>image_data_key='pe1_image'</em>, <em>pdf_config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">integrate_and_save</code><span class="sig-paren">(</span><em class="sig-param">headers</em>, <em class="sig-param">*</em>, <em class="sig-param">db=&lt;databroker._core.Broker object&gt;</em>, <em class="sig-param">save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em class="sig-param">visualize=False</em>, <em class="sig-param">polarization_factor=0.99</em>, <em class="sig-param">mask_setting='default'</em>, <em class="sig-param">mask_kwargs={'alpha': 3.0</em>, <em class="sig-param">'bs_width': 13</em>, <em class="sig-param">'edge': 30</em>, <em class="sig-param">'lower_thresh': 0.0</em>, <em class="sig-param">'tri_offset': 13</em>, <em class="sig-param">'v_asym': 0}</em>, <em class="sig-param">image_data_key='pe1_image'</em>, <em class="sig-param">pdf_config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for given list of headers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -398,7 +408,7 @@ Please refer to documentation for more details</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction.integrate_and_save_last">
-<code class="descclassname">xpdan.data_reduction.</code><code class="descname">integrate_and_save_last</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">integrate_and_save_last</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for the latest header</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -436,7 +446,7 @@ Please refer to documentation for more details</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction.save_last_tiff">
-<code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_last_tiff</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_last_tiff" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">save_last_tiff</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_last_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -455,7 +465,7 @@ the function call (keyword only argument)</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction.save_tiff">
-<code class="descclassname">xpdan.data_reduction.</code><code class="descname">save_tiff</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db=&lt;databroker._core.Broker object&gt;</em>, <em>save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em>visualize=False</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_tiff" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">save_tiff</code><span class="sig-paren">(</span><em class="sig-param">headers</em>, <em class="sig-param">*</em>, <em class="sig-param">db=&lt;databroker._core.Broker object&gt;</em>, <em class="sig-param">save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em class="sig-param">visualize=False</em>, <em class="sig-param">image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.save_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -472,12 +482,17 @@ the function call (keyword only argument)</p></li>
 </dl>
 </dd></dl>
 
+<dl class="data">
+<dt id="xpdan.data_reduction.tiff_save_kwargs">
+<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">tiff_save_kwargs</code><em class="property"> = {'db': &lt;databroker._core.Broker object&gt;, 'save_dir': '/home/travis/acqsim/xpdUser/tiff_base'}</em><a class="headerlink" href="#xpdan.data_reduction.tiff_save_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-xpdan.data_reduction_core">
 <span id="xpdan-data-reduction-core-module"></span><h2>xpdan.data_reduction_core module<a class="headerlink" href="#module-xpdan.data_reduction_core" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="xpdan.data_reduction_core.integrate_and_save">
-<code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">integrate_and_save</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db</em>, <em>save_dir</em>, <em>visualize=False</em>, <em>polarization_factor=0.99</em>, <em>mask_setting='default'</em>, <em>mask_kwargs=None</em>, <em>image_data_key='pe1_image'</em>, <em>pdf_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction_core.</code><code class="sig-name descname">integrate_and_save</code><span class="sig-paren">(</span><em class="sig-param">headers</em>, <em class="sig-param">*</em>, <em class="sig-param">db</em>, <em class="sig-param">save_dir</em>, <em class="sig-param">visualize=False</em>, <em class="sig-param">polarization_factor=0.99</em>, <em class="sig-param">mask_setting='default'</em>, <em class="sig-param">mask_kwargs=None</em>, <em class="sig-param">image_data_key='pe1_image'</em>, <em class="sig-param">pdf_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for given list of headers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -515,7 +530,7 @@ Please refer to documentation for more details</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction_core.integrate_and_save_last">
-<code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">integrate_and_save_last</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save_last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction_core.</code><code class="sig-name descname">integrate_and_save_last</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#integrate_and_save_last"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.integrate_and_save_last" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integrate and save dark subtracted images for the latest header</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -553,7 +568,7 @@ Please refer to documentation for more details</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction_core.save_last_tiff">
-<code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">save_last_tiff</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_last_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_last_tiff" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction_core.</code><code class="sig-name descname">save_last_tiff</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_last_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_last_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -572,7 +587,7 @@ the function call (keyword only argument)</p></li>
 
 <dl class="function">
 <dt id="xpdan.data_reduction_core.save_tiff">
-<code class="descclassname">xpdan.data_reduction_core.</code><code class="descname">save_tiff</code><span class="sig-paren">(</span><em>headers</em>, <em>*</em>, <em>db</em>, <em>save_dir</em>, <em>visualize=False</em>, <em>image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_tiff" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.data_reduction_core.</code><code class="sig-name descname">save_tiff</code><span class="sig-paren">(</span><em class="sig-param">headers</em>, <em class="sig-param">*</em>, <em class="sig-param">db</em>, <em class="sig-param">save_dir</em>, <em class="sig-param">visualize=False</em>, <em class="sig-param">image_data_key='pe1_image'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/data_reduction_core.html#save_tiff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.data_reduction_core.save_tiff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save images obtained from dataBroker as tiff format files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -594,7 +609,7 @@ the function call (keyword only argument)</p></li>
 <span id="xpdan-db-utils-module"></span><h2>xpdan.db_utils module<a class="headerlink" href="#module-xpdan.db_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="xpdan.db_utils.query_background">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_background</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">query_background</code><span class="sig-paren">(</span><em class="sig-param">docs</em>, <em class="sig-param">db</em>, <em class="sig-param">schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_background"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_background" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get background data from databroker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -615,7 +630,7 @@ the function call (keyword only argument)</p></li>
 
 <dl class="function">
 <dt id="xpdan.db_utils.query_dark">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_dark</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_dark" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">query_dark</code><span class="sig-paren">(</span><em class="sig-param">docs</em>, <em class="sig-param">db</em>, <em class="sig-param">schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_dark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_dark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get dark data from databroker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -636,7 +651,7 @@ the function call (keyword only argument)</p></li>
 
 <dl class="function">
 <dt id="xpdan.db_utils.query_flat_field">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">query_flat_field</code><span class="sig-paren">(</span><em>docs</em>, <em>db</em>, <em>schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_flat_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_flat_field" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">query_flat_field</code><span class="sig-paren">(</span><em class="sig-param">docs</em>, <em class="sig-param">db</em>, <em class="sig-param">schema=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#query_flat_field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.query_flat_field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get flat_field data from databroker</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -657,7 +672,7 @@ the function call (keyword only argument)</p></li>
 
 <dl class="function">
 <dt id="xpdan.db_utils.scan_diff">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">scan_diff</code><span class="sig-paren">(</span><em>hdrs</em>, <em>verbose=True</em>, <em>blacklist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_diff" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">scan_diff</code><span class="sig-paren">(</span><em class="sig-param">hdrs</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">blacklist=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_diff" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata differences between scans in hdrs list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -679,7 +694,7 @@ scans. The values are the results for each header.</p>
 
 <dl class="function">
 <dt id="xpdan.db_utils.scan_summary">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">scan_summary</code><span class="sig-paren">(</span><em>hdrs</em>, <em>fields=None</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_summary" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">scan_summary</code><span class="sig-paren">(</span><em class="sig-param">hdrs</em>, <em class="sig-param">fields=None</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#scan_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.scan_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide one line summaries of headers</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -703,7 +718,7 @@ defaults to None</p></li>
 
 <dl class="function">
 <dt id="xpdan.db_utils.sort_scans_by_hdr_key">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">sort_scans_by_hdr_key</code><span class="sig-paren">(</span><em>hdrs</em>, <em>key</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#sort_scans_by_hdr_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.sort_scans_by_hdr_key" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">sort_scans_by_hdr_key</code><span class="sig-paren">(</span><em class="sig-param">hdrs</em>, <em class="sig-param">key</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#sort_scans_by_hdr_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.sort_scans_by_hdr_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>In a list of hdrs, group the scans by header-key.</p>
 <p>Use this function to find all the scans in the list of headers that
 have a particular key value, such as ‘sample_name’=’Ni’</p>
@@ -733,7 +748,7 @@ For example a search over ‘sample_name’ might return
 
 <dl class="function">
 <dt id="xpdan.db_utils.temporal_prox">
-<code class="descclassname">xpdan.db_utils.</code><code class="descname">temporal_prox</code><span class="sig-paren">(</span><em>res</em>, <em>docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#temporal_prox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.temporal_prox" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.db_utils.</code><code class="sig-name descname">temporal_prox</code><span class="sig-paren">(</span><em class="sig-param">res</em>, <em class="sig-param">docs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/db_utils.html#temporal_prox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.db_utils.temporal_prox" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -745,11 +760,11 @@ For example a search over ‘sample_name’ might return
 <p>Enhanced databroker with fuzzy search options</p>
 <dl class="class">
 <dt id="xpdan.fuzzybroker.FuzzyBroker">
-<em class="property">class </em><code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">FuzzyBroker</code><span class="sig-paren">(</span><em>mds</em>, <em>reg=None</em>, <em>plugins=None</em>, <em>filters=None</em>, <em>auto_register=True</em>, <em>external_fetchers=None</em>, <em>name=None</em>, <em>event_sources=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.fuzzybroker.</code><code class="sig-name descname">FuzzyBroker</code><span class="sig-paren">(</span><em class="sig-param">mds</em>, <em class="sig-param">reg=None</em>, <em class="sig-param">plugins=None</em>, <em class="sig-param">filters=None</em>, <em class="sig-param">auto_register=True</em>, <em class="sig-param">external_fetchers=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">event_sources=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">databroker._core.Broker</span></code></p>
 <dl class="method">
 <dt id="xpdan.fuzzybroker.FuzzyBroker.beamtime_dates">
-<code class="descname">beamtime_dates</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">beamtime_dates</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get info for each beamtime</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -770,7 +785,7 @@ For example a search over ‘sample_name’ might return
 
 <dl class="method">
 <dt id="xpdan.fuzzybroker.FuzzyBroker.fuzzy_search">
-<code class="descname">fuzzy_search</code><span class="sig-paren">(</span><em>keys</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fuzzy_search</code><span class="sig-paren">(</span><em class="sig-param">keys</em>, <em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker for given keys</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -800,7 +815,7 @@ filter the databroker to shorten the total search time</p>
 
 <dl class="method">
 <dt id="xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search">
-<code class="descname">fuzzy_set_search</code><span class="sig-paren">(</span><em>key</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fuzzy_set_search</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the most similar set of values to the search string.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -834,7 +849,7 @@ return only one header with Alice as the PI.</p>
 
 <dl class="method">
 <dt id="xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search">
-<code class="descname">super_fuzzy_search</code><span class="sig-paren">(</span><em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">super_fuzzy_search</code><span class="sig-paren">(</span><em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#FuzzyBroker.super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.FuzzyBroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -866,7 +881,7 @@ shorten the total search time.</p>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.beamtime_dates">
-<code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">beamtime_dates</code><span class="sig-paren">(</span><em>db</em>, <em>keys=('beamtime_uid'</em>, <em>'bt_safN'</em>, <em>'facility'</em>, <em>'beamline')</em>, <em>beamtime_key='beamtime_uid'</em>, <em>print_results=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.fuzzybroker.</code><code class="sig-name descname">beamtime_dates</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">keys=('beamtime_uid'</em>, <em class="sig-param">'bt_safN'</em>, <em class="sig-param">'facility'</em>, <em class="sig-param">'beamline')</em>, <em class="sig-param">beamtime_key='beamtime_uid'</em>, <em class="sig-param">print_results=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#beamtime_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.beamtime_dates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get info for each beamtime</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -888,7 +903,7 @@ shorten the total search time.</p>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.fuzzy_search">
-<code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">fuzzy_search</code><span class="sig-paren">(</span><em>db</em>, <em>keys</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.fuzzybroker.</code><code class="sig-name descname">fuzzy_search</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">keys</em>, <em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker for given keys</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -915,7 +930,7 @@ shorten the total search time.</p>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.fuzzy_set_search">
-<code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">fuzzy_set_search</code><span class="sig-paren">(</span><em>db</em>, <em>key</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.fuzzybroker.</code><code class="sig-name descname">fuzzy_set_search</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">key</em>, <em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#fuzzy_set_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.fuzzy_set_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the most similar set of values to the search string.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -948,7 +963,7 @@ shorten the total search time.</p>
 
 <dl class="function">
 <dt id="xpdan.fuzzybroker.super_fuzzy_search">
-<code class="descclassname">xpdan.fuzzybroker.</code><code class="descname">super_fuzzy_search</code><span class="sig-paren">(</span><em>db</em>, <em>search_string</em>, <em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.fuzzybroker.</code><code class="sig-name descname">super_fuzzy_search</code><span class="sig-paren">(</span><em class="sig-param">db</em>, <em class="sig-param">search_string</em>, <em class="sig-param">size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/fuzzybroker.html#super_fuzzy_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.fuzzybroker.super_fuzzy_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fuzzy search a databroker</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -976,6 +991,11 @@ shorten the total search time.</p>
 <div class="section" id="module-xpdan.glbl">
 <span id="xpdan-glbl-module"></span><h2>xpdan.glbl module<a class="headerlink" href="#module-xpdan.glbl" title="Permalink to this headline">¶</a></h2>
 <p>Shim for loading the glbl_dict from xpdconf</p>
+<dl class="data">
+<dt id="xpdan.glbl.an_glbl">
+<code class="sig-prename descclassname">xpdan.glbl.</code><code class="sig-name descname">an_glbl</code><em class="property"> = {'_dark_dict_list': [], '_exclude_dir': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml'], '_export_tar_dir': ['/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/userScripts'], 'all_folders': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml', '/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/config_base/yml/samples', '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', '/home/travis/acqsim/xpdUser/tiff_base', '/home/travis/acqsim/xpdUser/userScripts', '/home/travis/acqsim/xpdUser/Import', '/home/travis/acqsim/xpdUser/userAnalysis'], 'allfolders': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml', '/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/config_base/yml/samples', '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', '/home/travis/acqsim/xpdUser/tiff_base', '/home/travis/acqsim/xpdUser/userScripts', '/home/travis/acqsim/xpdUser/Import', '/home/travis/acqsim/xpdUser/userAnalysis'], 'archive_base_dir': '/home/travis/acqsim/archive/.userbeamtimearchive', 'archive_base_dir_name': '.userbeamtimearchive', 'archive_dir': '/home/travis/acqsim/archive/.userbeamtimearchive/2019', 'archive_root_dir': '/home/travis/acqsim/archive', 'auto_dark': True, 'auto_load_calib': True, 'base': '/home/travis/acqsim', 'base_dir': '/home/travis/acqsim', 'beamline_host_name': ['xf28id2-ws2', 'xf28id2-ws3'], 'beamline_id': '28-id-2', 'blconfig_dir': '/home/travis/acqsim/xpdConfig', 'blconfig_dir_name': 'xpdConfig', 'blconfig_name': 'XPD_beamline_config.yml', 'blconfig_path': '/home/travis/acqsim/xpdConfig/XPD_beamline_config.yml', 'bt_dir': '/home/travis/acqsim/xpdUser/config_base/yml', 'calib_config_name': 'xpdAcq_calib_info.yml', 'config_base': '/home/travis/acqsim/xpdUser/config_base', 'dark_field_key': 'sc_dk_field_uid', 'dark_window': 3000, 'det_image_field': ['pe1_image', 'pe2_image', 'pe3_image'], 'diffraction_dets': ['pe1c', 'pe1', 'pe2c', 'pe2'], 'dk_window': 3000, 'exp_broker_name': 'temp', 'exp_db': &lt;databroker._core.Broker object&gt;, 'facility': 'sim', 'frame_acq_time': 0.1, 'frame_acquire_time': 0.1, 'glbl_yaml_name': 'glbl.yml', 'glbl_yaml_path': '/home/travis/acqsim/xpdUser/config_base/yml/glbl.yml', 'group': 'sim', 'home': '/home/travis/acqsim/xpdUser', 'home_dir': '/home/travis/acqsim/xpdUser', 'home_dir_name': 'xpdUser', 'image_fields': ['pe1_image', 'pe2_image', 'pe3_image'], 'import_dir': '/home/travis/acqsim/xpdUser/Import', 'inbound_proxy_address': '127.0.0.1:5567', 'is_simulation': True, 'mask_kwargs': {'alpha': 3.0, 'bs_width': 13, 'edge': 30, 'lower_thresh': 0.0, 'tri_offset': 13, 'v_asym': 0}, 'outbound_proxy_address': '127.0.0.1:5568', 'owner': 'sim', 'radiogram_dets': ['blackfly_det'], 'radiograph_names': ['blackfly_det'], 'sample_dir': '/home/travis/acqsim/xpdUser/config_base/yml/samples', 'scanplan_dir': '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', 'shutter_conf': {'close': 0, 'open': 60}, 'shutter_control': True, 'shutter_sleep': 0.1, 'simulation': True, 'tiff_base': '/home/travis/acqsim/xpdUser/tiff_base', 'user_backup_dir_name': '2019', 'userscript_dir': '/home/travis/acqsim/xpdUser/userScripts', 'usrAnalysis_dir': '/home/travis/acqsim/xpdUser/userAnalysis', 'usrScript_dir': '/home/travis/acqsim/xpdUser/userScripts', 'xpdconfig': '/home/travis/acqsim/xpdConfig', 'yaml_dir': '/home/travis/acqsim/xpdUser/config_base/yml'}</em><a class="headerlink" href="#xpdan.glbl.an_glbl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="xpdan-glbl-gen-module">
 <h2>xpdan.glbl_gen module<a class="headerlink" href="#xpdan-glbl-gen-module" title="Permalink to this headline">¶</a></h2>

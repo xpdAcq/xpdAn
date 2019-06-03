@@ -196,12 +196,12 @@
 <span id="db-server"></span><h2>xpdan.startup.db_server module<a class="headerlink" href="#xpdan-startup-db-server-module" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-xpdan.startup.db_server"></span><dl class="function">
 <dt id="xpdan.startup.db_server.run_main">
-<code class="descclassname">xpdan.startup.db_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/db_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.db_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.db_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/db_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.db_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.db_server.run_server">
-<code class="descclassname">xpdan.startup.db_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>data_dir</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>prefix=b'an'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/db_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.db_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.db_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">data_dir</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">prefix=b'an'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/db_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.db_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up the databroker server for analyzed data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -219,14 +219,24 @@
 </div>
 <div class="section" id="xpdan-startup-portable-db-server-module">
 <span id="portable-db-server"></span><h2>xpdan.startup.portable_db_server module<a class="headerlink" href="#xpdan-startup-portable-db-server-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-xpdan.startup.portable_db_server"></span><dl class="function">
+<span class="target" id="module-xpdan.startup.portable_db_server"></span><dl class="data">
+<dt id="xpdan.startup.portable_db_server.load_script">
+<code class="sig-prename descclassname">xpdan.startup.portable_db_server.</code><code class="sig-name descname">load_script</code><em class="property"> = &quot;\nfrom databroker import Broker\nimport yaml\ndbs = {}\nfor yaml_file in ['raw', 'an']:\n    with open(f'{yaml_file}.yml', 'r') as f:\n        dbs[yaml_file] = Broker.from_config(yaml.load(f))\n&quot;</em><a class="headerlink" href="#xpdan.startup.portable_db_server.load_script" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
+<dt id="xpdan.startup.portable_db_server.portable_template">
+<code class="sig-prename descclassname">xpdan.startup.portable_db_server.</code><code class="sig-name descname">portable_template</code><em class="property"> = &quot;description: '{0} database'\nmetadatastore:\n    module: 'databroker.headersource.sqlite'\n    class: 'MDS'\n    config:\n        directory: '{0}'\n        timezone: 'US/Eastern'\nassets:\n    module: 'databroker.assets.sqlite'\n    class: 'Registry'\n    config:\n        dbpath: '{0}/assets.sqlite'\nhandlers:\n    NPY_SEQ:\n        module: 'ophyd.sim'\n        class: 'NumpySeqHandler'\n&quot;</em><a class="headerlink" href="#xpdan.startup.portable_db_server.portable_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="xpdan.startup.portable_db_server.run_main">
-<code class="descclassname">xpdan.startup.portable_db_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/portable_db_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.portable_db_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.portable_db_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/portable_db_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.portable_db_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.portable_db_server.run_server">
-<code class="descclassname">xpdan.startup.portable_db_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>folder</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>prefix=None</em>, <em>handlers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/portable_db_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.portable_db_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.portable_db_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">folder</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">handlers=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/portable_db_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.portable_db_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up the portable databroker server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -247,14 +257,19 @@ the map used by the experimental databroker if possible</p></li>
 <div class="section" id="xpdan-startup-save-server-module">
 <span id="save-server"></span><h2>xpdan.startup.save_server module<a class="headerlink" href="#xpdan-startup-save-server-module" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-xpdan.startup.save_server"></span><p>Module for setting up and running a file saving server</p>
+<dl class="data">
+<dt id="xpdan.startup.save_server.base_template">
+<code class="sig-prename descclassname">xpdan.startup.save_server.</code><code class="sig-name descname">base_template</code><em class="property"> = '{base_folder}/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[original_start_uid]:.6}_{event[seq_num]:04d}{ext}'</em><a class="headerlink" href="#xpdan.startup.save_server.base_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="function">
 <dt id="xpdan.startup.save_server.run_main">
-<code class="descclassname">xpdan.startup.save_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.save_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.save_server.run_server">
-<code class="descclassname">xpdan.startup.save_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>base_folders=None</em>, <em>template='{base_folder}/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[original_start_uid]:.6}_{event[seq_num]:04d}{ext}'</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>db_names=('exp_db'</em>, <em>'an_db')</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.save_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">base_folders=None</em>, <em class="sig-param">template='{base_folder}/{folder_prefix}/{start[analysis_stage]}/{start[sample_name]}_{human_timestamp}_{__independent_vars__}{start[original_start_uid]:.6}_{event[seq_num]:04d}{ext}'</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">db_names=('exp_db'</em>, <em class="sig-param">'an_db')</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run file saving server</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -286,7 +301,7 @@ loading handlers</p></li>
 
 <dl class="function">
 <dt id="xpdan.startup.save_server.setup_saver">
-<code class="descclassname">xpdan.startup.save_server.</code><code class="descname">setup_saver</code><span class="sig-paren">(</span><em>doc</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#setup_saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.setup_saver" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.save_server.</code><code class="sig-name descname">setup_saver</code><span class="sig-paren">(</span><em class="sig-param">doc</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/save_server.html#setup_saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.save_server.setup_saver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to setup the correct savers, if the correct <code class="docutils literal notranslate"><span class="pre">analysis_stage</span></code>
 is set in the start doc then a saver will be created appropriate for the
 data</p>
@@ -306,19 +321,46 @@ data</p>
 </div>
 <div class="section" id="xpdan-startup-viz-server-module">
 <span id="viz-server"></span><h2>xpdan.startup.viz_server module<a class="headerlink" href="#xpdan-startup-viz-server-module" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-xpdan.startup.viz_server"></span><dl class="function">
+<span class="target" id="module-xpdan.startup.viz_server"></span><dl class="class">
+<dt id="xpdan.startup.viz_server.Live3DView">
+<em class="property">class </em><code class="sig-prename descclassname">xpdan.startup.viz_server.</code><code class="sig-name descname">Live3DView</code><a class="reference internal" href="_modules/xpdan/mayavi_callbacks.html#Live3DView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.Live3DView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">bluesky.callbacks.core.CallbackBase</span></code></p>
+<p>Callback for visualizing 3D data</p>
+<dl class="method">
+<dt id="xpdan.startup.viz_server.Live3DView.descriptor">
+<code class="sig-name descname">descriptor</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/mayavi_callbacks.html#Live3DView.descriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.Live3DView.descriptor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.startup.viz_server.Live3DView.event">
+<code class="sig-name descname">event</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/mayavi_callbacks.html#Live3DView.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.Live3DView.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="xpdan.startup.viz_server.Live3DView.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><em class="sig-param">doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/mayavi_callbacks.html#Live3DView.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.Live3DView.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="xpdan.startup.viz_server.black_list">
+<code class="sig-prename descclassname">xpdan.startup.viz_server.</code><code class="sig-name descname">black_list</code><em class="property"> = ['mask']</em><a class="headerlink" href="#xpdan.startup.viz_server.black_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="xpdan.startup.viz_server.if_correct_start">
-<code class="descclassname">xpdan.startup.viz_server.</code><code class="descname">if_correct_start</code><span class="sig-paren">(</span><em>callback</em>, <em>start_doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#if_correct_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.if_correct_start" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.viz_server.</code><code class="sig-name descname">if_correct_start</code><span class="sig-paren">(</span><em class="sig-param">callback</em>, <em class="sig-param">start_doc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#if_correct_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.if_correct_start" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.viz_server.run_main">
-<code class="descclassname">xpdan.startup.viz_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.viz_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.viz_server.run_server">
-<code class="descclassname">xpdan.startup.viz_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>handlers=None</em>, <em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>save_folder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.viz_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">handlers=None</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">save_folder=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/viz_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.viz_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up the visualization server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -342,12 +384,12 @@ the map used by the experimental databroker if possible</p></li>
 <span id="qoi-server"></span><h2>xpdan.startup.qoi_server module<a class="headerlink" href="#xpdan-startup-qoi-server-module" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-xpdan.startup.qoi_server"></span><dl class="function">
 <dt id="xpdan.startup.qoi_server.run_main">
-<code class="descclassname">xpdan.startup.qoi_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.qoi_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.qoi_server.run_server">
-<code class="descclassname">xpdan.startup.qoi_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.qoi_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">prefix=None</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">inbound_proxy_address='127.0.0.1:5567'</em>, <em class="sig-param">_publisher=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/qoi_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.qoi_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up the QOI server</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,12 +410,12 @@ from the global dict</p></li>
 <span id="intensity-server"></span><h2>xpdan.startup.intensity_server module<a class="headerlink" href="#xpdan-startup-intensity-server-module" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-xpdan.startup.intensity_server"></span><dl class="function">
 <dt id="xpdan.startup.intensity_server.run_main">
-<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.intensity_server.</code><code class="sig-name descname">run_main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.startup.intensity_server.run_server">
-<code class="descclassname">xpdan.startup.intensity_server.</code><code class="descname">run_server</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>outbound_proxy_address='127.0.0.1:5568'</em>, <em>inbound_proxy_address='127.0.0.1:5567'</em>, <em>_publisher=None</em>, <em>positions=()</em>, <em>stage='integration'</em>, <em>x_name='q'</em>, <em>y_name='mean'</em>, <em>plot_graph=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_server" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">xpdan.startup.intensity_server.</code><code class="sig-name descname">run_server</code><span class="sig-paren">(</span><em class="sig-param">prefix=None</em>, <em class="sig-param">outbound_proxy_address='127.0.0.1:5568'</em>, <em class="sig-param">inbound_proxy_address='127.0.0.1:5567'</em>, <em class="sig-param">_publisher=None</em>, <em class="sig-param">positions=()</em>, <em class="sig-param">stage='integration'</em>, <em class="sig-param">x_name='q'</em>, <em class="sig-param">y_name='mean'</em>, <em class="sig-param">plot_graph=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/startup/intensity_server.html#run_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.startup.intensity_server.run_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start up server for extracting single intensities</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

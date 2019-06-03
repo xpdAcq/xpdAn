@@ -3,6 +3,7 @@
 ./_modules/xpdan/data_reduction_core.html
 ./_modules/xpdan/db_utils.html
 ./_modules/xpdan/fuzzybroker.html
+./_modules/xpdan/mayavi_callbacks.html
 ./_modules/xpdan/pipelines/main.html
 ./_modules/xpdan/pipelines/pipeline_utils.html
 ./_modules/xpdan/startup/db_server.html

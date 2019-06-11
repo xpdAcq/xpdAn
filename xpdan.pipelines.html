@@ -197,11 +197,6 @@
 <code class="sig-prename descclassname">xpdan.pipelines.main.</code><code class="sig-name descname">clear_geo_gen</code><span class="sig-paren">(</span><em class="sig-param">source</em>, <em class="sig-param">geometry_img_shape</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#clear_geo_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.clear_geo_gen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="data">
-<dt id="xpdan.pipelines.main.pipeline_order">
-<code class="sig-prename descclassname">xpdan.pipelines.main.</code><code class="sig-name descname">pipeline_order</code><em class="property"> = [&lt;function start_gen&gt;, &lt;function image_process&gt;, &lt;function calibration&gt;, &lt;function clear_geo_gen&gt;, &lt;function save_cal&gt;, &lt;function scattering_correction&gt;, &lt;function gen_mask&gt;, &lt;function integration&gt;, &lt;function pdf_gen&gt;, &lt;function clear_comp&gt;]</em><a class="headerlink" href="#xpdan.pipelines.main.pipeline_order" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="function">
 <dt id="xpdan.pipelines.main.save_cal">
 <code class="sig-prename descclassname">xpdan.pipelines.main.</code><code class="sig-name descname">save_cal</code><span class="sig-paren">(</span><em class="sig-param">start_timestamp</em>, <em class="sig-param">gen_geo_cal</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/pipelines/main.html#save_cal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.pipelines.main.save_cal" title="Permalink to this definition">¶</a></dt>
@@ -252,11 +247,6 @@
 <dd></dd></dl>
 
 </dd></dl>
-
-<dl class="data">
-<dt id="xpdan.pipelines.pipeline_utils.base_template">
-<code class="sig-prename descclassname">xpdan.pipelines.pipeline_utils.</code><code class="sig-name descname">base_template</code><em class="property"> = '{base_folder}/{folder_prefix}/{analysis_stage}/{raw_start[sample_name]}_{human_timestamp}_[temp_{raw_event[data][temperature]:1.2f}{raw_descriptor[data_keys][temperature][units]}]_[dx_{raw_event[data][diff_x]:1.3f}{raw_descriptor[data_keys][diff_x][units]}]_[dy_{raw_event[data][diff_y]:1.3f}{raw_descriptor[data_keys][diff_y][units]}]_{raw_start[uid]:.6}_{raw_event[seq_num]:04d}{ext}'</em><a class="headerlink" href="#xpdan.pipelines.pipeline_utils.base_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="function">
 <dt id="xpdan.pipelines.pipeline_utils.clear_combine_latest">
@@ -324,11 +314,6 @@ folder_tag</p>
 </div>
 <div class="section" id="module-xpdan.pipelines.save_tiff">
 <span id="xpdan-pipelines-save-tiff-module"></span><h2>xpdan.pipelines.save_tiff module<a class="headerlink" href="#module-xpdan.pipelines.save_tiff" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
-<dt id="xpdan.pipelines.save_tiff.pipeline_order">
-<code class="sig-prename descclassname">xpdan.pipelines.save_tiff.</code><code class="sig-name descname">pipeline_order</code><em class="property"> = [&lt;function start_gen&gt;, &lt;function image_process&gt;, &lt;function save_pipeline&gt;, &lt;function save_tiff&gt;]</em><a class="headerlink" href="#xpdan.pipelines.save_tiff.pipeline_order" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 </div>
 

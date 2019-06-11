@@ -214,11 +214,6 @@
 </div>
 <div class="section" id="module-xpdan.callbacks">
 <span id="xpdan-callbacks-module"></span><span id="xpdan-callbacks"></span><h2>xpdan.callbacks module<a class="headerlink" href="#module-xpdan.callbacks" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
-<dt id="xpdan.callbacks.SAVER_MAP">
-<code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SAVER_MAP</code><em class="property"> = {'calib': &lt;class 'xpdan.callbacks.SaveCalib'&gt;, 'dark_sub': &lt;class 'xpdan.callbacks.SaveTiff'&gt;, 'fq': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;, 'integration': &lt;class 'xpdan.callbacks.SaveIntensity'&gt;, 'mask': &lt;class 'xpdan.callbacks.SaveMask'&gt;, 'pdf': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;, 'raw': &lt;class 'xpdan.callbacks.SaveMeta'&gt;, 'sq': &lt;class 'xpdan.callbacks.SavePDFgetx3'&gt;}</em><a class="headerlink" href="#xpdan.callbacks.SAVER_MAP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="class">
 <dt id="xpdan.callbacks.SaveBaseClass">
 <em class="property">class </em><code class="sig-prename descclassname">xpdan.callbacks.</code><code class="sig-name descname">SaveBaseClass</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">handler_reg</em>, <em class="sig-param">root_map=None</em>, <em class="sig-param">base_folders=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/xpdan/callbacks.html#SaveBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xpdan.callbacks.SaveBaseClass" title="Permalink to this definition">¶</a></dt>
@@ -363,11 +358,6 @@ in the template.</p>
 </div>
 <div class="section" id="module-xpdan.data_reduction">
 <span id="xpdan-data-reduction-module"></span><h2>xpdan.data_reduction module<a class="headerlink" href="#module-xpdan.data_reduction" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
-<dt id="xpdan.data_reduction.int_save_kwargs">
-<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">int_save_kwargs</code><em class="property"> = {'db': &lt;databroker._core.Broker object&gt;, 'mask_kwargs': {'alpha': 3.0, 'bs_width': 13, 'edge': 30, 'lower_thresh': 0.0, 'tri_offset': 13, 'v_asym': 0}, 'save_dir': '/home/travis/acqsim/xpdUser/tiff_base'}</em><a class="headerlink" href="#xpdan.data_reduction.int_save_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="function">
 <dt id="xpdan.data_reduction.integrate_and_save">
 <code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">integrate_and_save</code><span class="sig-paren">(</span><em class="sig-param">headers</em>, <em class="sig-param">*</em>, <em class="sig-param">db=&lt;databroker._core.Broker object&gt;</em>, <em class="sig-param">save_dir='/home/travis/acqsim/xpdUser/tiff_base'</em>, <em class="sig-param">visualize=False</em>, <em class="sig-param">polarization_factor=0.99</em>, <em class="sig-param">mask_setting='default'</em>, <em class="sig-param">mask_kwargs={'alpha': 3.0</em>, <em class="sig-param">'bs_width': 13</em>, <em class="sig-param">'edge': 30</em>, <em class="sig-param">'lower_thresh': 0.0</em>, <em class="sig-param">'tri_offset': 13</em>, <em class="sig-param">'v_asym': 0}</em>, <em class="sig-param">image_data_key='pe1_image'</em>, <em class="sig-param">pdf_config=None</em><span class="sig-paren">)</span><a class="headerlink" href="#xpdan.data_reduction.integrate_and_save" title="Permalink to this definition">¶</a></dt>
@@ -481,11 +471,6 @@ the function call (keyword only argument)</p></li>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="data">
-<dt id="xpdan.data_reduction.tiff_save_kwargs">
-<code class="sig-prename descclassname">xpdan.data_reduction.</code><code class="sig-name descname">tiff_save_kwargs</code><em class="property"> = {'db': &lt;databroker._core.Broker object&gt;, 'save_dir': '/home/travis/acqsim/xpdUser/tiff_base'}</em><a class="headerlink" href="#xpdan.data_reduction.tiff_save_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-xpdan.data_reduction_core">
@@ -991,11 +976,6 @@ shorten the total search time.</p>
 <div class="section" id="module-xpdan.glbl">
 <span id="xpdan-glbl-module"></span><h2>xpdan.glbl module<a class="headerlink" href="#module-xpdan.glbl" title="Permalink to this headline">¶</a></h2>
 <p>Shim for loading the glbl_dict from xpdconf</p>
-<dl class="data">
-<dt id="xpdan.glbl.an_glbl">
-<code class="sig-prename descclassname">xpdan.glbl.</code><code class="sig-name descname">an_glbl</code><em class="property"> = {'_dark_dict_list': [], '_exclude_dir': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml'], '_export_tar_dir': ['/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/userScripts'], 'all_folders': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml', '/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/config_base/yml/samples', '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', '/home/travis/acqsim/xpdUser/tiff_base', '/home/travis/acqsim/xpdUser/userScripts', '/home/travis/acqsim/xpdUser/Import', '/home/travis/acqsim/xpdUser/userAnalysis'], 'allfolders': ['/home/travis/acqsim/xpdUser', '/home/travis/acqsim/xpdConfig', '/home/travis/acqsim/xpdUser/config_base/yml', '/home/travis/acqsim/xpdUser/config_base', '/home/travis/acqsim/xpdUser/config_base/yml/samples', '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', '/home/travis/acqsim/xpdUser/tiff_base', '/home/travis/acqsim/xpdUser/userScripts', '/home/travis/acqsim/xpdUser/Import', '/home/travis/acqsim/xpdUser/userAnalysis'], 'archive_base_dir': '/home/travis/acqsim/archive/.userbeamtimearchive', 'archive_base_dir_name': '.userbeamtimearchive', 'archive_dir': '/home/travis/acqsim/archive/.userbeamtimearchive/2019', 'archive_root_dir': '/home/travis/acqsim/archive', 'auto_dark': True, 'auto_load_calib': True, 'base': '/home/travis/acqsim', 'base_dir': '/home/travis/acqsim', 'beamline_host_name': ['xf28id2-ws2', 'xf28id2-ws3'], 'beamline_id': '28-id-2', 'blconfig_dir': '/home/travis/acqsim/xpdConfig', 'blconfig_dir_name': 'xpdConfig', 'blconfig_name': 'XPD_beamline_config.yml', 'blconfig_path': '/home/travis/acqsim/xpdConfig/XPD_beamline_config.yml', 'bt_dir': '/home/travis/acqsim/xpdUser/config_base/yml', 'calib_config_name': 'xpdAcq_calib_info.yml', 'config_base': '/home/travis/acqsim/xpdUser/config_base', 'dark_field_key': 'sc_dk_field_uid', 'dark_window': 3000, 'det_image_field': ['pe1_image', 'pe2_image', 'pe3_image'], 'diffraction_dets': ['pe1c', 'pe1', 'pe2c', 'pe2'], 'dk_window': 3000, 'exp_broker_name': 'temp', 'exp_db': &lt;databroker._core.Broker object&gt;, 'facility': 'sim', 'frame_acq_time': 0.1, 'frame_acquire_time': 0.1, 'glbl_yaml_name': 'glbl.yml', 'glbl_yaml_path': '/home/travis/acqsim/xpdUser/config_base/yml/glbl.yml', 'group': 'sim', 'home': '/home/travis/acqsim/xpdUser', 'home_dir': '/home/travis/acqsim/xpdUser', 'home_dir_name': 'xpdUser', 'image_fields': ['pe1_image', 'pe2_image', 'pe3_image'], 'import_dir': '/home/travis/acqsim/xpdUser/Import', 'inbound_proxy_address': '127.0.0.1:5567', 'is_simulation': True, 'mask_kwargs': {'alpha': 3.0, 'bs_width': 13, 'edge': 30, 'lower_thresh': 0.0, 'tri_offset': 13, 'v_asym': 0}, 'outbound_proxy_address': '127.0.0.1:5568', 'owner': 'sim', 'radiogram_dets': ['blackfly_det'], 'radiograph_names': ['blackfly_det'], 'sample_dir': '/home/travis/acqsim/xpdUser/config_base/yml/samples', 'scanplan_dir': '/home/travis/acqsim/xpdUser/config_base/yml/scanplans', 'shutter_conf': {'close': 0, 'open': 60}, 'shutter_control': True, 'shutter_sleep': 0.1, 'simulation': True, 'tiff_base': '/home/travis/acqsim/xpdUser/tiff_base', 'user_backup_dir_name': '2019', 'userscript_dir': '/home/travis/acqsim/xpdUser/userScripts', 'usrAnalysis_dir': '/home/travis/acqsim/xpdUser/userAnalysis', 'usrScript_dir': '/home/travis/acqsim/xpdUser/userScripts', 'xpdconfig': '/home/travis/acqsim/xpdConfig', 'yaml_dir': '/home/travis/acqsim/xpdUser/config_base/yml'}</em><a class="headerlink" href="#xpdan.glbl.an_glbl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </div>
 <div class="section" id="xpdan-glbl-gen-module">
 <h2>xpdan.glbl_gen module<a class="headerlink" href="#xpdan-glbl-gen-module" title="Permalink to this headline">¶</a></h2>

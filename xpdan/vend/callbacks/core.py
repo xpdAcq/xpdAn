@@ -627,7 +627,7 @@ class Retrieve(CallbackBase):
         else:
             ev = event
         data = ev["data"]
-        filled = ev["filled"]
+        filled = ev.get("filled", {})
         for k in (
             set(data)
             & fields

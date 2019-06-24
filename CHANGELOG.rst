@@ -4,6 +4,16 @@
 
 .. current developments
 
+v0.8.1
+====================
+
+**Fixed:**
+
+* ``xpdan.vend.callbacks.core.Retrieve`` does the right thing when there is no
+  ``filled`` key
+
+
+
 v0.8.0
 ====================
 

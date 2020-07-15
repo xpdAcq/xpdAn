@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+PDFGETX=$1
+python -m pip install "$PDFGETX"

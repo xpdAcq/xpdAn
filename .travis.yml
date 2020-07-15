@@ -36,7 +36,7 @@ before_install:
   - ./miniconda.sh -b -p ~/mc
   - export PATH=~/mc/bin:$PATH
   - conda config --set always_yes yes --set changeps1 no --set quiet true
-  - conda config --add channels conda-forge
+  - conda config --add channels nsls-ii-forge
   - conda update conda --yes
   - export CONDARC=ci/condarc
   - export MDS_HOST=localhost
@@ -48,7 +48,6 @@ before_install:
   - export FS_DATABASE=test
   - mkdir -p /home/travis/.config/filestore
   - 'echo ''port: 27017'' > /home/travis/.config/filestore/connection.yml'
-
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`

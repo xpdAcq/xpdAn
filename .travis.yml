@@ -57,6 +57,7 @@ install:
 
 script:
   - set -e
+  - source activate testenv
   - coverage run run_tests.py
   - coverage report -m
   - codecov

@@ -53,7 +53,7 @@ before_install:
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
   - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
-  - conda install -n testenv --file requirements/run.txt --file requirements/test.txt --file requirements/doc.txt
+  - conda install -n testenv --file requirements/run.txt --file requirements/test.txt --file requirements/docs.txt
 
 script:
   - set -e

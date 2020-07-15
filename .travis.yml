@@ -51,7 +51,8 @@ before_install:
 
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION -c conda-forge orch
+  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION
+  - conda install -n testenv orch -c conda-forge
   - source activate testenv
   - orch score.yaml
 

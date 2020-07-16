@@ -283,7 +283,6 @@ def test_table(RE, hw):
 
 def test_table_external(RE, hw, db):
     RE.subscribe(db.insert)
-    hw.img.reg = db.reg
     RE(count([hw.img]), LiveTable(["img"]))
 
 
@@ -563,7 +562,6 @@ def test_broker_base(RE, hw, db):
     RE.subscribe(db.insert)
     bc = BrokerChecker(("img",), db=db)
     RE.subscribe(bc)
-    hw.img.reg = db.reg
     RE(count([hw.img]))
 
 

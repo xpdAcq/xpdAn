@@ -105,15 +105,12 @@ def ltdb(request):
 @pytest.fixture(scope="module")
 def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     db2 = ltdb
-    reg = db2.reg
-    reg.register_handler("NPY_SEQ", NumpySeqHandler)
     RE = fresh_RE
     RE.subscribe(db2.insert)
     bt_uid = str(uuid.uuid4())
 
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,
@@ -127,7 +124,6 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     )
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,
@@ -143,7 +139,6 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     )
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,

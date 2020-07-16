@@ -16,3 +16,4 @@ ophyd
 xpdtools
 xpdconf
 suitcase-jsonl
+tomopy

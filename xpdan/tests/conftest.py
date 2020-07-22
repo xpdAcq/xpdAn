@@ -223,11 +223,12 @@ def close_mpl_figs():
         plt.close(fig)
 
 
+def start_proxy():  # pragma: no cover
+    Proxy(5567, 5568).start()
+
+
 @pytest.fixture(scope="module")
 def proxy():
-    def start_proxy():  # pragma: no cover
-        Proxy(5567, 5568).start()
-
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
     proxy_proc.start()
     time.sleep(5)  # Give this plenty of time to start up.

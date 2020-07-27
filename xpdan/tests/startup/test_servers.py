@@ -10,7 +10,8 @@ import pytest
 from shed.simple import SimpleFromEventStream
 
 import bluesky.plans as bp
-from ophyd.sim import NumpySeqHandler, SynSignal
+from bluesky import RunEngine
+from ophyd.sim import NumpySeqHandler, SynSignal, hw
 from rapidz import Stream
 from xpdconf.conf import glbl_dict
 from xpdan.startup.portable_db_server import (
@@ -25,44 +26,47 @@ from xpdan.startup.intensity_server import run_server as intensity_run_server
 from xpdan.startup.peak_server import run_server as peak_run_server
 from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
+from bluesky.tests.conftest import RE
 
 
-def test_portable_db_run_server(tmpdir, proxy, RE, hw):
+def delayed_sigint(delay):  # pragma: no cover
+    time.sleep(delay)
+    print("killing")
+    os.kill(os.getpid(), signal.SIGINT)
+
+
+def run_exp0(delay, proxy):  # pragma: no cover
+    time.sleep(delay)
+    print("running exp")
+
+    p = Publisher(proxy[0], prefix=b"raw")
+    RE.subscribe(p)
+
+    # Tiny fake pipeline
+    pp = Publisher(proxy[0], prefix=b"an")
+    raw_source = Stream()
+    SimpleFromEventStream(
+        "event",
+        ("data", "img"),
+        raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
+        principle=True,
+    ).map(lambda x: x * 2).SimpleToEventStream(
+        ("img2",), analysis_stage="pdf"
+    ).starsink(
+        pp
+    )
+    RE.subscribe(lambda *x: raw_source.emit(x))
+
+    RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+    print("finished exp")
+    p.close()
+
+
+def test_portable_db_run_server(tmpdir, proxy):
     fn = str(tmpdir)
 
-    def delayed_sigint(delay):  # pragma: no cover
-        time.sleep(delay)
-        print("killing")
-        os.kill(os.getpid(), signal.SIGINT)
-
-    def run_exp(delay):  # pragma: no cover
-        time.sleep(delay)
-        print("running exp")
-
-        p = Publisher(proxy[0], prefix=b"raw")
-        RE.subscribe(p)
-
-        # Tiny fake pipeline
-        pp = Publisher(proxy[0], prefix=b"an")
-        raw_source = Stream()
-        SimpleFromEventStream(
-            "event",
-            ("data", "img"),
-            raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
-            principle=True,
-        ).map(lambda x: x * 2).SimpleToEventStream(
-            ("img2",), analysis_stage="pdf"
-        ).starsink(
-            pp
-        )
-        RE.subscribe(lambda *x: raw_source.emit(x))
-
-        RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
-        print("finished exp")
-        p.close()
-
     # Run experiment in another process (after delay)
-    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc = multiprocessing.Process(target=run_exp0, args=(2, proxy), daemon=True)
     exp_proc.start()
 
     # send the message that will eventually kick us out of the server loop
@@ -82,41 +86,38 @@ def test_portable_db_run_server(tmpdir, proxy, RE, hw):
             assert os.path.exists(os.path.join(fn, f"{k}/{kk}.json"))
 
 
+def run_exp1(delay, proxy):  # pragma: no cover
+    time.sleep(delay)
+    print("running exp")
+
+    p = Publisher(proxy[0], prefix=b"raw")
+    RE = RunEngine()
+    RE.subscribe(p)
+
+    # Tiny fake pipeline
+    pp = Publisher(proxy[0], prefix=b"an")
+    raw_source = Stream()
+    SimpleFromEventStream(
+        "event",
+        ("data", "img"),
+        raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
+        principle=True,
+    ).map(lambda x: x * 2).SimpleToEventStream(
+        ("img2",), analysis_stage="pdf"
+    ).starsink(
+        pp
+    )
+    RE.subscribe(lambda *x: raw_source.emit(x))
+
+    RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
+    print("finished exp")
+    p.close()
+
+
 @pytest.mark.parametrize("save_folder", [None, True])
-def test_viz_run_server(tmpdir, proxy, RE, hw, save_folder):
-    def delayed_sigint(delay):  # pragma: no cover
-        time.sleep(delay)
-        print("killing")
-        os.kill(os.getpid(), signal.SIGINT)
-
-    def run_exp(delay):  # pragma: no cover
-        time.sleep(delay)
-        print("running exp")
-
-        p = Publisher(proxy[0], prefix=b"raw")
-        RE.subscribe(p)
-
-        # Tiny fake pipeline
-        pp = Publisher(proxy[0], prefix=b"an")
-        raw_source = Stream()
-        SimpleFromEventStream(
-            "event",
-            ("data", "img"),
-            raw_source.starmap(Retrieve({"NPY_SEQ": NumpySeqHandler})),
-            principle=True,
-        ).map(lambda x: x * 2).SimpleToEventStream(
-            ("img2",), analysis_stage="pdf"
-        ).starsink(
-            pp
-        )
-        RE.subscribe(lambda *x: raw_source.emit(x))
-
-        RE(bp.count([hw.img], md=dict(analysis_stage="raw")))
-        print("finished exp")
-        p.close()
-
+def test_viz_run_server(tmpdir, proxy, save_folder):
     # Run experiment in another process (after delay)
-    exp_proc = multiprocessing.Process(target=run_exp, args=(2,), daemon=True)
+    exp_proc = multiprocessing.Process(target=run_exp1, args=(2, proxy), daemon=True)
     exp_proc.start()
 
     # send the message that will eventually kick us out of the server loop

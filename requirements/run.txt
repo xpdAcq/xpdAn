@@ -17,5 +17,4 @@ xpdtools
 xpdconf
 suitcase-jsonl
 tomopy
-couldpickle
 mayavi

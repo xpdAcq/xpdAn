@@ -27,7 +27,7 @@ from xpdan.vend.callbacks.core import Retrieve
 from xpdan.vend.callbacks.zmq import Publisher
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_portable_db_run_server(tmpdir, proxy, RE, hw):
     fn = str(tmpdir)
 
@@ -83,7 +83,7 @@ def test_portable_db_run_server(tmpdir, proxy, RE, hw):
             assert os.path.exists(os.path.join(fn, f"{k}/{kk}.json"))
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 @pytest.mark.parametrize("save_folder", [None, True])
 def test_viz_run_server(tmpdir, proxy, RE, hw, save_folder):
     def delayed_sigint(delay):  # pragma: no cover
@@ -143,7 +143,7 @@ def test_viz_run_server(tmpdir, proxy, RE, hw, save_folder):
         assert len(os.listdir(tmpdir)) == 2
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 @pytest.mark.parametrize("stage_blacklist", [(), ("mask",)])
 def test_analysis_run_server(tmpdir, proxy, RE, hw, stage_blacklist):
     def delayed_sigint(delay):  # pragma: no cover
@@ -189,7 +189,7 @@ def test_analysis_run_server(tmpdir, proxy, RE, hw, stage_blacklist):
         assert "original_start_time" in s
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 @pytest.mark.parametrize("stage_blacklist", [(), ("normalized_img",)])
 def test_analysis_run_server_radiogram(
     tmpdir, proxy, RE, hw, db, stage_blacklist
@@ -248,7 +248,7 @@ def test_analysis_run_server_radiogram(
         ]
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_db_run_server(tmpdir, proxy, RE, hw, db):
     db.reg.handler_reg = {"NPY_SEQ": NumpySeqHandler}
     glbl_dict["an_db"] = db
@@ -302,7 +302,7 @@ def test_db_run_server(tmpdir, proxy, RE, hw, db):
     assert db[-1].start["analysis_stage"] == "pdf"
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_qoi_run_server(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
@@ -337,7 +337,7 @@ def test_qoi_run_server(tmpdir, proxy, RE, hw):
     assert L
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
@@ -392,7 +392,7 @@ def test_tomo_run_server_2d_pencil(tmpdir, proxy, RE, hw):
     assert L
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
@@ -453,7 +453,7 @@ def test_tomo_run_server_3d_pencil(tmpdir, proxy, RE, hw):
     assert L
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
@@ -503,7 +503,7 @@ def test_tomo_run_server_full_field(tmpdir, proxy, RE, hw):
     assert L
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_intensity_run_server(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)
@@ -543,7 +543,7 @@ def test_intensity_run_server(tmpdir, proxy, RE, hw):
     # assert L
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_peak_run_server(tmpdir, proxy, RE, hw):
     def delayed_sigint(delay):  # pragma: no cover
         time.sleep(delay)

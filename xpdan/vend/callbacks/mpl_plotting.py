@@ -114,7 +114,7 @@ class LivePlot(CallbackBase):
         self.lines.append(self.current_line)
         self.legend = self.ax.legend(
             loc=0, title=self.legend_title
-        ).draggable()
+        )
         super().start(doc)
 
     def event(self, doc):

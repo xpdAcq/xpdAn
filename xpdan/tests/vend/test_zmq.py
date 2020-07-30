@@ -187,6 +187,7 @@ def test_zmq_no_RE(RE):
     assert remote_accumulator == local_accumulator
 
 
+@pytest.mark.skip
 def test_zmq_no_RE_newserializer(RE):
     # COMPONENT 1
     # Run a 0MQ proxy on a separate process.

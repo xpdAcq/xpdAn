@@ -15,3 +15,6 @@ xpdview
 ophyd
 xpdtools
 xpdconf
+suitcase-jsonl
+tomopy
+mayavi

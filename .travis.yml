@@ -25,9 +25,6 @@ addons:
     packages:
     - mongodb-org-server
 
-python:
-  - 3.6
-
 before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
   - "export DISPLAY=:99.0"
@@ -36,7 +33,9 @@ before_install:
   - ./miniconda.sh -b -p ~/mc
   - export PATH=~/mc/bin:$PATH
   - conda config --set always_yes yes --set changeps1 no --set quiet true
-  - conda config --add channels conda-forge
+  - conda config --append channels nsls2forge
+  - conda config --append channels anaconda
+  - conda config --append channels conda-forge
   - conda update conda --yes
   - export CONDARC=ci/condarc
   - export MDS_HOST=localhost
@@ -49,15 +48,13 @@ before_install:
   - mkdir -p /home/travis/.config/filestore
   - 'echo ''port: 27017'' > /home/travis/.config/filestore/connection.yml'
 
-
 install:
   - export GIT_FULL_HASH=`git rev-parse HEAD`
-  - conda create -n testenv python=$TRAVIS_PYTHON_VERSION orch
-  - source activate testenv
-  - orch score.yaml
+  - conda create -n testenv --file requirements/build.txt --file requirements/run.txt --file requirements/test.txt --file requirements/docs.txt
 
 script:
   - set -e
+  - source activate testenv
   - coverage run run_tests.py
   - coverage report -m
   - codecov

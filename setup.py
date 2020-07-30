@@ -28,4 +28,7 @@ setup(
     include_package_data=True,
     url="http:/github.com/xpdAcq/xpdAn",
     entry_points=entry_points,
+    scripts=[
+        'scripts/xpdan_install_extra'
+    ]
 )

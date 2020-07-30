@@ -249,12 +249,8 @@ def test_table(RE, hw):
     with _print_redirect() as fout:
         hw.det.precision = 2
         hw.motor.precision = 2
-        hw.motor.setpoint.put(0.0)  # Make dtype 'number' not 'integer'.
-        hw.det.put(0.0)  # Make dtype 'number' not 'integer'.
         assert hw.det.describe()["det"]["precision"] == 2
         assert hw.motor.describe()["motor"]["precision"] == 2
-        assert hw.det.describe()["det"]["dtype"] == "number"
-        assert hw.motor.describe()["motor"]["dtype"] == "number"
 
         table = LiveTable(["det", "motor"], min_width=16, extra_pad=2)
         ad_scan = bp.adaptive_scan(
@@ -283,7 +279,6 @@ def test_table(RE, hw):
 
 def test_table_external(RE, hw, db):
     RE.subscribe(db.insert)
-    hw.img.reg = db.reg
     RE(count([hw.img]), LiveTable(["img"]))
 
 
@@ -563,7 +558,6 @@ def test_broker_base(RE, hw, db):
     RE.subscribe(db.insert)
     bc = BrokerChecker(("img",), db=db)
     RE.subscribe(bc)
-    hw.img.reg = db.reg
     RE(count([hw.img]))
 
 

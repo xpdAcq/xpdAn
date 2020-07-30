@@ -44,24 +44,6 @@ if sys.version_info >= (3, 0):
     pass
 
 
-@pytest.fixture(scope="module")
-def fresh_RE(request):
-    loop = asyncio.new_event_loop()
-    loop.set_debug(True)
-    RE = RunEngine({}, loop=loop)
-    RE.ignore_callback_exceptions = False
-
-    def clean_event_loop():
-        if RE.state != "idle":
-            RE.halt()
-        ev = asyncio.Event(loop=loop)
-        ev.set()
-        loop.run_until_complete(ev.wait())
-
-    request.addfinalizer(clean_event_loop)
-    return RE
-
-
 @pytest.fixture(scope="function")
 def start_uid3(exp_db):
     assert "start_uid3" in exp_db[6]["start"]
@@ -103,17 +85,15 @@ def ltdb(request):
 
 
 @pytest.fixture(scope="module")
-def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
+def exp_db(ltdb, tmp_dir, img_size):
     db2 = ltdb
-    reg = db2.reg
-    reg.register_handler("NPY_SEQ", NumpySeqHandler)
-    RE = fresh_RE
+    RE = RunEngine()
+    RE.ignore_callback_exceptions = False
     RE.subscribe(db2.insert)
     bt_uid = str(uuid.uuid4())
 
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,
@@ -127,7 +107,6 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     )
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,
@@ -143,7 +122,6 @@ def exp_db(ltdb, tmp_dir, img_size, fresh_RE):
     )
     insert_imgs(
         RE,
-        reg,
         2,
         img_size,
         tmp_dir,
@@ -245,11 +223,12 @@ def close_mpl_figs():
         plt.close(fig)
 
 
+def start_proxy():  # pragma: no cover
+    Proxy(5567, 5568).start()
+
+
 @pytest.fixture(scope="module")
 def proxy():
-    def start_proxy():  # pragma: no cover
-        Proxy(5567, 5568).start()
-
     proxy_proc = multiprocessing.Process(target=start_proxy, daemon=True)
     proxy_proc.start()
     time.sleep(5)  # Give this plenty of time to start up.

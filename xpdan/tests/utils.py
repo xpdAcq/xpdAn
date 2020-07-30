@@ -73,7 +73,7 @@ pyFAI_calib = {
 
 
 def insert_imgs(
-    RE, reg, n, shape, save_dir, detector_name="pe1_image", **kwargs
+    RE, n, shape, save_dir, detector_name="pe1_image", **kwargs
 ):
     """
     Insert images into mds and fs for testing
@@ -81,7 +81,6 @@ def insert_imgs(
     Parameters
     ----------
     RE: bluesky.run_engine.RunEngine instance
-    reg: Registry instance
     n: int
         Number of images to take
     shape: tuple of ints
@@ -96,13 +95,11 @@ def insert_imgs(
     dark_det = sim.SynSignalWithRegistry(
         name=detector_name,
         func=lambda: (np.random.random(shape) * 65535).astype("uint16"),
-        reg=reg,
         save_path=save_dir,
     )
     light_det = sim.SynSignalWithRegistry(
         name=detector_name,
         func=lambda: (np.random.random(shape) * 65535).astype("uint16"),
-        reg=reg,
         save_path=save_dir,
     )
     beamtime_uid = str(uuid4())

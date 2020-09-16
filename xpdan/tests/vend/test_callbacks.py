@@ -17,15 +17,15 @@ from bluesky.run_engine import Msg, RunEngineInterrupted
 from bluesky.tests.conftest import NumpySeqHandler
 from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
 
-from xpdan.vend.callbacks import CallbackCounter, LiveTable, LiveFit
-from xpdan.vend.callbacks.broker import BrokerCallbackBase
-from xpdan.vend.callbacks.core import (
+from bluesky.callbacks import CallbackCounter, LiveTable, LiveFit
+from bluesky.callbacks.broker import BrokerCallbackBase
+from bluesky.callbacks.core import (
     Retrieve,
     ExportCallback,
     RunRouter,
     StripDepVar,
 )
-from xpdan.vend.callbacks.mpl_plotting import (
+from bluesky.callbacks.mpl_plotting import (
     LiveScatter,
     LivePlot,
     LiveGrid,

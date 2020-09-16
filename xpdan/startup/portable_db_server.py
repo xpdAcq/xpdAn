@@ -6,8 +6,8 @@ import yaml
 from databroker import Broker
 from rapidz import Stream
 from shed.writers import NpyWriter
-from xpdan.vend.callbacks.core import RunRouter, ExportCallback
-from xpdan.vend.callbacks.zmq import RemoteDispatcher
+from bluesky.callbacks.core import RunRouter, ExportCallback
+from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
 
 portable_template = """description: '{0} database'

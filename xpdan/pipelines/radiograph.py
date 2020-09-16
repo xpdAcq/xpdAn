@@ -10,7 +10,7 @@ from xpdan.db_utils import (
     query_flat_field,
 )
 from xpdan.pipelines.pipeline_utils import _timestampstr
-from xpdan.vend.callbacks.core import Retrieve
+from bluesky.callbacks.core import Retrieve
 from xpdconf.conf import glbl_dict
 
 

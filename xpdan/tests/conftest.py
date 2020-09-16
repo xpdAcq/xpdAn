@@ -23,7 +23,7 @@ import pytest
 import numpy as np
 import copy
 
-from xpdan.vend.callbacks.zmq import Proxy
+from bluesky.callbacks.zmq import Proxy
 from xpdsim import xpd_pe1c as det
 from bluesky.tests.conftest import (
     db,

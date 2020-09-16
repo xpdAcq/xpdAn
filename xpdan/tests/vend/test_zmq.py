@@ -6,7 +6,7 @@ import pytest
 import signal
 import threading
 import time
-from xpdan.vend.callbacks.zmq import Proxy, Publisher, RemoteDispatcher
+from bluesky.callbacks.zmq import Proxy, Publisher, RemoteDispatcher
 from bluesky.plans import count
 import cloudpickle
 

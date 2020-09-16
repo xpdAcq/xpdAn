@@ -16,7 +16,7 @@ import time
 from warnings import warn
 import weakref
 
-from xpdan.vend.callbacks.core import hinted_fields
+from bluesky.callbacks.core import hinted_fields
 from .core import CallbackBase, LiveTable
 from .mpl_plotting import LivePlot, LiveGrid, LiveScatter
 from .fitting import PeakStats

@@ -7,7 +7,7 @@ import numpy as np
 import tomopy
 from bluesky.run_engine import RunEngine
 from ophyd.sim import SynSignal, hw
-from xpdan.vend.callbacks.zmq import Publisher
+from bluesky.callbacks.zmq import Publisher
 from xpdconf.conf import glbl_dict
 
 hw = hw()

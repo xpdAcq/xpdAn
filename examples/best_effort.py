@@ -15,8 +15,8 @@ from shed.simple import (
     SimpleToEventStream,
     AlignEventStreams,
 )
-from xpdan.vend.callbacks.core import StripDepVar
-from xpdan.vend.callbacks.zmq import Publisher
+from bluesky.callbacks.core import StripDepVar
+from bluesky.callbacks.zmq import Publisher
 from xpdconf.conf import glbl_dict
 
 

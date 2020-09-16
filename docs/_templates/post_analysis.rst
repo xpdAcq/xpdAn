@@ -32,11 +32,11 @@ start up ipython.
    from xpdconf.conf import glbl_dict
 
    # import the publisher which will send our data to the proxy
-   from xpdan.vend.callbacks.zmq import Publisher
+   from bluesky.callbacks.zmq import Publisher
    # tell the publisher to send the data to the proxy with the prefix of raw
    # (which stands for raw data)
    pub = Publisher(glbl_dict['inbound_proxy_address'], prefix=b'raw')
-   
+
    # leave this line out if you don't need to change the darks
    better_dark_uid = 'hello world'
    # get the header

@@ -13,11 +13,12 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+import inspect
+from functools import partial
+
 from xpdan.data_reduction_core import (integrate_and_save, save_tiff,
                                        integrate_and_save_last, save_last_tiff)
 from xpdan.glbl import an_glbl
-from functools import partial
-import inspect
 
 # We are going to do some inspection magic to make functions who's default
 # kwargs come from the globals

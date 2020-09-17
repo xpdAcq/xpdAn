@@ -2,22 +2,10 @@ import os
 
 import numpy as np
 import tifffile
-
-from bluesky.callbacks.broker import LiveImage
-from bluesky.callbacks.core import CallbackBase
 from skbeam.core.utils import q_to_twotheta
 from skbeam.io.fit2d import fit2d_save
 from skbeam.io.save_powder_output import save_output
 from xpdtools.calib import img_calibration, _save_calib_param
-from xpdan.db_utils import query_dark, temporal_prox, query_background
-from xpdan.dev_utils import _timestampstr
-from xpdan.formatters import render_and_clean
-from xpdan.io import pdf_saver, dump_yml, poni_saver
-from xpdan.pipelines.pipeline_utils import (
-    if_dark,
-    if_calibration,
-    base_template,
-)
 from xpdtools.tools import (
     generate_binner,
     load_geo,
@@ -29,6 +17,18 @@ from xpdtools.tools import (
     z_score_image,
 )
 from xpdview.callbacks import LiveWaterfall
+
+from bluesky.callbacks.broker import LiveImage
+from bluesky.callbacks.core import CallbackBase
+from xpdan.db_utils import query_dark, temporal_prox, query_background
+from xpdan.dev_utils import _timestampstr
+from xpdan.formatters import render_and_clean
+from xpdan.io import pdf_saver, dump_yml, poni_saver
+from xpdan.pipelines.pipeline_utils import (
+    if_dark,
+    if_calibration,
+    base_template,
+)
 
 
 def format_event(**kwargs):
@@ -97,8 +97,8 @@ class MainCallback(CallbackBase):
                 "masked_img": LiveImage(
                     "overlay_mask",
                     window_title="Dark/Background/"
-                    "Polarization Corrected "
-                    "Image with Mask",
+                                 "Polarization Corrected "
+                                 "Image with Mask",
                     cmap="viridis",
                     limit_func=lambda im: (
                         np.nanpercentile(im, 1),

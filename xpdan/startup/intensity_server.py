@@ -1,10 +1,11 @@
+import numpy as np
+from rapidz import Stream, zip as szip
+from shed.simple import *
+from xpdconf.conf import glbl_dict
+
 from bluesky.callbacks.zmq import *
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.vend.callbacks.core import RunRouter, StripDepVar
-from xpdconf.conf import glbl_dict
-from shed.simple import *
-from rapidz import Stream, zip as szip
-import numpy as np
 
 
 def run_server(

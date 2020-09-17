@@ -1,5 +1,6 @@
-from bluesky.callbacks import CallbackBase
 from mayavi import mlab as mlab
+
+from bluesky.callbacks import CallbackBase
 
 
 class Live3DView(CallbackBase):

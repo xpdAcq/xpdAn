@@ -1,10 +1,10 @@
 import fire
-
+from event_model import RunRouter
 from rapidz import Stream
 from shed.writers import NpyWriter
-from event_model import RunRouter
-from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
+
+from bluesky.callbacks.zmq import RemoteDispatcher
 
 
 def run_server(

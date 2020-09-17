@@ -16,10 +16,11 @@
 
 from heapq import heapify, heappushpop
 from pprint import pprint
+
+from databroker.broker import Broker
 from pyxdameraulevenshtein import \
     normalized_damerau_levenshtein_distance as ndld
 
-from databroker.broker import Broker
 from .dev_utils import _timestampstr
 
 

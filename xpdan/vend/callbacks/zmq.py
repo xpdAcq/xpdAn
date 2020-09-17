@@ -1,12 +1,9 @@
 import asyncio
 import copy
-import multiprocessing
 import pickle
-import socket
-import time
 import warnings
+
 from bluesky.run_engine import Dispatcher, DocumentNames
-from bluesky.utils import apply_to_dict_recursively, sanitize_np
 
 
 class Publisher:
@@ -40,6 +37,7 @@ class Publisher:
     >>> RE = RunEngine({})
     >>> RE.subscribe(publisher)
     """
+
     def __init__(self, address, *, prefix=b'',
                  RE=None, zmq=None, serializer=pickle.dumps):
         if RE is not None:
@@ -127,6 +125,7 @@ class Proxy:
     56505
     >>> proxy.start()  # runs until interrupted
     """
+
     def __init__(self, in_port=None, out_port=None, *, zmq=None):
         if zmq is None:
             import zmq
@@ -167,7 +166,7 @@ class Proxy:
             self._frontend = frontend
             self._backend = backend
             self._context = context
-        
+
     def start(self):
         if self.closed:
             raise RuntimeError("This Proxy has already been started and "
@@ -220,6 +219,7 @@ class RemoteDispatcher(Dispatcher):
     >>> d.subscribe(print)
     >>> d.start()  # runs until interrupted
     """
+
     def __init__(self, address, *, prefix=None,
                  loop=None, zmq=None, zmq_asyncio=None,
                  deserializer=pickle.loads):

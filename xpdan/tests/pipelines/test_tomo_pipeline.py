@@ -1,8 +1,9 @@
-import bluesky.plans as bp
 import numpy as np
-from ophyd.sim import SynSignal
-from xpdan.startup.tomo_server import tomo_callback_factory
 from event_model import RunRouter
+from ophyd.sim import SynSignal
+
+import bluesky.plans as bp
+from xpdan.startup.tomo_server import tomo_callback_factory
 
 
 def test_pencil_tomo_pipeline(RE, hw, db):
@@ -36,7 +37,7 @@ def test_pencil_tomo_pipeline(RE, hw, db):
     )
     # det1
     # sinogram and recon
-    assert len(L) == (30 * 5 + 2 + 1 +2) * 2
+    assert len(L) == (30 * 5 + 2 + 1 + 2) * 2
 
 
 def test_full_field_tomo_pipeline(RE, hw, db):

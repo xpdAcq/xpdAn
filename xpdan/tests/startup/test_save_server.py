@@ -1,10 +1,11 @@
 import os
 
-import bluesky.plans as bp
+from event_model import RunRouter
 from ophyd.sim import NumpySeqHandler
+
+import bluesky.plans as bp
 from xpdan.dev_utils import _timestampstr
 from xpdan.startup.save_server import setup_saver
-from event_model import RunRouter
 
 
 def test_save_server(RE, hw, tmpdir):
@@ -15,12 +16,12 @@ def test_save_server(RE, hw, tmpdir):
             [setup_saver],
             base_folders=tmpdir.strpath,
             template="{base_folder}/{folder_prefix}/"
-            "{start[analysis_stage]}/"
-            "{start[sample_name]}_"
-            "{human_timestamp}_"
-            "{__independent_vars__}"
-            "{start[uid]:.6}_"
-            "{event[seq_num]:04d}{ext}",
+                     "{start[analysis_stage]}/"
+                     "{start[sample_name]}_"
+                     "{human_timestamp}_"
+                     "{__independent_vars__}"
+                     "{start[uid]:.6}_"
+                     "{event[seq_num]:04d}{ext}",
             handler_reg={"NPY_SEQ": NumpySeqHandler},
         )
     )

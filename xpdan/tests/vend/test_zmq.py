@@ -1,14 +1,16 @@
-from bluesky import Msg
-import multiprocess
 import os
-import numpy as np
-import pytest
 import signal
 import threading
 import time
+
+import cloudpickle
+import multiprocess
+import numpy as np
+import pytest
+
+from bluesky import Msg
 from bluesky.callbacks.zmq import Proxy, Publisher, RemoteDispatcher
 from bluesky.plans import count
-import cloudpickle
 
 
 def test_zmq(RE, hw):
@@ -45,7 +47,7 @@ def test_zmq(RE, hw):
 
     queue = multiprocess.Queue()
     dispatcher_proc = multiprocess.Process(target=make_and_start_dispatcher,
-                                              daemon=True, args=(queue,))
+                                           daemon=True, args=(queue,))
     dispatcher_proc.start()
     time.sleep(5)  # As above, give this plenty of time to start.
 
@@ -153,7 +155,7 @@ def test_zmq_no_RE(RE):
 
     queue = multiprocess.Queue()
     dispatcher_proc = multiprocess.Process(target=make_and_start_dispatcher,
-                                              daemon=True, args=(queue,))
+                                           daemon=True, args=(queue,))
     dispatcher_proc.start()
     time.sleep(5)  # As above, give this plenty of time to start.
 
@@ -221,7 +223,7 @@ def test_zmq_no_RE_newserializer(RE):
 
     queue = multiprocess.Queue()
     dispatcher_proc = multiprocess.Process(target=make_and_start_dispatcher,
-                                              daemon=True, args=(queue,))
+                                           daemon=True, args=(queue,))
     dispatcher_proc.start()
     time.sleep(5)  # As above, give this plenty of time to start.
 
@@ -273,7 +275,6 @@ def test_zmq_prefix(RE, hw):
     RE.subscribe(p)
     RE.subscribe(p2)
 
-
     # COMPONENT 3
     # Run a RemoteDispatcher on another separate process. Pass the documents
     # it receives over a Queue to this process, so we can count them for our
@@ -292,7 +293,7 @@ def test_zmq_prefix(RE, hw):
 
     queue = multiprocess.Queue()
     dispatcher_proc = multiprocess.Process(target=make_and_start_dispatcher,
-                                              daemon=True, args=(queue,))
+                                           daemon=True, args=(queue,))
     dispatcher_proc.start()
     time.sleep(5)  # As above, give this plenty of time to start.
 
@@ -346,7 +347,6 @@ def test_zmq_multi_prefix(RE, hw):
     RE.subscribe(p)
     RE.subscribe(p2)
 
-
     # COMPONENT 3
     # Run a RemoteDispatcher on another separate process. Pass the documents
     # it receives over a Queue to this process, so we can count them for our
@@ -365,7 +365,7 @@ def test_zmq_multi_prefix(RE, hw):
 
     queue = multiprocess.Queue()
     dispatcher_proc = multiprocess.Process(target=make_and_start_dispatcher,
-                                              daemon=True, args=(queue,))
+                                           daemon=True, args=(queue,))
     dispatcher_proc.start()
     time.sleep(5)  # As above, give this plenty of time to start.
 

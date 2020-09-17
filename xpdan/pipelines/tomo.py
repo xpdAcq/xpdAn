@@ -1,11 +1,11 @@
 import operator as op
-from pprint import pprint
 
+import numpy as np
 from rapidz import Stream, move_to_first
-from shed import SimpleToEventStream, SimpleFromEventStream, LastCache
+from shed import SimpleToEventStream, SimpleFromEventStream
+
 from xpdan.callbacks import StartStopCallback
 from xpdan.vend.callbacks.core import StripDepVar
-import numpy as np
 
 
 def pencil_tomo(source: Stream, qoi_name, translation, rotation, stack=None,

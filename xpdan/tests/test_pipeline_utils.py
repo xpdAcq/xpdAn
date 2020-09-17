@@ -6,7 +6,7 @@ def test_no_equal(test_md):
     a = render_and_clean(base_template,
                          raw_start=test_md,
                          raw_descriptor={'data_keys': {'temperature':
-                                                       {'units': 'K'}}},
+                                                           {'units': 'K'}}},
                          human_timestamp='19920116-000000',
                          raw_event={'seq_num': 100},
                          ext='.tif',

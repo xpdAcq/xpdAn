@@ -1,10 +1,10 @@
 """Module for setting up and running a file saving server"""
 import fire
-
-from xpdan.callbacks import SAVER_MAP
 from event_model import RunRouter
-from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
+
+from bluesky.callbacks.zmq import RemoteDispatcher
+from xpdan.callbacks import SAVER_MAP
 
 
 def setup_saver(doc, **kwargs):

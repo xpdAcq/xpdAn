@@ -1,31 +1,21 @@
 """
 Useful callbacks for the Run Engine
 """
-import itertools
-from itertools import count
-import warnings
-from collections import deque, namedtuple, OrderedDict
-import time as ttime
-
-from datetime import datetime
-import logging
-from pprint import pprint
-
-from bluesky.utils import ensure_uid
-from collections import defaultdict
-
 import copy
+import itertools
 import os
 import shutil
-import subprocess
+import time as ttime
+import warnings
 from collections import defaultdict
+from collections import deque, namedtuple, OrderedDict
+from datetime import datetime
+from itertools import count
 
-from bluesky.callbacks.core import CallbackBase
 from databroker._core import _sanitize
-from databroker.assets.path_only_handlers import (
-    AreaDetectorTiffPathOnlyHandler
-)
 from databroker.utils import ensure_path_exists
+
+from bluesky.utils import ensure_uid
 
 
 # deprecate callbacks moved to mpl_plotting ----------------------------------
@@ -58,6 +48,7 @@ LiveGrid = _deprecate_import_name("LiveGrid")
 LiveFitPlot = _deprecate_import_name("LiveFitPlot")
 LiveRaster = _deprecate_import_name("LiveRaster")
 LiveMesh = _deprecate_import_name("LiveMesh")
+
 
 # ----------------------------------------------------------------------------
 
@@ -96,6 +87,7 @@ class CallbackBase:
 
 class CallbackCounter:
     "As simple as it sounds: count how many times a callback is called."
+
     # Wrap itertools.count in something we can use as a callback.
     def __init__(self):
         self.counter = count()

@@ -1,11 +1,12 @@
 import time
 
 import pytest
-from shed.simple import SimpleToEventStream as ToEventStream
-
 from rapidz import Stream, move_to_first, destroy_pipeline
 from rapidz.link import link
+from shed.simple import SimpleToEventStream as ToEventStream
+
 from xpdan.pipelines.main import pipeline_order
+
 
 @pytest.mark.parametrize("exception", [True, False])
 @pytest.mark.parametrize("background", [True, False])

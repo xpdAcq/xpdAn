@@ -3,9 +3,10 @@ import time
 
 import pytest
 from rapidz import Stream
+from rapidz.link import link
+
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
-from rapidz.link import link
 
 
 @pytest.mark.parametrize("exception", [True, False])

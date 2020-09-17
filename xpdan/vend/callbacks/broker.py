@@ -1,8 +1,10 @@
 import os
 import time as ttime
-from .core import CallbackBase, Retrieve
-from bluesky.utils import ensure_uid
+
 import numpy as np
+
+from bluesky.utils import ensure_uid
+from .core import CallbackBase, Retrieve
 
 
 class BrokerCallbackBase(CallbackBase):
@@ -108,10 +110,10 @@ class LiveImage(Retrieve):
             k
             for k, v in doc["data_keys"].items()
             if len(v["shape"]) == 2
-            or (
-                len(v["shape"]) == 3
-                and len([dim for dim in v["shape"] if dim > 0]) == 2
-            )
+               or (
+                   len(v["shape"]) == 3
+                   and len([dim for dim in v["shape"] if dim > 0]) == 2
+               )
         ]
         data_keys = doc["data_keys"]
         if self.aspect is None:

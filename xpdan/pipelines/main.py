@@ -1,12 +1,8 @@
 import os
 
 import numpy as np
-from shed.simple import SimpleFromEventStream as FromEventStream
 from rapidz import move_to_first, union
-from xpdan.callbacks import StartStopCallback
-from xpdan.db_utils import query_background, query_dark, temporal_prox
-from xpdan.pipelines.pipeline_utils import _timestampstr, clear_combine_latest
-from xpdan.vend.callbacks.core import Retrieve
+from shed.simple import SimpleFromEventStream as FromEventStream
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (
@@ -17,6 +13,11 @@ from xpdtools.pipelines.raw_pipeline import (
     integration,
     pdf_gen,
 )
+
+from xpdan.callbacks import StartStopCallback
+from xpdan.db_utils import query_background, query_dark, temporal_prox
+from xpdan.pipelines.pipeline_utils import _timestampstr, clear_combine_latest
+from xpdan.vend.callbacks.core import Retrieve
 
 
 # TODO: use oracle to get rid of this
@@ -45,8 +46,8 @@ def save_cal(start_timestamp, gen_geo_cal, **kwargs):
     h_timestamp = start_timestamp.map(_timestampstr)
     (
         gen_geo_cal.pluck(0)
-        .zip_latest(h_timestamp)
-        .starsink(
+            .zip_latest(h_timestamp)
+            .starsink(
             lambda x, y: _save_calib_param(
                 x,
                 y,
@@ -97,12 +98,12 @@ def start_gen(
         # Emit on works here because we emit on the not_dark_scan first due
         # to the ordering of the nodes!
         raw_source.combine_latest(not_dark_scan, emit_on=0)
-        .filter(lambda x: x[1])
-        .pluck(0)
-        .starmap(
+            .filter(lambda x: x[1])
+            .pluck(0)
+            .starmap(
             Retrieve(handler_reg=db.reg.handler_reg, root_map=db.reg.root_map)
         )
-        .filter(lambda x: x[0] not in ["resource", "datum"])
+            .filter(lambda x: x[0] not in ["resource", "datum"])
     )
     # source.sink(lambda x: print('Source says ', x))
     # Get all the documents
@@ -136,7 +137,7 @@ def start_gen(
     ).unique(history=1)
     detector = (
         FromEventStream("start", ("detector",), source)
-        .union(
+            .union(
             *[
                 FromEventStream(
                     "descriptor",
@@ -152,7 +153,7 @@ def start_gen(
                 for image_name in image_names
             ]
         )
-        .unique(history=1)
+            .unique(history=1)
     )
 
     is_calibration_img = FromEventStream("start", (), source).map(
@@ -177,10 +178,10 @@ def start_gen(
     bg_query = start_docs.map(query_background, db=db)
     bg_docs = (
         bg_query.zip(start_docs)
-        .starmap(temporal_prox)
-        .filter(lambda x: x != [])
-        .map(lambda x: x[0].documents(fill=True))
-        .flatten()
+            .starmap(temporal_prox)
+            .filter(lambda x: x != [])
+            .map(lambda x: x[0].documents(fill=True))
+            .flatten()
     )
 
     # Get foreground dark
@@ -195,9 +196,9 @@ def start_gen(
                 "event",
                 ("data", image_name),
                 fg_dark_query.filter(lambda x: x != [])
-                .map(lambda x: x if not isinstance(x, list) else x[0])
-                .map(lambda x: x.documents(fill=True))
-                .flatten(),
+                    .map(lambda x: x if not isinstance(x, list) else x[0])
+                    .map(lambda x: x.documents(fill=True))
+                    .flatten(),
                 event_stream_name="primary",
             )
             for image_name in image_names
@@ -215,9 +216,9 @@ def start_gen(
                 "event",
                 ("data", image_name),
                 bg_dark_query.filter(lambda x: x != [])
-                .map(lambda x: x if not isinstance(x, list) else x[0])
-                .map(lambda x: x.documents(fill=True))
-                .flatten(),
+                    .map(lambda x: x if not isinstance(x, list) else x[0])
+                    .map(lambda x: x.documents(fill=True))
+                    .flatten(),
                 stream_name="raw_background_dark",
                 event_stream_name="primary",
             )
@@ -231,8 +232,8 @@ def start_gen(
             FromEventStream(
                 "event", ("data", image_name), source, event_stream_name="dark"
             )
-            .map(np.float32)
-            .connect(raw_foreground_dark)
+                .map(np.float32)
+                .connect(raw_foreground_dark)
         )
 
     # Get background

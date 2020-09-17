@@ -1,10 +1,10 @@
 import os
+from collections import defaultdict
 
 import numpy as np
 import yaml
 
 from .formatters import CleanFormatter, PartialFormatter
-from collections import defaultdict
 
 template_hdr = '''[DEFAULT]
 # input and output specifications

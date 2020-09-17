@@ -1,8 +1,9 @@
+import logging
+from collections import defaultdict
 from io import StringIO
 from pprint import pformat
-import logging
+
 from . import CallbackBase
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,7 @@ def logbook_cb_factory(logbook_func, desc_template=None, long_template=None,
         atch.name = 'long_description.txt'
         desc = desc.render(start=doc)
         logbook_func(text=desc, attachments=[atch], ensure=True)
+
     return lbcb
 
 
@@ -153,12 +155,12 @@ class OlogCallback(CallbackBase):
     # turn off the default logger
     >>> gs.RE.logbook = None
     """
+
     def __init__(self, logbook):
         self.logbook = logbook
         from pyOlog import SimpleOlogClient
         self.client = SimpleOlogClient()
         # Check at init time we are in an IPython session.
-        from IPython import get_ipython
 
     def start(self, doc):
         from IPython import get_ipython

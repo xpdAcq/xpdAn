@@ -3,23 +3,24 @@
     For instructions on how to test in a simulated environment please see:
         tests/interactive/best_effort_cb.py
 """
-from cycler import cycler
-from datetime import datetime
-from io import StringIO
 import itertools
-import numpy as np
-import matplotlib.pyplot as plt
-from pprint import pformat
 import re
 import sys
 import time
-from warnings import warn
 import weakref
+from datetime import datetime
+from io import StringIO
+from pprint import pformat
+from warnings import warn
+
+import matplotlib.pyplot as plt
+import numpy as np
+from cycler import cycler
 
 from bluesky.callbacks.core import hinted_fields
 from .core import CallbackBase, LiveTable
-from .mpl_plotting import LivePlot, LiveGrid, LiveScatter
 from .fitting import PeakStats
+from .mpl_plotting import LivePlot, LiveGrid, LiveScatter
 
 
 class BestEffortCallback(CallbackBase):
@@ -217,7 +218,7 @@ class BestEffortCallback(CallbackBase):
             c
             for c in columns
             if doc["data_keys"][c]["dtype"]
-            in ("number", "integer", "float64", "float32")
+               in ("number", "integer", "float64", "float32")
         ]
         if not self._plots_enabled:
             return

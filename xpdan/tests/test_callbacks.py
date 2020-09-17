@@ -1,7 +1,9 @@
-from ophyd.sim import NumpySeqHandler
-from xpdan.callbacks import SaveBaseClass, SaveTiff
-import bluesky.plans as bp
 import os
+
+from ophyd.sim import NumpySeqHandler
+
+import bluesky.plans as bp
+from xpdan.callbacks import SaveBaseClass, SaveTiff
 
 
 def test_SaveBaseClass(RE, hw, tmpdir):
@@ -52,7 +54,7 @@ def test_SaveTiff(RE, hw, tmpdir):
     sbc = SaveTiff(
         handler_reg={"NPY_SEQ": NumpySeqHandler},
         template="{base_folder}/{folder_prefix}/{start[hello]}{"
-        "__independent_vars__}{ext}",
+                 "__independent_vars__}{ext}",
         base_folders=tmpdir.strpath,
     )
     L = []

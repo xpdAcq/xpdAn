@@ -8,11 +8,16 @@ import copy
 from warnings import warn
 
 import fire
-
-from bluesky.utils import install_qt_kicker
 from rapidz import Stream, move_to_first
 from rapidz.link import link
 from shed import SimpleToEventStream
+from xpdconf.conf import glbl_dict
+from xpdtools.pipelines.extra import z_score_gen
+from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
+from xpdtools.pipelines.radiograph import radiograph_correction, average
+
+from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
+from bluesky.utils import install_qt_kicker
 from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
@@ -20,16 +25,10 @@ from xpdan.pipelines.radiograph import fes_radiograph, tes_radiograph
 from xpdan.pipelines.save import pipeline_order as save_pipeline_order
 from xpdan.pipelines.to_event_model import (
     pipeline_order as tem_pipeline_order,
-    to_event_stream_no_ind,
 )
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar, RunRouter
-from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
-from xpdconf.conf import glbl_dict
-from xpdtools.pipelines.extra import std_gen, median_gen, z_score_gen
-from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
-from xpdtools.pipelines.radiograph import radiograph_correction, average
 
 order = (
     pipeline_order
@@ -141,7 +140,7 @@ def create_analysis_pipeline(
                 node
                 for node in namespace.values()
                 if isinstance(node, SimpleToEventStream)
-                and node.md.get("analysis_stage", None) not in stage_blacklist
+                   and node.md.get("analysis_stage", None) not in stage_blacklist
             ],
             publisher=publisher,
         )

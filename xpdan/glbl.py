@@ -15,4 +15,5 @@
 ##############################################################################
 
 from xpdconf.conf import glbl_dict
+
 an_glbl = glbl_dict

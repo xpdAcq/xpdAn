@@ -1,30 +1,30 @@
-import multiprocess
 import os
 import signal
 import threading
 import time
 
 import matplotlib.pyplot as plt
+import multiprocess
 import numpy as np
 import pytest
-from shed.simple import SimpleFromEventStream
-
-import bluesky.plans as bp
 from ophyd.sim import NumpySeqHandler, SynSignal
 from rapidz import Stream
+from shed.simple import SimpleFromEventStream
 from xpdconf.conf import glbl_dict
+
+import bluesky.plans as bp
+from bluesky.callbacks.zmq import Publisher
+from xpdan.startup.analysis_server import run_server as analysis_run_server
+from xpdan.startup.db_server import run_server as db_run_server
+from xpdan.startup.intensity_server import run_server as intensity_run_server
+from xpdan.startup.peak_server import run_server as peak_run_server
 from xpdan.startup.portable_db_server import (
     run_server as portable_db_run_sever
 )
-from xpdan.startup.viz_server import run_server as viz_run_server
-from xpdan.startup.analysis_server import run_server as analysis_run_server
-from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.qoi_server import run_server as qoi_run_server
 from xpdan.startup.tomo_server import run_server as tomo_run_server
-from xpdan.startup.intensity_server import run_server as intensity_run_server
-from xpdan.startup.peak_server import run_server as peak_run_server
+from xpdan.startup.viz_server import run_server as viz_run_server
 from xpdan.vend.callbacks.core import Retrieve
-from bluesky.callbacks.zmq import Publisher
 
 
 @pytest.mark.skip

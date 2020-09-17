@@ -4,6 +4,8 @@ from shed.simple import (
     SimpleFromEventStream as FromEventStream,
     SimpleToEventStream,
 )
+from xpdconf.conf import glbl_dict
+
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import (
     query_dark,
@@ -11,7 +13,6 @@ from xpdan.db_utils import (
 )
 from xpdan.pipelines.pipeline_utils import _timestampstr
 from xpdan.vend.callbacks.core import Retrieve
-from xpdconf.conf import glbl_dict
 
 
 def fes_radiograph(
@@ -42,12 +43,12 @@ def fes_radiograph(
         # Emit on works here because we emit on the not_dark_scan first due
         # to the ordering of the nodes!
         raw_source.combine_latest(not_dark_scan, emit_on=0)
-        .filter(lambda x: x[1])
-        .pluck(0)
-        .starmap(
+            .filter(lambda x: x[1])
+            .pluck(0)
+            .starmap(
             Retrieve(handler_reg=db.reg.handler_reg, root_map=db.reg.root_map)
         )
-        .filter(lambda x: x[0] not in ["resource", "datum"])
+            .filter(lambda x: x[0] not in ["resource", "datum"])
     )
 
     # source.sink(lambda x: print('Source says ', x))
@@ -104,9 +105,9 @@ def fes_radiograph(
                 "event",
                 ("data", image_name),
                 fg_dark_query.filter(lambda x: x != [])
-                .map(lambda x: x if not isinstance(x, list) else x[0])
-                .map(lambda x: x.documents(fill=True))
-                .flatten(),
+                    .map(lambda x: x if not isinstance(x, list) else x[0])
+                    .map(lambda x: x.documents(fill=True))
+                    .flatten(),
                 event_stream_name="primary",
             )
             for image_name in radiograph_names
@@ -119,8 +120,8 @@ def fes_radiograph(
             FromEventStream(
                 "event", ("data", image_name), source, event_stream_name="dark"
             )
-            .map(np.float32)
-            .connect(dark)
+                .map(np.float32)
+                .connect(dark)
         )
 
     img = union(

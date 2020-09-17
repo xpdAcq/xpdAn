@@ -1,8 +1,10 @@
+import collections
 from itertools import islice
 from pprint import pprint
-from .dev_utils import _timestampstr
-import collections
+
 from databroker._core import Header
+
+from .dev_utils import _timestampstr
 
 
 def sort_scans_by_hdr_key(hdrs, key, verbose=True):

@@ -4,12 +4,13 @@ import os
 import fire
 import yaml
 from databroker import Broker
+from event_model import RunRouter
 from rapidz import Stream
 from shed.writers import NpyWriter
-from xpdan.vend.callbacks.core import ExportCallback
-from event_model import RunRouter
-from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
+
+from bluesky.callbacks.zmq import RemoteDispatcher
+from xpdan.vend.callbacks.core import ExportCallback
 
 portable_template = """description: '{0} database'
 metadatastore:

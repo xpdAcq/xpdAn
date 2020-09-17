@@ -1,5 +1,5 @@
 import warnings
-from cycler import cycler
+
 import numpy as np
 
 from .core import CallbackBase, CollectThenCompute
@@ -28,6 +28,7 @@ class LiveFit(CallbackBase):
     ----------
     result : lmfit.ModelResult
     """
+
     def __init__(self, model, y, independent_vars, init_guess=None, *,
                  update_every=1):
         self.ydata = []
@@ -279,8 +280,8 @@ class PeakStats(CollectThenCompute):
         crossings = np.where(np.diff((y > mid).astype(np.int)))[0]
         _cen_list = []
         for cr in crossings.ravel():
-            _x = x[cr:cr+2]
-            _y = y[cr:cr+2] - mid
+            _x = x[cr:cr + 2]
+            _y = y[cr:cr + 2] - mid
 
             dx = np.diff(_x)[0]
             dy = np.diff(_y)[0]

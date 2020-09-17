@@ -2,10 +2,22 @@ import os
 from collections import defaultdict
 from sqlite3 import InterfaceError
 
-import bluesky.plans as bp
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from event_model import RunRouter
+
+import bluesky.plans as bp
+from bluesky.callbacks import CallbackCounter, LiveTable, LiveFit
+from bluesky.callbacks.broker import BrokerCallbackBase
+from bluesky.callbacks.mpl_plotting import (
+    LiveScatter,
+    LivePlot,
+    LiveGrid,
+    LiveFitPlot,
+    LiveRaster,
+    LiveMesh,
+)
 from bluesky.examples import stepscan
 from bluesky.object_plans import AbsScanPlan
 from bluesky.plan_stubs import pause
@@ -16,22 +28,10 @@ from bluesky.preprocessors import stage_decorator, run_decorator
 from bluesky.run_engine import Msg, RunEngineInterrupted
 from bluesky.tests.conftest import NumpySeqHandler
 from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
-
-from bluesky.callbacks import CallbackCounter, LiveTable, LiveFit
-from bluesky.callbacks.broker import BrokerCallbackBase
 from xpdan.vend.callbacks.core import (
     Retrieve,
     ExportCallback,
     StripDepVar,
-)
-from event_model import RunRouter
-from bluesky.callbacks.mpl_plotting import (
-    LiveScatter,
-    LivePlot,
-    LiveGrid,
-    LiveFitPlot,
-    LiveRaster,
-    LiveMesh,
 )
 
 
@@ -65,7 +65,6 @@ def test_retrieve_db(RE, hw, db):
 
 
 def test_export_file(RE, hw, tmpdir):
-
     base_dir = str(tmpdir) + "/export_test"
     rt = ExportCallback(base_dir, handler_reg={"NPY_SEQ": NumpySeqHandler})
     L = []
@@ -245,7 +244,6 @@ def test_table_warns():
 
 
 def test_table(RE, hw):
-
     with _print_redirect() as fout:
         hw.det.precision = 2
         hw.motor.precision = 2
@@ -386,7 +384,6 @@ def test_live_fit(RE, hw):
 
 
 def test_live_fit_multidim(RE, hw):
-
     try:
         import lmfit
     except ImportError:
@@ -456,7 +453,6 @@ def test_live_fit_plot(RE, hw):
     [("stop", 1, 5), ("abort", 1, 5), ("halt", 1, 3)],
 )
 def test_interrupted_with_callbacks(RE, int_meth, stop_num, msg_num):
-
     docs = defaultdict(list)
 
     def collector_cb(name, doc):
@@ -664,7 +660,6 @@ def test_plotting_hints(RE, hw, db):
 
 
 def test_strip_dep_var(RE, hw):
-
     L = []
     LL = []
     RE.subscribe(lambda *x: L.append(x))

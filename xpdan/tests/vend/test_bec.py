@@ -1,9 +1,10 @@
 import ast
-from bluesky.plans import scan, grid_scan
-import bluesky.preprocessors as bpp
+
 import bluesky.plan_stubs as bps
-from bluesky.preprocessors import SupplementalData
+import bluesky.preprocessors as bpp
 from bluesky.callbacks.best_effort import BestEffortCallback
+from bluesky.plans import scan, grid_scan
+from bluesky.preprocessors import SupplementalData
 
 
 def test_hints(RE, hw):

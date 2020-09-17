@@ -1,10 +1,11 @@
-from collections import ChainMap
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-from cycler import cycler
-import numpy as np
-import warnings
 import os
+import warnings
+from collections import ChainMap
+
+import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
+import numpy as np
+from cycler import cycler
 
 from .core import CallbackBase, get_obj_fields
 

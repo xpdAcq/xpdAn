@@ -1,14 +1,14 @@
-home_dir_name : xpdUser
-blconfig_dir_name : xpdConfig
-beamline_host_name : xf28id1-ws2
-archive_base_dir_name : /direct/XF28ID1/pe1_data/.userBeamtimeArchive
-user_backup_dir_name : '2017'
-owner : xf28id1
-beamline_id : xpd
-group : XPD
-det_image_field : pe1_image
-dark_field_key : sc_dk_field_uid
-calib_config_name : xpdAcq_calib_info.yml
+home_dir_name: xpdUser
+blconfig_dir_name: xpdConfig
+beamline_host_name: xf28id1-ws2
+archive_base_dir_name: /direct/XF28ID1/pe1_data/.userBeamtimeArchive
+user_backup_dir_name: '2017'
+owner: xf28id1
+beamline_id: xpd
+group: XPD
+det_image_field: pe1_image
+dark_field_key: sc_dk_field_uid
+calib_config_name: xpdAcq_calib_info.yml
 mask_kwargs:
   edge: 30
   lower_thresh: 0.0

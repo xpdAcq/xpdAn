@@ -12,9 +12,10 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+import pytest
+
 from xpdan.fuzzybroker import (fuzzy_search, super_fuzzy_search,
                                beamtime_dates, fuzzy_set_search)
-import pytest
 
 
 @pytest.mark.parametrize(('search_str', 'target_str'),

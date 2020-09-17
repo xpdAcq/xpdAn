@@ -1,15 +1,15 @@
 import os
+
 import numpy as np
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save
 from tifffile import imsave
-from xpdan.formatters import render, clean_template
+from xpdconf.conf import glbl_dict
 
+from xpdan.formatters import render, clean_template
 # TODO: look at implementing hint/document based logic for saving
 from xpdan.io import dump_yml, pdf_saver
 from xpdan.pipelines.pipeline_utils import base_template
-
-from xpdconf.conf import glbl_dict
 
 
 def save_pipeline(
@@ -70,12 +70,12 @@ def save_tiff(filename_name_nodes, dark_corrected_foreground, **kwargs):
     # dark corrected img
     (
         filename_name_nodes["dark_corrected_image_name"]
-        .combine_latest(
+            .combine_latest(
             dark_corrected_foreground,
             emit_on=dark_corrected_foreground,
             first=dark_corrected_foreground,
         )
-        .starsink(imsave, stream_name="dark corrected foreground")
+            .starsink(imsave, stream_name="dark corrected foreground")
     )
     return locals()
 
@@ -84,18 +84,18 @@ def save_iq(filename_name_nodes, q, tth, mean, **kwargs):
     # integrated intensities
     (
         q.combine_latest(mean, emit_on=1, first=True)
-        .combine_latest(filename_name_nodes["iq_name"], emit_on=0)
-        .map(lambda l: (*l[0], l[1]))
-        .starsink(
+            .combine_latest(filename_name_nodes["iq_name"], emit_on=0)
+            .map(lambda l: (*l[0], l[1]))
+            .starsink(
             save_output, "Q", stream_name="save integration {}".format("Q")
         )
     )
 
     (
         tth.combine_latest(mean, emit_on=1, first=True)
-        .combine_latest(filename_name_nodes["tth_name"], emit_on=0)
-        .map(lambda l: (*l[0], l[1]))
-        .starsink(
+            .combine_latest(filename_name_nodes["tth_name"], emit_on=0)
+            .map(lambda l: (*l[0], l[1]))
+            .starsink(
             save_output,
             "2theta",
             stream_name="save integration {}".format("tth"),
@@ -125,8 +125,8 @@ def save_pdf(filename_name_nodes, pdf, fq, sq, **kwargs):
             upstream.combine_latest(
                 filename_name_nodes[k], first=upstream, emit_on=0
             )
-            .map(lambda l: (*l[0], l[1]))
-            .starsink(pdf_saver, stream_name="name")
+                .map(lambda l: (*l[0], l[1]))
+                .starsink(pdf_saver, stream_name="name")
         )
     return locals()
 

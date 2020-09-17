@@ -50,9 +50,9 @@ def test_save_tiff_smoke(exp_db, fast_tmp_dir):
 
     assert (
         set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
-            old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+        old_times) != set(
+        [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+         os.listdir(fast_tmp_dir)]))
 
 
 def test_save_last_tiff_smoke(exp_db, fast_tmp_dir):
@@ -63,6 +63,6 @@ def test_save_last_tiff_smoke(exp_db, fast_tmp_dir):
 
     assert (
         set(old_files) != set(os.listdir(fast_tmp_dir)) or set(
-            old_times) != set(
-            [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
-             os.listdir(fast_tmp_dir)]))
+        old_times) != set(
+        [os.path.getmtime(os.path.join(fast_tmp_dir, f)) for f in
+         os.listdir(fast_tmp_dir)]))

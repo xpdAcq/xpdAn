@@ -1,11 +1,12 @@
+import numpy as np
+from rapidz import Stream, zip as szip
+from scipy.signal import peak_widths, find_peaks
+from shed.simple import *
+from xpdconf.conf import glbl_dict
+
 from bluesky.callbacks.zmq import *
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.vend.callbacks.core import RunRouter, StripDepVar
-from xpdconf.conf import glbl_dict
-from shed.simple import *
-from rapidz import Stream, zip as szip
-import numpy as np
-from scipy.signal import peak_widths, find_peaks
 
 
 def run_server(
@@ -76,14 +77,14 @@ def run_server(
         ).starmap(lambda x, y, yy: x[y:yy])
         peak_position = (
             y_range.map(find_peaks)
-            .pluck(0)
-            .map(lambda x: x if len(x) == 1 else 0)
+                .pluck(0)
+                .map(lambda x: x if len(x) == 1 else 0)
         )
         peak_width = (
             y_range.zip(peak_position)
-            .starmap(peak_widths)
-            .pluck(0)
-            .map(lambda x: x[0] if len(x) == 1 else 0)
+                .starmap(peak_widths)
+                .pluck(0)
+                .map(lambda x: x[0] if len(x) == 1 else 0)
         )
         positions.append(peak_position)
         peak_wdths.append(peak_width)

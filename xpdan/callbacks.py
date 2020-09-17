@@ -2,14 +2,15 @@ import os
 import time
 
 import numpy as np
-from xpdan.vend.callbacks.core import CallbackBase
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save
 from tifffile import imsave
+from xpdtools.dev_utils import _timestampstr
+
 from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
+from xpdan.vend.callbacks.core import CallbackBase
 from xpdan.vend.callbacks.core import Retrieve
-from xpdtools.dev_utils import _timestampstr
 
 
 class StartStopCallback(CallbackBase):
@@ -158,8 +159,8 @@ class SaveBaseClass(Retrieve):
                 event=doc,
                 base_folder=bf,
             )
-            .replace(".", ",")
-            .replace("__", "_")
+                .replace(".", ",")
+                .replace("__", "_")
             for bf in self.base_folders
         ]
         # Note that formally there are more steps to the formatting, but we

@@ -1,4 +1,3 @@
-import logging
 import time as ttime
 from collections import Iterable, ChainMap
 
@@ -6,9 +5,9 @@ import jsonschema
 import numpy as np
 from event_model import DocumentNames, schemas
 
-from .core import CallbackBase
 from bluesky.run_engine import Dispatcher
 from bluesky.utils import new_uid
+from .core import CallbackBase
 
 
 class LiveDispatcher(CallbackBase):
@@ -35,6 +34,7 @@ class LiveDispatcher(CallbackBase):
         # Subscribe any callbacks we desire to second stream
         ld.subscribe(LivePlot('det', x='motor'))
     """
+
     def __init__(self):
         # Public dispatcher for callbacks
         self.dispatcher = Dispatcher()
@@ -151,7 +151,7 @@ class LiveDispatcher(CallbackBase):
                              'run_start': self._stream_start_uid,
                              'data_keys': data_keys, 'configuration': config,
                              'object_keys': {'stream':
-                                             list(data_keys.keys())}},
+                                                 list(data_keys.keys())}},
                             raw_desc)
             # Store information about our descriptors
             desc = dict(desc)

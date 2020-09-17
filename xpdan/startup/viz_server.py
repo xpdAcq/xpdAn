@@ -1,21 +1,21 @@
 import fire
 import matplotlib.pyplot as plt
 import numpy as np
-from bluesky.utils import install_qt_kicker
-from matplotlib.colors import SymLogNorm
-from bluesky.callbacks.best_effort import BestEffortCallback
-from bluesky.callbacks.broker import LiveImage
 from event_model import RunRouter
-from bluesky.callbacks.mpl_plotting import SavePlots
-from bluesky.callbacks.zmq import RemoteDispatcher
+from matplotlib.colors import SymLogNorm
 from xpdconf.conf import glbl_dict
 from xpdview.callbacks import LiveWaterfall
+
+from bluesky.callbacks.best_effort import BestEffortCallback
+from bluesky.callbacks.broker import LiveImage
+from bluesky.callbacks.mpl_plotting import SavePlots
+from bluesky.callbacks.zmq import RemoteDispatcher
+from bluesky.utils import install_qt_kicker
 
 try:
     from xpdan.mayavi_callbacks import Live3DView
 except ImportError:
     Live3DView = None
-
 
 plt.ion()
 

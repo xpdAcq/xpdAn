@@ -1,30 +1,28 @@
 import itertools
-from pprint import pprint
 
 import fire
-from bluesky.utils import install_qt_kicker
-from rapidz import Stream, move_to_first
-from rapidz.link import link
-from xpdan.pipelines.pipeline_utils import Filler
-from xpdan.pipelines.to_event_model import (
-    to_event_stream_no_ind,
-    to_event_stream_with_ind,
-)
-from xpdan.pipelines.tomo import (
-    pencil_tomo,
-    tomo_event_stream,
-    full_field_tomo,
-)
-from bluesky.callbacks import CallbackBase
-from xpdan.vend.core import Retrieve
 from event_model import RunRouter
-from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
+from rapidz import Stream
+from rapidz.link import link
+from xpdan.vend.core import Retrieve
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.tomo import (
     tomo_prep,
     tomo_pipeline_piecewise,
     tomo_pipeline_theta,
     tomo_stack_2D,
+)
+
+from bluesky.callbacks import CallbackBase
+from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
+from bluesky.utils import install_qt_kicker
+from xpdan.pipelines.to_event_model import (
+    to_event_stream_no_ind,
+)
+from xpdan.pipelines.tomo import (
+    pencil_tomo,
+    tomo_event_stream,
+    full_field_tomo,
 )
 
 pencil_order = [
@@ -84,12 +82,12 @@ class PencilTomoCallback(CallbackBase):
             n: doc["data_keys"][n]["shape"]
             for n in doc["data_keys"]
             if n
-            not in list(
+               not in list(
                 itertools.chain.from_iterable(
                     [doc["object_keys"][n] for n in self.dim_names]
                 )
             )
-            and doc["data_keys"][n]["dtype"] in ["number", "array", "integer"]
+               and doc["data_keys"][n]["dtype"] in ["number", "array", "integer"]
         }
 
         # Only compute QOIs on scalars, currently
@@ -179,7 +177,7 @@ class FullFieldTomoCallback(Retrieve):
             n: doc["data_keys"][n]["shape"]
             for n in doc["data_keys"]
             if n
-            not in list(
+               not in list(
                 itertools.chain.from_iterable(
                     [doc["object_keys"][n] for n in self.dim_names]
                 )

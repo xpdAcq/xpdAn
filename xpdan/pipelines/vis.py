@@ -1,9 +1,9 @@
 import numpy as np
-from bluesky.callbacks.broker import LiveImage
 from shed.translation import ToEventStream
 from xpdtools.tools import overlay_mask
-
 from xpdview.callbacks import LiveWaterfall
+
+from bluesky.callbacks.broker import LiveImage
 
 
 # TODO: break this up into smaller pipelines things, so we can compose them

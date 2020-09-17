@@ -3,7 +3,6 @@ from collections import Iterable
 from pathlib import Path
 
 from bluesky.callbacks import CallbackBase
-
 from xpdan.dev_utils import _timestampstr
 
 

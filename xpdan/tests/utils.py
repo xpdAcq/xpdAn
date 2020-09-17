@@ -16,8 +16,9 @@ from itertools import product
 from uuid import uuid4
 
 import numpy as np
-from bluesky.plans import count
 from ophyd import sim
+
+from bluesky.plans import count
 
 pyFAI_calib = {
     "calibrant_name": "Ni24",

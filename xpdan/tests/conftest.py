@@ -12,33 +12,24 @@
 # See LICENSE.txt for license information.
 #
 ##############################################################################
+import copy
 import multiprocessing
 import os
-import shutil
 import sys
 import tempfile
 import time
 import uuid
-import pytest
-import numpy as np
-import copy
-
-from bluesky.callbacks.zmq import Proxy
-from xpdsim import xpd_pe1c as det
-from bluesky.tests.conftest import (
-    db,
-    NumpySeqHandler,
-    RunEngine,
-    asyncio,
-    RE,
-    hw,
-)
-from skbeam.io.fit2d import fit2d_save
-
-from xpdan.fuzzybroker import FuzzyBroker
-from .utils import insert_imgs
 
 import matplotlib.pyplot as plt
+import pytest
+
+from bluesky.callbacks.zmq import Proxy
+from bluesky.tests.conftest import (
+    NumpySeqHandler,
+    RunEngine,
+)
+from xpdan.fuzzybroker import FuzzyBroker
+from .utils import insert_imgs
 
 if sys.version_info >= (3, 0):
     pass
@@ -175,7 +166,7 @@ def test_md():
         "bt_wavelength": 0.1867,
         "composition_string": "C18.0H14.0",
         "detector_calibration_client_uid": "57d48021-d6a3-4b98-99ac"
-        "-dfc9ba4cdff2",
+                                           "-dfc9ba4cdff2",
         "detectors": ["pe1"],
         "facility": "NSLS-II",
         "group": "XPD",

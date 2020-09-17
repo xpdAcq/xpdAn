@@ -5,7 +5,8 @@ from rapidz.link import link
 from shed import SimpleToEventStream
 from xpdan.pipelines.qoi import amorphsivity_fem, amorphsivity_tem
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
-from bluesky.callbacks.core import RunRouter, StripDepVar
+from event_model import RunRouter
+from xpdan.vend.callbacks.core import StripDepVar
 from bluesky.callbacks.zmq import RemoteDispatcher, Publisher
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.qoi import amorphsivity_pipeline

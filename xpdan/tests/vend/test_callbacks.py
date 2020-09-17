@@ -19,12 +19,12 @@ from bluesky.tests.utils import _print_redirect, MsgCollector, DocCollector
 
 from bluesky.callbacks import CallbackCounter, LiveTable, LiveFit
 from bluesky.callbacks.broker import BrokerCallbackBase
-from bluesky.callbacks.core import (
+from xpdan.vend.callbacks.core import (
     Retrieve,
     ExportCallback,
-    RunRouter,
     StripDepVar,
 )
+from event_model import RunRouter
 from bluesky.callbacks.mpl_plotting import (
     LiveScatter,
     LivePlot,

@@ -5,7 +5,7 @@ from bluesky.utils import install_qt_kicker
 from matplotlib.colors import SymLogNorm
 from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.callbacks.broker import LiveImage
-from bluesky.callbacks.core import RunRouter
+from event_model import RunRouter
 from bluesky.callbacks.mpl_plotting import SavePlots
 from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict

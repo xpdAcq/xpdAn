@@ -4,7 +4,7 @@ import bluesky.plans as bp
 from ophyd.sim import NumpySeqHandler
 from xpdan.dev_utils import _timestampstr
 from xpdan.startup.save_server import setup_saver
-from bluesky.callbacks.core import RunRouter
+from event_model import RunRouter
 
 
 def test_save_server(RE, hw, tmpdir):

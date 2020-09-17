@@ -16,7 +16,8 @@ from xpdan.pipelines.tomo import (
     full_field_tomo,
 )
 from bluesky.callbacks import CallbackBase
-from bluesky.callbacks.core import RunRouter, Retrieve
+from xpdan.vend.core import Retrieve
+from event_model import RunRouter
 from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.tomo import (

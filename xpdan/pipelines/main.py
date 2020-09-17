@@ -6,7 +6,7 @@ from rapidz import move_to_first, union
 from xpdan.callbacks import StartStopCallback
 from xpdan.db_utils import query_background, query_dark, temporal_prox
 from xpdan.pipelines.pipeline_utils import _timestampstr, clear_combine_latest
-from bluesky.callbacks.core import Retrieve
+from xpdan.vend.callbacks.core import Retrieve
 from xpdconf.conf import glbl_dict
 from xpdtools.calib import _save_calib_param
 from xpdtools.pipelines.raw_pipeline import (

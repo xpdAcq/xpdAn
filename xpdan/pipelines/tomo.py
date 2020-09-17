@@ -4,7 +4,7 @@ from pprint import pprint
 from rapidz import Stream, move_to_first
 from shed import SimpleToEventStream, SimpleFromEventStream, LastCache
 from xpdan.callbacks import StartStopCallback
-from bluesky.callbacks.core import StripDepVar
+from xpdan.vend.callbacks.core import StripDepVar
 import numpy as np
 
 

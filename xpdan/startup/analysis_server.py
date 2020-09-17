@@ -24,7 +24,7 @@ from xpdan.pipelines.to_event_model import (
 )
 from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
-from bluesky.callbacks.core import StripDepVar, RunRouter
+from xpdan.vend.callbacks.core import StripDepVar, RunRouter
 from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
 from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.extra import std_gen, median_gen, z_score_gen

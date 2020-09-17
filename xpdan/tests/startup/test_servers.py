@@ -23,7 +23,7 @@ from xpdan.startup.qoi_server import run_server as qoi_run_server
 from xpdan.startup.tomo_server import run_server as tomo_run_server
 from xpdan.startup.intensity_server import run_server as intensity_run_server
 from xpdan.startup.peak_server import run_server as peak_run_server
-from bluesky.callbacks.core import Retrieve
+from xpdan.vend.callbacks.core import Retrieve
 from bluesky.callbacks.zmq import Publisher
 
 

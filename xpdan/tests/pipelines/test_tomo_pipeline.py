@@ -2,7 +2,7 @@ import bluesky.plans as bp
 import numpy as np
 from ophyd.sim import SynSignal
 from xpdan.startup.tomo_server import tomo_callback_factory
-from bluesky.callbacks.core import RunRouter
+from event_model import RunRouter
 
 
 def test_pencil_tomo_pipeline(RE, hw, db):

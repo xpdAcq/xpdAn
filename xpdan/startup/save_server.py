@@ -2,7 +2,7 @@
 import fire
 
 from xpdan.callbacks import SAVER_MAP
-from bluesky.callbacks.core import RunRouter
+from event_model import RunRouter
 from bluesky.callbacks.zmq import RemoteDispatcher
 from xpdconf.conf import glbl_dict
 

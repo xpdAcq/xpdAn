@@ -2,13 +2,13 @@ import os
 import time
 
 import numpy as np
-from bluesky.callbacks.core import CallbackBase
+from xpdan.vend.callbacks.core import CallbackBase
 from skbeam.io import save_output
 from skbeam.io.fit2d import fit2d_save
 from tifffile import imsave
 from xpdan.formatters import pfmt, clean_template, render2
 from xpdan.io import pdf_saver, dump_yml
-from bluesky.callbacks.core import Retrieve
+from xpdan.vend.callbacks.core import Retrieve
 from xpdtools.dev_utils import _timestampstr
 
 

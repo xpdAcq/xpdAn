@@ -19,20 +19,21 @@ def interrupt(delay: float) -> None:
     os.kill(os.getpid(), signal.SIGINT)
 
 
-def experiment(delay: float, address: str):
+def experiment(delay: float, address: str, prefix: str):
     time.sleep(delay)
     RE = RunEngine()
     devices = hw()
-    publisher = Publisher(address, prefix=b"raw")
+    publisher = Publisher(address, prefix=prefix)
     RE.subscribe(publisher)
-    RE(plans.count([devices.det1]))
+    RE(plans.count([devices.img]))
     return
 
 
 def test_simple_server(proxy):
-    process = Process(target=experiment, args=(1, proxy[0]), daemon=True)
+    prefix = b"raw"
+    process = Process(target=experiment, args=(1, proxy[0], prefix), daemon=True)
     thread = Thread(target=interrupt, args=(3,))
-    server = simple_server(proxy[1], prefix=b"raw")
+    server = simple_server(proxy[1], prefix=prefix)
     thread.start()
     process.start()
     run_server(server)

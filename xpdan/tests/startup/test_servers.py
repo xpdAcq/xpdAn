@@ -14,7 +14,7 @@ from xpdconf.conf import glbl_dict
 
 import bluesky.plans as bp
 from bluesky.callbacks.zmq import Publisher
-from xpdan.startup.analysis_server import run_server as analysis_run_server
+from xpdan.startup.analysis_server import analysis_server as analysis_run_server
 from xpdan.startup.db_server import run_server as db_run_server
 from xpdan.startup.intensity_server import run_server as intensity_run_server
 from xpdan.startup.peak_server import run_server as peak_run_server

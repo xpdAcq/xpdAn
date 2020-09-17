@@ -1,11 +1,7 @@
-"""Server for analyzing data at XPD
-
-Notes
------
-This module can be called via a ``fire`` cli or used interactively.
-"""
+"""Server for analyzing data at XPD."""
 import copy
 from warnings import warn
+import typing
 
 import fire
 from rapidz import Stream, move_to_first
@@ -15,9 +11,9 @@ from xpdconf.conf import glbl_dict
 from xpdtools.pipelines.extra import z_score_gen
 from xpdtools.pipelines.qoi import max_intensity_mean, max_gr_mean
 from xpdtools.pipelines.radiograph import radiograph_correction, average
-
 from bluesky.callbacks.zmq import Publisher, RemoteDispatcher
 from bluesky.utils import install_qt_kicker
+
 from xpdan.pipelines.extra import z_score_tem
 from xpdan.pipelines.main import pipeline_order
 from xpdan.pipelines.qoi import pipeline_order as qoi_pipeline_order
@@ -30,7 +26,7 @@ from xpdan.pipelines.to_event_model import to_event_stream_with_ind
 from xpdan.pipelines.vis import vis_pipeline
 from xpdan.vend.callbacks.core import StripDepVar, RunRouter
 
-order = (
+ORDER = (
     pipeline_order
     + [
         # std_gen,
@@ -65,64 +61,32 @@ radiogram_order = (
 )
 
 
-def start_analysis(save=True, vis=True, **kwargs):
-    """Start analysis pipeline [Depreciated]
-
-    Parameters
-    ----------
-    mask_kwargs : dict
-        The kwargs passed to the masking see xpdtools.tools.mask_img
-    pdf_kwargs : dict
-        The kwargs passed to the pdf generator, see xpdtools.tools.pdf_getter
-    fq_kwargs : dict
-        The kwargs passed to the fq generator, see xpdtools.tools.fq_getter
-    mask_setting : dict
-        The setting of the mask
-    save_template : str
-        The template string for file saving
-    base_folder : str
-        The base folder for saving files
-    """
-    warn(DeprecationWarning("Use the server instead"))
-    # TODO: also start up grave vis, maybe?
-    d = RemoteDispatcher(glbl_dict["outbound_proxy_address"])
-    install_qt_kicker(
-        loop=d.loop
-    )  # This may need to be d._loop depending on tag
-    order = pipeline_order
-    if save:
-        order += save_pipeline_order
-    if vis:
-        order += [vis_pipeline]
-    namespace = link(
-        *order, raw_source=Stream(stream_name="raw source"), **kwargs
-    )
-    raw_source = namespace["raw_source"]
-    d.subscribe(lambda *x: raw_source.emit(x))
-    print("Starting Analysis Server")
-    d.start()
-
-
 def create_analysis_pipeline(
-    order,
-    stage_blacklist=(),
-    publisher=Publisher(glbl_dict["inbound_proxy_address"], prefix=b"an"),
+    order: typing.List[typing.Callable],
+    stage_blacklist: typing.Union[typing.FrozenSet[str], typing.Set[str]] = frozenset(),
+    publisher: Publisher = Publisher(glbl_dict["inbound_proxy_address"], prefix=b"an"),
     **kwargs,
 ):
     """Create the analysis pipeline from an list of chunks and pipeline kwargs
 
     Parameters
     ----------
-    order : list of functions
+    order :
         The list of pipeline chunk functions
-    kwargs : Any
+
+    stage_blacklist :
+        The list of stages to be skipped.
+
+    publisher :
+        The publisher of the data.
+
+    kwargs :
         The kwargs to pass to the pipeline creation
 
     Returns
     -------
     namespace : dict
         The namespace of the pipeline
-
     """
     namespace = link(
         *order, raw_source=Stream(stream_name="raw source"), **kwargs
@@ -139,13 +103,15 @@ def create_analysis_pipeline(
             *[
                 node
                 for node in namespace.values()
-                if isinstance(node, SimpleToEventStream)
-                   and node.md.get("analysis_stage", None) not in stage_blacklist
+                if isinstance(
+                    node, SimpleToEventStream
+                ) and node.md.get(
+                    "analysis_stage", None
+                ) not in stage_blacklist
             ],
             publisher=publisher,
         )
     )
-
     return namespace
 
 
@@ -177,8 +143,8 @@ def radiogram_router(
         return lambda *x: radiogram_namespace["raw_source"].emit(x)
 
 
-def run_server(
-    order=order,
+def analysis_server(
+    order=ORDER,
     radiogram_order=radiogram_order,
     db=glbl_dict["exp_db"],
     outbound_proxy_address=glbl_dict["outbound_proxy_address"],
@@ -188,7 +154,7 @@ def run_server(
     prefix=b"raw",
     inbound_prefix=b"an",
     zscore=False,
-    stage_blacklist=(),
+    stage_blacklist=frozenset(),
     _publisher=None,
     **kwargs,
 ):
@@ -225,7 +191,7 @@ def run_server(
         The prefix for outbound data, defaults to ``b"an"``
     zscore : bool, optional
         If True compute Z-Score, defaults to False
-    stage_blacklist : list of str, optional
+    stage_blacklist :
         Stages to not publish. Defaults to an empty tuple. Not publishing
         some of the large memory datasets (mask, mask_overlay,
         bg_corrected_img, dark_sub) could speed up data processing by cutting
@@ -302,12 +268,4 @@ def run_server(
     d.subscribe(rr)
     d.subscribe(rr2)
     print("Starting Analysis Server")
-    d.start()
-
-
-def run_main():
-    fire.Fire(run_server)
-
-
-if __name__ == "__main__":
-    run_main()
+    return d

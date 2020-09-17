@@ -29,7 +29,7 @@ def experiment(delay: float, address: str):
     return
 
 
-def test_simple_server(proxy):
+def test_simple_stream_server(proxy):
     process = Process(target=experiment, args=(1, proxy[0]), daemon=True)
     thread = Thread(target=interrupt, args=(3,))
     source = simple_stream()

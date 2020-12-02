@@ -64,6 +64,9 @@ LiveMesh = _deprecate_import_name("LiveMesh")
 
 class CallbackBase:
     def __call__(self, name, doc):
+        # SHED will try to mutate documents, cast back to dict to let it.
+        if hasattr(doc, 'to_dict'):
+            doc = to_dict()
         ret = getattr(self, name)(doc)
         if ret:
             return name, ret

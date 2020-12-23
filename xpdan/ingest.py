@@ -144,7 +144,7 @@ def ingest_chi(fpath, sample_name, md):
                     "dtype": "number",
                     "shape": [],
                     "source": "compute",
-                    "units": "angstrom",
+                    "units": "inverse angstrom",
                 },
                 "I": {
                     "dtype": "number",
